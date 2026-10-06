@@ -43,6 +43,7 @@ from the repository traffic API, which reports the last 14 days. All figures wer
 |---|---|---:|
 | Website page views | last 30 days | 521,690 |
 | GitHub repository views | 2026-09-22 to 2026-10-05 | 280,632 |
+| GitHub repository views, 30-day rate | estimate from the 14-day figure | about 601,000 |
 | GitHub unique visitors | 2026-09-22 to 2026-10-05 | 72,761 |
 | GitHub clones | 2026-09-22 to 2026-10-05 | 20,228 (5,625 unique) |
 | GitHub stars | all time | 65,223 |
@@ -53,12 +54,13 @@ from the repository traffic API, which reports the last 14 days. All figures wer
 - **Top GitHub pages, last 14 days:** the README (108K views), the Chinese README (8.1K),
   Phase 0 setup (4.8K)
 
-Across the website and the repository, the project drew more than 800,000 views in the
-windows above. Gold, Platinum, and Diamond sponsors also receive the cross-platform
-co-features defined in the tier ladder below.
+GitHub reports traffic for 14 days only. At the same daily rate, the repository draws
+about 601,000 views in 30 days, more than the website. Across both, the project draws
+more than 1.1 million views a month. Gold, Platinum, and Diamond sponsors also receive the
+cross-platform co-features defined in the tier ladder below.
 
-A sponsor placement at this scale is in the same range as a paid slot in a dev newsletter
-or publication with 500K monthly page views.
+A sponsor placement at this scale is in the same range as a paid slot in a dev publication
+with one million monthly page views.
 
 ## Tier ladder
 
@@ -126,8 +128,9 @@ will end with a link back to this page.
 ## Pricing anchors
 
 The tier amounts above are anchored against (a) public sponsor pages of comparable
-open-source projects, and (b) standard sponsor-slot rates for dev publications at 500K
-monthly page views. Audience figures and GitHub stars verified 2026-10-07.
+open-source projects, and (b) standard sponsor-slot rates for dev publications at one
+million monthly page views across channels. Audience figures and GitHub stars verified
+2026-10-07.
 
 Comparable open-source rate cards:
 
@@ -144,8 +147,8 @@ Comparable open-source rate cards:
   dedicated lesson + hero placement is what justifies the price.
 - **$10,000 Diamond / Title Partner** is one exclusive annual slot. The rate reflects
   65.2K stars, 11.2K forks, 521.7K website page views in 30 days, 280.6K repository views
-  in 14 days, title placement, quarterly reporting, and the maintainer-written integration
-  work.
+  in 14 days (about 601K a month), title placement, quarterly reporting, and the
+  maintainer-written integration work.
 
 ## What sponsorship pays for
 
