@@ -6,6 +6,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import translate_ui_strings as ui  # noqa: E402
@@ -114,6 +115,42 @@ class BuildLanguageTest(unittest.TestCase):
 
 
 class EndToEndTest(unittest.TestCase):
+    def test_default_ui_languages_include_curated_languages(self):
+        registry = ui.lessons._load_registry()
+        expected = [
+            entry["code"] for entry in registry
+            if not entry.get("source") and (entry.get("ci") or entry.get("reviewed"))
+        ]
+        self.assertEqual(ui.ui_languages(), expected)
+        self.assertIn("zh-TW", ui.ui_languages())
+        self.assertNotIn("ja", ui.ui_languages())
+
+    def test_reviewed_language_keeps_new_keys_in_english_without_loading_a_model(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "ui-strings.json"
+            source.write_text(json.dumps({
+                "keys": ["New navigation label", "Pinned label"],
+                "overrides": {"zh-TW": {"Pinned label": "固定標籤"}},
+            }), encoding="utf-8")
+            published = Path(tmp) / "zh-TW" / "ui.json"
+            published.parent.mkdir()
+            published.write_text(json.dumps({
+                "strings": {"New navigation label": "舊機器翻譯"}, "pinned": []
+            }), encoding="utf-8")
+            with patch.object(
+                ui, "translator", side_effect=AssertionError("reviewed UI must not load a model")
+            ):
+                ui.main([
+                    "--lang", "zh-TW", "--provider", "nllb", "--out", tmp,
+                    "--source", str(source),
+                ])
+            output = json.loads((Path(tmp) / "zh-TW" / "ui.json").read_text(encoding="utf-8"))
+            self.assertEqual(output["strings"], {
+                "New navigation label": "New navigation label",
+                "Pinned label": "固定標籤",
+            })
+            self.assertEqual(output["pinned"], ["Pinned label"])
+
     def test_echo_provider_writes_every_language(self):
         keys, overrides = ui.load_source()
         with tempfile.TemporaryDirectory() as tmp:

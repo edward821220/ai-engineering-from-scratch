@@ -53,6 +53,7 @@ def _load_registry():
 _REG = _load_registry()
 LANG_NAMES = {entry["code"]: entry["name"] for entry in _REG if not entry.get("source")}
 NLLB_CODES = {entry["code"]: entry.get("nllb") for entry in _REG}
+REVIEWED_LANGS = {entry["code"] for entry in _REG if entry.get("reviewed") is True}
 
 # Inline span vocabulary, named once so the two protection lists compose from the
 # same regexes instead of copy-pasting them.
@@ -281,6 +282,9 @@ def main():
     ap.add_argument("--only", help="limit to one lesson path (phases/.../lesson)")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
+
+    if args.lang in REVIEWED_LANGS:
+        raise SystemExit(f"language {args.lang!r} is reviewed; automated lesson translation is disabled")
 
     cpath = cache_path(args.lang, args.phase)
     cache = {}

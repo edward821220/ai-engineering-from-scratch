@@ -23,6 +23,7 @@ const {
   renderCatalogDiscovery,
   renderCertificationDiscovery,
   serializeFigureProviderManifest,
+  writeLangs,
 } = require('./build.js');
 const {
   learningPathDestination,
@@ -456,6 +457,19 @@ function writeMarkdown(file, { name, description, version }) {
     '',
   ].join('\n'));
 }
+
+test('curated reviewed languages appear in the switcher without joining lesson CI', () => {
+  const registry = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'languages.json'), 'utf8'));
+  const traditionalChinese = registry.languages.find(language => language.code === 'zh-TW');
+  assert.equal(traditionalChinese.reviewed, true);
+  assert.notEqual(traditionalChinese.ci, true);
+
+  const languages = writeLangs();
+  assert.ok(languages.some(language => language.code === 'en'));
+  assert.ok(languages.some(language => language.code === 'es'));
+  assert.ok(languages.some(language => language.code === 'zh-TW' && language.native === '繁體中文'));
+  assert.ok(!languages.some(language => language.code === 'ja'));
+});
 
 test('shared site asset families use the expected cache keys on every page', () => {
   const release = '20260822a';

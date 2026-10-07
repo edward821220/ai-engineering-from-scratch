@@ -1,5 +1,5 @@
 {
-  "_comment": "Canonical language registry. English is the source. Adding a language here wires it into the translation script (scripts/translate_lessons.py) and the site switcher (via site/build.js -> site/langs.js). code = BCP-47-ish tag used in filenames and URLs; name = English name for the translation prompt; native = label shown in the switcher; ci = true means the auto push-triggered workflow builds this language (workflow_dispatch can still request any).",
+  "_comment": "Canonical language registry. English is the source. code = tag used in filenames and URLs; name = English name for prompts; native = switcher label; ci = true opts into automatic lesson translation and the switcher; reviewed = curated lessons appear in the switcher, are excluded from all lesson-translation requests, and still get UI-string jobs.",
   "languages": [
     {
       "code": "en",
@@ -19,7 +19,8 @@
       "code": "zh-TW",
       "name": "Traditional Chinese",
       "native": "繁體中文",
-      "nllb": "zho_Hant"
+      "nllb": "zho_Hant",
+      "reviewed": true
     },
     {
       "code": "hi",

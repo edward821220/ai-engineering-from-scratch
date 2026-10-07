@@ -9,11 +9,14 @@ import re
 import shlex
 import stat
 import subprocess
+import sys
 import tempfile
 import textwrap
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
+import translate_lessons
 from build_readme_i18n import render
 from readme_translations import HERO2, TRANSLATIONS
 
@@ -59,6 +62,15 @@ def step_script(marker: str) -> str:
 
 def publish_script() -> str:
     return step_script(PUBLISH_STEP)
+
+
+def prepare_outputs(requested: str) -> dict[str, str]:
+    with tempfile.TemporaryDirectory() as tmp:
+        output = Path(tmp) / "github-output"
+        env = os.environ.copy()
+        env.update({"REQUESTED": requested, "REQUESTED_PHASE": "", "GITHUB_OUTPUT": str(output)})
+        run("bash", "-euo", "pipefail", "-c", step_script(PREPARE_STEP), cwd=ROOT, env=env)
+        return dict(line.split("=", 1) for line in output.read_text(encoding="utf-8").splitlines())
 
 
 def create_publisher_fixture(root: Path) -> tuple[Path, Path, Path]:
@@ -146,6 +158,10 @@ class TranslateWorkflowContractTest(unittest.TestCase):
                     self.assertIsInstance(language["source"], bool)
                 if "ci" in language:
                     self.assertIsInstance(language["ci"], bool)
+                if "reviewed" in language:
+                    self.assertIsInstance(language["reviewed"], bool)
+                    self.assertFalse(language.get("source", False))
+                    self.assertFalse(language.get("ci", False))
 
                 codes.append(language["code"])
                 if language.get("source") is True:
@@ -163,7 +179,7 @@ class TranslateWorkflowContractTest(unittest.TestCase):
         enabled = [
             language["code"]
             for language in registry["languages"]
-            if language.get("ci") is True
+            if language.get("ci") is True and language.get("reviewed") is not True
         ]
         phases = [
             path.name
@@ -177,6 +193,41 @@ class TranslateWorkflowContractTest(unittest.TestCase):
             256,
             "GitHub Actions permits at most 256 jobs in one matrix",
         )
+
+    def test_reviewed_languages_skip_lesson_matrix_but_remain_in_ui_matrix(self) -> None:
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("needs.prepare.outputs.lesson-langs != '[]'", workflow)
+        self.assertIn("needs.prepare.outputs.ui-langs != '[]'", workflow)
+        self.assertIn("fromJSON(needs.prepare.outputs.lesson-langs)", workflow)
+        self.assertIn("fromJSON(needs.prepare.outputs.ui-langs)", workflow)
+        default = prepare_outputs("")
+        default_lessons = json.loads(default["lesson-langs"])
+        default_ui = json.loads(default["ui-langs"])
+        self.assertNotIn("zh-TW", default_lessons)
+        self.assertIn("zh-TW", default_ui)
+        self.assertNotIn("ja", default_ui)
+
+        requested = prepare_outputs("fr zh-TW")
+        requested_lessons = json.loads(requested["lesson-langs"])
+        requested_ui = json.loads(requested["ui-langs"])
+        self.assertIn("fr", requested_lessons)
+        self.assertNotIn("zh-TW", requested_lessons)
+        self.assertCountEqual(requested_ui, ["fr", "zh-TW"])
+
+        only_reviewed = prepare_outputs("zh-TW")
+        self.assertEqual(json.loads(only_reviewed["lesson-langs"]), [])
+        self.assertEqual(json.loads(only_reviewed["ui-langs"]), ["zh-TW"])
+
+    def test_reviewed_language_cannot_write_a_machine_translation_or_cache(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            output_root = Path(tmp) / "i18n"
+            with patch.object(translate_lessons, "OUT_ROOT", output_root), patch.object(
+                sys, "argv", ["translate_lessons.py", "--lang", "zh-TW", "--provider", "echo"]
+            ):
+                with self.assertRaises(SystemExit) as result:
+                    translate_lessons.main()
+            self.assertIn("reviewed", str(result.exception))
+            self.assertFalse(output_root.exists())
 
     def test_registry_changes_trigger_curriculum_checks(self) -> None:
         workflow = CURRICULUM_WORKFLOW.read_text(encoding="utf-8")

@@ -10,14 +10,15 @@ dictionary keyed by the English string.
 site/ui-strings.json is the only hand-maintained input: "keys" lists the English
 interface strings the pages use, "overrides" pins a translation per language
 where a machine translation would be wrong (short labels such as Build or Run).
-Every other key is translated through the same provider layer as the lessons,
-and a previously published translation is reused, so a run only translates keys
-that are new or lost their override. The published file records which keys were
-pinned, so removing an override retranslates that key instead of freezing the old
-pin. Output goes to the translations branch, never to main.
+Other languages translate remaining keys through the same provider layer as
+the lessons; reviewed languages keep missing keys in English without loading a
+model. Automatic languages reuse published values; reviewed languages use only
+current overrides and keep all other keys English. The file records pinned keys
+so removing an override re-translates it instead of freezing the old pin. Output
+goes to the translations branch, never to main.
 
 Usage:
-    python3 scripts/translate_ui_strings.py                       # every ci:true language, NLLB
+    python3 scripts/translate_ui_strings.py                       # ci:true or reviewed languages; NLLB for automatic languages
     python3 scripts/translate_ui_strings.py --lang zh --provider anthropic
     python3 scripts/translate_ui_strings.py --dry-run             # report, no model load
 """
@@ -83,8 +84,11 @@ def check_source(keys, overrides):
     return problems
 
 
-def ci_languages():
-    return [e["code"] for e in lessons._load_registry() if e.get("ci") and not e.get("source")]
+def ui_languages():
+    return [
+        entry["code"] for entry in lessons._load_registry()
+        if not entry.get("source") and (entry.get("ci") or entry.get("reviewed"))
+    ]
 
 
 def protect_ui(text):
@@ -184,7 +188,7 @@ def build_language(keys, overrides, existing, translate_fn, pinned_before=frozen
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--lang", action="append", help="language code; repeat for several. Default: every ci:true language")
+    ap.add_argument("--lang", action="append", help="language code; repeat for several. Default: ci:true or reviewed languages")
     ap.add_argument("--provider", default=os.environ.get("TRANSLATE_PROVIDER", "nllb"))
     ap.add_argument("--force", action="store_true", help="retranslate every key that has no override")
     ap.add_argument("--dry-run", action="store_true")
@@ -193,22 +197,34 @@ def main(argv=None):
     args = ap.parse_args(argv)
 
     keys, overrides = load_source(Path(args.source))
-    langs = args.lang or ci_languages()
+    langs = args.lang or ui_languages()
     for lang in langs:
         if lang not in lessons.LANG_NAMES:
             raise SystemExit(f"unknown language {lang!r}: not in languages.json")
         dst = Path(args.out) / lang / "ui.json"
         existing, pinned_before = ({}, set()) if args.force else load_published(dst)
+        reviewed = lang in lessons.REVIEWED_LANGS
+        if reviewed:
+            existing, pinned_before = {}, set()
         pins = overrides.get(lang, {})
-        translate_fn = None if args.dry_run else Lazy(lambda lang=lang: translator(lang, args.provider))
+        if args.dry_run:
+            translate_fn = None
+        elif reviewed:
+            translate_fn = str
+        else:
+            translate_fn = Lazy(lambda lang=lang: translator(lang, args.provider))
         strings, count = build_language(keys, pins, existing, translate_fn, pinned_before)
         if args.dry_run:
-            print(f"{lang}: would translate {count} of {len(keys)} keys")
+            action = "keep in English" if reviewed else "translate"
+            print(f"{lang}: would {action} {count} of {len(keys)} keys")
             continue
         published = {"strings": strings, "pinned": [key for key in keys if key in pins]}
         dst.parent.mkdir(parents=True, exist_ok=True)
         dst.write_text(json.dumps(published, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-        print(f"{lang}: {count} translated, {len(strings) - count} reused or pinned -> {dst}")
+        if reviewed:
+            print(f"{lang}: {count} unoverridden keys kept in English, {len(strings) - count} pinned -> {dst}")
+        else:
+            print(f"{lang}: {count} translated, {len(strings) - count} reused or pinned -> {dst}")
 
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
 name: translate
 
 # Machine-translates lesson prose with NLLB-200, a free open model that runs
-# inside the runner. No API key, no Vercel cost. Results are pushed to a
-# dedicated `translations` branch; main stays English-only.
+# inside the runner. Curated languages are excluded from lesson translation;
+# reviewed UI strings use English fallback. Results go to `translations`.
 #
 # Sharded one job per (language, phase). A full 503-lesson language run is ~27h
 # on a CPU runner, far past the 6-hour job limit, so a per-language job always
@@ -31,7 +31,7 @@ on:
   workflow_dispatch:
     inputs:
       langs:
-        description: "space-separated language codes; blank = the ci:true set in languages.json"
+        description: "space-separated language codes; blank = automatic lesson and UI language sets"
         default: ""
       phase:
         description: "one phase directory (for example 01-math-foundations); blank = all phases"
@@ -47,7 +47,8 @@ jobs:
     permissions:
       contents: read
     outputs:
-      langs: ${{ steps.set.outputs.langs }}
+      lesson-langs: ${{ steps.set.outputs.lesson-langs }}
+      ui-langs: ${{ steps.set.outputs.ui-langs }}
       phases: ${{ steps.set.outputs.phases }}
     steps:
       - uses: actions/checkout@v4
@@ -58,17 +59,21 @@ jobs:
           REQUESTED: ${{ github.event.inputs.langs }}
           REQUESTED_PHASE: ${{ github.event.inputs.phase }}
         run: |
-          # every emitted code must exist in the registry; requested codes are
-          # intersected with it, so untrusted input can never reach matrix.lang
+          # Manual requests may name any known language, but source English is
+          # never translated and reviewed languages never enter the lesson job.
           if [ -n "$REQUESTED" ]; then
-            JSON=$(jq -c --arg req "$REQUESTED" \
+            REQUESTED_LANGS=$(jq -c --arg req "$REQUESTED" \
               '($req | split(" ") | map(select(length > 0))) as $want
-               | [.languages[].code] as $known
-               | [$want[] | select(. as $c | $known | index($c))]' languages.json)
+               | [.languages[] | . as $lang
+                  | select($lang.source != true and ($want | index($lang.code)) != null)]' languages.json)
+            LESSON_LANGS=$(jq -c '[.[] | select(.reviewed != true) | .code]' <<< "$REQUESTED_LANGS")
+            UI_LANGS=$(jq -c '[.[] | .code]' <<< "$REQUESTED_LANGS")
           else
-            JSON=$(jq -c '[.languages[] | select(.ci == true) | .code]' languages.json)
+            LESSON_LANGS=$(jq -c '[.languages[] | select(.ci == true and .reviewed != true and .source != true) | .code]' languages.json)
+            UI_LANGS=$(jq -c '[.languages[] | select(.source != true and (.ci == true or .reviewed == true)) | .code]' languages.json)
           fi
-          echo "langs=$JSON" >> "$GITHUB_OUTPUT"
+          echo "lesson-langs=$LESSON_LANGS" >> "$GITHUB_OUTPUT"
+          echo "ui-langs=$UI_LANGS" >> "$GITHUB_OUTPUT"
           # Manual runs can select one phase for a cheap end-to-end smoke test.
           # Push runs and blank manual inputs retain the full phase matrix.
           if [ -n "$REQUESTED_PHASE" ]; then
@@ -88,6 +93,7 @@ jobs:
 
   translate:
     needs: prepare
+    if: ${{ needs.prepare.outputs.lesson-langs != '[]' }}
     runs-on: ubuntu-latest
     timeout-minutes: 330
     permissions:
@@ -98,7 +104,7 @@ jobs:
       fail-fast: false
       max-parallel: 20
       matrix:
-        lang: ${{ fromJSON(needs.prepare.outputs.langs) }}
+        lang: ${{ fromJSON(needs.prepare.outputs.lesson-langs) }}
         phase: ${{ fromJSON(needs.prepare.outputs.phases) }}
     steps:
       - name: Checkout main (English source)
@@ -235,11 +241,12 @@ jobs:
           echo "could not publish after retries" >&2; exit 1
 
   ui-strings:
+    if: ${{ needs.prepare.outputs.ui-langs != '[]' }}
     # The site's interface strings (navigation, sidebar, checkpoints, panels)
-    # are translated the same way, from site/ui-strings.json, into one small
-    # i18n/<lang>/ui.json that the browser fetches from the translations branch.
-    # Keys with a hand-pinned override or a previously published translation
-    # are reused, so most runs load no model at all.
+    # are translated from site/ui-strings.json into i18n/<lang>/ui.json. The
+    # matrix includes automatic and reviewed languages. Reviewed languages
+    # publish current overrides plus English fallback without loading a model.
+    # Automatic languages reuse hand-pinned and previously published values.
     needs: prepare
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -250,7 +257,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        lang: ${{ fromJSON(needs.prepare.outputs.langs) }}
+        lang: ${{ fromJSON(needs.prepare.outputs.ui-langs) }}
     steps:
       - name: Checkout main (English source)
         uses: actions/checkout@v4
