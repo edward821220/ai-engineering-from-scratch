@@ -15,6 +15,7 @@
 | driver | 驅動程式 | 否 | — | 硬體裝置的軟體驅動程式。 |
 | backend | 後端 | 否 |  | 系統架構語境。 |
 | RAG | RAG | 是 |  | Retrieval-augmented generation 的縮寫。 |
+| large language model | 大型語言模型 | 否 |  |  |
 | data | 資料 | 否 | 數據 | 不指資料庫中的單一欄位名稱。 |
 | software | 軟體 | 否 | 軟件 |  |
 | hardware | 硬體 | 否 | 硬件 |  |
@@ -81,6 +82,7 @@
 | feature | 特徵 | 否 |  | 機器學習輸入變數；產品功能依上下文譯為「功能」。 |
 | feature engineering | 特徵工程 | 否 |  |  |
 | feature vector | 特徵向量 | 否 |  |  |
+| feature matrix | 特徵矩陣 | 否 |  |  |
 | feature scaling | 特徵縮放 | 否 |  |  |
 | feature selection | 特徵選擇 | 否 |  |  |
 | feature importance | 特徵重要度 | 否 |  |  |
@@ -97,6 +99,7 @@
 | parameter | 參數 | 否 |  |  |
 | hyperparameter | 超參數 | 否 |  |  |
 | weight | 權重 | 否 | 重量 | 神經網路參數；不得譯成物理重量。 |
+| weight matrix | 權重矩陣 | 否 |  |  |
 | bias (model parameter) | 偏置 | 否 | — | 模型的截距參數。 |
 | bias (statistical error) | 偏差 | 否 | — | bias–variance 語境。 |
 | variance | 變異數 | 否 | 方差 | 統計量；bias–variance tradeoff 可用「變異」表示模型敏感度。 |
@@ -133,7 +136,7 @@
 | standardization | 標準化 | 否 |  |  |
 | cross-validation | 交叉驗證 | 否 |  |  |
 | training/validation/test split | 訓練／驗證／測試集切分 | 否 |  |  |
-| algorithm | 演算法 | 否 | 算法 |  |
+| algorithm | 演算法 | 否 | — |  |
 | supervised | 監督式 | 否 |  | 依上下文與「學習」組合。 |
 | unsupervised | 非監督式 | 否 | — |  |
 | probability | 機率 | 否 | 概率 |  |
@@ -177,30 +180,50 @@
 | normal equations | 正規方程組 | 否 | 正態方程 |  |
 | least squares | 最小平方法 | 否 | 最小二乘法 |  |
 | linear independence | 線性獨立 | 否 |  |  |
+| linear combination | 線性組合 | 否 |  |  |
+| linear dependence | 線性相依 | 否 |  |  |
+| linearly dependent | 線性相依 | 否 |  |  |
 | matrix rank | 矩陣秩 | 否 |  | 與 tensor rank 區分。 |
+| full rank | 滿秩 | 否 |  |  |
+| rank-deficient | 秩不足 | 否 |  |  |
+| well-conditioned | 條件良好 | 否 |  |  |
+| ill-conditioned | 條件不良 | 否 |  |  |
 | tensor rank | 張量階數 | 否 |  | 指張量的軸數；不可與矩陣秩混用。 |
 | basis | 基底 | 否 | — |  |
+| standard basis | 標準基底 | 否 |  |  |
+| subspace | 子空間 | 否 |  |  |
 | projection | 投影 | 否 |  |  |
 | orthonormal | 標準正交 | 否 |  |  |
 | orthonormal basis | 標準正交基底 | 否 |  |  |
 | dimension | 維度 | 否 |  |  |
+| vector component | 向量分量 | 否 |  |  |
+| coordinate | 座標 | 否 | 坐标 |  |
+| origin | 原點 | 否 |  | 座標系統的原點。 |
+| coordinate system | 座標系統 | 否 |  |  |
 | span | 張成 | 否 |  | 依句子結構譯為「張成空間」或「張成」。 |
 | column space | 欄空間 | 否 | — | 與 row space 區分。 |
 | row space | 列空間 | 否 | — | 與 column space 區分。 |
 | norm | 範數 | 否 |  |  |
+| magnitude | 長度／大小 | 否 |  | 向量或複數的 magnitude 依領域可譯為「長度」或「模」。 |
+| residual | 殘差 | 否 |  |  |
+| orthogonal | 正交 | 否 |  |  |
+| orthogonal decomposition | 正交分解 | 否 |  |  |
 | L1 norm | L1 範數 | 否 |  |  |
 | L2 norm | L2 範數 | 否 |  |  |
 | Lp norm | Lp 範數 | 否 |  |  |
 | cosine similarity | 餘弦相似度 | 否 |  |  |
+| similarity search | 相似度搜尋 | 否 |  |  |
 | attention | 注意力 | 否 |  |  |
 | attention score | 注意力分數 | 否 |  |  |
 | Euclidean distance | 歐幾里得距離 | 否 | — |  |
+| dimensionality reduction | 降維 | 否 |  |  |
 | transpose | 轉置 | 否 |  | 動詞或運算。 |
 | inverse | 反矩陣 | 否 | — | 指矩陣運算時。 |
 | identity matrix | 單位矩陣 | 否 |  |  |
 | determinant | 行列式 | 否 |  |  |
 | linear transformation | 線性變換 | 否 |  |  |
 | matrix transformation | 矩陣變換 | 否 |  |  |
+| singular matrix | 奇異矩陣 | 否 |  |  |
 | eigenvalue | 特徵值 | 否 | — | 全書採用常見數學／AI 用語「特徵值」。 |
 | eigenvector | 特徵向量 | 否 | — |  |
 | derivative | 導數 | 否 |  |  |
@@ -210,6 +233,7 @@
 | Hessian | 海森矩陣 | 否 |  |  |
 | backpropagation | 反向傳播 | 否 | 反向傳播算法 | 首次寫「反向傳播（backpropagation）」。 |
 | automatic differentiation | 自動微分 | 否 |  |  |
+| autodiff | 自動微分 | 否 |  |  |
 | computational graph | 計算圖 | 否 |  |  |
 | forward mode | 正向模式 | 否 |  | 自動微分語境。 |
 | reverse mode | 反向模式 | 否 |  | 自動微分語境。 |
@@ -232,6 +256,9 @@
 | bias | 偏置／偏差 | 否 | — | 模型參數用「偏置」；統計誤差用「偏差」；公平性語境可用「偏見」。 |
 | principal component analysis (PCA) | 主成分分析 | 否 |  |  |
 | singular value decomposition (SVD) | 奇異值分解 | 否 | — |  |
+| truncated SVD | 截斷奇異值分解 | 否 |  |  |
+| SVD truncation | SVD 截斷 | 否 |  |  |
+| low-rank | 低秩 | 否 |  |  |
 | singular value | 奇異值 | 否 | — |  |
 | principal component | 主成分 | 否 |  |  |
 | covariance matrix | 共變異數矩陣 | 否 | 協方差矩陣 |  |
