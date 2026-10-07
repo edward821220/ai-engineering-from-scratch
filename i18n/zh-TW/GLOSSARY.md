@@ -36,6 +36,7 @@
 | package manager | 套件管理器 | 否 | 包管理器 |  |
 | package | 套件 | 否 | — | 指軟體套件時；一般包裝依上下文翻譯。 |
 | toolchain | 工具鏈 | 否 | 工具鍊 |  |
+| project | 專案 | 否 | 項目 | 軟體／商務工作語境。 |
 | library | 函式庫 | 否 |  | 程式庫也可依上下文使用；本書統一用「函式庫」。 |
 | stack | 堆疊 | 否 | 棧 | 技術層次的 stack；容器或資料結構語境需依上下文。 |
 | runtime | 執行環境 | 否 | 運行時 |  |
@@ -117,6 +118,7 @@
 | hyperparameter | 超參數 | 否 |  |  |
 | weight | 權重 | 否 | 重量 | 神經網路參數；不得譯成物理重量。 |
 | weight matrix | 權重矩陣 | 否 |  |  |
+| weight update | 權重更新 | 否 |  |  |
 | bias (model parameter) | 偏置 | 否 | — | 模型的截距參數。 |
 | bias (statistical error) | 偏差 | 否 | — | bias–variance 語境。 |
 | variance | 變異數 | 否 | 方差 | 統計量；bias–variance tradeoff 可用「變異」表示模型敏感度。 |
@@ -260,9 +262,11 @@
 | inverse | 反矩陣 | 否 | — | 指矩陣運算時。 |
 | identity matrix | 單位矩陣 | 否 |  |  |
 | determinant | 行列式 | 否 |  |  |
+| transformation | 變換 | 否 |  |  |
 | linear transformation | 線性變換 | 否 |  |  |
 | matrix transformation | 矩陣變換 | 否 |  |  |
 | singular matrix | 奇異矩陣 | 否 |  |  |
+| singular system | 奇異系統 | 否 |  |  |
 | eigenvalue | 特徵值 | 否 | — | 全書採用常見數學／AI 用語「特徵值」。 |
 | eigenvector | 特徵向量 | 否 | — |  |
 | derivative | 導數 | 否 |  |  |
