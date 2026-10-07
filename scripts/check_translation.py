@@ -245,34 +245,51 @@ def _prose(block: Block) -> str:
     return ""
 
 
-def parse_glossary(text: str) -> list[tuple[str, str]]:
+def parse_glossary_rows(text: str) -> list[dict[str, str]]:
     lines = text.splitlines()
     header_index = next((i for i, line in enumerate(lines) if line.lstrip().startswith("|")), None)
     if header_index is None:
         return []
     headers = [cell.strip().lower() for cell in _table_cells(lines[header_index])]
-    try:
-        english_index = headers.index("english")
-        forbidden_index = next(i for i, value in enumerate(headers) if value in {"禁用", "禁用譯法", "forbidden", "forbidden variants"})
-    except (ValueError, StopIteration):
+    forbidden_headers = {"禁用", "禁用譯法", "forbidden", "forbidden variants"}
+    if "english" not in headers or not forbidden_headers.intersection(headers):
         return []
-
-    entries: list[tuple[str, str]] = []
+    indexes = {
+        "english": headers.index("english"),
+        "preferred": next(
+            (i for i, value in enumerate(headers) if value in {"譯法", "taiwan translation", "translation"}), -1
+        ),
+        "keep_english": next(
+            (i for i, value in enumerate(headers) if value in {"保留英文", "keep english"}), -1
+        ),
+        "forbidden": next(i for i, value in enumerate(headers) if value in forbidden_headers),
+        "notes": next((i for i, value in enumerate(headers) if value in {"備註", "notes"}), -1),
+    }
+    rows: list[dict[str, str]] = []
     for line in lines[header_index + 1:]:
         if not _is_table_row(line):
-            if entries:
+            if rows:
                 break
             continue
         cells = _table_cells(line)
         if all(TABLE_SEPARATOR_RE.fullmatch(cell.replace(" ", "")) for cell in cells):
             continue
-        if max(english_index, forbidden_index) >= len(cells):
+        if len(cells) != len(headers):
             continue
-        english = cells[english_index].strip()
-        for variant in re.split(r"[、,;；]+", cells[forbidden_index]):
+        rows.append({
+            key: cells[index] if index >= 0 else ""
+            for key, index in indexes.items()
+        })
+    return rows
+
+
+def parse_glossary(text: str) -> list[tuple[str, str]]:
+    entries: list[tuple[str, str]] = []
+    for row in parse_glossary_rows(text):
+        for variant in re.split(r"[、,;；]+", row["forbidden"]):
             variant = variant.strip().strip("`*_ ")
-            if english and variant and variant not in {"—", "-", "無", "none"}:
-                entries.append((english, variant))
+            if row["english"] and variant and variant not in {"—", "-", "無", "none"}:
+                entries.append((row["english"], variant))
     return entries
 
 

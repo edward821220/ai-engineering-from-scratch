@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "check_translation.py"
 sys.path.insert(0, str(ROOT / "scripts"))
-from check_translation import check_document, parse_glossary
+from check_translation import check_document, parse_glossary, parse_glossary_rows
 
 SOURCE = """# Demo Lesson
 
@@ -183,9 +183,11 @@ class TranslationDocumentTest(unittest.TestCase):
         glossary = """| English | 譯法 | 保留英文 | 禁用 | 備註 |
 | --- | --- | --- | --- | --- |
 | token | token | 是 | 詞元、令牌 | keep English |
+| data | 資料 | 否 | — | no forbidden variant |
 """
         entries = parse_glossary(glossary)
         self.assertEqual([("token", "詞元"), ("token", "令牌")], entries)
+        self.assertEqual(2, len(parse_glossary_rows(glossary)))
 
     def assert_has_finding(self, findings: list[str], phrase: str) -> None:
         self.assertTrue(findings, "expected a finding")
