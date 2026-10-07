@@ -8,6 +8,22 @@ on:
       - "book/**"
       - "scripts/build_book.py"
   workflow_dispatch:
+    inputs:
+      lang:
+        description: BCP-47 language code from languages.json
+        required: true
+        type: string
+        default: en
+      volume:
+        description: Volume slug from book/volumes.json, or all
+        required: true
+        type: string
+        default: all
+      translations_ref:
+        description: Branch in this repository containing i18n/<lang>
+        required: true
+        type: string
+        default: translations
   release:
     types: [published]
 
@@ -16,10 +32,27 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      BOOK_LANG: ${{ github.event.inputs.lang || 'en' }}
+      BOOK_VOLUME: ${{ github.event.inputs.volume || 'all' }}
+      TRANSLATIONS_REF: ${{ github.event.inputs.translations_ref || 'translations' }}
+      BUILD_PDF: ${{ github.event_name != 'push' }}
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+
+      - name: Validate build inputs
+        run: >-
+          python3 scripts/build_book.py --validate-inputs
+          --lang "$BOOK_LANG" --volume "$BOOK_VOLUME"
+          --translations-ref "$TRANSLATIONS_REF"
+
+      - name: Fetch translated lessons
+        if: env.BOOK_LANG != 'en'
+        run: |
+          git fetch --no-tags --depth=1 origin "refs/heads/$TRANSLATIONS_REF"
+          git archive FETCH_HEAD "i18n/$BOOK_LANG" | tar -x
 
       - name: Install pandoc
         run: |
@@ -32,34 +65,41 @@ jobs:
         run: npm install -g @mermaid-js/mermaid-cli
 
       - name: Install xelatex
-        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        if: env.BUILD_PDF == 'true'
         run: |
           sudo apt-get update -q
           sudo apt-get install -y -q texlive-xetex texlive-fonts-recommended fonts-dejavu librsvg2-bin poppler-utils
 
+      - name: Install CJK TeX support and fonts
+        if: env.BUILD_PDF == 'true' && (env.BOOK_LANG == 'zh' || env.BOOK_LANG == 'zh-TW' || env.BOOK_LANG == 'ja' || env.BOOK_LANG == 'ko')
+        run: sudo apt-get install -y -q texlive-lang-chinese fonts-noto-cjk
+
       - name: Validate book rendering
         run: python3 scripts/test_book_rendering.py
 
-      - name: Build EPUB volumes
-        if: github.event_name == 'push'
-        run: python3 scripts/build_book.py
-
-      - name: Build EPUB and PDF volumes
-        if: github.event_name != 'push'
-        run: python3 scripts/build_book.py --pdf
+      - name: Build selected book volumes
+        run: |
+          args=(--lang "$BOOK_LANG")
+          if [[ "$BOOK_VOLUME" != all ]]; then
+            args+=(--volume "$BOOK_VOLUME")
+          fi
+          if [[ "$BUILD_PDF" == true ]]; then
+            args+=(--pdf)
+          fi
+          python3 scripts/build_book.py "${args[@]}"
 
       - name: Upload EPUBs
         uses: actions/upload-artifact@v4
         with:
-          name: book-epub
+          name: book-epub-${{ env.BOOK_LANG }}
           path: dist/book/*.epub
           retention-days: 30
 
       - name: Upload PDFs
-        if: github.event_name != 'push'
+        if: env.BUILD_PDF == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: book-pdf
+          name: book-pdf-${{ env.BOOK_LANG }}
           path: dist/book/*.pdf
           retention-days: 90
 

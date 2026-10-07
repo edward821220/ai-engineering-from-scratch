@@ -1,5 +1,6 @@
 import hashlib
 import io
+import re
 import shutil
 import subprocess
 import tempfile
@@ -214,6 +215,49 @@ class BookRenderingTest(unittest.TestCase):
             self.assertIn("toc-title: 目錄", metadata)
             self.assertEqual(build_book.MISSING_BOOK_KEYS, set())
             self.assertEqual(build_book.ENGLISH_FALLBACKS, [])
+
+    def test_build_input_validation_uses_registry_and_git_ref_rules(self):
+        build_book.validate_build_inputs("zh-TW", "foundations", "zh-tw/validation")
+        invalid = [
+            ("xx", "foundations", "translations"),
+            ("zh-TW", "missing-volume", "translations"),
+            ("zh-TW", "foundations", "../../main"),
+            ("zh-TW", "foundations", "bad..ref"),
+            ("zh-TW", "foundations", "-option"),
+            ("zh-TW", "foundations", "refs/heads/translations"),
+            ("zh-TW", "foundations", "branch;echo"),
+            ("zh-TW", "foundations", "branch with space"),
+            ("zh-TW", "foundations", "branch\\\\name"),
+            ("zh-TW", "foundations", "a" * 256),
+        ]
+        for values in invalid:
+            with self.subTest(values=values), self.assertRaises(ValueError):
+                build_book.validate_build_inputs(*values)
+
+    def test_book_workflow_validates_env_inputs_without_shell_interpolation(self):
+        workflow = (ROOT / ".github" / "workflows" / "build-book.yml").read_text(encoding="utf-8")
+        lines = workflow.splitlines()
+        run_lines = []
+        for index, line in enumerate(lines):
+            if not re.match(r"^\s+run:", line):
+                continue
+            indent = len(line) - len(line.lstrip())
+            run_lines.append(line)
+            for following in lines[index + 1:]:
+                if following.strip() and len(following) - len(following.lstrip()) <= indent:
+                    break
+                run_lines.append(following)
+        self.assertNotIn("${{", "\n".join(run_lines))
+        self.assertIn("BOOK_LANG: ${{ github.event.inputs.lang || 'en' }}", workflow)
+        self.assertIn("BOOK_VOLUME: ${{ github.event.inputs.volume || 'all' }}", workflow)
+        self.assertIn("TRANSLATIONS_REF: ${{ github.event.inputs.translations_ref || 'translations' }}", workflow)
+        self.assertIn("--validate-inputs", workflow)
+        self.assertIn('git archive FETCH_HEAD "i18n/$BOOK_LANG" | tar -x', workflow)
+        self.assertIn("BUILD_PDF: ${{ github.event_name != 'push' }}", workflow)
+        self.assertIn("env.BOOK_LANG == 'zh-TW'", workflow)
+        self.assertIn("args+=(--pdf)", workflow)
+        self.assertIn("name: book-epub-${{ env.BOOK_LANG }}", workflow)
+        self.assertIn("name: book-pdf-${{ env.BOOK_LANG }}", workflow)
 
     def test_missing_translation_is_listed_as_english_fallback(self):
         strings = build_book.load_book_strings("zh-TW")

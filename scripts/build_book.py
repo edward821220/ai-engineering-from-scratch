@@ -140,6 +140,25 @@ def volume_subtitle(vol):
     return book_text(f"volume.{vol['slug']}.subtitle", vol["subtitle"])
 
 
+def validate_build_inputs(lang, volume, translations_ref):
+    languages = json.loads((ROOT / "languages.json").read_text(encoding="utf-8"))
+    language_codes = {entry["code"] for entry in languages["languages"]}
+    volume_slugs = {entry["slug"] for entry in CONFIG["volumes"]}
+    if lang not in language_codes:
+        raise ValueError(f"unknown language: {lang}")
+    if volume != "all" and volume not in volume_slugs:
+        raise ValueError(f"unknown volume: {volume}")
+    if (not translations_ref or len(translations_ref) > 255 or translations_ref.startswith("refs/")
+            or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._/-]*", translations_ref)):
+        raise ValueError("translations_ref must be a short branch name")
+    checked = subprocess.run(
+        ["git", "check-ref-format", "--branch", translations_ref],
+        capture_output=True, text=True,
+    )
+    if checked.returncode:
+        raise ValueError("translations_ref is not a valid Git branch name")
+
+
 def _lesson_source(phase, lesson):
     en = ROOT / "phases" / phase / lesson / "docs" / "en.md"
     if BOOK_LANG != "en":
@@ -581,9 +600,19 @@ def main():
     ap.add_argument("--assemble-only", action="store_true", help="skip pandoc")
     ap.add_argument("--lang", default="en",
                     help="build a translated edition from i18n/<lang>/ (English fallback per lesson)")
+    ap.add_argument("--validate-inputs", action="store_true", help=argparse.SUPPRESS)
+    ap.add_argument("--translations-ref", default="translations", help=argparse.SUPPRESS)
     args = ap.parse_args()
+    try:
+        validate_build_inputs(args.lang, args.volume or "all", args.translations_ref)
+    except ValueError as exc:
+        sys.exit(str(exc))
     BOOK_LANG = args.lang
     BOOK_STRINGS = load_book_strings(BOOK_LANG)
+
+    if args.validate_inputs:
+        print("build inputs valid")
+        return
 
     check_phases()
 
