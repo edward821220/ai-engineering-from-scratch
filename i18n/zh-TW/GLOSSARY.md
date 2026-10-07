@@ -213,6 +213,7 @@
 | confusion matrix | 混淆矩陣 | 否 |  |  |
 | threshold | 閾值 | 否 | 閥值 |  |
 | decision boundary | 決策邊界 | 否 |  |  |
+| linear decision boundary | 線性決策邊界 | 否 |  |  |
 | linear algebra | 線性代數 | 否 |  |  |
 | linear system | 線性方程組 | 否 | — | Ax=b 語境。 |
 | vector | 向量 | 否 |  |  |
