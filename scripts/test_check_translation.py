@@ -47,7 +47,7 @@ Use $x + y$ and [the guide](https://example.com/guide).
 
 ```mermaid
 graph TD
-    A[Source label] --> B[Target label]
+    A[Source label] -->|source edge| B[Target label]
 ```
 
 ```figure
@@ -86,7 +86,7 @@ print(1)
 
 ```mermaid
 graph TD
-    A[來源標籤] --> B[目標標籤]
+    A[來源標籤] -->|source edge| B[目標標籤]
 ```
 
 ```figure
@@ -119,12 +119,16 @@ class TranslationDocumentTest(unittest.TestCase):
         self.assert_has_finding(check_document(SOURCE, altered), "metadata")
 
     def test_mermaid_labels_may_translate_but_node_ids_and_edges_must_match(self) -> None:
-        translated_labels = TRANSLATION.replace("A[來源標籤] --> B[目標標籤]", "A[起點] --> B[終點]")
+        translated_labels = TRANSLATION.replace("A[來源標籤] -->|source edge| B[目標標籤]", "A[起點] -->|source edge| B[終點]")
         self.assertEqual([], check_document(SOURCE, translated_labels))
         altered_node = TRANSLATION.replace("B[目標標籤]", "C[目標標籤]")
         self.assert_has_finding(check_document(SOURCE, altered_node), "mermaid")
-        altered_edge = TRANSLATION.replace("A[來源標籤] --> B", "A[來源標籤] -.-> B")
+        altered_edge = TRANSLATION.replace("A[來源標籤] -->|source edge| B", "A[來源標籤] -.->|source edge| B")
         self.assert_has_finding(check_document(SOURCE, altered_edge), "mermaid")
+
+    def test_mermaid_edge_labels_must_remain_verbatim(self) -> None:
+        altered = TRANSLATION.replace("|source edge|", "|translated edge|")
+        self.assert_has_finding(check_document(SOURCE, altered), "mermaid")
 
     def test_figure_block_must_remain_verbatim(self) -> None:
         altered = TRANSLATION.replace("figure-id", "different-figure")
