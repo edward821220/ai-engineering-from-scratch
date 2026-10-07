@@ -54,7 +54,10 @@ def lesson_dirs(phase):
 
 
 def phase_title(phase):
-    return read_h1(PHASES / phase / "README.md") or slug_to_title(phase.split("-", 1)[-1])
+    title = read_h1(PHASES / phase / "README.md") or slug_to_title(phase.split("-", 1)[-1])
+    if BOOK_LANG == "en":
+        return title
+    return book_text(f"phase.{phase}", clean_phase_title(title))
 
 
 def urls_for(phase, lesson):
@@ -72,16 +75,25 @@ def fenced_div(cls, *lines):
 
 def continue_box(u, has_quiz):
     lines = [
-        "**Continue online.** The living edition of this chapter has more than the page can hold:",
+        book_text(
+            "continue.heading",
+            "**Continue online.** The living edition of this chapter has more than the page can hold:",
+        ),
         "",
-        f"- Animated, interactive figures and the web text: <{u['web']}>",
-        f"- Runnable code for every step: <{u['code']}>",
+        book_text(
+            "continue.figures", "- Animated, interactive figures and the web text: <{web}>",
+            web=u["web"],
+        ),
+        book_text("continue.code", "- Runnable code for every step: <{code}>", code=u["code"]),
     ]
     if has_quiz:
-        lines.append(f"- The chapter quiz, graded in the browser: <{u['web']}>")
+        lines.append(book_text("continue.quiz", "- The chapter quiz, graded in the browser: <{web}>", web=u["web"]))
     lines += [
         "",
-        "The repository moves faster than any printing. When the book and the repo disagree, trust the repo.",
+        book_text(
+            "continue.repo-note",
+            "The repository moves faster than any printing. When the book and the repo disagree, trust the repo.",
+        ),
     ]
     return fenced_div("continue-online", *lines)
 
@@ -94,7 +106,38 @@ def fence_end(src, i):
     return j
 
 
-BOOK_LANG = "en"  # set by --lang; selects translated source when available
+BOOK_LANG = "en"
+BOOK_STRINGS = {}
+MISSING_BOOK_KEYS = set()
+ENGLISH_FALLBACKS = []
+
+
+def load_book_strings(lang):
+    if lang == "en":
+        return {}
+    path = ROOT / "book" / "i18n" / f"{lang}.json"
+    return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+
+
+def book_text(key, default, **values):
+    value = BOOK_STRINGS.get(key) if BOOK_LANG != "en" else default
+    if not isinstance(value, str):
+        if BOOK_LANG != "en":
+            MISSING_BOOK_KEYS.add(key)
+        value = default
+    return value.format(**values) if values else value
+
+
+def series_title():
+    return book_text("series.title", CONFIG["series"])
+
+
+def volume_title(vol):
+    return book_text(f"volume.{vol['slug']}.title", vol["title"])
+
+
+def volume_subtitle(vol):
+    return book_text(f"volume.{vol['slug']}.subtitle", vol["subtitle"])
 
 
 def _lesson_source(phase, lesson):
@@ -103,6 +146,7 @@ def _lesson_source(phase, lesson):
         tr = ROOT / "i18n" / BOOK_LANG / "phases" / phase / lesson / "docs" / f"{BOOK_LANG}.md"
         if tr.is_file():
             return tr
+        ENGLISH_FALLBACKS.append(f"phases/{phase}/{lesson}")
     return en
 
 
@@ -128,16 +172,23 @@ def transform_lesson(phase, lesson_dir):
                 fig_id = block[0].strip() if block else "figure"
                 out += fenced_div(
                     "interactive-figure",
-                    f"**Interactive figure: `{fig_id}`.** This one moves. Watch it animate and drag its controls in the web edition: <{u['web']}>",
+                    book_text(
+                        "figure.interactive",
+                        "**Interactive figure: `{id}`.** This one moves. Watch it animate and drag its controls in the web edition: <{web}>",
+                        id=fig_id, web=u["web"],
+                    ),
                 )
             elif info == "mermaid":
                 rendered = render_mermaid(block)
                 if rendered:
-                    out += ["", f"![diagram]({rendered})", ""]
+                    out += ["", f"![{book_text('figure.alt', 'diagram')}]({rendered})", ""]
                 else:
                     out += fenced_div(
                         "interactive-figure",
-                        f"**Diagram.** Rendered live in the web edition: <{u['web']}>",
+                        book_text(
+                            "figure.mermaid", "**Diagram.** Rendered live in the web edition: <{web}>",
+                            web=u["web"],
+                        ),
                     )
             else:
                 out += src[i : end + 1]
@@ -147,7 +198,11 @@ def transform_lesson(phase, lesson_dir):
         if line.startswith("## Ship It"):
             out += fenced_div(
                 "continue-online",
-                f"**This chapter ships an artifact.** The course version of this lesson produces a reusable prompt or agent skill. It lives in the repository, ready to install: <{u['repo']}>",
+                book_text(
+                    "ship-it.box",
+                    "**This chapter ships an artifact.** The course version of this lesson produces a reusable prompt or agent skill. It lives in the repository, ready to install: <{repo}>",
+                    repo=u["repo"],
+                ),
             )
             i += 1
             while i < len(src):
@@ -165,7 +220,10 @@ def transform_lesson(phase, lesson_dir):
         if line.startswith("## Exercises"):
             out.append(line)
             out.append("")
-            out.append(f"Starter code and the lesson's working implementation: <{u['code']}>")
+            out.append(book_text(
+                "exercises.starter", "Starter code and the lesson's working implementation: <{code}>",
+                code=u["code"],
+            ))
             i += 1
             continue
 
@@ -243,6 +301,54 @@ def titlepage_template():
     return (ROOT / "book" / "titlepage.tex").read_text(encoding="utf-8")
 
 
+def titlepage_content(vol, chapters):
+    number = f"{vol['number']:03d}"
+    replacements = {
+        "@VOLMARK@": book_text("titlepage.volume-mark", "VOL\\_{number}", number=number),
+        "@REFERENCE_MANUAL@": book_text("titlepage.reference-manual", "REFERENCE\\ MANUAL"),
+        "@SERIES_TITLE_TOP@": book_text("series.title.top", "AI\\ ENGINEERING"),
+        "@SERIES_TITLE_BOTTOM@": book_text("series.title.bottom", "FROM\\ SCRATCH."),
+        "@OPEN_SOURCE@": book_text("titlepage.open-source", "OPEN\\ SOURCE"),
+        "@MIT_LICENSE@": book_text("titlepage.mit-license", "MIT\\ LICENSE"),
+        "@VOLUME_PREFIX@": book_text("titlepage.volume-prefix", "VOLUME"),
+        "@VOLUME_SUFFIX@": book_text("titlepage.volume-suffix", ""),
+        "@CHAPTERS_LABEL@": book_text("titlepage.chapters-label", "CHAPTERS"),
+        "@PHASES_LABEL@": book_text("titlepage.phases-label", "PHASES"),
+        "@EDITION_LABEL@": book_text("titlepage.edition-label", "EDITION"),
+        "@LIVING_COURSE_LABEL@": book_text("titlepage.living-course-label", "A SNAPSHOT OF A LIVING COURSE"),
+        "@NEWEST_BUILD_LABEL@": book_text("titlepage.newest-build-label", "NEWEST BUILD ALWAYS AT THE LINK BELOW"),
+        "@ROMAN@": ROMAN[vol["number"] - 1],
+        "@TOTALVOL@": ROMAN[len(CONFIG["volumes"]) - 1],
+        "@CHAPTERS@": str(chapters),
+        "@PHASES@": "\\ \\textperiodcentered\\ ".join(p.split("-")[0] for p in vol["phases"]),
+        "@EDITION@": git_edition(),
+        "@TITLE@": volume_title(vol),
+        "@SUBTITLE@": volume_subtitle(vol),
+    }
+    template = titlepage_template()
+    for placeholder, value in replacements.items():
+        template = template.replace(placeholder, value)
+    return template
+
+
+def theme_file(vol):
+    BUILD.mkdir(parents=True, exist_ok=True)
+    theme = (ROOT / "book" / "theme.tex").read_text(encoding="utf-8")
+    prefix = book_text("chapter.prefix", "CHAPTER ")
+    suffix = book_text("chapter.suffix", "")
+    theme = theme.replace(
+        r"\newcommand{\bookchapterprefix}{CHAPTER }",
+        "\\newcommand{\\bookchapterprefix}{" + prefix + "}",
+    )
+    theme = theme.replace(
+        r"\newcommand{\bookchaptersuffix}{}",
+        "\\newcommand{\\bookchaptersuffix}{" + suffix + "}",
+    )
+    path = BUILD / f"{vol['slug']}-theme.tex"
+    path.write_text(theme, encoding="utf-8")
+    return path
+
+
 def clean_phase_title(raw):
     return re.sub(r"^Phase\s+\d+\s*[:—-]\s*", "", raw).strip()
 
@@ -252,37 +358,77 @@ def series_map(vol):
     for v in CONFIG["volumes"]:
         marker = "**" if v["slug"] == vol["slug"] else ""
         phases = ", ".join(p.split("-")[0] for p in v["phases"])
-        rows.append(f"| {marker}{v['number']}{marker} | {marker}{v['title']}{marker} — {v['subtitle']} | {phases} |")
-    return "\n".join([
-        "| Vol | Title | Course phases |",
-        "|-----|-------|---------------|",
-    ] + rows)
+        title, subtitle = volume_title(v), volume_subtitle(v)
+        rows.append(
+            f"| {marker}{v['number']}{marker} | {marker}{title}{marker} — {subtitle} | {phases} |"
+        )
+    headers = [
+        book_text("front.series-map.volume", "Vol"),
+        book_text("front.series-map.title", "Title"),
+        book_text("front.series-map.phases", "Course phases"),
+    ]
+    return "\n".join(["| " + " | ".join(headers) + " |", "|-----|-------|---------------|"] + rows)
 
 
 def how_to_use(vol):
-    return f"""# About This Volume {{.unnumbered}}
+    series = series_title()
+    title = volume_title(vol)
+    number = vol["number"]
+    phases = ", ".join(p.split("-")[0] for p in vol["phases"])
+    index = f"{SITE}/llms.txt"
+    return f"""# {book_text('front.about-volume.heading', 'About This Volume')} {{.unnumbered}}
 
-This is Volume {vol['number']} of *{CONFIG['series']}*, a six-volume compilation of the open course of the same name. Each volume stands alone; cross-references cite course phase numbers, which map to volumes like this:
+{book_text(
+    'front.about-volume.body',
+    'This is Volume {number} of *{series}*, a six-volume compilation of the open course of the same name. Each volume stands alone; cross-references cite course phase numbers, which map to volumes like this:',
+    number=number, series=series,
+)}
 
 {series_map(vol)}
 
-The chapters in this volume come from course phases {', '.join(p.split('-')[0] for p in vol['phases'])}. Chapter prerequisites name phases, not volumes; use the table above to translate.
+{book_text(
+    'front.chapters.body',
+    'The chapters in this volume come from course phases {phases}. Chapter prerequisites name phases, not volumes; use the table above to translate.',
+    phases=phases,
+)}
 
-# How to Use This Book {{.unnumbered}}
+# {book_text('front.how-to-use.heading', 'How to Use This Book')} {{.unnumbered}}
 
-This volume is one loop of a larger machine, and it works best when you run the whole loop:
+{book_text('front.how-to-use.intro', 'This volume is one loop of a larger machine, and it works best when you run the whole loop:')}
 
-1. **Read the chapter here.** The prose, the derivations, and the code walkthroughs are complete on the page.
-2. **Run the code from the repository.** Every chapter has a `code/` directory with a working implementation you can run and break: <{REPO}>
-3. **Open the web edition for what paper cannot do.** Animated figures you can watch and drag, and a quiz per chapter that grades itself: <{SITE}>
+1. {book_text(
+    'front.how-to-use.read',
+    '**Read the chapter here.** The prose, the derivations, and the code walkthroughs are complete on the page.',
+)}
+2. {book_text(
+    'front.how-to-use.run',
+    '**Run the code from the repository.** Every chapter has a `code/` directory with a working implementation you can run and break: <{repo}>',
+    repo=REPO,
+)}
+3. {book_text(
+    'front.how-to-use.web',
+    '**Open the web edition for what paper cannot do.** Animated figures you can watch and drag, and a quiz per chapter that grades itself: <{site}>',
+    site=SITE,
+)}
 
-The repository is the living edition. Lessons are updated as the field moves; the book is a snapshot with a version number. When they disagree, the repo is right.
+{book_text(
+    'front.repository.note',
+    'The repository is the living edition. Lessons are updated as the field moves; the book is a snapshot with a version number. When they disagree, the repo is right.',
+)}
 
-## Learning with an AI {{.unnumbered}}
+## {book_text('front.learning-with-ai.heading', 'Learning with an AI')} {{.unnumbered}}
 
-This course is built to be read by agents as well as people. The machine-readable index of every lesson lives at <{SITE}/llms.txt>. If you learn with an AI assistant, paste this and go:
+{book_text(
+    'front.learning-with-ai.body',
+    'This course is built to be read by agents as well as people. The machine-readable index of every lesson lives at <{index}>. If you learn with an AI assistant, paste this and go:',
+    index=index,
+)}
 
-> I am working through *{CONFIG["series"]}, Volume {vol["number"]}: {vol["title"]}*. Fetch {SITE}/llms.txt, find the lesson I name, and act as my tutor: quiz me on its Key Terms, review my solutions to its Exercises, and walk me through its code from the repository.
+> {book_text(
+    'front.learning-with-ai.prompt',
+    'I am working through *{series}, Volume {number}: {title}*. Fetch {index}, find the lesson I name, and act as my tutor: quiz me on its Key Terms, review my solutions to its Exercises, and walk me through its code from the repository.',
+    series=series, number=number, title=title, index=index,
+)}
 """
 
 
@@ -293,8 +439,8 @@ def assemble(vol):
     for part_idx, phase in enumerate(vol["phases"]):
         title = clean_phase_title(phase_title(phase))
         parts.append(
-            f"\n# Part {ROMAN[part_idx]} — {title} {{.unnumbered .part}}\n\n"
-            f"*Course phase {phase.split('-')[0]}. Live edition with animated figures and quizzes: <{SITE}/catalog.html>*\n"
+            f"\n# {book_text('part.heading', 'Part {roman} — {title}', roman=ROMAN[part_idx], title=title)} {{.unnumbered .part}}\n\n"
+            f"*{book_text('phase.intro', 'Course phase {number}. Live edition with animated figures and quizzes: <{catalog}>', number=phase.split('-')[0], catalog=f'{SITE}/catalog.html')}*\n"
         )
         for lesson_dir in lesson_dirs(phase):
             parts.append("\n".join(transform_lesson(phase, lesson_dir)))
@@ -307,13 +453,18 @@ def assemble(vol):
 
 def metadata(vol):
     meta = BUILD / f"{vol['slug']}-meta.yaml"
+    subtitle = book_text(
+        "metadata.subtitle",
+        "Volume {number} — {title}: {subtitle}",
+        number=vol["number"], title=volume_title(vol), subtitle=volume_subtitle(vol),
+    )
     meta.write_text(
         "---\n"
-        f"title: \"{CONFIG['series']}\"\n"
-        f"subtitle: \"Volume {vol['number']} — {vol['title']}: {vol['subtitle']}\"\n"
+        f"title: \"{series_title()}\"\n"
+        f"subtitle: \"{subtitle}\"\n"
         f"author: \"{CONFIG['author']}\"\n"
-        "lang: en\n"
-        "toc-title: Contents\n"
+        f"lang: {BOOK_LANG}\n"
+        f"toc-title: {book_text('toc.title', 'Contents')}\n"
         "---\n",
         encoding="utf-8",
     )
@@ -346,18 +497,7 @@ def render(vol, md, chapters, pdf=False):
         pdf = False
     if pdf:
         titlepage = BUILD / f"{vol['slug']}-titlepage.tex"
-        titlepage.write_text(
-            titlepage_template()
-            .replace("@VOLNUM3@", f"{vol['number']:03d}")
-            .replace("@EDITION@", git_edition())
-            .replace("@ROMAN@", ROMAN[vol["number"] - 1])
-            .replace("@TOTALVOL@", ROMAN[len(CONFIG["volumes"]) - 1])
-            .replace("@CHAPTERS@", str(chapters))
-            .replace("@PHASES@", "\\ \\textperiodcentered\\ ".join(p.split("-")[0] for p in vol["phases"]))
-            .replace("@TITLE@", vol["title"])
-            .replace("@SUBTITLE@", vol["subtitle"]),
-            encoding="utf-8",
-        )
+        titlepage.write_text(titlepage_content(vol, chapters), encoding="utf-8")
         pdf_out = DIST / f"aiefs-vol{vol['number']}-{vol['slug']}{suffix}.pdf"
         cmd_pdf = [
             "pandoc", str(md),
@@ -370,12 +510,12 @@ def render(vol, md, chapters, pdf=False):
             "--pdf-engine=xelatex",
             "--columns=40",
             "--resource-path", str(ROOT),
-            "--include-in-header", str(ROOT / "book" / "theme.tex"),
+            "--include-in-header", str(theme_file(vol)),
             "--include-before-body", str(titlepage),
-            "-M", f"title-meta={CONFIG['series']} Volume {vol['number']}: {vol['title']}",
+            "-M", f"title-meta={book_text('metadata.pdf-title', '{series} Volume {number}: {title}', series=series_title(), number=vol['number'], title=volume_title(vol))}",
             "-M", "author-meta=aiengineeringfromscratch.com",
             "-M", f"lang={BOOK_LANG}",
-            "-V", "toc-title=Contents",
+            "-V", f"toc-title={book_text('toc.title', 'Contents')}",
             "-V", "documentclass=book",
             "-V", "classoption=oneside,openany",
             "-V", "geometry=margin=1in",
@@ -398,7 +538,7 @@ def render(vol, md, chapters, pdf=False):
         if BOOK_LANG in cjk_candidates:
             cjk = pick_font(cjk_candidates[BOOK_LANG])
             if cjk:
-                cmd_pdf += ["-V", f"CJKmainfont={cjk}"]
+                cmd_pdf += ["-V", f"CJKmainfont={cjk}", "-V", f"CJKmonofont={cjk}"]
         subprocess.run(cmd_pdf, check=True, cwd=ROOT)
         results.append(pdf_out)
     return results
@@ -416,8 +556,25 @@ def check_phases():
             print(f"warning: phase directory {d.name} is not claimed by any volume", file=sys.stderr)
 
 
+def report_fallbacks(vol):
+    if BOOK_LANG == "en":
+        return
+    if MISSING_BOOK_KEYS:
+        print(
+            f"warning: missing {BOOK_LANG} book strings for {vol['slug']}; using English: "
+            + ", ".join(sorted(MISSING_BOOK_KEYS)),
+            file=sys.stderr,
+        )
+    if ENGLISH_FALLBACKS:
+        print(f"warning: {BOOK_LANG} lessons fell back to English for {vol['slug']}:", file=sys.stderr)
+        for lesson in ENGLISH_FALLBACKS:
+            print(f"  {lesson}", file=sys.stderr)
+    else:
+        print(f"{BOOK_LANG} English lesson fallbacks for {vol['slug']}: none", file=sys.stderr)
+
+
 def main():
-    global BOOK_LANG
+    global BOOK_LANG, BOOK_STRINGS
     ap = argparse.ArgumentParser()
     ap.add_argument("--volume", help="build one volume by slug")
     ap.add_argument("--pdf", action="store_true", help="also render PDF via xelatex")
@@ -426,6 +583,7 @@ def main():
                     help="build a translated edition from i18n/<lang>/ (English fallback per lesson)")
     args = ap.parse_args()
     BOOK_LANG = args.lang
+    BOOK_STRINGS = load_book_strings(BOOK_LANG)
 
     check_phases()
 
@@ -436,12 +594,15 @@ def main():
             sys.exit(f"unknown volume: {args.volume}")
 
     for vol in vols:
+        MISSING_BOOK_KEYS.clear()
+        ENGLISH_FALLBACKS.clear()
         md, chapters, words = assemble(vol)
         print(f"vol {vol['number']} {vol['slug']}: {chapters} chapters, {words:,} words -> {md}")
         if not args.assemble_only:
             for artifact in render(vol, md, chapters, pdf=args.pdf):
                 size = artifact.stat().st_size // 1024
                 print(f"  {artifact} ({size} KB)")
+        report_fallbacks(vol)
 
 
 if __name__ == "__main__":

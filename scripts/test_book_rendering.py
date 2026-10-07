@@ -1,7 +1,10 @@
+import hashlib
+import io
 import shutil
 import subprocess
 import tempfile
 import unittest
+from contextlib import redirect_stderr
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from unittest.mock import patch
@@ -45,6 +48,37 @@ Further reading: (http://neuralnetworksanddeeplearning.com/). Keep the URL click
 | Training/serving skew | Model sees different features in prod | One Pipeline object for both |
 | A long plain identifier | Must remain readable in a narrow table cell | Abcdefghijklmnopqrstuvwxyz0123456789Abcdefghijklmnopqrstuvwxyz0123456789 |
 """
+
+
+def fixture_book(root, *, localized=False, translated=False):
+    phase = "00-setup-and-tooling" if localized else "00-fixture"
+    phase_name = "Setup & Tooling" if localized else "Fixture Phase"
+    slug = "foundations" if localized else "fixture"
+    subtitle = "Math, Tooling, and Classical Machine Learning" if localized else "Math and ML"
+    lesson = "01-example"
+    phase_dir = root / "phases" / phase
+    lesson_docs = phase_dir / lesson / "docs"
+    lesson_docs.mkdir(parents=True)
+    (phase_dir / "README.md").write_text(f"# Phase 00: {phase_name}\n", encoding="utf-8")
+    source = "# Example\n\n## Ship It\n\nThis artifact is reusable.\n\n## Exercises\n\nTry it.\n"
+    (lesson_docs / "en.md").write_text(source, encoding="utf-8")
+    if translated:
+        translated_docs = root / "i18n" / "zh-TW" / "phases" / phase / lesson / "docs"
+        translated_docs.mkdir(parents=True)
+        (translated_docs / "zh-TW.md").write_text(
+            "# 範例\n\n## Ship It｜交付成果\n\n本課的成果。\n\n## Exercises｜練習\n\n試試看。\n",
+            encoding="utf-8",
+        )
+    vol = {
+        "slug": slug, "number": 1, "title": "Foundations", "subtitle": subtitle,
+        "phases": [phase],
+    }
+    config = dict(build_book.CONFIG)
+    config.update(
+        series="AI Engineering from Scratch", site="https://course.test",
+        repo="https://repo.test", volumes=[vol],
+    )
+    return vol, config, phase, lesson, phase_dir / lesson
 
 
 def render(source, output="html", lua_filter=FILTER):
@@ -135,6 +169,112 @@ class BookRenderingTest(unittest.TestCase):
             self.assertIn(marker, text)
         self.assertIn("OneHotEncoder(handle_unknown=", text)
         self.assertIn("Abcdefghijklmnopqrstuvwxyz0123456789" * 2, text)
+
+    def test_english_assembly_is_byte_identical(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            vol, config, _, _, _ = fixture_book(root)
+            build_book.MISSING_BOOK_KEYS.clear()
+            build_book.ENGLISH_FALLBACKS.clear()
+            with patch.multiple(
+                build_book, ROOT=root, PHASES=root / "phases", BUILD=root / "build",
+                CONFIG=config, SITE=config["site"], REPO=config["repo"],
+                BOOK_LANG="en", BOOK_STRINGS={},
+            ):
+                md, chapters, _ = build_book.assemble(vol)
+            self.assertEqual(chapters, 1)
+            self.assertEqual(
+                hashlib.sha256(md.read_bytes()).hexdigest(),
+                "95e3437e38b7819f34f4cab25ae11eeb89b2c9d3f8027550eaa50f79ad7b5584",
+            )
+
+    def test_zh_tw_assembly_and_metadata_are_localized(self):
+        strings = build_book.load_book_strings("zh-TW")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            vol, config, _, _, _ = fixture_book(root, localized=True, translated=True)
+            build_book.MISSING_BOOK_KEYS.clear()
+            build_book.ENGLISH_FALLBACKS.clear()
+            with patch.multiple(
+                build_book, ROOT=root, PHASES=root / "phases", BUILD=root / "build",
+                CONFIG=config, SITE=config["site"], REPO=config["repo"],
+                BOOK_LANG="zh-TW", BOOK_STRINGS=strings,
+            ):
+                md, chapters, _ = build_book.assemble(vol)
+                metadata = build_book.metadata(vol).read_text(encoding="utf-8")
+            text = md.read_text(encoding="utf-8")
+            for phrase in (
+                "# 關於本卷", "| 卷 | 書名 | 課程階段 |", "# 第 I 部：環境設定與工具",
+                "本課交付的成果", "起始程式碼和本課的完整實作", "線上繼續學習",
+            ):
+                self.assertIn(phrase, text)
+            self.assertEqual(chapters, 1)
+            self.assertIn('title: "從零打造 AI 工程"', metadata)
+            self.assertIn("lang: zh-TW", metadata)
+            self.assertIn("toc-title: 目錄", metadata)
+            self.assertEqual(build_book.MISSING_BOOK_KEYS, set())
+            self.assertEqual(build_book.ENGLISH_FALLBACKS, [])
+
+    def test_missing_translation_is_listed_as_english_fallback(self):
+        strings = build_book.load_book_strings("zh-TW")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, config, phase, lesson, lesson_dir = fixture_book(root, localized=True)
+            build_book.ENGLISH_FALLBACKS.clear()
+            with patch.multiple(
+                build_book, ROOT=root, BOOK_LANG="zh-TW", BOOK_STRINGS=strings,
+            ):
+                source = build_book._lesson_source(phase, lesson)
+            self.assertEqual(source, lesson_dir / "docs" / "en.md")
+            self.assertEqual(build_book.ENGLISH_FALLBACKS, [f"phases/{phase}/{lesson}"])
+
+    def test_missing_book_string_falls_back_and_is_reported(self):
+        vol = {"slug": "foundations"}
+        build_book.MISSING_BOOK_KEYS.clear()
+        build_book.ENGLISH_FALLBACKS.clear()
+        with patch.multiple(build_book, BOOK_LANG="zh-TW", BOOK_STRINGS={}):
+            self.assertEqual(build_book.book_text("missing.key", "English default"), "English default")
+            output = io.StringIO()
+            with redirect_stderr(output):
+                build_book.report_fallbacks(vol)
+        self.assertIn("missing.key", output.getvalue())
+
+    def test_english_titlepage_is_byte_identical(self):
+        with patch.multiple(build_book, BOOK_LANG="en", BOOK_STRINGS={}):
+            with patch.object(build_book, "git_edition", return_value="2026.10"):
+                titlepage = build_book.titlepage_content(build_book.CONFIG["volumes"][0], 3)
+        self.assertEqual(
+            hashlib.sha256(titlepage.encode("utf-8")).hexdigest(),
+            "faf0924ca7570026d3205a2a21afaebda3ddb53f23a3dae974d4aac4e58a14c9",
+        )
+
+    def test_zh_tw_pdf_localizes_cover_and_chapter_and_sets_cjk_mono_font(self):
+        strings = build_book.load_book_strings("zh-TW")
+        vol = build_book.CONFIG["volumes"][0]
+        build_book.MISSING_BOOK_KEYS.clear()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "build").mkdir()
+            with patch.multiple(
+                build_book, BUILD=root / "build", DIST=root / "dist",
+                BOOK_LANG="zh-TW", BOOK_STRINGS=strings,
+            ), patch.object(build_book, "git_date", return_value="2026-10-07"), \
+                 patch.object(build_book, "git_edition", return_value="2026.10"), \
+                 patch.object(build_book, "pick_font", return_value="Noto Sans CJK TC"), \
+                 patch.object(build_book.subprocess, "run") as run:
+                build_book.render(vol, Path("fixture.md"), 3, pdf=True)
+            titlepage = (root / "build" / "foundations-titlepage.tex").read_text(encoding="utf-8")
+            theme = (root / "build" / "foundations-theme.tex").read_text(encoding="utf-8")
+            pdf_command = run.call_args_list[1].args[0]
+            self.assertIn("參考手冊", titlepage)
+            self.assertIn("從零打造", titlepage)
+            self.assertIn("第 001 卷", titlepage)
+            self.assertNotIn("@REFERENCE_MANUAL@", titlepage)
+            self.assertIn(r"\newcommand{\bookchapterprefix}{第 }", theme)
+            self.assertIn(r"\bookchapterprefix\thechapter\bookchaptersuffix", theme)
+            self.assertIn("CJKmonofont=Noto Sans CJK TC", pdf_command)
+            self.assertIn("lang=zh-TW", pdf_command)
+            self.assertEqual(build_book.MISSING_BOOK_KEYS, set())
 
 
 if __name__ == "__main__":

@@ -34,9 +34,11 @@
 }
 
 \usepackage{titlesec}
+\newcommand{\bookchapterprefix}{CHAPTER }
+\newcommand{\bookchaptersuffix}{}
 \titleformat{\chapter}[display]
   {\normalfont\bfseries\color{ink}}
-  {\ttfamily\normalsize\bfseries\color{blueprint}CHAPTER \thechapter}
+  {\ttfamily\normalsize\bfseries\color{blueprint}\bookchapterprefix\thechapter\bookchaptersuffix}
   {10pt}
   {\huge}
   [\vspace{6pt}{\color{blueprint}\titlerule[1.5pt]}]
