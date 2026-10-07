@@ -86,10 +86,18 @@
 | feature vector | 特徵向量 | 否 |  |  |
 | feature matrix | 特徵矩陣 | 否 |  |  |
 | feature scaling | 特徵縮放 | 否 |  |  |
+| synthetic data | 合成資料 | 否 | 合成數據 |  |
+| heuristic | 啟發式方法 | 否 |  |  |
+| lookup table | 查表 | 否 |  |  |
 | feature selection | 特徵選擇 | 否 |  |  |
 | feature importance | 特徵重要度 | 否 |  |  |
 | label | 標籤 | 否 |  | 機器學習的目標標籤。 |
 | model | 模型 | 否 |  |  |
+| classifier | 分類器 | 否 |  |  |
+| pipeline | 管線 | 否 | 管道 | 機器學習資料處理流程。 |
+| policy | 策略 | 否 |  | 強化學習語境。 |
+| reward | 獎勵 | 否 |  | 強化學習語境。 |
+| penalty | 懲罰 | 否 |  | 強化學習語境。 |
 | neural network | 神經網路 | 否 | 神經網絡 |  |
 | multicollinearity | 多重共線性 | 否 |  |  |
 | training | 訓練 | 否 |  |  |
@@ -143,8 +151,12 @@
 | overfitting | 過度擬合 | 否 |  |  |
 | underfitting | 欠擬合 | 否 |  |  |
 | regularization | 正則化 | 否 | — | 與特徵 normalization 區分。 |
+| dropout | dropout | 是 |  | 在神經網路訓練中保留業界用語。 |
+| early stopping | 提前停止 | 否 |  |  |
 | deterministic method | 確定性方法 | 否 |  |  |
 | no free lunch theorem | No Free Lunch 定理 | 是 |  | 常保留原英文定理名。 |
+| explainability | 可解釋性 | 否 |  |  |
+| deterministic rule | 確定性規則 | 否 |  |  |
 | normalization | 正規化 | 否 |  | 與 model regularization 區分。 |
 | standardization | 標準化 | 否 |  |  |
 | cross-validation | 交叉驗證 | 否 |  |  |
