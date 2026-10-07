@@ -11,6 +11,9 @@
 | embedding | embedding | 是 | 嵌入、嵌入向量 | 依使用者指定保留英文。 |
 | transformer | transformer | 是 | 轉換器 | 依使用者指定保留英文；模型架構名不翻。 |
 | AI engineering | AI 工程 | 否 |  |  |
+| repository | 儲存庫 | 否 | — | Git 專案語境。 |
+| driver | 驅動程式 | 否 | — | 硬體裝置的軟體驅動程式。 |
+| backend | 後端 | 否 |  | 系統架構語境。 |
 | RAG | RAG | 是 |  | Retrieval-augmented generation 的縮寫。 |
 | data | 資料 | 否 | 數據 | 不指資料庫中的單一欄位名稱。 |
 | software | 軟體 | 否 | 軟件 |  |
@@ -30,12 +33,13 @@
 | click | 點選 | 否 | 點擊 |  |
 | software package | 軟體套件 | 否 | 軟件包 |  |
 | package manager | 套件管理器 | 否 | 包管理器 |  |
-| package | 套件 | 否 | 包 | 指軟體套件時；一般包裝依上下文翻譯。 |
+| package | 套件 | 否 | — | 指軟體套件時；一般包裝依上下文翻譯。 |
 | toolchain | 工具鏈 | 否 | 工具鍊 |  |
 | library | 函式庫 | 否 |  | 程式庫也可依上下文使用；本書統一用「函式庫」。 |
 | stack | 堆疊 | 否 | 棧 | 技術層次的 stack；容器或資料結構語境需依上下文。 |
 | runtime | 執行環境 | 否 | 運行時 |  |
 | virtual environment | 虛擬環境 | 否 |  |  |
+| web app | 網頁應用程式 | 否 | 網頁應用程序 |  |
 | dependency | 相依套件 | 否 | 依賴包 | Python／Node.js 套件語境。 |
 | transitive dependency | 間接相依套件 | 否 | 轉遞依賴 |  |
 | lockfile | lockfile | 是 | 鎖定文件 | 套件管理器的檔名與術語保留。 |
