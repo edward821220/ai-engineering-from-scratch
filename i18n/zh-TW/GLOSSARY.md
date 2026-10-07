@@ -36,7 +36,7 @@
 | package manager | 套件管理器 | 否 | 包管理器 |  |
 | package | 套件 | 否 | — | 指軟體套件時；一般包裝依上下文翻譯。 |
 | toolchain | 工具鏈 | 否 | 工具鍊 |  |
-| project | 專案 | 否 | 項目 | 軟體／商務工作語境。 |
+| project | 專案 | 否 | — | 專案語境用「專案」；「項目」仍可表示品項。 |
 | library | 函式庫 | 否 |  | 程式庫也可依上下文使用；本書統一用「函式庫」。 |
 | stack | 堆疊 | 否 | 棧 | 技術層次的 stack；容器或資料結構語境需依上下文。 |
 | runtime | 執行環境 | 否 | 運行時 |  |
@@ -108,6 +108,7 @@
 | neuron | 神經元 | 否 |  |  |
 | multicollinearity | 多重共線性 | 否 |  |  |
 | training | 訓練 | 否 |  |  |
+| retrain | 重新訓練 | 否 |  |  |
 | inference | 推論 | 否 |  |  |
 | prediction | 預測 | 否 |  |  |
 | dataset | 資料集 | 否 |  |  |
@@ -161,6 +162,8 @@
 | test data | 測試資料 | 否 |  |  |
 | dataset split | 資料集切分 | 否 |  |  |
 | data leakage | 資料洩漏 | 否 | 數據洩露 |  |
+| preprocessing | 前處理 | 否 | 預處理 |  |
+| data exploration | 資料探索 | 否 |  |  |
 | data drift | 資料漂移 | 否 | 數據漂移 |  |
 | generalization | 泛化 | 否 |  |  |
 | overfitting | 過度擬合 | 否 |  |  |
@@ -172,6 +175,7 @@
 | no free lunch theorem | No Free Lunch 定理 | 是 |  | 常保留原英文定理名。 |
 | explainability | 可解釋性 | 否 |  |  |
 | deterministic rule | 確定性規則 | 否 |  |  |
+| cryptographic verification | 密碼學驗證 | 否 |  |  |
 | normalization | 正規化 | 否 |  | 與 model regularization 區分。 |
 | standardization | 標準化 | 否 |  |  |
 | cross-validation | 交叉驗證 | 否 |  |  |
