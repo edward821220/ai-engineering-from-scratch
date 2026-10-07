@@ -87,6 +87,7 @@
 | label | 標籤 | 否 |  | 機器學習的目標標籤。 |
 | model | 模型 | 否 |  |  |
 | neural network | 神經網路 | 否 | 神經網絡 |  |
+| multicollinearity | 多重共線性 | 否 |  |  |
 | training | 訓練 | 否 |  |  |
 | inference | 推論 | 否 |  |  |
 | prediction | 預測 | 否 |  |  |
@@ -143,6 +144,11 @@
 | standard deviation | 標準差 | 否 |  |  |
 | gradient | 梯度 | 否 |  |  |
 | gradient descent | 梯度下降法 | 否 |  |  |
+| least-squares solution | 最小平方法解 | 否 | 最小二乘解 |  |
+| ridge regression | 嶺迴歸 | 否 |  |  |
+| Gram-Schmidt process | Gram-Schmidt 正交化過程 | 否 |  | 保留演算法名稱。 |
+| QR decomposition | QR 分解 | 否 |  |  |
+| Gaussian elimination | 高斯消去法 | 否 |  |  |
 | learning rate | 學習率 | 否 |  |  |
 | optimizer | 最佳化器 | 否 | 優化器 |  |
 | optimization | 最佳化 | 否 | 優化 |  |
@@ -160,6 +166,7 @@
 | threshold | 閾值 | 否 | 閥值 |  |
 | decision boundary | 決策邊界 | 否 |  |  |
 | linear algebra | 線性代數 | 否 |  |  |
+| linear system | 線性方程組 | 否 | — | Ax=b 語境。 |
 | vector | 向量 | 否 |  |  |
 | matrix | 矩陣 | 否 |  |  |
 | tensor | 張量 | 否 |  |  |
@@ -178,6 +185,8 @@
 | orthonormal basis | 標準正交基底 | 否 |  |  |
 | dimension | 維度 | 否 |  |  |
 | span | 張成 | 否 |  | 依句子結構譯為「張成空間」或「張成」。 |
+| column space | 欄空間 | 否 | — | 與 row space 區分。 |
+| row space | 列空間 | 否 | — | 與 column space 區分。 |
 | norm | 範數 | 否 |  |  |
 | L1 norm | L1 範數 | 否 |  |  |
 | L2 norm | L2 範數 | 否 |  |  |
