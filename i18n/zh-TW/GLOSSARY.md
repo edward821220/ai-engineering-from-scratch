@@ -12,6 +12,15 @@
 | transformer | transformer | 是 | 轉換器 | 依使用者指定保留英文；模型架構名不翻。 |
 | AI engineering | AI 工程 | 否 |  |  |
 | repository | 儲存庫 | 否 | — | Git 專案語境。 |
+| version control | 版本控制 | 否 |  | 管理檔案變更與協作的技術。 |
+| working directory | 工作目錄 | 否 |  | Git 工作目錄。 |
+| staging area | 暫存區 | 否 |  | Git 中準備納入下一個 commit 的區域。 |
+| binary file | 二進位檔案 | 否 |  | 與文字檔相對。 |
+| model checkpoint | model checkpoint | 是 |  | AI 模型訓練中保存的參數與狀態；保留英文。 |
+| fork | fork | 是 |  | GitHub 協作功能，保留英文。 |
+| rebase | rebase | 是 |  | Git 歷史整理操作，保留英文。 |
+| cherry-pick | cherry-pick | 是 |  | Git 操作，保留英文。 |
+| submodule | submodule | 是 |  | Git 子模組機制，保留英文。 |
 | driver | 驅動程式 | 否 | — | 硬體裝置的軟體驅動程式。 |
 | backend | 後端 | 否 |  | 系統架構語境。 |
 | RAG | RAG | 是 |  | Retrieval-augmented generation 的縮寫。 |
@@ -52,7 +61,7 @@
 | pipe | 管線 | 否 | — | shell 的標準輸出串接語境。 |
 | commit | commit | 是 | 提交、提交記錄 | Git 專有術語依台灣開發者慣例保留英文。 |
 | branch | branch | 是 | 分支 | Git 專有術語依台灣開發者慣例保留英文。 |
-| merge | merge | 是 | 合併 | Git 專有術語依台灣開發者慣例保留英文。 |
+| merge | merge | 是 |  | Git 專有術語依台灣開發者慣例保留英文；一般描述仍可依語境使用「合併」。 |
 | remote | remote | 是 | 遠程 | Git remote 名稱與概念保留英文。 |
 | container | 容器 | 否 |  | Docker 語境。 |
 | image layer | 映像層 | 否 | 鏡像層 | Docker 語境。 |
@@ -64,7 +73,19 @@
 | virtual machine | 虛擬機器 | 否 | — | 正文可簡稱「虛擬機」。 |
 | GPU | GPU | 是 | 圖形處理器 | 在 AI 工程文件中保留縮寫。 |
 | CPU | CPU | 是 | 中央處理器 | 在 AI 工程文件中保留縮寫。 |
+| CNN | CNN | 是 |  | 卷積神經網路的縮寫；保留縮寫。 |
+| LLM | LLM | 是 |  | large language model 的縮寫；保留縮寫。 |
 | CUDA | CUDA | 是 |  | NVIDIA 平台名稱。 |
+| fp16 | fp16 | 是 | 半精度 | 16 位元浮點數格式；保留格式標記。 |
+| fp32 | fp32 | 是 |  | 32 位元浮點數格式；保留格式標記。 |
+| memory | 記憶體 | 否 | 內存 | 電腦的記憶體。 |
+| video RAM | 顯示記憶體 | 否 |  | GPU 的 video RAM。 |
+| half precision | 半精度 | 否 |  | 浮點數精度格式。 |
+| benchmark | 效能基準測試 | 否 |  | 比較系統或硬體效能的測試。 |
+| speedup | 加速比 | 否 |  | 比較運算速度的比例。 |
+| cloud GPU | 雲端 GPU | 否 |  | 透過雲端服務使用的 GPU。 |
+| notebook | notebook | 是 | 筆記本 | Jupyter Notebook／Colab 文件；保留英文。 |
+| parallel computing | 平行運算 | 否 | 並行計算 |  |
 | MPS | MPS | 是 |  | Apple Metal Performance Shaders 縮寫。 |
 | VRAM | VRAM | 是 |  |  |
 | Tensor Core | Tensor Core | 是 | 張量核心 | NVIDIA 產品名稱。 |
