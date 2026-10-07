@@ -53,6 +53,7 @@
 | volume mount | 磁碟區掛載 | 否 | 卷掛載 | Docker 語境。 |
 | API key | API 金鑰 | 否 | API 密鑰 |  |
 | rate limit | 速率限制 | 否 |  |  |
+| preflight check | 前置檢查 | 否 |  | 執行前確認環境或設定的檢查。 |
 | virtual machine | 虛擬機器 | 否 | — | 正文可簡稱「虛擬機」。 |
 | GPU | GPU | 是 | 圖形處理器 | 在 AI 工程文件中保留縮寫。 |
 | CPU | CPU | 是 | 中央處理器 | 在 AI 工程文件中保留縮寫。 |
@@ -160,6 +161,7 @@
 | scalar | 純量 | 否 | — |  |
 | dot product | 內積 | 否 |  |  |
 | matrix multiplication | 矩陣乘法 | 否 |  |  |
+| matrix multiply | 矩陣乘法 | 否 |  | 與 matrix multiplication 同義。 |
 | normal equations | 正規方程組 | 否 | 正態方程 |  |
 | least squares | 最小平方法 | 否 | 最小二乘法 |  |
 | linear independence | 線性獨立 | 否 |  |  |
