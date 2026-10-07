@@ -80,6 +80,8 @@
 | LSP | LSP | 是 |  | Language Server Protocol 縮寫。 |
 | Pylance | Pylance | 是 |  | 產品名稱。 |
 | feature | 特徵 | 否 |  | 機器學習輸入變數；產品功能依上下文譯為「功能」。 |
+| labeled data | 有標籤資料 | 否 |  |  |
+| unlabeled data | 無標籤資料 | 否 |  |  |
 | feature engineering | 特徵工程 | 否 |  |  |
 | feature vector | 特徵向量 | 否 |  |  |
 | feature matrix | 特徵矩陣 | 否 |  |  |
@@ -104,6 +106,10 @@
 | bias (statistical error) | 偏差 | 否 | — | bias–variance 語境。 |
 | variance | 變異數 | 否 | 方差 | 統計量；bias–variance tradeoff 可用「變異」表示模型敏感度。 |
 | loss function | 損失函數 | 否 |  |  |
+| baseline | 基準模型 | 否 | 基線 | 評估模型時作為比較對象。 |
+| random baseline | 隨機基準模型 | 否 |  |  |
+| nearest centroid classifier | 最近質心分類器 | 否 |  |  |
+| spam filter | 垃圾郵件篩選器 | 否 | 垃圾郵件過濾器 |  |
 | cost function | 成本函數 | 否 |  |  |
 | objective function | 目標函數 | 否 |  |  |
 | machine learning | 機器學習 | 否 |  |  |
@@ -112,6 +118,11 @@
 | unsupervised learning | 非監督式學習 | 否 | — |  |
 | semi-supervised learning | 半監督式學習 | 否 |  |  |
 | self-supervised learning | 自我監督式學習 | 否 |  |  |
+| label propagation | 標籤傳播 | 否 |  |  |
+| pseudo-labeling | 偽標籤法 | 否 |  |  |
+| consistency regularization | 一致性正則化 | 否 |  |  |
+| contrastive learning | 對比式學習 | 否 |  |  |
+| masked language modeling | 遮罩語言模型 | 否 |  |  |
 | reinforcement learning | 強化學習 | 否 |  |  |
 | classification | 分類 | 否 |  |  |
 | regression | 迴歸 | 否 | — | 機器學習任務。 |
@@ -132,6 +143,8 @@
 | overfitting | 過度擬合 | 否 |  |  |
 | underfitting | 欠擬合 | 否 |  |  |
 | regularization | 正則化 | 否 | — | 與特徵 normalization 區分。 |
+| deterministic method | 確定性方法 | 否 |  |  |
+| no free lunch theorem | No Free Lunch 定理 | 是 |  | 常保留原英文定理名。 |
 | normalization | 正規化 | 否 |  | 與 model regularization 區分。 |
 | standardization | 標準化 | 否 |  |  |
 | cross-validation | 交叉驗證 | 否 |  |  |
@@ -254,6 +267,8 @@
 | training example | 訓練樣本 | 否 | — |  |
 | model parameter | 模型參數 | 否 |  |  |
 | bias | 偏置／偏差 | 否 | — | 模型參數用「偏置」；統計誤差用「偏差」；公平性語境可用「偏見」。 |
+| bias-variance tradeoff | 偏差－變異取捨 | 否 |  |  |
+| irreducible noise | 不可約雜訊 | 否 |  |  |
 | principal component analysis (PCA) | 主成分分析 | 否 |  |  |
 | singular value decomposition (SVD) | 奇異值分解 | 否 | — |  |
 | truncated SVD | 截斷奇異值分解 | 否 |  |  |
