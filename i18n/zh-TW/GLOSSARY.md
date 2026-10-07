@@ -99,15 +99,19 @@
 | classifier | 分類器 | 否 |  |  |
 | pipeline | 管線 | 否 | 管道 | 機器學習資料處理流程。 |
 | policy | 策略 | 否 |  | 強化學習語境。 |
+| policy optimization | 策略最佳化 | 否 |  |  |
+| value learning | 價值學習 | 否 |  |  |
 | reward | 獎勵 | 否 |  | 強化學習語境。 |
 | penalty | 懲罰 | 否 |  | 強化學習語境。 |
 | neural network | 神經網路 | 否 | 神經網絡 |  |
+| neuron | 神經元 | 否 |  |  |
 | multicollinearity | 多重共線性 | 否 |  |  |
 | training | 訓練 | 否 |  |  |
 | inference | 推論 | 否 |  |  |
 | prediction | 預測 | 否 |  |  |
 | dataset | 資料集 | 否 |  |  |
 | sample | 樣本 | 否 |  |  |
+| input-output pair | 輸入－輸出配對 | 否 |  | 監督式學習的訓練範例。 |
 | data point | 資料點 | 否 |  |  |
 | parameter | 參數 | 否 |  |  |
 | hyperparameter | 超參數 | 否 |  |  |
@@ -171,6 +175,7 @@
 | cross-validation | 交叉驗證 | 否 |  |  |
 | training/validation/test split | 訓練／驗證／測試集切分 | 否 |  |  |
 | algorithm | 演算法 | 否 | — |  |
+| learning algorithm | 學習演算法 | 否 |  |  |
 | supervised | 監督式 | 否 |  | 依上下文與「學習」組合。 |
 | unsupervised | 非監督式 | 否 | — |  |
 | probability | 機率 | 否 | 概率 |  |
