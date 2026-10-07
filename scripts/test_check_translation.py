@@ -162,7 +162,7 @@ class TranslationDocumentTest(unittest.TestCase):
         self.assert_has_finding(check_document(SOURCE, mainland), "mainland")
         ambiguous = TRANSLATION.replace("一段原始文字。", "這段配置很清楚。")
         self.assertEqual([], check_document(SOURCE, ambiguous))
-        shared_traditional = TRANSLATION.replace("一段原始文字。", "皇后就在 3 公里外，只有一個人。")
+        shared_traditional = TRANSLATION.replace("一段原始文字。", "皇后就在 3 公里外，只有一個人；兩者互相呼應。")
         self.assertEqual([], check_document(SOURCE, shared_traditional))
 
     def test_glossary_forbidden_variants_are_reported_with_lesson_path(self) -> None:
