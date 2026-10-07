@@ -51,9 +51,12 @@
     btn.className = 'lang-picker-btn';
     btn.setAttribute('aria-haspopup', 'dialog');
     btn.setAttribute('aria-controls', id + 'Panel');
+    btn.setAttribute('aria-labelledby', id + 'AccessibleLabel ' + id + 'Current');
     btn.setAttribute('aria-expanded', 'false');
     btn.innerHTML = '<span class="lang-glyph" aria-hidden="true">A文</span>'
-      + '<span class="lang-current"></span><span class="lang-caret" aria-hidden="true">▾</span>';
+      + '<span hidden id="' + id + 'AccessibleLabel">Choose language</span>'
+      + '<span class="lang-current lang-native" id="' + id + 'Current"></span>'
+      + '<span class="lang-caret" aria-hidden="true">▾</span>';
     host.appendChild(btn);
 
     var panel = document.createElement('div');
@@ -74,9 +77,7 @@
     var list = panel.querySelector('.lang-list');
 
     function updateButton() {
-      var label = nativeOf(current());
-      currentLabel.textContent = label;
-      btn.setAttribute('aria-label', 'Choose language. Current language: ' + label);
+      currentLabel.textContent = nativeOf(current());
     }
 
     function renderList(q) {

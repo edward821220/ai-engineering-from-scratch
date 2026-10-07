@@ -38,6 +38,24 @@ test('the key list is a trimmed, unique list of English strings', () => {
   }
 });
 
+test('language picker labels translate while native language names stay unchanged', () => {
+  const picker = fs.readFileSync(path.join(SITE, 'lang-picker.js'), 'utf8');
+  assert.ok(KEYS.includes('Choose language'));
+  assert.equal(OVERRIDES['zh-TW']['Choose language'], '選擇語言');
+  assert.doesNotMatch(i18n.SKIP_SELECTOR, /(?:^|, )\.lang-picker(?:,|$)/);
+  assert.match(i18n.SKIP_SELECTOR, /\.lang-native/);
+  assert.match(i18n.SKIP_SELECTOR, /\.lang-code/);
+  assert.match(picker, /aria-labelledby/);
+  assert.match(picker, /<span hidden id=/);
+  assert.match(picker, /lang-current lang-native/);
+  assert.doesNotMatch(picker, /setAttribute\('aria-label', 'Choose language/);
+});
+
+test('zh-TW disambiguates career-route baselines and independent certification prep', () => {
+  assert.equal(OVERRIDES['zh-TW'].Baseline, '先備基礎');
+  assert.equal(OVERRIDES['zh-TW']['Independent preparation'], '獨立備考');
+});
+
 test('overrides only pin keys from the list and only for registered languages', () => {
   const codes = new Set(registry.map((lang) => lang.code));
   for (const [code, table] of Object.entries(OVERRIDES)) {
@@ -60,9 +78,10 @@ test('every key still appears in the site pages or scripts', () => {
 });
 
 test('translateText swaps only the trimmed core and keeps surrounding whitespace', () => {
-  const dict = { Contents: '目录', 'On this page': '本页内容' };
+  const dict = { Contents: '目录', 'On this page': '本页内容', 'Choose language': '選擇語言' };
   assert.equal(i18n.translateText('\n  Contents\n', dict), '\n  目录\n');
   assert.equal(i18n.translateText('On  this\n page', dict), '本页内容');
+  assert.equal(i18n.translateText('Choose language', dict), '選擇語言');
   assert.equal(i18n.translateText('Unknown label', dict), 'Unknown label');
   assert.equal(i18n.translateText('   ', dict), '   ');
   assert.equal(i18n.translateText('Contents', null), 'Contents');

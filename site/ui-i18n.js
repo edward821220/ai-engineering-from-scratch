@@ -4,7 +4,7 @@
   var TRANSLATIONS_BASE = 'https://raw.githubusercontent.com/rohitg00/ai-engineering-from-scratch/translations/i18n/';
   var ATTRS = ['aria-label', 'title', 'placeholder'];
   var SKIP_TAGS = { SCRIPT: 1, STYLE: 1, CODE: 1, PRE: 1, KBD: 1, SAMP: 1, TEXTAREA: 1, NOSCRIPT: 1, svg: 1, SVG: 1, MATH: 1 };
-  var SKIP_SELECTOR = '.lang-picker, .mermaid-render, .mermaid-modal-body, .quiz-question-text, .quiz-option-text, .quiz-explanation, .nav-title, .sidebar-lesson-link, .toc-nav, [data-i18n-skip]';
+  var SKIP_SELECTOR = '.lang-native, .lang-code, .mermaid-render, .mermaid-modal-body, .quiz-question-text, .quiz-option-text, .quiz-explanation, .nav-title, .sidebar-lesson-link, .toc-nav, [data-i18n-skip]';
   var ARTICLE_SELECTOR = '.lesson-article';
   var ARTICLE_ALLOW_SELECTOR = '.lesson-action-panel, .lesson-action-path, .ai-panels, .quiz-section, .lesson-nav-bottom, .continue-callout, .cert-notice';
   var RTL = { ar: 1, he: 1, fa: 1, ur: 1 };

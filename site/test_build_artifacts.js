@@ -474,7 +474,7 @@ test('curated reviewed languages appear in the switcher without joining lesson C
 test('shared site asset families use the expected cache keys on every page', () => {
   const release = '20260822a';
   const styleRelease = '20260824a';
-  const navigationRelease = '20260927a';
+  const navigationRelease = '20261007a';
   const narrationRelease = '20260829a';
   const homepageRelease = '20260927a';
   const pages = [
