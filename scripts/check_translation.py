@@ -205,7 +205,6 @@ def _mermaid_syntax(raw: str) -> str:
     if len(lines) >= 2:
         lines = lines[1:-1]
     body = "\n".join(lines)
-    body = re.sub(r"\|[^|\n]*\|", "||", body)
     # Replace node labels but retain each node identifier and shape delimiter.
     for opening, closing in (("[", "]"), ("(", ")"), ("{", "}")):
         pattern = re.compile(r"(\b[\w.-]+\s*" + re.escape(opening) + r")[^\n" + re.escape(closing) + r"]*" + re.escape(closing))
