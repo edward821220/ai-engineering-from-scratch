@@ -10,6 +10,8 @@
 | fine-tuning | fine-tuning | 是 | 微調 | 依使用者指定保留英文。 |
 | embedding | embedding | 是 | 嵌入、嵌入向量 | 依使用者指定保留英文。 |
 | transformer | transformer | 是 | 轉換器 | 依使用者指定保留英文；模型架構名不翻。 |
+| AI engineering | AI 工程 | 否 |  |  |
+| RAG | RAG | 是 |  | Retrieval-augmented generation 的縮寫。 |
 | data | 資料 | 否 | 數據 | 不指資料庫中的單一欄位名稱。 |
 | software | 軟體 | 否 | 軟件 |  |
 | hardware | 硬體 | 否 | 硬件 |  |
@@ -29,6 +31,8 @@
 | software package | 軟體套件 | 否 | 軟件包 |  |
 | package manager | 套件管理器 | 否 | 包管理器 |  |
 | toolchain | 工具鏈 | 否 | 工具鍊 |  |
+| library | 函式庫 | 否 |  | 程式庫也可依上下文使用；本書統一用「函式庫」。 |
+| stack | 堆疊 | 否 | 棧 | 技術層次的 stack；容器或資料結構語境需依上下文。 |
 | runtime | 執行環境 | 否 | 運行時 |  |
 | virtual environment | 虛擬環境 | 否 |  |  |
 | dependency | 相依套件 | 否 | 依賴包 | Python／Node.js 套件語境。 |
@@ -76,6 +80,7 @@
 | feature importance | 特徵重要度 | 否 |  |  |
 | label | 標籤 | 否 |  | 機器學習的目標標籤。 |
 | model | 模型 | 否 |  |  |
+| neural network | 神經網路 | 否 | 神經網絡 |  |
 | training | 訓練 | 否 |  |  |
 | inference | 推論 | 否 |  |  |
 | prediction | 預測 | 否 |  |  |
@@ -155,6 +160,8 @@
 | scalar | 純量 | 否 | — |  |
 | dot product | 內積 | 否 |  |  |
 | matrix multiplication | 矩陣乘法 | 否 |  |  |
+| normal equations | 正規方程組 | 否 | 正態方程 |  |
+| least squares | 最小平方法 | 否 | 最小二乘法 |  |
 | linear independence | 線性獨立 | 否 |  |  |
 | matrix rank | 矩陣秩 | 否 |  | 與 tensor rank 區分。 |
 | tensor rank | 張量階數 | 否 |  | 指張量的軸數；不可與矩陣秩混用。 |
@@ -169,6 +176,8 @@
 | L2 norm | L2 範數 | 否 |  |  |
 | Lp norm | Lp 範數 | 否 |  |  |
 | cosine similarity | 餘弦相似度 | 否 |  |  |
+| attention | 注意力 | 否 |  |  |
+| attention score | 注意力分數 | 否 |  |  |
 | Euclidean distance | 歐幾里得距離 | 否 | — |  |
 | transpose | 轉置 | 否 |  | 動詞或運算。 |
 | inverse | 反矩陣 | 否 | — | 指矩陣運算時。 |
