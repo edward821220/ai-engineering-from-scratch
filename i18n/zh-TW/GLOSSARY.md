@@ -81,6 +81,9 @@
 | Pylance | Pylance | 是 |  | 產品名稱。 |
 | feature | 特徵 | 否 |  | 機器學習輸入變數；產品功能依上下文譯為「功能」。 |
 | labeled data | 有標籤資料 | 否 |  |  |
+| data distribution | 資料分布 | 否 |  |  |
+| class | 類別 | 否 |  | 分類語境。 |
+| class imbalance | 類別不平衡 | 否 |  |  |
 | unlabeled data | 無標籤資料 | 否 |  |  |
 | feature engineering | 特徵工程 | 否 |  |  |
 | feature vector | 特徵向量 | 否 |  |  |
@@ -115,12 +118,17 @@
 | variance | 變異數 | 否 | 方差 | 統計量；bias–variance tradeoff 可用「變異」表示模型敏感度。 |
 | loss function | 損失函數 | 否 |  |  |
 | baseline | 基準模型 | 否 | 基線 | 評估模型時作為比較對象。 |
+| success metric | 成功指標 | 否 |  |  |
 | random baseline | 隨機基準模型 | 否 |  |  |
 | nearest centroid classifier | 最近質心分類器 | 否 |  |  |
 | spam filter | 垃圾郵件篩選器 | 否 | 垃圾郵件過濾器 |  |
 | cost function | 成本函數 | 否 |  |  |
 | objective function | 目標函數 | 否 |  |  |
 | machine learning | 機器學習 | 否 |  |  |
+| language model | 語言模型 | 否 |  |  |
+| recommendation engine | 推薦引擎 | 否 |  |  |
+| voice assistant | 語音助理 | 否 |  |  |
+| self-driving car | 自動駕駛車 | 否 |  |  |
 | deep learning | 深度學習 | 否 |  |  |
 | supervised learning | 監督式學習 | 否 |  |  |
 | unsupervised learning | 非監督式學習 | 否 | — |  |
@@ -131,6 +139,7 @@
 | consistency regularization | 一致性正則化 | 否 |  |  |
 | contrastive learning | 對比式學習 | 否 |  |  |
 | masked language modeling | 遮罩語言模型 | 否 |  |  |
+| next-token prediction | next-token prediction | 是 | 下一個詞預測 | token 依使用者指定保留英文。 |
 | reinforcement learning | 強化學習 | 否 |  |  |
 | classification | 分類 | 否 |  |  |
 | regression | 迴歸 | 否 | — | 機器學習任務。 |
