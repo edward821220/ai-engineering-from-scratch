@@ -126,6 +126,13 @@ class TranslationDocumentTest(unittest.TestCase):
         altered_edge = TRANSLATION.replace("A[來源標籤] -->|source edge| B", "A[來源標籤] -.->|source edge| B")
         self.assert_has_finding(check_document(SOURCE, altered_edge), "mermaid")
 
+    def test_mermaid_sequence_participant_labels_may_translate(self) -> None:
+        source = '''# Sequence Diagram\n\n```mermaid\nsequenceDiagram\n    participant WD as Working Directory\n    participant SA as Staging Area\n    WD->>SA: git add\n```\n'''
+        translation = source.replace("Working Directory", "工作目錄").replace("Staging Area", "暫存區")
+        self.assertEqual([], check_document(source, translation))
+        altered_id = translation.replace("participant WD as", "participant W as")
+        self.assert_has_finding(check_document(source, altered_id), "mermaid")
+
     def test_mermaid_edge_labels_must_remain_verbatim(self) -> None:
         altered = TRANSLATION.replace("|source edge|", "|translated edge|")
         self.assert_has_finding(check_document(SOURCE, altered), "mermaid")
