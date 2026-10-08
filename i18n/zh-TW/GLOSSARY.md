@@ -76,9 +76,11 @@
 | CNN | CNN | 是 |  | 卷積神經網路的縮寫；保留縮寫。 |
 | LLM | LLM | 是 |  | large language model 的縮寫；保留縮寫。 |
 | CUDA | CUDA | 是 |  | NVIDIA 平台名稱。 |
-| fp16 | fp16 | 是 | 半精度 | 16 位元浮點數格式；保留格式標記。 |
+| fp16 | fp16 | 是 |  | 16 位元浮點數格式；保留格式標記。 |
 | fp32 | fp32 | 是 |  | 32 位元浮點數格式；保留格式標記。 |
 | memory | 記憶體 | 否 | 內存 | 電腦的記憶體。 |
+| byte | 位元組 | 否 | 字節 | 資料量的單位。 |
+| floating point | 浮點數 | 否 |  | 數值表示方式。 |
 | video RAM | 顯示記憶體 | 否 |  | GPU 的 video RAM。 |
 | half precision | 半精度 | 否 |  | 浮點數精度格式。 |
 | benchmark | 效能基準測試 | 否 |  | 比較系統或硬體效能的測試。 |
