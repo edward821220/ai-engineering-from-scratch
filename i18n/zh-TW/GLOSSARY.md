@@ -383,6 +383,23 @@
 | classification | 分類 | 否 |  |  |
 | regression | 迴歸 | 否 | — | 機器學習任務。 |
 | linear regression | 線性迴歸 | 否 | — |  |
+| multiple linear regression | 多元線性迴歸 | 否 |  | 使用多個特徵的線性迴歸。 |
+| intercept | 截距 | 否 |  | 線性模型中的截距項。 |
+| normal equation | 正規方程組 | 否 |  | 線性迴歸的封閉解方法；normal equations 的單數形式。 |
+| matrix inversion | 矩陣求逆 | 否 |  |  |
+| computational complexity | 計算複雜度 | 否 |  |  |
+| polynomial regression | 多項式迴歸 | 否 |  | 以多項式特徵擬合資料的線性迴歸。 |
+| polynomial features | 多項式特徵 | 否 |  | 由輸入變數的多項式次方建立的特徵。 |
+| R-squared | R 平方 | 否 |  | 以 R^2 表示的迴歸評估指標。 |
+| R-squared score | R 平方分數 | 否 |  | 衡量預測值相對於目標平均值的改善程度。 |
+| feature standardization | 特徵標準化 | 否 |  | 透過減去平均值並除以標準差縮放特徵。 |
+| standardize | 標準化 | 否 |  | 動詞；對資料或特徵執行標準化。 |
+| convex paraboloid | 凸拋物面 | 否 |  | 向上開口的凸拋物面。 |
+| cost surface | 成本曲面 | 否 |  | 成本函數隨模型參數變化所形成的曲面。 |
+| batch gradient descent | 批次梯度下降法 | 否 |  | 每次參數更新都使用整批訓練資料。 |
+| mini-batch gradient descent | 小批次梯度下降法 | 否 |  | 每次參數更新都使用一小批訓練樣本。 |
+| penalty term | 懲罰項 | 否 |  | 加入成本函數以限制模型參數的項。 |
+| lasso regression | LASSO 迴歸 | 否 |  | 使用 L1 正則化的線性迴歸。 |
 | logistic regression | 邏輯斯迴歸 | 否 | — |  |
 | decision tree | 決策樹 | 否 |  |  |
 | model training | 模型訓練 | 否 |  |  |
