@@ -67,8 +67,25 @@
 | image layer | 映像層 | 否 | 鏡像層 | Docker 語境。 |
 | base image | 基礎映像 | 否 | 基礎鏡像 | Docker 語境。 |
 | volume mount | 磁碟區掛載 | 否 | 卷掛載 | Docker 語境。 |
+| API | API | 是 |  | 在技術文件中保留縮寫。 |
+| API call | API 呼叫 | 否 |  |  |
+| API server | API 伺服器 | 否 |  |  |
+| SDK | SDK | 是 |  | Software development kit 的縮寫；保留英文。 |
+| HTTP | HTTP | 是 |  | Hypertext Transfer Protocol 的縮寫；保留英文。 |
+| JSON | JSON | 是 |  | 資料格式名稱縮寫；保留英文。 |
+| URL | URL | 是 |  | 網址縮寫；保留英文。 |
+| environment variable | 環境變數 | 否 | 環境變量 |  |
+| endpoint | 端點 | 否 |  |  |
+| request | 請求 | 否 |  | API 通訊語境。 |
+| response | 回應 | 否 |  | API 通訊語境。 |
+| request body | 請求本文 | 否 |  |  |
+| response body | 回應本文 | 否 |  |  |
+| authentication | 身分驗證 | 否 |  |  |
+| authorization | 授權 | 否 |  |  |
 | API key | API 金鑰 | 否 | API 密鑰 |  |
 | rate limit | 速率限制 | 否 |  |  |
+| billing unit | 計費單位 | 否 |  |  |
+| streaming | 串流 | 否 |  |  |
 | preflight check | 前置檢查 | 否 |  | 執行前確認環境或設定的檢查。 |
 | virtual machine | 虛擬機器 | 否 | — | 正文可簡稱「虛擬機」。 |
 | GPU | GPU | 是 | 圖形處理器 | 在 AI 工程文件中保留縮寫。 |
