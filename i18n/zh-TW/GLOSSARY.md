@@ -516,7 +516,53 @@
 | L1 norm | L1 範數 | 否 |  |  |
 | L2 norm | L2 範數 | 否 |  |  |
 | Lp norm | Lp 範數 | 否 |  |  |
+| L-infinity norm | L-infinity 範數 | 否 |  |  |
 | cosine similarity | 餘弦相似度 | 否 |  |  |
+| cosine distance | 餘弦距離 | 否 |  |  |
+| Manhattan distance | 曼哈頓距離 | 否 |  |  |
+| Chebyshev distance | 切比雪夫距離 | 否 |  | L-infinity 距離。 |
+| distance function | 距離函數 | 否 |  |  |
+| distance metric | 距離度量 | 否 |  |  |
+| unit ball | 單位球 | 否 |  | 範數為 1 的點所構成的集合。 |
+| sparsity | 稀疏性 | 否 |  |  |
+| outlier | 離群值 | 否 |  |  |
+| whitening | 白化 | 否 |  | 將特徵去相關並正規化。 |
+| Mahalanobis distance | 馬氏距離 | 否 |  |  |
+| Jaccard similarity | Jaccard 相似度 | 否 |  |  |
+| Jaccard distance | Jaccard 距離 | 否 |  |  |
+| edit distance | 編輯距離 | 否 |  |  |
+| Levenshtein distance | Levenshtein 距離 | 否 |  |  |
+| weighted edit distance | 加權編輯距離 | 否 |  |  |
+| triangle inequality | 三角不等式 | 否 |  |  |
+| Wasserstein distance | Wasserstein 距離 | 否 |  |  |
+| Earth Mover's Distance | 推土距離 | 否 |  | Wasserstein distance 的別稱。 |
+| optimal transport | 最優傳輸 | 否 |  |  |
+| transport plan | 傳輸計畫 | 否 |  |  |
+| probability mass | 機率質量 | 否 |  |  |
+| L1 regularization | L1 正則化 | 否 |  |  |
+| L2 regularization | L2 正則化 | 否 |  |  |
+| LASSO | LASSO | 是 |  | L1 regularization 方法名稱。 |
+| Ridge regularization | 嶺迴歸正則化 | 否 |  |  |
+| Elastic Net | Elastic Net | 是 |  | L1 與 L2 正則化方法名稱。 |
+| mean absolute error | 平均絕對誤差 | 否 |  |  |
+| MAE | MAE | 是 |  | mean absolute error 縮寫。 |
+| hinge loss | 合頁損失 | 否 |  |  |
+| triplet loss | 三元組損失 | 否 |  |  |
+| contrastive loss | 對比損失 | 否 |  |  |
+| approximate nearest neighbor | 近似最近鄰 | 否 |  |  |
+| exact nearest neighbor search | 精確最近鄰搜尋 | 否 |  |  |
+| KD-tree | KD-tree | 是 |  | 最近鄰搜尋資料結構名稱。 |
+| Ball tree | Ball tree | 是 |  | 最近鄰搜尋資料結構名稱。 |
+| locality-sensitive hashing | 區域敏感雜湊 | 否 |  |  |
+| LSH | LSH | 是 |  | locality-sensitive hashing 縮寫。 |
+| HNSW | HNSW | 是 |  | 近似最近鄰搜尋演算法名稱。 |
+| IVF | IVF | 是 |  | 倒排檔索引演算法縮寫。 |
+| inverted file index | 倒排檔索引 | 否 |  |  |
+| product quantization | 乘積量化 | 否 |  |  |
+| MinHash | MinHash | 是 |  | 近似估計 Jaccard 相似度的雜湊方法。 |
+| intersection over union (IoU) | 交並比（IoU） | 否 |  | 常用於分割模型評估。 |
+| KNN | KNN | 是 |  | k-nearest neighbors 縮寫。 |
+| ANN | ANN | 是 |  | approximate nearest neighbor 縮寫。 |
 | similarity search | 相似度搜尋 | 否 |  |  |
 | attention | 注意力 | 否 |  |  |
 | attention score | 注意力分數 | 否 |  |  |
