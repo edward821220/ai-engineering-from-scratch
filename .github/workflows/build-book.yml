@@ -66,6 +66,13 @@ jobs:
         continue-on-error: true
         run: npm install -g @mermaid-js/mermaid-cli
 
+      - name: Allow Chromium's user-namespace sandbox on Ubuntu
+        run: |
+          # Let downloaded Chromium create the user namespace required for its sandbox.
+          if command -v mmdc >/dev/null && [[ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+
       - name: Install xelatex
         if: env.BUILD_PDF == 'true'
         run: |
