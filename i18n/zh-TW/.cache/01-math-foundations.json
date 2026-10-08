@@ -11,5 +11,6 @@
   "phases/01-math-foundations/10-dimensionality-reduction/docs/en.md": "13f508adaa0599b3db8d18ad77c9b20b501cf6864dd242ad884a48412e41bcfc",
   "phases/01-math-foundations/11-singular-value-decomposition/docs/en.md": "8cd08bd71af0e84ef70159d67acf7b0781860dd567dd060b037c3923ae27c214",
   "phases/01-math-foundations/12-tensor-operations/docs/en.md": "98beea9409bda9831f924611911ce5218d012444740a5a8a800f9c7823aaf632",
-  "phases/01-math-foundations/13-numerical-stability/docs/en.md": "1f803ae9c3db1ab75678a37007833c86479ef7810778c396201e3c5d91e731c6"
+  "phases/01-math-foundations/13-numerical-stability/docs/en.md": "1f803ae9c3db1ab75678a37007833c86479ef7810778c396201e3c5d91e731c6",
+  "phases/01-math-foundations/14-norms-and-distances/docs/en.md": "f0949b87124ae76e14ed331231e357edf7e60552dc4fadd42dee0ffed10ebeca"
 }
