@@ -560,6 +560,22 @@
 | cross-entropy | 交叉熵 | 否 |  |  |
 | entropy | 熵 | 否 |  |  |
 | KL divergence | KL 散度 | 否 | — |  |
+| mutual information | 互資訊 | 否 |  |  |
+| conditional entropy | 條件熵 | 否 |  |  |
+| joint entropy | 聯合熵 | 否 |  |  |
+| information content | 資訊量 | 否 |  |  |
+| perplexity | 困惑度 | 否 |  | 語言模型評估指標。 |
+| label smoothing | 標籤平滑 | 否 |  |  |
+| soft target | 軟目標 | 否 |  |  |
+| hard target | 硬目標 | 否 |  |  |
+| negative log-likelihood | 負對數概似 | 否 |  |  |
+| bit | 位元 | 否 | 比特 | 資訊單位。 |
+| nat | 奈特 | 否 |  | 以自然對數為底的資訊單位。 |
+| calibration | 校準 | 否 |  | 預測機率反映真實不確定性。 |
+| Pearson correlation | 皮爾森相關係數 | 否 |  |  |
+| Spearman correlation | 斯皮爾曼相關係數 | 否 |  |  |
+| monotonic | 單調 | 否 |  |  |
+| binning | 分箱 | 否 |  |  |
 | information gain | 資訊增益 | 否 | 信息增益 |  |
 | feature embedding space | embedding 空間 | 否 | 嵌入空間 | 依使用者指定保留 embedding。 |
 | training example | 訓練樣本 | 否 | — |  |
@@ -594,7 +610,6 @@
 | non-convex | 非凸 | 否 |  |  |
 | velocity | 速度 | 否 |  | 動量語境。 |
 | bias correction | 偏差校正 | 否 |  | Adam 語境。 |
-| generalization | 泛化 | 否 |  |  |
 | Adam | Adam | 是 |  | 最佳化演算法名稱。 |
 | SGD | SGD | 是 |  | 首次寫「隨機梯度下降（SGD）」。 |
 | stochastic gradient descent | 隨機梯度下降 | 否 |  |  |
