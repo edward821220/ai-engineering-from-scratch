@@ -4,5 +4,6 @@
   "phases/01-math-foundations/03-matrix-transformations/docs/en.md": "bd248b5462edccab7838ef32e303839811157e453873fb6b19421e4f3d5f2365",
   "phases/01-math-foundations/05-chain-rule-and-autodiff/docs/en.md": "4687cfcd67796cd61c6a73bfca1125c030030cf7a75f6aef98f7e640c5447190",
   "phases/01-math-foundations/04-calculus-for-ml/docs/en.md": "0ed4721bd7a01a876bdfd1cafd3a732d645842bf942f708bf32198fd5a8e6794",
-  "phases/01-math-foundations/06-probability-and-distributions/docs/en.md": "6af905cb9c5318be55d10a25d9ba18b2dc253d8b8fe6b5b4cc32fe243d2e47f8"
+  "phases/01-math-foundations/06-probability-and-distributions/docs/en.md": "6af905cb9c5318be55d10a25d9ba18b2dc253d8b8fe6b5b4cc32fe243d2e47f8",
+  "phases/01-math-foundations/08-optimization/docs/en.md": "390797c59e5e709c5670edc7aa79d087fa9ada55a37a6818f35f946a53be92d6"
 }
