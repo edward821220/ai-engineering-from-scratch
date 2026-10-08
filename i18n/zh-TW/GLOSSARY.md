@@ -499,7 +499,7 @@
 | RNN | RNN | 是 |  | recurrent neural network 縮寫。 |
 | data augmentation | 資料增強 | 否 |  | 以變換擴增訓練資料。 |
 | dynamical system | 動態系統 | 否 |  | 狀態隨時間演化的系統。 |
-| spectral clustering | 譜聚類 | 否 |  | 使用拉普拉斯矩陣特徵值的分群方法。 |
+| spectral clustering | 譜分群 | 否 |  | 使用拉普拉斯矩陣特徵值的分群方法。 |
 | adjacency matrix | 相鄰矩陣 | 否 |  | 表示圖中節點連接關係的矩陣。 |
 | Laplacian | 拉普拉斯矩陣 | 否 |  | 圖論中由度矩陣減相鄰矩陣構成的矩陣。 |
 | derivative | 導數 | 否 |  |  |
