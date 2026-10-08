@@ -504,7 +504,7 @@
 | Laplacian | 拉普拉斯矩陣 | 否 |  | 圖論中由度矩陣減相鄰矩陣構成的矩陣。 |
 | derivative | 導數 | 否 |  |  |
 | partial derivative | 偏導數 | 否 |  |  |
-| chain rule | 鏈鎖律 | 否 |  |  |
+| chain rule | 連鎖律 | 否 | 鏈鎖律 | 台灣教材標準用語為「連鎖律」。 |
 | Jacobian | 雅可比矩陣 | 否 |  |  |
 | Hessian | 海森矩陣 | 否 |  |  |
 | backpropagation | 反向傳播 | 否 | 反向傳播算法 | 首次寫「反向傳播（backpropagation）」。 |
@@ -514,6 +514,34 @@
 | forward mode | 正向模式 | 否 |  | 自動微分語境。 |
 | reverse mode | 反向模式 | 否 |  | 自動微分語境。 |
 | numerical derivative | 數值微分 | 否 |  |  |
+| analytical derivative | 解析導數 | 否 |  | 用微積分規則求得的精確導數。 |
+| tangent line | 切線 | 否 |  | 曲線在某點的切線。 |
+| slope | 斜率 | 否 |  | 直線的傾斜程度。 |
+| local minimum | 局部最小值 | 否 |  | 鄰近範圍內的最小值。 |
+| global minimum | 全域最小值 | 否 |  | 整個定義域的最小值。 |
+| saddle point | 鞍點 | 否 |  | 某些方向向上、某些方向向下的臨界點。 |
+| critical point | 臨界點 | 否 |  | 梯度為零的點。 |
+| positive definite | 正定 | 否 |  | 所有特徵值為正的矩陣性質。 |
+| negative definite | 負定 | 否 |  | 所有特徵值為負的矩陣性質。 |
+| indefinite | 不定 | 否 |  | 特徵值正負混合的矩陣性質。 |
+| Taylor series | 泰勒級數 | 否 |  | 以導數展開函數的級數。 |
+| Newton's method | 牛頓法 | 否 |  | 使用 Hessian 的二階最佳化方法。 |
+| integral | 積分 | 否 |  | 計算累積量或曲線下面積的運算。 |
+| Bayesian inference | 貝氏推論 | 否 |  | 以貝氏定理做參數推論的方法。 |
+| variational inference | 變分推論 | 否 |  | 以最佳化近似機率分布的推論方法。 |
+| MCMC | MCMC | 是 |  | Markov chain Monte Carlo 縮寫。 |
+| L-BFGS | L-BFGS | 是 |  | 擬牛頓最佳化演算法名稱。 |
+| natural gradient | 自然梯度 | 否 |  | 使用 Fisher 資訊矩陣的梯度方法。 |
+| Fisher information matrix | Fisher 資訊矩陣 | 否 |  | 衡量參數資訊量的矩陣。 |
+| marginal likelihood | 邊際似然 | 否 |  | 對參數積分後的資料似然。 |
+| normalization constant | 正規化常數 | 否 |  | 使機率總和為 1 的常數。 |
+| empirical | 經驗 | 否 |  | 由觀測資料計算而非理論推得。 |
+| knowledge distillation | 知識蒸餾 | 否 |  | 用大模型教小模型的技術。 |
+| ELBO | ELBO | 是 |  | evidence lower bound 縮寫。 |
+| loss landscape | 損失地景 | 否 |  | 損失函數隨參數變化的地形。 |
+| contour plot | 等高線圖 | 否 |  | 以等值線表示函數值的圖。 |
+| MSE | MSE | 是 |  | mean squared error 縮寫。 |
+
 | numerical gradient | 數值梯度 | 否 |  |  |
 | gradient checking | 梯度檢查 | 否 |  |  |
 | gradient accumulation | 梯度累積 | 否 |  |  |
