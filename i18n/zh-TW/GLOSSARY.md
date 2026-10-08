@@ -115,7 +115,12 @@
 | cell | 儲存格 | 否 | 單元格 | Jupyter 語境。 |
 | kernel | 核心 | 否 | 內核 | Jupyter 語境；不是作業系統 kernel 時仍依上下文。 |
 | magic command | magic command | 是 | 魔法命令 | Jupyter 專有用法。 |
+| line magic | line magic | 是 | 行魔法 | Jupyter 的 `%` 行命令，保留英文。 |
+| cell magic | cell magic | 是 | 儲存格魔法 | Jupyter 的 `%%` 儲存格命令，保留英文。 |
 | Markdown | Markdown | 是 |  | 標記語言名稱，保留英文。 |
+| markdown cell | Markdown 儲存格 | 否 |  | Jupyter 儲存格類型。 |
+| code cell | 程式碼儲存格 | 否 |  | Jupyter 儲存格類型。 |
+| inline plot | 內嵌圖表 | 否 |  | 在 notebook 儲存格輸出區顯示的圖表。 |
 | script | 程式檔案 | 否 |  | 指可執行的程式碼檔案。 |
 | keyboard shortcut | 快捷鍵 | 否 |  |  |
 | command mode | 命令模式 | 否 |  | Jupyter 介面模式。 |
