@@ -132,6 +132,33 @@
 | memory | 記憶體 | 否 | 內存 | 電腦的記憶體。 |
 | byte | 位元組 | 否 | 字節 | 資料量的單位。 |
 | floating point | 浮點數 | 否 |  | 數值表示方式。 |
+| floating-point arithmetic | 浮點運算 | 否 |  |  |
+| numerical stability | 數值穩定性 | 否 |  |  |
+| numerical precision | 數值精度 | 否 |  | 浮點數表示精度；與分類指標 precision 區分。 |
+| IEEE 754 | IEEE 754 | 是 |  | 浮點數標準。 |
+| sign bit | 符號位元 | 否 |  |  |
+| exponent | 指數 | 否 |  | 浮點數格式語境。 |
+| mantissa | 尾數 | 否 |  |  |
+| significand | 有效數 | 否 |  | 浮點數格式語境。 |
+| machine epsilon | 機器精度 | 否 |  |  |
+| significant digit | 有效數字 | 否 |  |  |
+| rounding error | 捨入誤差 | 否 |  |  |
+| rounding noise | 捨入雜訊 | 否 |  |  |
+| catastrophic cancellation | 災難性消去 | 否 |  |  |
+| relative error | 相對誤差 | 否 |  |  |
+| log-sum-exp trick | log-sum-exp 技巧 | 否 |  |  |
+| max-subtraction trick | 最大值相減技巧 | 否 |  |  |
+| stable softmax | 穩定 softmax | 否 |  |  |
+| centered finite difference | 中心有限差分 | 否 |  |  |
+| finite precision | 有限精度 | 否 |  |  |
+| float16 | float16 | 是 |  | 16 位元浮點數格式名稱。 |
+| float32 | float32 | 是 |  | 32 位元浮點數格式名稱。 |
+| float64 | float64 | 是 |  | 64 位元浮點數格式名稱。 |
+| bfloat16 | bfloat16 | 是 |  | 16 位元浮點數格式名稱。 |
+| loss scaling | 損失縮放 | 否 |  |  |
+| dynamic loss scaling | 動態損失縮放 | 否 |  |  |
+| Welford algorithm | Welford 演算法 | 否 |  |  |
+| subnormal number | 次正規數 | 否 |  | 浮點數中低於最小正規數的非零數。 |
 | video RAM | 顯示記憶體 | 否 |  | GPU 的 video RAM。 |
 | half precision | 半精度 | 否 |  | 浮點數精度格式。 |
 | benchmark | 效能基準測試 | 否 |  | 比較系統或硬體效能的測試。 |
