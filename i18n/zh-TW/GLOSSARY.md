@@ -678,6 +678,66 @@
 | frequency component | 頻率成分 | 否 |  |  |
 | inverse discrete Fourier transform | 反離散傅立葉轉換 | 否 |  |  |
 | IDFT | IDFT | 是 |  | Inverse Discrete Fourier Transform 縮寫。 |
+| time domain | 時域 | 否 |  | 訊號以時間索引表示的領域。 |
+| space domain | 空間域 | 否 |  | 以空間座標表示的資料領域。 |
+| signal | 訊號 | 否 |  | 訊號處理與資料序列語境。 |
+| time series | 時間序列 | 否 |  | 按時間順序排列的資料。 |
+| frequency coefficient | 頻率係數 | 否 |  | DFT 輸出中代表某個頻率的複數係數。 |
+| frequency bin | 頻率槽 | 否 |  | DFT 輸出中索引 k 對應的離散頻率位置。 |
+| frequency resolution | 頻率解析度 | 否 |  | 區分相近頻率的能力。 |
+| sampling rate | 取樣率 | 否 |  | 訊號處理中每秒取樣的次數。 |
+| DC component | 直流分量 | 否 |  | 訊號的零頻率分量。 |
+| Nyquist frequency | 奈奎斯特頻率 | 否 |  | 取樣率的一半；實數取樣訊號可表示的最高頻率。 |
+| power spectrum | 功率頻譜 | 否 |  | 各頻率係數平方模所呈現的能量分布。 |
+| magnitude spectrum | 振幅頻譜 | 否 |  | 各頻率係數的模隨頻率變化的表示。 |
+| phase spectrum | 相位頻譜 | 否 |  | 各頻率係數相位隨頻率變化的表示。 |
+| spectral analysis | 頻譜分析 | 否 |  | 分析訊號頻率成分的過程。 |
+| spectral leakage | 頻譜洩漏 | 否 |  | 非週期訊號被當作週期訊號處理時產生的虛假頻率成分。 |
+| Cooley-Tukey algorithm | Cooley-Tukey 演算法 | 否 |  | 以偶數與奇數索引分治計算 FFT 的常見演算法。 |
+| twiddle factor | 旋轉因子 | 否 |  | FFT 合併子 DFT 時使用的複指數因子。 |
+| butterfly computation | 蝶形運算 | 否 |  | FFT 中合併偶數與奇數子結果的運算。 |
+| inverse fast Fourier transform | 反快速傅立葉轉換 | 否 |  | FFT 的反向轉換。 |
+| IFFT | IFFT | 是 |  | Inverse Fast Fourier Transform 縮寫。 |
+| convolution | 卷積 | 否 |  | 訊號處理與卷積神經網路語境。 |
+| convolution theorem | 卷積定理 | 否 |  | 時域卷積等價於頻域逐點相乘。 |
+| pointwise multiplication | 逐點乘法 | 否 |  | 對應位置的元素分別相乘。 |
+| circular convolution | 循環卷積 | 否 |  | 訊號會週期性繞回的卷積；DFT 自然計算此形式。 |
+| linear convolution | 線性卷積 | 否 |  | 不會繞回的標準卷積。 |
+| convolution kernel | 卷積核 | 否 |  | 卷積層套用於輸入的權重。 |
+| signal filter | 訊號濾波器 | 否 |  | 用來改變或選取訊號頻率成分的系統。 |
+| receptive field | 感受野 | 否 |  | 卷積輸出位置所能涵蓋的輸入範圍。 |
+| feature map | 特徵圖 | 否 |  | 神經網路中間層輸出的空間或序列表示。 |
+| convolutional layer | 卷積層 | 否 |  | 以卷積核對輸入執行卷積的神經網路層。 |
+| window | 視窗 | 否 |  | 訊號處理中指擷取的訊號片段；軟體介面語境亦譯為視窗。 |
+| windowing | 加窗 | 否 |  | 對訊號套用窗函數，以降低頻譜洩漏。 |
+| window function | 窗函數 | 否 |  | 在訊號片段兩端逐漸衰減的函數。 |
+| rectangular window | 矩形窗 | 否 |  | 振幅保持平坦的窗函數。 |
+| Hann window | Hann 窗 | 否 |  | 常用的餘弦窗函數。 |
+| Hamming window | Hamming 窗 | 否 |  | 常用的改良餘弦窗函數。 |
+| Blackman window | Blackman 窗 | 否 |  | 旁瓣抑制效果強的窗函數。 |
+| main lobe | 主瓣 | 否 |  | 頻譜窗響應中中央主要波瓣。 |
+| side lobe | 旁瓣 | 否 |  | 頻譜窗響應中主瓣以外的波瓣。 |
+| Parseval's theorem | 帕塞瓦爾定理 | 否 |  | 傅立葉轉換前後的總能量關係。 |
+| energy conservation | 能量守恆 | 否 |  | 轉換前後總能量相同的性質。 |
+| short-time Fourier transform | 短時傅立葉轉換 | 否 |  | 對訊號重疊視窗逐一計算 FFT 的轉換。 |
+| STFT | STFT | 是 |  | Short-Time Fourier Transform 縮寫。 |
+| spectrogram | 頻譜圖 | 否 |  | 以時間與頻率為兩軸表示訊號能量的圖。 |
+| chirp | 啁啾訊號 | 否 |  | 頻率隨時間改變的訊號。 |
+| hop size | 跳躍長度 | 否 |  | STFT 相鄰視窗起點之間的樣本數。 |
+| overlap | 重疊 | 否 |  | 相鄰視窗共用的訊號樣本比例或數量。 |
+| mel scale | 梅爾刻度 | 否 |  | 近似人類音高感知的頻率刻度。 |
+| mel-spectrogram | 梅爾頻譜圖 | 否 |  | 將頻率映射至梅爾刻度的頻譜圖。 |
+| aliasing | 混疊 | 否 |  | 超過奈奎斯特頻率的成分被誤認為較低頻率。 |
+| anti-aliasing filter | 抗混疊濾波器 | 否 |  | 取樣前移除奈奎斯特頻率以上成分的濾波器。 |
+| low-pass filter | 低通濾波器 | 否 |  | 保留低頻並抑制高頻的濾波器。 |
+| downsampling | 降採樣 | 否 |  | 降低訊號取樣率或特徵圖解析度的操作。 |
+| anti-aliased pooling | 抗混疊池化 | 否 |  | 降採樣前先抑制高頻成分的池化方法。 |
+| zero-padding | 補零 | 否 |  | 在訊號尾端加入零值以延長序列。 |
+| observation time | 觀測時間 | 否 |  | 收集訊號樣本的總時間長度。 |
+| frequency decomposition | 頻率分解 | 否 |  | 將訊號表示為不同頻率成分的過程。 |
+| linearity | 線性 | 否 |  | 輸入的線性組合會映射為輸出的相同線性組合。 |
+| time shift | 時間位移 | 否 |  | 將訊號沿時間軸平移。 |
+| conjugate symmetry | 共軛對稱 | 否 |  | 實值訊號的 DFT 係數滿足 X[k] = conj(X[N-k])。 |
 | positional encoding | 位置編碼 | 否 |  | transformer 語境。 |
 | sinusoidal positional encoding | 正弦位置編碼 | 否 |  | transformer 語境。 |
 | RoPE | RoPE | 是 |  | Rotary Position Embedding 縮寫。 |
