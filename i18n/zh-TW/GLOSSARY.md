@@ -766,6 +766,69 @@
 | spectral clustering | 譜分群 | 否 |  | 使用拉普拉斯矩陣特徵值的分群方法。 |
 | adjacency matrix | 相鄰矩陣 | 否 |  | 表示圖中節點連接關係的矩陣。 |
 | Laplacian | 拉普拉斯矩陣 | 否 |  | 圖論中由度矩陣減相鄰矩陣構成的矩陣。 |
+| graph theory | 圖論 | 否 |  | 研究圖及其結構的數學領域。 |
+| graph | 圖 | 否 |  | 圖論中的節點與邊結構。 |
+| vertex | 頂點 | 否 |  | 圖中的基本元素，也稱 node。 |
+| node | 節點 | 否 |  | 圖中的頂點；此處採圖論語境。 |
+| edge | 邊 | 否 |  | 連接圖中兩個頂點的關係。 |
+| directed graph | 有向圖 | 否 |  | 邊具有方向的圖。 |
+| undirected graph | 無向圖 | 否 |  | 邊沒有方向的圖。 |
+| weighted graph | 加權圖 | 否 |  | 邊帶有數值權重的圖。 |
+| unweighted graph | 無權圖 | 否 |  | 邊不帶數值權重的圖。 |
+| adjacency list | 相鄰串列 | 否 |  | 以每個節點的鄰居清單表示圖的資料結構。 |
+| degree | 度數 | 否 |  | 圖論中與節點相連的邊數。 |
+| degree matrix | 度矩陣 | 否 |  | 對角線為各節點度數的矩陣。 |
+| in-degree | 入度 | 否 |  | 有向圖中指向該節點的邊數。 |
+| out-degree | 出度 | 否 |  | 有向圖中從該節點指出的邊數。 |
+| degree distribution | 度分布 | 否 |  | 網路中節點度數的分布。 |
+| power law | 冪律 | 否 |  | 常見於少數樞紐節點、許多低度節點的網路分布。 |
+| hub node | 樞紐節點 | 否 |  | 連接許多其他節點的高程度節點。 |
+| leaf node | 葉節點 | 否 |  | 連接邊數很少的節點。 |
+| graph traversal | 圖形走訪 | 否 |  | 依規則逐步探索圖中節點與邊的過程。 |
+| breadth-first search | 廣度優先搜尋 | 否 |  | 先探索目前節點的所有鄰居，再往更遠層探索。 |
+| BFS | BFS | 是 |  | Breadth-First Search 縮寫。 |
+| depth-first search | 深度優先搜尋 | 否 |  | 沿一條路徑盡可能深入，再回溯探索。 |
+| DFS | DFS | 是 |  | Depth-First Search 縮寫。 |
+| queue | 佇列 | 否 |  | 先進先出（FIFO）的資料結構。 |
+| shortest path | 最短路徑 | 否 |  | 兩個節點之間邊數或成本最小的路徑。 |
+| hop count | 跳數 | 否 |  | 路徑經過的邊數。 |
+| cycle detection | 環路偵測 | 否 |  | 判斷圖中是否存在封閉路徑的程序。 |
+| back edge | 回邊 | 否 |  | DFS 中連回目前路徑上祖先節點的邊。 |
+| connected component | 連通分量 | 否 |  | 最大的連通子圖；其中任兩個節點之間都存在路徑。 |
+| connected graph | 連通圖 | 否 |  | 任兩個節點之間都存在路徑的圖。 |
+| connectivity | 連通性 | 否 |  | 圖中節點彼此可透過路徑連接的性質。 |
+| positive semidefinite | 半正定 | 否 |  | 所有特徵值皆非負的對稱矩陣性質。 |
+| Fiedler value | Fiedler 值 | 否 |  | 拉普拉斯矩陣最小的非零特徵值，也稱代數連通度。 |
+| Fiedler vector | Fiedler 向量 | 否 |  | 對應 Fiedler 值的特徵向量。 |
+| spectral graph theory | 譜圖論 | 否 |  | 以矩陣特徵值與特徵向量研究圖結構的領域。 |
+| spectral gap | 譜隙 | 否 |  | 描述特徵值間隔、與圖連通性及隨機漫步收斂有關的量。 |
+| random walk | 隨機漫步 | 否 |  | 每一步依機率選擇下一個節點的圖上漫步。 |
+| mixing time | 混合時間 | 否 |  | 隨機漫步接近平穩分布所需的時間。 |
+| message passing | 訊息傳遞 | 否 |  | 節點從鄰居聚合資訊並更新表示的 GNN 操作。 |
+| aggregation | 聚合 | 否 |  | 將多個鄰居訊息合併成一個表示的操作。 |
+| node feature | 節點特徵 | 否 |  | 描述單一圖節點的數值表示。 |
+| normalized adjacency matrix | 正規化相鄰矩陣 | 否 |  | 依節點度數或列總和調整後的相鄰矩陣。 |
+| normalized Laplacian | 正規化拉普拉斯矩陣 | 否 |  | 依節點度數正規化的圖拉普拉斯矩陣。 |
+| self-loop | 自環 | 否 |  | 從節點連回自身的邊。 |
+| symmetric normalization | 對稱正規化 | 否 |  | 在相鄰矩陣左右兩側乘上度矩陣的對稱正規化方式。 |
+| graph neural network | 圖神經網路 | 否 |  | 以圖結構及節點間訊息傳遞處理資料的神經網路。 |
+| GNN | GNN | 是 |  | Graph Neural Network 縮寫。 |
+| graph convolution | 圖卷積 | 否 |  | 在圖結構上聚合鄰居資訊的卷積操作。 |
+| graph convolutional network | 圖卷積網路 | 否 |  | 以圖卷積處理節點表示的神經網路。 |
+| GCN | GCN | 是 |  | Graph Convolutional Network 縮寫。 |
+| graph attention network | 圖注意力網路 | 否 |  | 使用注意力機制聚合圖鄰居資訊的神經網路。 |
+| GAT | GAT | 是 |  | Graph Attention Network 縮寫。 |
+| GraphSAGE | GraphSAGE | 是 |  | 圖神經網路架構名稱，保留英文。 |
+| community detection | 社群偵測 | 否 |  | 找出圖中內部連結較緊密之節點群組的工作。 |
+| graph partitioning | 圖分割 | 否 |  | 將圖中的節點切分成數個群組。 |
+| PageRank | PageRank | 是 |  | 網頁與圖節點重要性排序演算法名稱，保留英文。 |
+| clique | 完全子圖 | 否 |  | 任兩個節點都互相連接的子圖。 |
+| Dijkstra's algorithm | Dijkstra 演算法 | 否 |  | 在非負權重圖中尋找最短路徑的演算法。 |
+| ground truth | 真實標籤 | 否 |  | 評估時作為正確答案的已知標籤。 |
+| k-means | k-means | 是 |  | 以距離將資料分成 k 群的演算法，保留英文名稱。 |
+| random graph | 隨機圖 | 否 |  | 邊依隨機機制產生的圖。 |
+| neighbor | 鄰居節點 | 否 |  | 與指定節點直接相連的圖節點。 |
+| knowledge graph | 知識圖譜 | 否 |  | 以節點和邊表示實體及其關係的圖。 |
 | derivative | 導數 | 否 |  |  |
 | partial derivative | 偏導數 | 否 |  |  |
 | chain rule | 連鎖律 | 否 | 鏈鎖律 | 台灣教材標準用語為「連鎖律」。 |
