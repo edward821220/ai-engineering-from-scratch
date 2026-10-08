@@ -1170,6 +1170,47 @@
 | Monte Carlo estimation | 蒙地卡羅估計 | 否 |  |  |
 | law of large numbers | 大數法則 | 否 |  |  |
 | partition function | 配分函數 | 否 |  |  |
+| stochastic process | 隨機過程 | 否 |  | 隨機狀態隨時間演變的數學模型。 |
+| displacement | 位移 | 否 |  | 相對於起始位置的淨位置變化。 |
+| Brownian motion | 布朗運動 | 否 |  | 隨機漫步在連續時間下的極限過程。 |
+| martingale | 鞅 | 否 |  | 給定目前資訊後，未來值的條件期望等於目前值的隨機過程。 |
+| Markov process | 馬可夫過程 | 否 |  | 未來狀態在給定目前狀態後不依賴更早歷史的隨機過程。 |
+| Markov property | 馬可夫性質 | 否 |  | 未來狀態在給定目前狀態後，與過去歷史條件獨立的性質。 |
+| state | 狀態 | 否 |  | 馬可夫鏈或強化學習系統在某一時刻的狀況。 |
+| transition matrix | 轉移矩陣 | 否 |  | 表示系統從一個狀態轉移到另一個狀態之機率的矩陣。 |
+| transition probability | 轉移機率 | 否 |  | 系統從目前狀態轉移到指定下一狀態的機率。 |
+| power method | 冪次法 | 否 |  | 反覆乘上矩陣以近似主特徵向量的演算法。 |
+| left eigenvector | 左特徵向量 | 否 |  | 以左乘方式滿足特徵值方程式的向量。 |
+| right eigenvector | 右特徵向量 | 否 |  | 以右乘方式滿足特徵值方程式的向量。 |
+| irreducible | 不可約 | 否 |  | 馬可夫鏈中任一狀態都能到達任一其他狀態的性質。 |
+| aperiodic | 非週期 | 否 |  | 狀態回返時間不受固定週期限制的性質。 |
+| absorbing state | 吸收狀態 | 否 |  | 一旦進入便不會離開的狀態。 |
+| total variation distance | 總變差距離 | 否 |  | 衡量兩個機率分布差異的距離。 |
+| temperature | 溫度 | 否 |  | 控制機率分布尖銳程度或隨機性程度的參數。 |
+| diffusion process | 擴散過程 | 否 |  | 隨時間逐步加入或移除雜訊的隨機過程。 |
+| Langevin dynamics | Langevin 動力學 | 否 |  | 將梯度漂移與隨機雜訊結合的抽樣動力學。 |
+| energy function | 能量函數 | 否 |  | 描述狀態能量、並可決定其機率權重的函數。 |
+| energy landscape | 能量地形 | 否 |  | 能量函數在狀態空間中的整體形狀。 |
+| gradient force | 梯度力 | 否 |  | 由能量函數梯度產生、推動系統移動的力。 |
+| random force | 隨機力 | 否 |  | 由隨機擾動產生的力。 |
+| gambler's ruin | 賭徒破產問題 | 否 |  | 隨機漫步在吸收邊界間先抵達指定邊界的機率問題。 |
+| Markov decision process | 馬可夫決策過程 | 否 |  | 以狀態、動作、轉移機率和獎勵描述的決策模型。 |
+| random policy | 隨機策略 | 否 |  | 依機率分布選擇動作的策略。 |
+| normalizing constant | 正規化常數 | 否 |  | normalization constant 的同義說法。 |
+| prior distribution | 先驗分布 | 否 |  | 觀察資料前對參數或假設所指定的機率分布。 |
+| fractal dimension | 分形維度 | 否 |  | 描述分形結構在不同尺度下複雜度的維度。 |
+| independent increments | 獨立增量 | 否 |  | 不重疊時間區間上的增量彼此獨立的性質。 |
+| simulated annealing | 模擬退火法 | 否 |  | 逐步降低溫度以搜尋低能量解的最佳化方法。 |
+| double-well potential | 雙井位能 | 否 |  | 具有兩個局部低谷的位能函數。 |
+| stochastic gradient Langevin dynamics | 隨機梯度 Langevin 動力學 | 否 |  | 結合隨機梯度與 Langevin 雜訊的近似貝葉斯抽樣方法。 |
+| SGLD | SGLD | 是 |  | stochastic gradient Langevin dynamics 縮寫。 |
+| DDPM | DDPM | 是 |  | denoising diffusion probabilistic model 縮寫。 |
+| denoising diffusion probabilistic model | 去噪擴散機率模型 | 否 |  | DDPM 全名。 |
+| score-based generative model | 基於分數的生成模型 | 否 |  | 使用資料分布分數函數建構的生成模型。 |
+| exploration | 探索 | 否 |  | 強化學習中嘗試不同動作以蒐集資訊的行為。 |
+| exploitation | 利用 | 否 |  | 強化學習中選擇目前估計最佳動作以取得回報的行為。 |
+| embedding dimension | embedding 維度 | 否 |  | embedding 向量的維數；依專案規範保留 embedding 英文。 |
+| acceptance probability | 接受機率 | 否 |  | MCMC 中接受提議樣本的機率。 |
 | Markov chain | 馬可夫鏈 | 否 |  |  |
 | Markov chain Monte Carlo | 馬可夫鏈蒙地卡羅 | 否 |  | MCMC 全名。 |
 | Metropolis-Hastings | Metropolis-Hastings | 是 |  | 演算法名稱保留英文。 |
