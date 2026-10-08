@@ -591,6 +591,21 @@
 | logit | logit | 是 |  | 多個值用 logits；AI 工程語境保留。 |
 | logits | logits | 是 |  |  |
 | probability density function (PDF) | 機率密度函數 | 否 | 概率密度函数 | 數學語境；避免與 PDF 檔案格式混淆。 |
+| Bernoulli distribution | 伯努利分布 | 否 |  |  |
+| categorical distribution | 類別分布 | 否 |  |  |
+| Poisson distribution | 卜瓦松分布 | 否 | 泊松分布 | 台灣譯卜瓦松。 |
+| uniform distribution | 均勻分布 | 否 |  |  |
+| joint distribution | 聯合分布 | 否 |  |  |
+| marginal distribution | 邊際分布 | 否 |  |  |
+| central limit theorem (CLT) | 中央極限定理 | 否 | 中心極限定理 | 台灣常稱中央極限定理。 |
+| independence | 獨立 | 否 |  | 事件獨立語境。 |
+| sample space | 樣本空間 | 否 |  |  |
+| underflow | 下溢位 | 否 |  | 數值低於可表示範圍。 |
+| overflow | 溢位 | 否 |  | 數值超過可表示範圍。 |
+| log probability | 對數機率 | 否 | 對數概率 |  |
+| inverse transform sampling | 反函數取樣 | 否 | 逆變換採樣 |  |
+| rejection sampling | 拒絕取樣 | 否 |  |  |
+| reparameterization trick | 重參數化技巧 | 否 |  | VAE 語境。 |
 | probability mass function (PMF) | 機率質量函數 | 否 |  |  |
 | expected value | 期望值 | 否 |  |  |
 | conditional probability | 條件機率 | 否 | 條件概率 |  |
