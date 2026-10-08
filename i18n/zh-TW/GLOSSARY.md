@@ -88,6 +88,11 @@
 | orchestration | 編排 | 否 |  | 協調多個服務或容器。 |
 | GPU passthrough | GPU 直通 | 否 | GPU 穿透 |  |
 | NVIDIA Container Toolkit | NVIDIA Container Toolkit | 是 | NVIDIA 容器工具包 | NVIDIA 產品名稱，保留英文。 |
+| build | 建置 | 否 | 構建 |  |
+| compiler | 編譯器 | 否 |  |  |
+| filesystem | 檔案系統 | 否 | 文件系統 |  |
+| inference server | 推論伺服器 | 否 |  |  |
+| docker-compose | docker-compose | 是 | docker compose | 本課術語表中的歷史 CLI 名稱，保留來源寫法。 |
 | load balancer | 負載平衡器 | 否 | 負載均衡器 |  |
 | API | API | 是 |  | 在技術文件中保留縮寫。 |
 | API call | API 呼叫 | 否 |  |  |
