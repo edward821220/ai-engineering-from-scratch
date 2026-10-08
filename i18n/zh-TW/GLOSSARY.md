@@ -136,6 +136,8 @@
 | prototype | 原型 | 否 |  |  |
 | training pipeline | 訓練管線 | 否 | 訓練流水線 |  |
 | session | 工作階段 | 否 |  | Jupyter／Colab 工作階段。 |
+| extension | 擴充功能 | 否 | 外掛 | 軟體或編輯器的擴充功能。 |
+| training run | 訓練作業 | 否 |  | 一次完整的模型訓練執行。 |
 | list comprehension | 串列推導式 | 否 |  | Python 語法。 |
 | array | 陣列 | 否 |  | NumPy／數值運算語境。 |
 | microbenchmark | 微型效能基準測試 | 否 |  |  |
