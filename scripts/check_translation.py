@@ -213,6 +213,10 @@ def _mermaid_syntax(raw: str) -> str:
         r"\1<participant-label>",
         body,
     )
+    # Quoted labels may contain bracket/paren characters (e.g. `id["[1, 0] (x)"]`).
+    # Strip the whole quoted span first so the inner delimiters cannot confuse the
+    # per-shape loop below.
+    body = re.sub(r'(\b[\w.-]+\s*[\[({])"[^"\n]*"', r'\1""', body)
     # Replace node labels but retain each node identifier and shape delimiter.
     for opening, closing in (("[", "]"), ("(", ")"), ("{", "}")):
         pattern = re.compile(r"(\b[\w.-]+\s*" + re.escape(opening) + r")[^\n" + re.escape(closing) + r"]*" + re.escape(closing))
