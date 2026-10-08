@@ -768,6 +768,7 @@
 | Laplacian | 拉普拉斯矩陣 | 否 |  | 圖論中由度矩陣減相鄰矩陣構成的矩陣。 |
 | graph theory | 圖論 | 否 |  | 研究圖及其結構的數學領域。 |
 | graph | 圖 | 否 |  | 圖論中的節點與邊結構。 |
+| social network | 社群網路 | 否 |  | 以人或帳號為節點、關係為邊的網路。 |
 | vertex | 頂點 | 否 |  | 圖中的基本元素，也稱 node。 |
 | node | 節點 | 否 |  | 圖中的頂點；此處採圖論語境。 |
 | edge | 邊 | 否 |  | 連接圖中兩個頂點的關係。 |
@@ -806,6 +807,10 @@
 | mixing time | 混合時間 | 否 |  | 隨機漫步接近平穩分布所需的時間。 |
 | message passing | 訊息傳遞 | 否 |  | 節點從鄰居聚合資訊並更新表示的 GNN 操作。 |
 | aggregation | 聚合 | 否 |  | 將多個鄰居訊息合併成一個表示的操作。 |
+| linear transform | 線性變換 | 否 |  | linear transformation 的同義說法。 |
+| K-hop neighborhood | K 跳鄰域 | 否 |  | 經過 K 條邊可到達的節點範圍。 |
+| all-ones vector | 全 1 向量 | 否 |  | 每一個分量都等於 1 的向量。 |
+| knowledge base | 知識庫 | 否 |  | 儲存結構化知識以供查詢的系統。 |
 | node feature | 節點特徵 | 否 |  | 描述單一圖節點的數值表示。 |
 | normalized adjacency matrix | 正規化相鄰矩陣 | 否 |  | 依節點度數或列總和調整後的相鄰矩陣。 |
 | normalized Laplacian | 正規化拉普拉斯矩陣 | 否 |  | 依節點度數正規化的圖拉普拉斯矩陣。 |
