@@ -861,6 +861,8 @@
 | skewed distribution | 偏斜分布 | 否 |  |  |
 | sample size | 樣本數 | 否 |  |  |
 | population | 母體 | 否 |  |  |
+| standardized variable | 標準化變數 | 否 |  |  |
+| imbalanced data | 類別不平衡資料 | 否 |  |  |
 | base rate | 基礎率 | 否 |  | base rate fallacy 語境。 |
 | sampling | 抽樣 | 否 | 采样 |  |
 | distribution | 分布 | 否 | — |  |
