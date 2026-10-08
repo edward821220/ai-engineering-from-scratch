@@ -135,6 +135,10 @@
 | variable | 變數 | 否 |  |  |
 | prototype | 原型 | 否 |  |  |
 | training pipeline | 訓練管線 | 否 | 訓練流水線 |  |
+| session | 工作階段 | 否 |  | Jupyter／Colab 工作階段。 |
+| list comprehension | 串列推導式 | 否 |  | Python 語法。 |
+| array | 陣列 | 否 |  | NumPy／數值運算語境。 |
+| microbenchmark | 微型效能基準測試 | 否 |  |  |
 | HTML | HTML | 是 |  | 標記語言縮寫，保留英文。 |
 | CSV | CSV | 是 |  | 檔案格式縮寫，保留英文。 |
 | IDE | IDE | 是 | 整合開發環境 | 保留縮寫。 |
