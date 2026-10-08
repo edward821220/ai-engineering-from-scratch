@@ -943,3 +943,6 @@
 | Gaussian mixture | 高斯混合模型 | 否 |  |  |
 | class balance | 類別平衡 | 否 |  | 訓練資料或交叉驗證切分語境。 |
 | generative adversarial network (GAN) | 生成對抗網路（GAN） | 否 |  | 生成模型架構。 |
+| large language model (LLM) | 大型語言模型（LLM） | 否 |  |  |
+| discrete distribution | 離散分布 | 否 |  |  |
+| bimodal distribution | 雙峰分布 | 否 |  |  |
