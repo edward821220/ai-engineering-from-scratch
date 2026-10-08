@@ -864,9 +864,76 @@
 | standardized variable | 標準化變數 | 否 |  |  |
 | imbalanced data | 類別不平衡資料 | 否 |  |  |
 | base rate | 基礎率 | 否 |  | base rate fallacy 語境。 |
-| sampling | 抽樣 | 否 | 采样 |  |
+| sampling | 抽樣 | 否 | 采样 | 統計抽取樣本時用「抽樣」；生成模型的特定演算法名稱依既定譯法用「取樣」。 |
 | distribution | 分布 | 否 | — |  |
 | model complexity | 模型複雜度 | 否 |  |  |
 | target | 目標 | 否 |  | 依變數或預測目標。 |
 | vector database | 向量資料庫 | 否 | 向量數據庫 |  |
 | transformer model | transformer | 是 | 轉換器模型 | 依使用者指定保留 transformer。 |
+| sampling method | 抽樣方法 | 否 |  |  |
+| uniform random sampling | 均勻隨機抽樣 | 否 |  |  |
+| uniform random number generator | 均勻亂數產生器 | 否 |  |  |
+| inverse CDF | CDF 反函數 | 否 |  |  |
+| inverse CDF method | 反函數取樣 | 否 |  |  |
+| exponential distribution | 指數分布 | 否 |  |  |
+| standard normal distribution | 標準常態分布 | 否 |  |  |
+| truncated normal distribution | 截斷常態分布 | 否 |  |  |
+| Cauchy distribution | 柯西分布 | 否 |  |  |
+| importance sampling | 重要性取樣 | 否 |  |  |
+| importance weight | 重要性權重 | 否 |  |  |
+| self-normalized importance sampling | 自我正規化重要性取樣 | 否 |  |  |
+| estimator | 估計量 | 否 |  |  |
+| expectation | 期望值 | 否 |  |  |
+| Monte Carlo | 蒙地卡羅 | 否 |  |  |
+| Monte Carlo estimation | 蒙地卡羅估計 | 否 |  |  |
+| law of large numbers | 大數法則 | 否 |  |  |
+| partition function | 配分函數 | 否 |  |  |
+| Markov chain | 馬可夫鏈 | 否 |  |  |
+| Markov chain Monte Carlo | 馬可夫鏈蒙地卡羅 | 否 |  | MCMC 全名。 |
+| Metropolis-Hastings | Metropolis-Hastings | 是 |  | 演算法名稱保留英文。 |
+| target distribution | 目標分布 | 否 |  |  |
+| proposal distribution | 提議分布 | 否 |  |  |
+| stationary distribution | 平穩分布 | 否 |  |  |
+| posterior distribution | 後驗分布 | 否 |  |  |
+| acceptance ratio | 接受比率 | 否 |  |  |
+| acceptance rate | 接受率 | 否 |  |  |
+| burn-in | 暖身期 | 否 |  | MCMC 語境。 |
+| thinning | 抽稀 | 否 |  | MCMC 語境。 |
+| autocorrelation | 自相關 | 否 |  |  |
+| detailed balance | 細緻平衡 | 否 |  |  |
+| proposal scale | 提議尺度 | 否 |  |  |
+| Gibbs sampling | Gibbs 取樣 | 否 |  |  |
+| conditional distribution | 條件分布 | 否 |  |  |
+| temperature sampling | 溫度取樣 | 否 |  | 語言模型生成語境。 |
+| greedy decoding | 貪婪解碼 | 否 |  |  |
+| top-k sampling | top-k 取樣 | 否 |  |  |
+| top-p sampling | top-p 取樣 | 否 |  |  |
+| nucleus sampling | 核取樣 | 否 |  | 又稱 top-p sampling。 |
+| variational autoencoder (VAE) | 變分自編碼器（VAE） | 否 |  |  |
+| Gumbel-Softmax | Gumbel-Softmax | 是 |  | 方法名稱保留英文。 |
+| Gumbel-Max trick | Gumbel-Max 技巧 | 否 |  |  |
+| Gumbel distribution | Gumbel 分布 | 否 |  |  |
+| one-hot vector | one-hot 向量 | 否 |  |  |
+| continuous relaxation | 連續鬆弛 | 否 |  |  |
+| straight-through estimator | 直通估計器 | 否 |  |  |
+| latent space | 潛在空間 | 否 |  |  |
+| latent representation | 潛在表徵 | 否 |  |  |
+| hard attention | 硬式注意力 | 否 |  |  |
+| neural architecture search | 神經架構搜尋 | 否 |  |  |
+| stratified sampling | 分層抽樣 | 否 |  |  |
+| stratum | 層 | 否 |  | 分層抽樣中的一層。 |
+| strata | 層 | 否 |  | stratum 複數。 |
+| quasi-Monte Carlo | 準蒙地卡羅 | 否 |  |  |
+| neural radiance fields | 神經輻射場 | 否 |  | NeRF 全名。 |
+| NeRF | NeRF | 是 |  | neural radiance fields 縮寫。 |
+| diffusion model | 擴散模型 | 否 |  |  |
+| noise schedule | 雜訊排程 | 否 |  | 擴散模型語境。 |
+| ancestral sampling | 祖先取樣 | 否 |  |  |
+| forward process | 前向過程 | 否 |  | 擴散模型語境。 |
+| reverse process | 反向過程 | 否 |  | 擴散模型語境。 |
+| Box-Muller transform | Box-Muller 轉換 | 否 |  |  |
+| Ising model | 伊辛模型 | 否 |  |  |
+| proximal policy optimization (PPO) | 近端策略最佳化（PPO） | 否 |  | 強化學習演算法。 |
+| TRPO | TRPO | 是 |  | trust region policy optimization 縮寫。 |
+| policy gradient | 策略梯度 | 否 |  |  |
+| trajectory | 軌跡 | 否 |  | 強化學習或 MCMC 路徑語境。 |
