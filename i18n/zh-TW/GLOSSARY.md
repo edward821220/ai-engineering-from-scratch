@@ -539,6 +539,8 @@
 | optimal transport | 最優傳輸 | 否 |  |  |
 | transport plan | 傳輸計畫 | 否 |  |  |
 | probability mass | 機率質量 | 否 |  |  |
+| cumulative distribution function (CDF) | 累積分布函數（CDF） | 否 |  |  |
+| dynamic programming | 動態規劃 | 否 |  |  |
 | L1 regularization | L1 正則化 | 否 |  |  |
 | L2 regularization | L2 正則化 | 否 |  |  |
 | LASSO | LASSO | 是 |  | L1 regularization 方法名稱。 |
