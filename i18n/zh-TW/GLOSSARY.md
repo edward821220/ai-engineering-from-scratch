@@ -162,14 +162,14 @@
 | memory leak | 記憶體洩漏 | 否 |  |  |
 | debugging | 除錯 | 否 | 調試 |  |
 | debugger | 除錯器 | 否 | 調試器 |  |
-| breakpoint | 中斷點 | 否 | 斷點 |  |
+| breakpoint | 中斷點 | 否 | — | 簡體「断点」由簡體字檢查攔下；繁體寫法統一用「中斷點」。 |
 | profiling | 效能分析 | 否 |  | 測量程式各部分的時間與資源使用。 |
 | profiler | 效能分析器 | 否 |  | 執行效能分析的工具。 |
 | memory profiling | 記憶體分析 | 否 |  | 測量程式記憶體使用的分析。 |
 | bottleneck | 瓶頸 | 否 |  | 限制整體效能的環節。 |
 | stack trace | 堆疊追蹤 | 否 | 堆棧跟蹤 | 程式錯誤時列出的呼叫序列。 |
 | runtime error | 執行階段錯誤 | 否 | 運行時錯誤 | 程式執行中才發生的錯誤。 |
-| timestamp | 時間戳記 | 否 | 時間戳 |  |
+| timestamp | 時間戳記 | 否 | — |  |
 | logging | 日誌記錄 | 否 |  | 程式執行時寫下事件與訊息。 |
 | device | 裝置 | 否 | 設備 | CPU／GPU 等執行張量運算的硬體。 |
 | dtype | dtype | 是 |  | 張量資料型別屬性名，保留程式名稱。 |
