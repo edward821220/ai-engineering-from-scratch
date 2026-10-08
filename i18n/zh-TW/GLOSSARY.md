@@ -667,6 +667,26 @@
 | indefinite | 不定 | 否 |  | 特徵值正負混合的矩陣性質。 |
 | Taylor series | 泰勒級數 | 否 |  | 以導數展開函數的級數。 |
 | Newton's method | 牛頓法 | 否 |  | 使用 Hessian 的二階最佳化方法。 |
+| constrained optimization | 受限最佳化 | 否 |  |  |
+| unconstrained optimization | 無約束最佳化 | 否 |  |  |
+| constraint | 限制條件 | 否 |  | 最佳化語境。 |
+| inequality constraint | 不等式限制條件 | 否 |  |  |
+| Lagrange multiplier | 拉格朗日乘數 | 否 |  |  |
+| Lagrangian | 拉格朗日函數 | 否 |  |  |
+| Karush-Kuhn-Tucker conditions | Karush-Kuhn-Tucker（KKT）條件 | 否 |  | 亦稱 KKT conditions。 |
+| KKT conditions | KKT 條件 | 否 |  | Karush-Kuhn-Tucker conditions 的縮寫。 |
+| stationarity condition | 駐點條件 | 否 |  | KKT 語境。 |
+| primal feasibility | 原始可行性 | 否 |  |  |
+| dual feasibility | 對偶可行性 | 否 |  |  |
+| complementary slackness | 互補鬆弛條件 | 否 |  |  |
+| active constraint | 作用中限制條件 | 否 |  |  |
+| primal problem | 原始問題 | 否 |  |  |
+| dual problem | 對偶問題 | 否 |  |  |
+| dual function | 對偶函數 | 否 |  |  |
+| duality | 對偶性 | 否 |  |  |
+| strong duality | 強對偶性 | 否 |  |  |
+| Slater's condition | Slater 條件 | 否 |  |  |
+| feasible region | 可行區域 | 否 |  |  |
 | integral | 積分 | 否 |  | 計算累積量或曲線下面積的運算。 |
 | Bayesian inference | 貝氏推論 | 否 |  | 以貝氏定理做參數推論的方法。 |
 | Bayesian network | 貝氏網路 | 否 |  | 由變數間條件相依關係構成的機率圖模型。 |
@@ -675,12 +695,24 @@
 | L-BFGS | L-BFGS | 是 |  | 擬牛頓最佳化演算法名稱。 |
 | natural gradient | 自然梯度 | 否 |  | 使用 Fisher 資訊矩陣的梯度方法。 |
 | Fisher information matrix | Fisher 資訊矩陣 | 否 |  | 衡量參數資訊量的矩陣。 |
+| K-FAC | K-FAC | 是 |  | Kronecker-Factored Approximate Curvature 方法縮寫。 |
+| Kronecker-Factored Approximate Curvature | Kronecker 因子化近似曲率 | 否 |  | K-FAC 方法全名。 |
+| Kronecker product | Kronecker 積 | 否 |  |  |
+| Hessian-free optimization | 免形成海森矩陣的最佳化 | 否 |  |  |
+| Hessian-vector product | 海森矩陣向量積 | 否 |  |  |
+| Hutchinson's estimator | Hutchinson 估計量 | 否 |  |  |
+| diagonal approximation | 對角近似 | 否 |  |  |
 | marginal likelihood | 邊際概似 | 否 |  | 對參數積分後的資料概似。 |
 | normalization constant | 正規化常數 | 否 |  | 使機率總和為 1 的常數。 |
 | empirical | 經驗 | 否 |  | 由觀測資料計算而非理論推得。 |
 | knowledge distillation | 知識蒸餾 | 否 |  | 用大模型教小模型的技術。 |
 | ELBO | ELBO | 是 |  | evidence lower bound 縮寫。 |
 | loss landscape | 損失地景 | 否 |  | 損失函數隨參數變化的地形。 |
+| overparameterization | 過度參數化 | 否 |  |  |
+| implicit regularization | 隱式正則化 | 否 |  |  |
+| sharp minimum | 尖銳極小值 | 否 |  |  |
+| flat minimum | 平坦極小值 | 否 |  |  |
+| stochastic noise | 隨機雜訊 | 否 |  |  |
 | contour plot | 等高線圖 | 否 |  | 以等值線表示函數值的圖。 |
 | MSE | MSE | 是 |  | mean squared error 縮寫。 |
 | numerical gradient | 數值梯度 | 否 |  |  |
@@ -774,6 +806,7 @@
 | cluster | 群集 | 否 |  | 動詞依句型譯為「分群」。 |
 | centroid | 質心 | 否 |  |  |
 | support vector machine | 支援向量機 | 否 |  |  |
+| support vector | 支援向量 | 否 |  | SVM 語境。 |
 | K-nearest neighbors | k 最近鄰法 | 否 |  | 可保留 KNN 縮寫。 |
 | anomaly detection | 異常偵測 | 否 |  |  |
 | weight decay | 權重衰減 | 否 | — |  |
@@ -785,6 +818,20 @@
 | warmup | 預熱 | 否 |  | 學習率暖身語境。 |
 | convex function | 凸函數 | 否 |  |  |
 | non-convex | 非凸 | 否 |  |  |
+| convex set | 凸集合 | 否 |  |  |
+| convexity | 凸性 | 否 |  |  |
+| concave function | 凹函數 | 否 |  |  |
+| convex optimization | 凸最佳化 | 否 |  |  |
+| line segment | 線段 | 否 |  |  |
+| halfspace | 半空間 | 否 |  |  |
+| second derivative test | 二階導數判別法 | 否 |  |  |
+| Hessian test | 海森矩陣判別法 | 否 |  |  |
+| first-order method | 一階方法 | 否 |  |  |
+| second-order method | 二階方法 | 否 |  |  |
+| quadratic convergence | 二次收斂 | 否 |  |  |
+| curvature | 曲率 | 否 |  |  |
+| quadratic approximation | 二次近似 | 否 |  |  |
+| scale-invariant | 尺度不變 | 否 |  |  |
 | velocity | 速度 | 否 |  | 動量語境。 |
 | bias correction | 偏差校正 | 否 |  | Adam 語境。 |
 | Adam | Adam | 是 |  | 最佳化演算法名稱。 |
