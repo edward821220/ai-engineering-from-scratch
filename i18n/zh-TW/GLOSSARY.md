@@ -167,6 +167,20 @@
 | training pipeline | 訓練管線 | 否 | 訓練流水線 |  |
 | session | 工作階段 | 否 |  | Jupyter／Colab 工作階段。 |
 | extension | 擴充功能 | 否 | 外掛 | 軟體或編輯器的擴充功能。 |
+| editor | 編輯器 | 否 |  | 撰寫與檢視程式碼的編輯器。 |
+| autocomplete | 自動完成 | 否 |  | 編輯器依上下文提供程式碼補全。 |
+| type checking | 型別檢查 | 否 |  | 檢查程式碼中的型別是否相容。 |
+| type hint | 型別提示 | 否 |  | 顯示或標註程式碼的型別資訊。 |
+| linting | 程式碼檢查 | 否 |  | 靜態檢查常見程式碼問題。 |
+| format on save | 儲存時自動格式化 | 否 |  | 儲存檔案時自動套用程式碼格式。 |
+| formatter | 格式化工具 | 否 |  | 自動調整程式碼排版的工具。 |
+| language server | 語言伺服器 | 否 |  | 透過 LSP 提供編輯器語言功能的伺服器。 |
+| code completion | 程式碼補全 | 否 |  | 編輯器提供的程式碼完成建議。 |
+| diagnostic | 診斷資訊 | 否 |  | 語言伺服器回報的錯誤或警告。 |
+| inline error | 行內錯誤訊息 | 否 |  | 顯示在編輯器程式碼附近的錯誤。 |
+| type information | 型別資訊 | 否 |  | 變數、參數或回傳值的型別資料。 |
+| ruler | 編輯器尺標 | 否 |  | 顯示行長位置的垂直輔助線。 |
+| remote development | 遠端開發 | 否 |  | 在遠端主機上編輯、執行或除錯程式。 |
 | training run | 訓練作業 | 否 |  | 一次完整的模型訓練執行。 |
 | list comprehension | 串列推導式 | 否 |  | Python 語法。 |
 | array | 陣列 | 否 |  | NumPy／數值運算語境。 |
