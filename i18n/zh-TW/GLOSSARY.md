@@ -937,3 +937,9 @@
 | TRPO | TRPO | 是 |  | trust region policy optimization 縮寫。 |
 | policy gradient | 策略梯度 | 否 |  |  |
 | trajectory | 軌跡 | 否 |  | 強化學習或 MCMC 路徑語境。 |
+| vocabulary | 詞彙表 | 否 |  | 語言模型 token 語境。 |
+| encoder | 編碼器 | 否 |  | 神經網路架構語境。 |
+| decoder | 解碼器 | 否 |  | 神經網路架構語境。 |
+| Gaussian mixture | 高斯混合模型 | 否 |  |  |
+| class balance | 類別平衡 | 否 |  | 訓練資料或交叉驗證切分語境。 |
+| generative adversarial network (GAN) | 生成對抗網路（GAN） | 否 |  | 生成模型架構。 |
