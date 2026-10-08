@@ -429,6 +429,18 @@
 | Gram-Schmidt process | Gram-Schmidt 正交化過程 | 否 |  | 保留演算法名稱。 |
 | QR decomposition | QR 分解 | 否 |  |  |
 | Gaussian elimination | 高斯消去法 | 否 |  |  |
+| pivot | 主元 | 否 |  | 消去法語境。 |
+| partial pivoting | 部分選主元 | 否 |  | 高斯消去法語境。 |
+| upper triangular matrix | 上三角矩陣 | 否 |  |  |
+| lower triangular matrix | 下三角矩陣 | 否 |  |  |
+| upper triangular system | 上三角方程組 | 否 |  |  |
+| lower triangular system | 下三角方程組 | 否 |  |  |
+| back substitution | 回代 | 否 |  | 由最後一個方程式往回求解。 |
+| forward substitution | 前向代入 | 否 |  | 由第一個方程式往前求解。 |
+| LU decomposition | LU 分解 | 否 |  |  |
+| permutation matrix | 置換矩陣 | 否 |  |  |
+| Cholesky decomposition | Cholesky 分解 | 否 |  |  |
+| Cholesky factor | Cholesky 因子 | 否 |  | 分解 A = LL^T 時的 L。 |
 | learning rate | 學習率 | 否 |  |  |
 | optimizer | 最佳化器 | 否 | 優化器 |  |
 | optimization | 最佳化 | 否 | 優化 |  |
@@ -448,6 +460,12 @@
 | linear decision boundary | 線性決策邊界 | 否 |  |  |
 | linear algebra | 線性代數 | 否 |  |  |
 | linear system | 線性方程組 | 否 | — | Ax=b 語境。 |
+| hyperplane | 超平面 | 否 |  | 線性方程式的幾何表示。 |
+| invertible | 可逆 | 否 |  | 方陣語境。 |
+| inconsistent system | 不相容方程組 | 否 |  | 沒有解的線性方程組。 |
+| null space | 零空間 | 否 |  | Ax=0 的解所構成的空間。 |
+| row picture | 列觀點 | 否 |  | 以 A 的列描述線性方程組。 |
+| column picture | 欄觀點 | 否 |  | 以 A 的欄向量組合描述 Ax=b。 |
 | vector | 向量 | 否 |  |  |
 | broadcasting | 廣播 | 否 |  | NumPy／框架把小陣列延展成相符形狀的機制。 |
 | element-wise | 逐元素 | 否 |  | 對相同位置的元素逐一運算。 |
@@ -583,6 +601,18 @@
 | UMAP | UMAP | 是 |  | 方法名稱。 |
 | nearest neighbor | 最近鄰 | 否 | 最近邻 |  |
 | positive semi-definite | 半正定 | 否 |  |  |
+| symmetric matrix | 對稱矩陣 | 否 |  |  |
+| symmetric positive definite | 對稱正定 | 否 |  |  |
+| symmetric positive semi-definite | 對稱半正定 | 否 |  |  |
+| kernel matrix | 核矩陣 | 否 |  | 高斯過程語境。 |
+| Gaussian process | 高斯過程 | 否 |  |  |
+| log determinant | 對數行列式 | 否 |  |  |
+| closed-form solution | 封閉解 | 否 |  |  |
+| minimum-norm solution | 最小範數解 | 否 |  |  |
+| orthogonal initialization | 正交初始化 | 否 |  |  |
+| collinear | 共線 | 否 |  |  |
+| collinearity | 共線性 | 否 |  |  |
+| feature collinearity | 特徵共線性 | 否 |  |  |
 | hypercube | 超立方體 | 否 |  |  |
 | pre-image | 原像 | 否 |  |  |
 | feature space | 特徵空間 | 否 |  |  |
@@ -720,6 +750,15 @@
 | deflate (matrix) | 對矩陣做降階處理 | 否 |  | SVD 演算法語境。 |
 | noise floor | 噪底 | 否 |  |  |
 | overdetermined system | 超定系統 | 否 |  |  |
+| sparse matrix | 稀疏矩陣 | 否 |  |  |
+| sparse system | 稀疏系統 | 否 |  |  |
+| iterative method | 迭代法 | 否 |  |  |
+| iterative solver | 迭代求解器 | 否 |  |  |
+| conjugate gradient | 共軛梯度法 | 否 |  |  |
+| CG | CG | 是 |  | conjugate gradient 縮寫。 |
+| search direction | 搜尋方向 | 否 |  |  |
+| preconditioning | 預條件化 | 否 |  | 數值線性代數語境。 |
+| preconditioner | 預條件子 | 否 |  |  |
 | alternating least squares | 交替最小平方法 | 否 |  | ALS。 |
 | noise reduction | 降噪 | 否 |  |  |
 | matrix factorization | 矩陣分解 | 否 |  |  |
