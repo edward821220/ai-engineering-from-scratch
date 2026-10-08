@@ -17,6 +17,7 @@
 | staging area | 暫存區 | 否 |  | Git 中準備納入下一個 commit 的區域。 |
 | binary file | 二進位檔案 | 否 |  | 與文字檔相對。 |
 | model checkpoint | model checkpoint | 是 |  | AI 模型訓練中保存的參數與狀態；保留英文。 |
+| model weights | 模型權重 | 否 |  | 模型訓練後保存的參數。 |
 | fork | fork | 是 |  | GitHub 協作功能，保留英文。 |
 | rebase | rebase | 是 |  | Git 歷史整理操作，保留英文。 |
 | cherry-pick | cherry-pick | 是 |  | Git 操作，保留英文。 |
