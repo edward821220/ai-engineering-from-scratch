@@ -1188,6 +1188,8 @@
 | total variation distance | 總變差距離 | 否 |  | 衡量兩個機率分布差異的距離。 |
 | temperature | 溫度 | 否 |  | 控制機率分布尖銳程度或隨機性程度的參數。 |
 | diffusion process | 擴散過程 | 否 |  | 隨時間逐步加入或移除雜訊的隨機過程。 |
+| stochastic differential equation | 隨機微分方程 | 否 |  | 含隨機項的微分方程。 |
+| SDE | SDE | 是 |  | stochastic differential equation 縮寫。 |
 | Langevin dynamics | Langevin 動力學 | 否 |  | 將梯度漂移與隨機雜訊結合的抽樣動力學。 |
 | energy function | 能量函數 | 否 |  | 描述狀態能量、並可決定其機率權重的函數。 |
 | energy landscape | 能量地形 | 否 |  | 能量函數在狀態空間中的整體形狀。 |
