@@ -201,6 +201,9 @@
 | Parquet | Parquet | 是 |  | 檔案格式名稱。 |
 | Arrow | Arrow | 是 |  | Apache 專案名稱。 |
 | Git LFS | Git LFS | 是 |  | 專案名稱。 |
+| DVC | DVC | 是 |  | Data Version Control 工具名稱。 |
+| data version control | 資料版本控制 | 否 |  | 管理資料集與模型版本的方式。 |
+| Hugging Face Hub | Hugging Face Hub | 是 |  | Hugging Face 的資料集與模型託管平台。 |
 | LSP | LSP | 是 |  | Language Server Protocol 縮寫。 |
 | Pylance | Pylance | 是 |  | 產品名稱。 |
 | feature | 特徵 | 否 |  | 機器學習輸入變數；產品功能依上下文譯為「功能」。 |
@@ -235,6 +238,13 @@
 | inference | 推論 | 否 |  |  |
 | prediction | 預測 | 否 |  |  |
 | dataset | 資料集 | 否 |  |  |
+| `datasets` library | `datasets` 函式庫 | 否 |  | Hugging Face 用來載入與處理資料集的函式庫。 |
+| columnar format | 欄式格式 | 否 |  | 以欄為單位組織資料的儲存格式。 |
+| in-memory processing | 記憶體內處理 | 否 |  | 直接處理目前載入記憶體的資料。 |
+| fixed random seed | 固定亂數種子 | 否 |  | 讓隨機操作可重現的固定種子值。 |
+| local cache | 本機快取 | 否 |  | 儲存在本機、供後續使用的下載資料副本。 |
+| cloud storage | 雲端儲存空間 | 否 |  |  |
+| storage backend | 儲存後端 | 否 |  | 工具用來存放資料的儲存服務。 |
 | sample | 樣本 | 否 |  |  |
 | input-output pair | 輸入－輸出配對 | 否 |  | 監督式學習的訓練範例。 |
 | data point | 資料點 | 否 |  |  |
