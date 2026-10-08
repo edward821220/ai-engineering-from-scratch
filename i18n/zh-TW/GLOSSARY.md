@@ -486,6 +486,22 @@
 | singular system | 奇異系統 | 否 |  |  |
 | eigenvalue | 特徵值 | 否 | — | 全書採用常見數學／AI 用語「特徵值」。 |
 | eigenvector | 特徵向量 | 否 | — |  |
+| eigendecomposition | 特徵分解 | 否 |  | 把矩陣分解為 V @ D @ V^(-1)。 |
+| characteristic equation | 特徵方程式 | 否 |  | 根為特徵值的多項式方程 det(A - λI) = 0。 |
+| rotation matrix | 旋轉矩陣 | 否 |  | 沿圓弧移動點的正交矩陣。 |
+| scaling matrix | 縮放矩陣 | 否 |  | 沿各軸獨立伸縮的對角矩陣。 |
+| shearing matrix | 推移矩陣 | 否 |  | 依另一座標比例平移一座標的矩陣；台灣教材常用「推移」。 |
+| reflection | 反射 | 否 |  | 把空間沿軸或平面翻轉的變換。 |
+| orthogonal matrix | 正交矩陣 | 否 |  | 欄為標準正交向量的矩陣。 |
+| diagonal matrix | 對角矩陣 | 否 |  | 僅主對角線非零的矩陣。 |
+| commutative | 可交換 | 否 |  | 運算順序不影響結果的性質。 |
+| recurrent neural network | 循環神經網路 | 否 |  | 具有迴圈結構、處理序列的網路；RNN。 |
+| RNN | RNN | 是 |  | recurrent neural network 縮寫。 |
+| data augmentation | 資料增強 | 否 |  | 以變換擴增訓練資料。 |
+| dynamical system | 動態系統 | 否 |  | 狀態隨時間演化的系統。 |
+| spectral clustering | 譜聚類 | 否 |  | 使用拉普拉斯矩陣特徵值的分群方法。 |
+| adjacency matrix | 相鄰矩陣 | 否 |  | 表示圖中節點連接關係的矩陣。 |
+| Laplacian | 拉普拉斯矩陣 | 否 |  | 圖論中由度矩陣減相鄰矩陣構成的矩陣。 |
 | derivative | 導數 | 否 |  |  |
 | partial derivative | 偏導數 | 否 |  |  |
 | chain rule | 鏈鎖律 | 否 |  |  |
