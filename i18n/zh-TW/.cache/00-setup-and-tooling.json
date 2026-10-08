@@ -6,5 +6,6 @@
   "phases/00-setup-and-tooling/06-python-environments/docs/en.md": "eafe05c7f0cc6d66440c773d6e4e38b39c5fb099be6e031512c144a59e0c2ed9",
   "phases/00-setup-and-tooling/05-jupyter-notebooks/docs/en.md": "6f0e391d6e853320124a3a8954e8b8ce8e28163d6cb0749b5e831fb05449acff",
   "phases/00-setup-and-tooling/08-editor-setup/docs/en.md": "b5c36f56fa153fb13620cceac0df13914373d466d229efe3e28915399b96fc84",
-  "phases/00-setup-and-tooling/07-docker-for-ai/docs/en.md": "7010d2e2c5d90012f328cee7e51ba8d18660582048dc8311ead1885c6455d952"
+  "phases/00-setup-and-tooling/07-docker-for-ai/docs/en.md": "7010d2e2c5d90012f328cee7e51ba8d18660582048dc8311ead1885c6455d952",
+  "phases/00-setup-and-tooling/09-data-management/docs/en.md": "21f3293155f3b48ef79eaef08e7bf86be58a791974ed7266cbe9f18681c9b237"
 }
