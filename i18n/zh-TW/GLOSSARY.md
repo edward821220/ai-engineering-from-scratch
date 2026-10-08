@@ -179,6 +179,13 @@
 | diagnostic | 診斷資訊 | 否 |  | 語言伺服器回報的錯誤或警告。 |
 | inline error | 行內錯誤訊息 | 否 |  | 顯示在編輯器程式碼附近的錯誤。 |
 | type information | 型別資訊 | 否 |  | 變數、參數或回傳值的型別資料。 |
+| import resolution | 匯入解析 | 否 |  | 編輯器解析程式匯入模組的來源。 |
+| variable explorer | 變數瀏覽器 | 否 |  | 編輯器用來檢視目前變數的面板。 |
+| integrated terminal | 整合式終端機 | 否 |  | 內嵌在程式編輯器中的終端機。 |
+| terminal integration | 終端機整合 | 否 |  | 編輯器與終端機之間的整合功能。 |
+| Language Server Protocol | 語言伺服器通訊協定 | 否 |  | 簡稱 LSP，定義編輯器和語言伺服器之間的通訊。 |
+| SSH key | SSH 金鑰 | 否 |  | 用於 SSH 驗證的金鑰。 |
+| training loop | 訓練迴圈 | 否 |  | 重複執行模型訓練步驟的程式流程。 |
 | ruler | 編輯器尺標 | 否 |  | 顯示行長位置的垂直輔助線。 |
 | remote development | 遠端開發 | 否 |  | 在遠端主機上編輯、執行或除錯程式。 |
 | training run | 訓練作業 | 否 |  | 一次完整的模型訓練執行。 |
