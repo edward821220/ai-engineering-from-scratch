@@ -23,6 +23,7 @@
 | submodule | submodule | 是 |  | Git 子模組機制，保留英文。 |
 | driver | 驅動程式 | 否 | — | 硬體裝置的軟體驅動程式。 |
 | backend | 後端 | 否 |  | 系統架構語境。 |
+| framework | 框架 | 否 |  | 軟體開發語境。 |
 | RAG | RAG | 是 |  | Retrieval-augmented generation 的縮寫。 |
 | large language model | 大型語言模型 | 否 |  |  |
 | data | 資料 | 否 | 數據 | 不指資料庫中的單一欄位名稱。 |
@@ -47,12 +48,21 @@
 | toolchain | 工具鏈 | 否 | 工具鍊 |  |
 | project | 專案 | 否 | — | 專案語境用「專案」；「項目」仍可表示品項。 |
 | library | 函式庫 | 否 |  | 程式庫也可依上下文使用；本書統一用「函式庫」。 |
+| C library | C 函式庫 | 否 | C 庫 |  |
 | stack | 堆疊 | 否 | 棧 | 技術層次的 stack；容器或資料結構語境需依上下文。 |
 | runtime | 執行環境 | 否 | 運行時 |  |
+| Python interpreter | Python 直譯器 | 否 | 解釋器 |  |
 | virtual environment | 虛擬環境 | 否 |  |  |
+| symlink | 符號連結 | 否 | 軟連接 |  |
 | web app | 網頁應用程式 | 否 | 網頁應用程序 |  |
 | dependency | 相依套件 | 否 | 依賴包 | Python／Node.js 套件語境。 |
 | transitive dependency | 間接相依套件 | 否 | 轉遞依賴 |  |
+| dependency hell | 相依地獄 | 否 | 依賴地獄 |  |
+| dependency conflict | 相依套件衝突 | 否 | 依賴衝突 |  |
+| global install | 全域安裝 | 否 | 全局安裝 |  |
+| dependency resolution | 相依性解析 | 否 | 依賴解析 |  |
+| optional dependency group | 選用相依套件群組 | 否 |  |  |
+| reproducibility | 可重現性 | 否 |  |  |
 | lockfile | lockfile | 是 | 鎖定文件 | 套件管理器的檔名與術語保留。 |
 | cache | 快取 | 否 | 緩存 |  |
 | shell | shell | 是 |  | 指命令直譯器時保留英文。 |
@@ -96,6 +106,9 @@
 | CNN | CNN | 是 |  | 卷積神經網路的縮寫；保留縮寫。 |
 | LLM | LLM | 是 |  | large language model 的縮寫；保留縮寫。 |
 | CUDA | CUDA | 是 |  | NVIDIA 平台名稱。 |
+| CUDA toolkit | CUDA 工具套件 | 否 |  |  |
+| CUDA binding | CUDA 繫結 | 否 |  |  |
+| CUDA version mismatch | CUDA 版本不相容 | 否 | CUDA 版本不匹配 |  |
 | fp16 | fp16 | 是 |  | 16 位元浮點數格式；保留格式標記。 |
 | fp32 | fp32 | 是 |  | 32 位元浮點數格式；保留格式標記。 |
 | memory | 記憶體 | 否 | 內存 | 電腦的記憶體。 |
