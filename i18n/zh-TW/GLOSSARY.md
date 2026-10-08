@@ -238,6 +238,14 @@
 | inference | 推論 | 否 |  |  |
 | prediction | 預測 | 否 |  |  |
 | dataset | 資料集 | 否 |  |  |
+| tokenization | tokenization | 是 |  | 文字處理步驟；保留 token 的英文用法。 |
+| language modeling | 語言建模 | 否 |  |  |
+| question answering | 問答 | 否 |  |  |
+| text classification | 文字分類 | 否 |  |  |
+| image classification | 影像分類 | 否 |  |  |
+| multimodal | 多模態 | 否 |  |  |
+| image-text pair | 圖文配對 | 否 |  |  |
+| large-scale text processing | 大規模文字處理 | 否 |  |  |
 | `datasets` library | `datasets` 函式庫 | 否 |  | Hugging Face 用來載入與處理資料集的函式庫。 |
 | columnar format | 欄式格式 | 否 |  | 以欄為單位組織資料的儲存格式。 |
 | in-memory processing | 記憶體內處理 | 否 |  | 直接處理目前載入記憶體的資料。 |
