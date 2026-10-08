@@ -639,6 +639,7 @@
 | Newton's method | 牛頓法 | 否 |  | 使用 Hessian 的二階最佳化方法。 |
 | integral | 積分 | 否 |  | 計算累積量或曲線下面積的運算。 |
 | Bayesian inference | 貝氏推論 | 否 |  | 以貝氏定理做參數推論的方法。 |
+| Bayesian network | 貝氏網路 | 否 |  | 由變數間條件相依關係構成的機率圖模型。 |
 | variational inference | 變分推論 | 否 |  | 以最佳化近似機率分布的推論方法。 |
 | MCMC | MCMC | 是 |  | Markov chain Monte Carlo 縮寫。 |
 | L-BFGS | L-BFGS | 是 |  | 擬牛頓最佳化演算法名稱。 |
