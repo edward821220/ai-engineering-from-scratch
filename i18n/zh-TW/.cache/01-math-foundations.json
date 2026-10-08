@@ -15,5 +15,6 @@
   "phases/01-math-foundations/14-norms-and-distances/docs/en.md": "f0949b87124ae76e14ed331231e357edf7e60552dc4fadd42dee0ffed10ebeca",
   "phases/01-math-foundations/15-statistics-for-ml/docs/en.md": "9770d8e715f37b25538f2c9b0e78de30b38d7c1ddccc81765b124880071e0561",
   "phases/01-math-foundations/16-sampling-methods/docs/en.md": "387bb3952f9a86f59c898179ec88597a8e9719e662ecab1b6b93bd6a977c2616",
-  "phases/01-math-foundations/17-linear-systems/docs/en.md": "de9a2c0f1e09351e6061834a651110bdab18ae3df534315ea2a62a33a156af49"
+  "phases/01-math-foundations/17-linear-systems/docs/en.md": "de9a2c0f1e09351e6061834a651110bdab18ae3df534315ea2a62a33a156af49",
+  "phases/01-math-foundations/18-convex-optimization/docs/en.md": "061158e46d86c18ffeb43b730c98c52994ae863629445f6431942a368cfdb952"
 }
