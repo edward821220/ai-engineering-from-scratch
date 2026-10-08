@@ -9,5 +9,6 @@
   "phases/01-math-foundations/07-bayes-theorem/docs/en.md": "e44e7db0a2b9c89dc09eecbe3ac41bb1c631b8aa239609b82b832c532d75ce6d",
   "phases/01-math-foundations/09-information-theory/docs/en.md": "56e2b277862358e636e71058ac13e9cd31366d39105702aa91570844e1e38953",
   "phases/01-math-foundations/10-dimensionality-reduction/docs/en.md": "13f508adaa0599b3db8d18ad77c9b20b501cf6864dd242ad884a48412e41bcfc",
-  "phases/01-math-foundations/11-singular-value-decomposition/docs/en.md": "8cd08bd71af0e84ef70159d67acf7b0781860dd567dd060b037c3923ae27c214"
+  "phases/01-math-foundations/11-singular-value-decomposition/docs/en.md": "8cd08bd71af0e84ef70159d67acf7b0781860dd567dd060b037c3923ae27c214",
+  "phases/01-math-foundations/12-tensor-operations/docs/en.md": "98beea9409bda9831f924611911ce5218d012444740a5a8a800f9c7823aaf632"
 }
