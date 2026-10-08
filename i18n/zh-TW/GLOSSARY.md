@@ -123,6 +123,7 @@
 | inline plot | 內嵌圖表 | 否 |  | 在 notebook 儲存格輸出區顯示的圖表。 |
 | script | 程式檔案 | 否 |  | 指可執行的程式碼檔案。 |
 | keyboard shortcut | 快捷鍵 | 否 |  |  |
+| function signature | 函式簽章 | 否 |  | 函式接受的參數和回傳型別等宣告。 |
 | command mode | 命令模式 | 否 |  | Jupyter 介面模式。 |
 | edit mode | 編輯模式 | 否 |  | Jupyter 介面模式。 |
 | out-of-order execution | 不依序執行 | 否 |  | 指以不同於由上而下的順序執行 notebook 儲存格。 |
@@ -133,6 +134,7 @@
 | process | 行程 | 否 | 進程 | 作業系統中執行中的程式執行個體。 |
 | variable | 變數 | 否 |  |  |
 | prototype | 原型 | 否 |  |  |
+| training pipeline | 訓練管線 | 否 | 訓練流水線 |  |
 | HTML | HTML | 是 |  | 標記語言縮寫，保留英文。 |
 | CSV | CSV | 是 |  | 檔案格式縮寫，保留英文。 |
 | IDE | IDE | 是 | 整合開發環境 | 保留縮寫。 |
