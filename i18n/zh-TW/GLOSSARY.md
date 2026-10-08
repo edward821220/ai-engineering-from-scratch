@@ -431,6 +431,26 @@
 | BLAS | BLAS | 是 |  | 線性代數運算函式庫標準。 |
 | matrix | 矩陣 | 否 |  |  |
 | tensor | 張量 | 否 |  |  |
+| tensor operation | 張量運算 | 否 |  |  |
+| reshape | 重塑 | 否 |  | 張量運算語境。 |
+| self-attention | 自注意力 | 否 |  |  |
+| multi-head attention | 多頭注意力 | 否 |  |  |
+| pairwise distance | 成對距離 | 否 |  |  |
+| tensor shape | 張量形狀 | 否 |  |  |
+| axis | 軸 | 否 |  |  |
+| stride | 步幅 | 否 |  | 張量記憶體索引語境。 |
+| memory layout | 記憶體配置 | 否 |  |  |
+| contiguous | 連續 | 否 |  | 張量元素在記憶體中依序儲存。 |
+| non-contiguous | 非連續 | 否 |  | 張量記憶體配置語境。 |
+| permute | 軸置換 | 否 |  | 張量維度順序。 |
+| einsum | einsum | 是 |  | Einstein 求和表示法及程式 API 名稱。 |
+| Einstein summation | Einstein 求和表示法 | 否 |  | 張量索引表示法。 |
+| tensor contraction | 張量縮約 | 否 |  | 對共享索引相乘並加總。 |
+| reduction | 歸約 | 否 |  | 張量運算；沿軸聚合或消去維度。 |
+| global average pooling | 全域平均池化 | 否 |  | CNN 語境。 |
+| row-major | 列優先 | 否 |  | C order。 |
+| column-major | 欄優先 | 否 |  | Fortran order。 |
+| batch normalization | 批次正規化 | 否 |  |  |
 | scalar | 純量 | 否 | — |  |
 | dot product | 內積 | 否 |  |  |
 | matrix multiplication | 矩陣乘法 | 否 |  |  |
