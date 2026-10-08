@@ -839,6 +839,11 @@
 | Type II error | 第二類錯誤 | 否 |  | 虛無假設為假卻未被拒絕。 |
 | false positive rate | 偽陽性率 | 否 |  |  |
 | statistical power | 檢定力 | 否 |  | 正確拒絕虛無假設的機率。 |
+| right skew | 右偏 | 否 |  | 數值較多集中在較小值，尾部向右延伸。 |
+| left skew | 左偏 | 否 |  | 數值較多集中在較大值，尾部向左延伸。 |
+| p-hacking | p-hacking | 是 |  | 反覆嘗試分析方式以取得顯著結果，保留英文。 |
+| fairness metric | 公平性指標 | 否 |  |  |
+| AUC | AUC | 是 |  | area under the curve 縮寫。 |
 | sampling distribution | 抽樣分布 | 否 |  |  |
 | bootstrap | bootstrap | 是 |  | 統計重抽樣方法，保留英文。 |
 | resampling with replacement | 有放回重抽樣 | 否 |  |  |
