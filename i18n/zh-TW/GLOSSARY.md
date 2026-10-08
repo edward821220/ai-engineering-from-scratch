@@ -670,6 +670,7 @@
 | constrained optimization | 受限最佳化 | 否 |  |  |
 | unconstrained optimization | 無約束最佳化 | 否 |  |  |
 | constraint | 限制條件 | 否 |  | 最佳化語境。 |
+| equality constraint | 等式限制條件 | 否 |  |  |
 | inequality constraint | 不等式限制條件 | 否 |  |  |
 | Lagrange multiplier | 拉格朗日乘數 | 否 |  |  |
 | Lagrangian | 拉格朗日函數 | 否 |  |  |
