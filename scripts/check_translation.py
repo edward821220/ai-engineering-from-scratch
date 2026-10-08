@@ -333,9 +333,9 @@ def check_document(source: str, translation: str, *, glossary_text: str = "", le
             if original_match and translated_match:
                 original_title, translated_title = original_match.group(2), translated_match.group(2)
                 if original_title in FIXED_HEADINGS:
-                    expected = original_title + "｜"
-                    if not translated_title.startswith(expected) or not translated_title[len(expected):].strip():
-                        findings.append(f"{prefix}fixed heading {original_title!r} must be followed by ｜ and a Chinese label")
+                    expected = original_title + "｜" + FIXED_HEADINGS[original_title]
+                    if translated_title != expected:
+                        findings.append(f"{prefix}fixed heading must be {expected!r}, got {translated_title!r}")
 
     source_spans = Counter()
     target_spans = Counter()

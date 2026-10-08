@@ -585,6 +585,16 @@
 | anomaly detection | 異常偵測 | 否 |  |  |
 | weight decay | 權重衰減 | 否 | — |  |
 | momentum | 動量 | 否 |  |  |
+| learning rate schedule | 學習率排程 | 否 |  |  |
+| step decay | 步進衰減 | 否 |  | 學習率排程語境。 |
+| exponential decay | 指數衰減 | 否 |  |  |
+| cosine annealing | 餘弦退火 | 否 |  | 學習率排程語境。 |
+| warmup | 預熱 | 否 |  | 學習率暖身語境。 |
+| convex function | 凸函數 | 否 |  |  |
+| non-convex | 非凸 | 否 |  |  |
+| velocity | 速度 | 否 |  | 動量語境。 |
+| bias correction | 偏差校正 | 否 |  | Adam 語境。 |
+| generalization | 泛化 | 否 |  |  |
 | Adam | Adam | 是 |  | 最佳化演算法名稱。 |
 | SGD | SGD | 是 |  | 首次寫「隨機梯度下降（SGD）」。 |
 | stochastic gradient descent | 隨機梯度下降 | 否 |  |  |
