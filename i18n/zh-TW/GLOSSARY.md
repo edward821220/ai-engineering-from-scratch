@@ -567,6 +567,7 @@
 | mean absolute error | 平均絕對誤差 | 否 |  |  |
 | MAE | MAE | 是 |  | mean absolute error 縮寫。 |
 | hinge loss | 合頁損失 | 否 |  |  |
+| log-loss | 對數損失 | 否 |  |  |
 | triplet loss | 三元組損失 | 否 |  |  |
 | contrastive loss | 對比損失 | 否 |  |  |
 | approximate nearest neighbor | 近似最近鄰 | 否 |  |  |
@@ -694,6 +695,8 @@
 | variational inference | 變分推論 | 否 |  | 以最佳化近似機率分布的推論方法。 |
 | MCMC | MCMC | 是 |  | Markov chain Monte Carlo 縮寫。 |
 | L-BFGS | L-BFGS | 是 |  | 擬牛頓最佳化演算法名稱。 |
+| conditional random field | 條件隨機場 | 否 |  |  |
+| second moment | 二階矩 | 否 |  | Adam 語境，梯度平方的平均量。 |
 | natural gradient | 自然梯度 | 否 |  | 使用 Fisher 資訊矩陣的梯度方法。 |
 | Fisher information matrix | Fisher 資訊矩陣 | 否 |  | 衡量參數資訊量的矩陣。 |
 | K-FAC | K-FAC | 是 |  | Kronecker-Factored Approximate Curvature 方法縮寫。 |
