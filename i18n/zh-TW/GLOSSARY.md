@@ -76,6 +76,9 @@
 | URL | URL | 是 |  | 網址縮寫；保留英文。 |
 | environment variable | 環境變數 | 否 | 環境變量 |  |
 | endpoint | 端點 | 否 |  |  |
+| provider | 服務供應商 | 否 |  | API 服務語境。 |
+| schema | 結構描述 | 否 |  | 技術資料格式語境。 |
+| free tier | 免費方案 | 否 |  | 服務免費使用層級。 |
 | request | 請求 | 否 |  | API 通訊語境。 |
 | response | 回應 | 否 |  | API 通訊語境。 |
 | request body | 請求本文 | 否 |  |  |
