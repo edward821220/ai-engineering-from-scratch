@@ -383,6 +383,7 @@
 | classification | 分類 | 否 |  |  |
 | regression | 迴歸 | 否 | — | 機器學習任務。 |
 | linear regression | 線性迴歸 | 否 | — |  |
+| scatter plot | 散佈圖 | 否 |  |  |
 | multiple linear regression | 多元線性迴歸 | 否 |  | 使用多個特徵的線性迴歸。 |
 | intercept | 截距 | 否 |  | 線性模型中的截距項。 |
 | normal equation | 正規方程組 | 否 |  | 線性迴歸的封閉解方法；normal equations 的單數形式。 |
@@ -560,6 +561,7 @@
 | distance metric | 距離度量 | 否 |  |  |
 | unit ball | 單位球 | 否 |  | 範數為 1 的點所構成的集合。 |
 | sparsity | 稀疏性 | 否 |  |  |
+| sparse solution | 稀疏解 | 否 |  | 大部分參數為零或接近零的解。 |
 | outlier | 離群值 | 否 |  |  |
 | whitening | 白化 | 否 |  | 將特徵去相關並正規化。 |
 | Mahalanobis distance | 馬氏距離 | 否 |  |  |
