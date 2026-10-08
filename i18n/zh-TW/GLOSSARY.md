@@ -533,7 +533,7 @@
 | L-BFGS | L-BFGS | 是 |  | 擬牛頓最佳化演算法名稱。 |
 | natural gradient | 自然梯度 | 否 |  | 使用 Fisher 資訊矩陣的梯度方法。 |
 | Fisher information matrix | Fisher 資訊矩陣 | 否 |  | 衡量參數資訊量的矩陣。 |
-| marginal likelihood | 邊際似然 | 否 |  | 對參數積分後的資料似然。 |
+| marginal likelihood | 邊際概似 | 否 |  | 對參數積分後的資料概似。 |
 | normalization constant | 正規化常數 | 否 |  | 使機率總和為 1 的常數。 |
 | empirical | 經驗 | 否 |  | 由觀測資料計算而非理論推得。 |
 | knowledge distillation | 知識蒸餾 | 否 |  | 用大模型教小模型的技術。 |
