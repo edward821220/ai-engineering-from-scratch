@@ -23,6 +23,7 @@
 | submodule | submodule | 是 |  | Git 子模組機制，保留英文。 |
 | driver | 驅動程式 | 否 | — | 硬體裝置的軟體驅動程式。 |
 | backend | 後端 | 否 |  | 系統架構語境。 |
+| framework | 框架 | 否 |  | 軟體開發語境。 |
 | RAG | RAG | 是 |  | Retrieval-augmented generation 的縮寫。 |
 | large language model | 大型語言模型 | 否 |  |  |
 | data | 資料 | 否 | 數據 | 不指資料庫中的單一欄位名稱。 |
@@ -47,12 +48,21 @@
 | toolchain | 工具鏈 | 否 | 工具鍊 |  |
 | project | 專案 | 否 | — | 專案語境用「專案」；「項目」仍可表示品項。 |
 | library | 函式庫 | 否 |  | 程式庫也可依上下文使用；本書統一用「函式庫」。 |
+| C library | C 函式庫 | 否 | C 庫 |  |
 | stack | 堆疊 | 否 | 棧 | 技術層次的 stack；容器或資料結構語境需依上下文。 |
 | runtime | 執行環境 | 否 | 運行時 |  |
+| Python interpreter | Python 直譯器 | 否 | 解釋器 |  |
 | virtual environment | 虛擬環境 | 否 |  |  |
+| symlink | 符號連結 | 否 | 軟連接 |  |
 | web app | 網頁應用程式 | 否 | 網頁應用程序 |  |
 | dependency | 相依套件 | 否 | 依賴包 | Python／Node.js 套件語境。 |
 | transitive dependency | 間接相依套件 | 否 | 轉遞依賴 |  |
+| dependency hell | 相依地獄 | 否 | 依賴地獄 |  |
+| dependency conflict | 相依套件衝突 | 否 | 依賴衝突 |  |
+| global install | 全域安裝 | 否 | 全局安裝 |  |
+| dependency resolution | 相依性解析 | 否 | 依賴解析 |  |
+| optional dependency group | 選用相依套件群組 | 否 |  |  |
+| reproducibility | 可重現性 | 否 |  |  |
 | lockfile | lockfile | 是 | 鎖定文件 | 套件管理器的檔名與術語保留。 |
 | cache | 快取 | 否 | 緩存 |  |
 | shell | shell | 是 |  | 指命令直譯器時保留英文。 |
@@ -64,9 +74,26 @@
 | merge | merge | 是 |  | Git 專有術語依台灣開發者慣例保留英文；一般描述仍可依語境使用「合併」。 |
 | remote | remote | 是 | 遠程 | Git remote 名稱與概念保留英文。 |
 | container | 容器 | 否 |  | Docker 語境。 |
+| image | 映像 | 否 | 鏡像 | Docker 映像。 |
+| container image | 容器映像 | 否 | 容器鏡像 |  |
+| Dockerfile | Dockerfile | 是 |  | Docker 組態檔名稱，保留英文。 |
+| Docker Compose | Docker Compose | 是 |  | Docker 官方多容器編排工具名稱。 |
 | image layer | 映像層 | 否 | 鏡像層 | Docker 語境。 |
 | base image | 基礎映像 | 否 | 基礎鏡像 | Docker 語境。 |
+| volume | 磁碟區 | 否 | 卷 | Docker 持續性儲存空間。 |
 | volume mount | 磁碟區掛載 | 否 | 卷掛載 | Docker 語境。 |
+| host | 主機 | 否 | 宿主機 | 執行容器的機器。 |
+| port | 通訊埠 | 否 | 端口 | 網路通訊語境。 |
+| orchestrate | 編排 | 否 |  | 協調多個服務或容器。 |
+| orchestration | 編排 | 否 |  | 協調多個服務或容器。 |
+| GPU passthrough | GPU 直通 | 否 | GPU 穿透 |  |
+| NVIDIA Container Toolkit | NVIDIA Container Toolkit | 是 | NVIDIA 容器工具包 | NVIDIA 產品名稱，保留英文。 |
+| build | 建置 | 否 | 構建 |  |
+| compiler | 編譯器 | 否 |  |  |
+| filesystem | 檔案系統 | 否 | 文件系統 |  |
+| inference server | 推論伺服器 | 否 |  |  |
+| docker-compose | docker-compose | 是 | docker compose | 本課術語表中的歷史 CLI 名稱，保留來源寫法。 |
+| load balancer | 負載平衡器 | 否 | 負載均衡器 |  |
 | API | API | 是 |  | 在技術文件中保留縮寫。 |
 | API call | API 呼叫 | 否 |  |  |
 | API server | API 伺服器 | 否 |  |  |
@@ -96,6 +123,9 @@
 | CNN | CNN | 是 |  | 卷積神經網路的縮寫；保留縮寫。 |
 | LLM | LLM | 是 |  | large language model 的縮寫；保留縮寫。 |
 | CUDA | CUDA | 是 |  | NVIDIA 平台名稱。 |
+| CUDA toolkit | CUDA 工具套件 | 否 |  |  |
+| CUDA binding | CUDA 繫結 | 否 |  |  |
+| CUDA version mismatch | CUDA 版本不相容 | 否 | CUDA 版本不匹配 |  |
 | fp16 | fp16 | 是 |  | 16 位元浮點數格式；保留格式標記。 |
 | fp32 | fp32 | 是 |  | 32 位元浮點數格式；保留格式標記。 |
 | memory | 記憶體 | 否 | 內存 | 電腦的記憶體。 |
@@ -115,6 +145,35 @@
 | cell | 儲存格 | 否 | 單元格 | Jupyter 語境。 |
 | kernel | 核心 | 否 | 內核 | Jupyter 語境；不是作業系統 kernel 時仍依上下文。 |
 | magic command | magic command | 是 | 魔法命令 | Jupyter 專有用法。 |
+| line magic | line magic | 是 | 行魔法 | Jupyter 的 `%` 行命令，保留英文。 |
+| cell magic | cell magic | 是 | 儲存格魔法 | Jupyter 的 `%%` 儲存格命令，保留英文。 |
+| Markdown | Markdown | 是 |  | 標記語言名稱，保留英文。 |
+| markdown cell | Markdown 儲存格 | 否 |  | Jupyter 儲存格類型。 |
+| code cell | 程式碼儲存格 | 否 |  | Jupyter 儲存格類型。 |
+| inline plot | 內嵌圖表 | 否 |  | 在 notebook 儲存格輸出區顯示的圖表。 |
+| script | 程式檔案 | 否 |  | 指可執行的程式碼檔案。 |
+| keyboard shortcut | 快捷鍵 | 否 |  |  |
+| function signature | 函式簽章 | 否 |  | 函式接受的參數和回傳型別等宣告。 |
+| command mode | 命令模式 | 否 |  | Jupyter 介面模式。 |
+| edit mode | 編輯模式 | 否 |  | Jupyter 介面模式。 |
+| out-of-order execution | 不依序執行 | 否 |  | 指以不同於由上而下的順序執行 notebook 儲存格。 |
+| hidden state | 隱藏狀態 | 否 |  | 變數仍保留在 kernel 記憶體、但目前可見儲存格沒有建立它的狀況。 |
+| memory leak | 記憶體洩漏 | 否 |  |  |
+| DataFrame | DataFrame | 是 |  | pandas 資料表物件；保留類別名稱。 |
+| metadata | 中繼資料 | 否 | 元資料 |  |
+| process | 行程 | 否 | 進程 | 作業系統中執行中的程式執行個體。 |
+| variable | 變數 | 否 |  |  |
+| prototype | 原型 | 否 |  |  |
+| training pipeline | 訓練管線 | 否 | 訓練流水線 |  |
+| session | 工作階段 | 否 |  | Jupyter／Colab 工作階段。 |
+| extension | 擴充功能 | 否 | 外掛 | 軟體或編輯器的擴充功能。 |
+| training run | 訓練作業 | 否 |  | 一次完整的模型訓練執行。 |
+| list comprehension | 串列推導式 | 否 |  | Python 語法。 |
+| array | 陣列 | 否 |  | NumPy／數值運算語境。 |
+| microbenchmark | 微型效能基準測試 | 否 |  |  |
+| HTML | HTML | 是 |  | 標記語言縮寫，保留英文。 |
+| CSV | CSV | 是 |  | 檔案格式縮寫，保留英文。 |
+| IDE | IDE | 是 | 整合開發環境 | 保留縮寫。 |
 | tmux | tmux | 是 |  | 專案名稱。 |
 | SSH | SSH | 是 |  | 協定縮寫。 |
 | PID | PID | 是 |  | process ID 的縮寫。 |
