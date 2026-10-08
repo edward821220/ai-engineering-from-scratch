@@ -81,7 +81,7 @@
 | Docker Compose | Docker Compose | 是 |  | Docker 官方多容器編排工具名稱。 |
 | image layer | 映像層 | 否 | 鏡像層 | Docker 語境。 |
 | base image | 基礎映像 | 否 | 基礎鏡像 | Docker 語境。 |
-| volume | 磁碟區 | 否 | 卷 | Docker 持續性儲存空間。 |
+| volume | 磁碟區 | 否 |  | Docker 持續性儲存空間。 |
 | volume mount | 磁碟區掛載 | 否 | 卷掛載 | Docker 語境。 |
 | host | 主機 | 否 | 宿主機 | 執行容器的機器。 |
 | port | 通訊埠 | 否 | 端口 | 網路通訊語境。 |
@@ -735,6 +735,14 @@
 | zero-padding | 補零 | 否 |  | 在訊號尾端加入零值以延長序列。 |
 | observation time | 觀測時間 | 否 |  | 收集訊號樣本的總時間長度。 |
 | frequency decomposition | 頻率分解 | 否 |  | 將訊號表示為不同頻率成分的過程。 |
+| change of basis | 基底變換 | 否 |  | 以另一組座標基底重新表示相同資訊。 |
+| real-valued signal | 實值訊號 | 否 |  | 每個樣本都是實數的訊號。 |
+| complex sinusoid | 複數正弦訊號 | 否 |  | 以複數表示的正弦頻率成分。 |
+| analog-to-digital converter | 類比數位轉換裝置 | 否 |  | 將類比訊號轉成數位樣本的設備，簡稱 ADC。 |
+| phase angle | 相位角 | 否 |  | 表示複數或週期訊號相位的角度。 |
+| frequency band | 頻帶 | 否 |  | 頻率範圍。 |
+| pure tone | 純音 | 否 |  | 只含單一頻率的聲音。 |
+| pitch perception | 音高感知 | 否 |  | 人類對聲音音高的知覺。 |
 | linearity | 線性 | 否 |  | 輸入的線性組合會映射為輸出的相同線性組合。 |
 | time shift | 時間位移 | 否 |  | 將訊號沿時間軸平移。 |
 | conjugate symmetry | 共軛對稱 | 否 |  | 實值訊號的 DFT 係數滿足 X[k] = conj(X[N-k])。 |
