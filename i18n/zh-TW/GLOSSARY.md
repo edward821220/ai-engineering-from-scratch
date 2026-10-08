@@ -1198,6 +1198,7 @@
 | random policy | 隨機策略 | 否 |  | 依機率分布選擇動作的策略。 |
 | normalizing constant | 正規化常數 | 否 |  | normalization constant 的同義說法。 |
 | prior distribution | 先驗分布 | 否 |  | 觀察資料前對參數或假設所指定的機率分布。 |
+| fractal | 分形 | 否 |  | 在不同尺度下呈現相似結構的幾何形態。 |
 | fractal dimension | 分形維度 | 否 |  | 描述分形結構在不同尺度下複雜度的維度。 |
 | independent increments | 獨立增量 | 否 |  | 不重疊時間區間上的增量彼此獨立的性質。 |
 | simulated annealing | 模擬退火法 | 否 |  | 逐步降低溫度以搜尋低能量解的最佳化方法。 |
