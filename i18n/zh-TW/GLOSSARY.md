@@ -619,6 +619,10 @@
 | Latent Semantic Analysis | 潛在語意分析 | 否 |  |  |
 | Latent Semantic Indexing | 潛在語意索引 | 否 |  |  |
 | term-document matrix | 詞項－文件矩陣 | 否 |  |  |
+| document-term matrix | 詞項－文件矩陣 | 否 |  |  |
+| document-term frequency table | 詞項－文件詞頻表 | 否 |  |  |
+| deflate (matrix) | 對矩陣做降階處理 | 否 |  | SVD 演算法語境。 |
+| noise floor | 噪底 | 否 |  |  |
 | overdetermined system | 超定系統 | 否 |  |  |
 | alternating least squares | 交替最小平方法 | 否 |  | ALS。 |
 | noise reduction | 降噪 | 否 |  |  |
