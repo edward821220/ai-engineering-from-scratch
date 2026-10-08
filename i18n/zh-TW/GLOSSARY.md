@@ -631,6 +631,60 @@
 | eigendecomposition | 特徵分解 | 否 |  | 把矩陣分解為 V @ D @ V^(-1)。 |
 | characteristic equation | 特徵方程式 | 否 |  | 根為特徵值的多項式方程 det(A - λI) = 0。 |
 | rotation matrix | 旋轉矩陣 | 否 |  | 沿圓弧移動點的正交矩陣。 |
+| complex number | 複數 | 否 |  |  |
+| complex arithmetic | 複數運算 | 否 |  |  |
+| real number | 實數 | 否 |  |  |
+| imaginary number | 虛數 | 否 |  |  |
+| real part | 實部 | 否 |  | 複數語境。 |
+| imaginary part | 虛部 | 否 |  | 複數語境。 |
+| imaginary unit | 虛數單位 | 否 |  |  |
+| complex plane | 複數平面 | 否 |  |  |
+| real axis | 實軸 | 否 |  |  |
+| imaginary axis | 虛軸 | 否 |  |  |
+| number line | 數線 | 否 |  |  |
+| conjugate | 共軛 | 否 |  | 複數語境。 |
+| complex conjugate | 共軛複數 | 否 |  |  |
+| rectangular form | 直角座標形式 | 否 |  | 複數語境。 |
+| polar form | 極式 | 否 |  | 複數語境。 |
+| modulus | 模 | 否 |  | 複數的模。 |
+| phase | 相位 | 否 |  | 訊號或複數語境。 |
+| argument | 輻角 | 否 |  | 複數語境；勿與函數引數混淆。 |
+| Euler's formula | 歐拉公式 | 否 |  |  |
+| unit circle | 單位圓 | 否 |  |  |
+| complex exponential | 複指數函數 | 否 |  |  |
+| complex multiplication | 複數乘法 | 否 |  |  |
+| rotation operator | 旋轉算子 | 否 |  |  |
+| trigonometric function | 三角函數 | 否 |  |  |
+| phasor | 相量 | 否 |  |  |
+| angular frequency | 角頻率 | 否 |  |  |
+| frequency | 頻率 | 否 |  | 訊號語境。 |
+| sine wave | 正弦波 | 否 |  |  |
+| cosine wave | 餘弦波 | 否 |  |  |
+| sinusoidal signal | 正弦訊號 | 否 |  |  |
+| signal processing | 訊號處理 | 否 |  |  |
+| phase shift | 相位偏移 | 否 |  |  |
+| frequency shift | 頻率偏移 | 否 |  |  |
+| amplitude | 振幅 | 否 |  |  |
+| modulation | 調變 | 否 |  | 訊號語境。 |
+| spectrum | 頻譜 | 否 |  |  |
+| roots of unity | 單位根 | 否 |  |  |
+| primitive root of unity | 本原單位根 | 否 |  |  |
+| Fourier transform | 傅立葉轉換 | 否 |  |  |
+| discrete Fourier transform | 離散傅立葉轉換 | 否 |  |  |
+| DFT | DFT | 是 |  | Discrete Fourier Transform 縮寫。 |
+| fast Fourier transform | 快速傅立葉轉換 | 否 |  |  |
+| FFT | FFT | 是 |  | Fast Fourier Transform 縮寫。 |
+| frequency domain | 頻域 | 否 |  |  |
+| frequency component | 頻率成分 | 否 |  |  |
+| inverse discrete Fourier transform | 反離散傅立葉轉換 | 否 |  |  |
+| IDFT | IDFT | 是 |  | Inverse Discrete Fourier Transform 縮寫。 |
+| positional encoding | 位置編碼 | 否 |  | transformer 語境。 |
+| sinusoidal positional encoding | 正弦位置編碼 | 否 |  | transformer 語境。 |
+| RoPE | RoPE | 是 |  | Rotary Position Embedding 縮寫。 |
+| Rotary Position Embedding | Rotary Position Embedding | 是 |  | 依專案規範保留 embedding 英文。 |
+| quantum computing | 量子計算 | 否 |  |  |
+| quantum state | 量子態 | 否 |  |  |
+| complex vector space | 複數向量空間 | 否 |  |  |
 | scaling matrix | 縮放矩陣 | 否 |  | 沿各軸獨立伸縮的對角矩陣。 |
 | shearing matrix | 推移矩陣 | 否 |  | 依另一座標比例平移一座標的矩陣；台灣教材常用「推移」。 |
 | reflection | 反射 | 否 |  | 把空間沿軸或平面翻轉的變換。 |
