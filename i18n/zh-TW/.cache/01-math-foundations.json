@@ -1,4 +1,5 @@
 {
   "phases/01-math-foundations/01-linear-algebra-intuition/docs/en.md": "9bac2df58d85c30df3f36bde3626b02a3fa6aa001536bc343320b9048ee284e1",
-  "phases/01-math-foundations/02-vectors-matrices-operations/docs/en.md": "398ce87f481e54f360898e1af0d0c05877f631d5d1b1c1edebf83f3cf5a09981"
+  "phases/01-math-foundations/02-vectors-matrices-operations/docs/en.md": "398ce87f481e54f360898e1af0d0c05877f631d5d1b1c1edebf83f3cf5a09981",
+  "phases/01-math-foundations/03-matrix-transformations/docs/en.md": "bd248b5462edccab7838ef32e303839811157e453873fb6b19421e4f3d5f2365"
 }
