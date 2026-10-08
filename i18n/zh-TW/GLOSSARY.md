@@ -792,6 +792,70 @@
 | bandit | bandit | 是 |  | multi-armed bandit 語境保留英文。 |
 | online learning | 線上學習 | 否 |  | 逐步更新語境。 |
 | A/B testing | A/B 測試 | 否 |  |  |
+| descriptive statistics | 描述統計 | 否 |  |  |
+| measure of central tendency | 集中趨勢指標 | 否 |  |  |
+| measure of spread | 離散程度指標 | 否 |  |  |
+| mode (statistics) | 眾數 | 否 |  | 統計量。 |
+| percentile | 百分位數 | 否 |  |  |
+| range (statistics) | 全距 | 否 |  | 統計量，最大值減最小值。 |
+| interquartile range | 四分位距 | 否 |  |  |
+| IQR | IQR | 是 |  | interquartile range 縮寫。 |
+| sample mean | 樣本平均數 | 否 |  |  |
+| population mean | 母體平均數 | 否 |  |  |
+| sample variance | 樣本變異數 | 否 |  |  |
+| population variance | 母體變異數 | 否 |  |  |
+| Bessel's correction | 貝塞爾校正 | 否 |  |  |
+| covariance | 共變異數 | 否 |  |  |
+| correlation coefficient | 相關係數 | 否 |  |  |
+| Spearman rank correlation | 斯皮爾曼等級相關係數 | 否 |  |  |
+| correlation matrix | 相關矩陣 | 否 |  |  |
+| linear association | 線性關聯 | 否 |  |  |
+| monotonic association | 單調關聯 | 否 |  |  |
+| ordinal data | 序位資料 | 否 |  |  |
+| continuous data | 連續資料 | 否 |  |  |
+| categorical data | 類別資料 | 否 |  |  |
+| hypothesis testing | 假設檢定 | 否 |  |  |
+| null hypothesis | 虛無假設 | 否 |  |  |
+| alternative hypothesis | 對立假設 | 否 |  |  |
+| p-value | p 值 | 否 |  |  |
+| significance level | 顯著水準 | 否 |  |  |
+| confidence level | 信賴水準 | 否 |  |  |
+| t-test | t 檢定 | 否 |  |  |
+| one-sample t-test | 單一樣本 t 檢定 | 否 |  |  |
+| two-sample t-test | 雙樣本 t 檢定 | 否 |  |  |
+| paired t-test | 成對樣本 t 檢定 | 否 |  |  |
+| Welch's t-test | Welch t 檢定 | 否 |  |  |
+| degrees of freedom | 自由度 | 否 |  |  |
+| chi-squared test | 卡方檢定 | 否 |  |  |
+| observed frequency | 觀察頻數 | 否 |  |  |
+| expected frequency | 期望頻數 | 否 |  |  |
+| effect size | 效果量 | 否 |  |  |
+| Cohen's d | Cohen's d | 是 |  | 效果量指標。 |
+| statistical significance | 統計顯著性 | 否 |  |  |
+| practical significance | 實務顯著性 | 否 |  |  |
+| multiple comparisons | 多重比較 | 否 |  |  |
+| Bonferroni correction | Bonferroni 校正 | 否 |  |  |
+| Type I error | 第一類錯誤 | 否 |  | 虛無假設為真卻被拒絕。 |
+| Type II error | 第二類錯誤 | 否 |  | 虛無假設為假卻未被拒絕。 |
+| false positive rate | 偽陽性率 | 否 |  |  |
+| statistical power | 檢定力 | 否 |  | 正確拒絕虛無假設的機率。 |
+| sampling distribution | 抽樣分布 | 否 |  |  |
+| bootstrap | bootstrap | 是 |  | 統計重抽樣方法，保留英文。 |
+| resampling with replacement | 有放回重抽樣 | 否 |  |  |
+| percentile method | 百分位數法 | 否 |  |  |
+| point estimate | 點估計 | 否 |  |  |
+| parametric test | 參數檢定 | 否 |  |  |
+| non-parametric test | 無母數檢定 | 否 |  |  |
+| Mann-Whitney U test | Mann-Whitney U 檢定 | 否 |  |  |
+| Wilcoxon signed-rank test | Wilcoxon 符號等級檢定 | 否 |  |  |
+| Kruskal-Wallis test | Kruskal-Wallis 檢定 | 否 |  |  |
+| ANOVA | ANOVA | 是 |  | analysis of variance 縮寫。 |
+| independent and identically distributed | 獨立同分布 | 否 |  |  |
+| heavy-tailed distribution | 厚尾分布 | 否 |  |  |
+| normality | 常態性 | 否 |  |  |
+| skewed distribution | 偏斜分布 | 否 |  |  |
+| sample size | 樣本數 | 否 |  |  |
+| population | 母體 | 否 |  |  |
 | base rate | 基礎率 | 否 |  | base rate fallacy 語境。 |
 | sampling | 抽樣 | 否 | 采样 |  |
 | distribution | 分布 | 否 | — |  |
