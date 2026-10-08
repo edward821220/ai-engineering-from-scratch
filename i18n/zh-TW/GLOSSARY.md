@@ -197,6 +197,28 @@
 | CSV | CSV | 是 |  | 檔案格式縮寫，保留英文。 |
 | IDE | IDE | 是 | 整合開發環境 | 保留縮寫。 |
 | tmux | tmux | 是 |  | 專案名稱。 |
+| pane | 窗格 | 否 |  | tmux 視窗內的分割區域。 |
+| redirect | 重新導向 | 否 |  | shell 把輸出／輸入導向檔案或其他命令。 |
+| stdout | 標準輸出 | 否 |  | 命令的標準輸出串流。 |
+| stderr | 標準錯誤 | 否 |  | 命令的標準錯誤串流。 |
+| stdin | 標準輸入 | 否 |  | 命令的標準輸入串流。 |
+| background process | 背景行程 | 否 |  | 不佔用前景終端機、持續執行的行程。 |
+| foreground | 前景 | 否 |  | 終端機中佔用輸入焦點的執行狀態。 |
+| detach | 分離 | 否 |  | tmux 語境：離開工作階段但讓其繼續執行。 |
+| reattach | 重新連接 | 否 |  | tmux 語境：回到先前的工作階段。 |
+| terminal multiplexer | 終端機多工器 | 否 |  | 在單一視窗中管理多個終端機工作階段的工具，如 tmux、screen。 |
+| htop | htop | 是 |  | 互動式系統行程監控工具名稱。 |
+| nvtop | nvtop | 是 |  | GPU 行程監控工具名稱。 |
+| rsync | rsync | 是 |  | 檔案同步工具名稱。 |
+| scp | scp | 是 |  | 基於 SSH 的檔案複製命令。 |
+| nohup | nohup | 是 |  | 使命令不受掛斷訊號影響的工具名稱。 |
+| hangup signal | 掛斷訊號 | 否 |  | 終端機關閉時送給行程的 SIGHUP 訊號。 |
+| port forwarding | 通訊埠轉發 | 否 |  | 把本機通訊埠的流量轉送到遠端機器。 |
+| log file | 日誌檔 | 否 |  | 程式執行時記錄輸出的檔案。 |
+| command line | 命令列 | 否 | 命令行 | 以文字命令操作的介面。 |
+| alias | 別名 | 否 |  | shell 中為常用命令定義的短名稱。 |
+| disk space | 磁碟空間 | 否 |  | 儲存裝置的可用容量。 |
+| OOM | OOM | 是 |  | out-of-memory 的縮寫；記憶體不足錯誤。 |
 | SSH | SSH | 是 |  | 協定縮寫。 |
 | PID | PID | 是 |  | process ID 的縮寫。 |
 | Parquet | Parquet | 是 |  | 檔案格式名稱。 |
