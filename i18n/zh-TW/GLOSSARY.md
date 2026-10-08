@@ -873,6 +873,7 @@
 | sampling method | 抽樣方法 | 否 |  |  |
 | uniform random sampling | 均勻隨機抽樣 | 否 |  |  |
 | uniform random number generator | 均勻亂數產生器 | 否 |  |  |
+| uniform random number | 均勻亂數 | 否 |  |  |
 | inverse CDF | CDF 反函數 | 否 |  |  |
 | inverse CDF method | 反函數取樣 | 否 |  |  |
 | exponential distribution | 指數分布 | 否 |  |  |
@@ -941,6 +942,9 @@
 | encoder | 編碼器 | 否 |  | 神經網路架構語境。 |
 | decoder | 解碼器 | 否 |  | 神經網路架構語境。 |
 | Gaussian mixture | 高斯混合模型 | 否 |  |  |
+| Gaussian distribution | 常態分布 | 否 |  | normal distribution 的同義詞。 |
+| Gaussian noise | 高斯雜訊 | 否 |  |  |
+| Gaussian proposal | 高斯提議分布 | 否 |  | MCMC 語境。 |
 | class balance | 類別平衡 | 否 |  | 訓練資料或交叉驗證切分語境。 |
 | generative adversarial network (GAN) | 生成對抗網路（GAN） | 否 |  | 生成模型架構。 |
 | large language model (LLM) | 大型語言模型（LLM） | 否 |  |  |
