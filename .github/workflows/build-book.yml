@@ -2,11 +2,13 @@ name: build-book
 
 on:
   push:
-    branches: [main]
+    branches: [main, zh-tw/validation]
     paths:
       - "phases/**"
       - "book/**"
       - "scripts/build_book.py"
+      - "i18n/zh-TW/**"
+      - ".github/workflows/build-book.yml"
   workflow_dispatch:
     inputs:
       lang:
@@ -33,10 +35,10 @@ jobs:
     permissions:
       contents: write
     env:
-      BOOK_LANG: ${{ github.event.inputs.lang || 'en' }}
-      BOOK_VOLUME: ${{ github.event.inputs.volume || 'all' }}
-      TRANSLATIONS_REF: ${{ github.event.inputs.translations_ref || 'translations' }}
-      BUILD_PDF: ${{ github.event_name != 'push' }}
+      BOOK_LANG: ${{ github.event.inputs.lang || (github.ref_name == 'zh-tw/validation' && 'zh-TW') || 'en' }}
+      BOOK_VOLUME: ${{ github.event.inputs.volume || (github.ref_name == 'zh-tw/validation' && 'foundations') || 'all' }}
+      TRANSLATIONS_REF: ${{ github.event.inputs.translations_ref || (github.ref_name == 'zh-tw/validation' && github.ref_name) || 'translations' }}
+      BUILD_PDF: ${{ github.event_name != 'push' || github.ref_name == 'zh-tw/validation' }}
     steps:
       - uses: actions/checkout@v4
         with:
