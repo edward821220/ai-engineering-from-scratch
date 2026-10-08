@@ -601,6 +601,28 @@
 | irreducible noise | 不可約雜訊 | 否 |  |  |
 | principal component analysis (PCA) | 主成分分析 | 否 |  |  |
 | singular value decomposition (SVD) | 奇異值分解 | 否 | — |  |
+| left singular vector | 左奇異向量 | 否 |  |  |
+| right singular vector | 右奇異向量 | 否 |  |  |
+| pseudoinverse | 廣義反矩陣 | 否 |  |  |
+| Moore-Penrose pseudoinverse | Moore–Penrose 廣義反矩陣 | 否 |  |  |
+| condition number | 條件數 | 否 |  |  |
+| Frobenius norm | Frobenius 範數 | 否 |  |  |
+| power iteration | 冪次迭代 | 否 |  |  |
+| Eckart-Young theorem | Eckart–Young 定理 | 否 |  |  |
+| low-rank approximation | 低秩近似 | 否 |  |  |
+| outer product | 外積 | 否 |  |  |
+| compression ratio | 壓縮率 | 否 |  |  |
+| image compression | 影像壓縮 | 否 |  | 避免與 Docker image 混淆。 |
+| recommendation system | 推薦系統 | 否 |  |  |
+| recommender system | 推薦系統 | 否 |  |  |
+| latent factor | 潛在因子 | 否 |  | 推薦系統語境。 |
+| Latent Semantic Analysis | 潛在語意分析 | 否 |  |  |
+| Latent Semantic Indexing | 潛在語意索引 | 否 |  |  |
+| term-document matrix | 詞項－文件矩陣 | 否 |  |  |
+| overdetermined system | 超定系統 | 否 |  |  |
+| alternating least squares | 交替最小平方法 | 否 |  | ALS。 |
+| noise reduction | 降噪 | 否 |  |  |
+| matrix factorization | 矩陣分解 | 否 |  |  |
 | truncated SVD | 截斷奇異值分解 | 否 |  |  |
 | SVD truncation | SVD 截斷 | 否 |  |  |
 | low-rank | 低秩 | 否 |  |  |
