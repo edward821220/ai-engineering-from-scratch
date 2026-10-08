@@ -160,6 +160,32 @@
 | out-of-order execution | 不依序執行 | 否 |  | 指以不同於由上而下的順序執行 notebook 儲存格。 |
 | hidden state | 隱藏狀態 | 否 |  | 變數仍保留在 kernel 記憶體、但目前可見儲存格沒有建立它的狀況。 |
 | memory leak | 記憶體洩漏 | 否 |  |  |
+| debugging | 除錯 | 否 | 調試 |  |
+| debugger | 除錯器 | 否 | 調試器 |  |
+| breakpoint | 中斷點 | 否 | 斷點 |  |
+| profiling | 效能分析 | 否 |  | 測量程式各部分的時間與資源使用。 |
+| profiler | 效能分析器 | 否 |  | 執行效能分析的工具。 |
+| memory profiling | 記憶體分析 | 否 |  | 測量程式記憶體使用的分析。 |
+| bottleneck | 瓶頸 | 否 |  | 限制整體效能的環節。 |
+| stack trace | 堆疊追蹤 | 否 | 堆棧跟蹤 | 程式錯誤時列出的呼叫序列。 |
+| runtime error | 執行階段錯誤 | 否 | 運行時錯誤 | 程式執行中才發生的錯誤。 |
+| timestamp | 時間戳記 | 否 | 時間戳 |  |
+| logging | 日誌記錄 | 否 |  | 程式執行時寫下事件與訊息。 |
+| device | 裝置 | 否 | 設備 | CPU／GPU 等執行張量運算的硬體。 |
+| dtype | dtype | 是 |  | 張量資料型別屬性名，保留程式名稱。 |
+| NaN | NaN | 是 |  | Not a Number，非數值結果。 |
+| shape mismatch | 形狀不相符 | 否 |  | 張量形狀與預期不一致的錯誤。 |
+| gradient norm | 梯度範數 | 否 |  | 梯度向量的大小。 |
+| vanishing gradient | 梯度消失 | 否 |  | 梯度趨近於零、使訓練停滯的現象。 |
+| exploding gradient | 梯度爆炸 | 否 |  | 梯度過大導致訓練不穩定的現象。 |
+| mixed precision | 混合精度 | 否 |  | 混用 fp16／fp32 以節省記憶體的訓練方式。 |
+| gradient checkpointing | 梯度檢查點 | 否 |  | 以重算換取記憶體的訓練技巧。 |
+| TensorBoard | TensorBoard | 是 |  | PyTorch／TensorFlow 的視覺化工具名稱。 |
+| histogram | 直方圖 | 否 |  | 顯示數值分布的圖表。 |
+| forward pass | 前向傳遞 | 否 |  | 模型由輸入算出輸出的一次運算。 |
+| backward pass | 反向傳遞 | 否 |  | 由損失計算梯度的一次運算。 |
+| numerical instability | 數值不穩定 | 否 |  | 浮點運算誤差導致結果失控的狀況。 |
+| snapshot | 快照 | 否 |  | 某個時間點的狀態記錄。 |
 | DataFrame | DataFrame | 是 |  | pandas 資料表物件；保留類別名稱。 |
 | metadata | 中繼資料 | 否 | 元資料 |  |
 | process | 行程 | 否 | 進程 | 作業系統中執行中的程式執行個體。 |
@@ -219,6 +245,21 @@
 | alias | 別名 | 否 |  | shell 中為常用命令定義的短名稱。 |
 | disk space | 磁碟空間 | 否 |  | 儲存裝置的可用容量。 |
 | OOM | OOM | 是 |  | out-of-memory 的縮寫；記憶體不足錯誤。 |
+| permission | 權限 | 否 |  | 檔案或系統操作的存取權。 |
+| file permission | 檔案權限 | 否 |  | Linux 檔案的讀、寫、執行權限位元。 |
+| home directory | 家目錄 | 否 |  | 使用者的個人目錄，`~`。 |
+| root | root | 是 |  | Linux 的最高權限使用者；也指根目錄 `/`。 |
+| sudo | sudo | 是 |  | 以 root 權限執行單一命令的工具。 |
+| system package | 系統套件 | 否 |  | 作業系統層級的軟體套件。 |
+| daemon | 常駐程式 | 否 | 守護行程 | 在背景持續執行的系統服務。 |
+| service | 服務 | 否 |  | systemd 管理的背景程式。 |
+| clipboard | 剪貼簿 | 否 |  | 系統的複製貼上緩衝區。 |
+| case-sensitive | 區分大小寫 | 否 |  | 檔名或比對時區別字母大小寫。 |
+| line ending | 換行符號 | 否 |  | 檔案中表示換行的字元。 |
+| mount | 掛載 | 否 |  | 讓檔案系統出現在指定目錄下。 |
+| dual boot | 雙重開機 | 否 |  | 一台電腦安裝兩個作業系統。 |
+| WSL | WSL | 是 |  | Windows Subsystem for Linux 縮寫。 |
+| GUI | GUI | 是 | 圖形化介面、圖形使用者介面 | 圖形使用者介面縮寫，保留英文。 |
 | SSH | SSH | 是 |  | 協定縮寫。 |
 | PID | PID | 是 |  | process ID 的縮寫。 |
 | Parquet | Parquet | 是 |  | 檔案格式名稱。 |
