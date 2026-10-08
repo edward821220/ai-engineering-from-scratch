@@ -543,6 +543,14 @@
 | MSE | MSE | 是 |  | mean squared error 縮寫。 |
 | numerical gradient | 數值梯度 | 否 |  |  |
 | gradient checking | 梯度檢查 | 否 |  |  |
+| dual number | 對偶數 | 否 |  | 自動微分語境。 |
+| topological sort | 拓撲排序 | 否 |  |  |
+| dynamic graph | 動態圖 | 否 |  | define-by-run 的計算圖。 |
+| multi-layer perceptron | 多層感知器 | 否 | 多層感知機 |  |
+| upstream gradient | 上游梯度 | 否 |  |  |
+| finite difference | 有限差分 | 否 |  |  |
+| seed | 種子 | 否 |  | 梯度種子 dy/dy = 1 語境；random seed 用隨機種子。 |
+| autograd | 自動微分 | 否 |  | 系統名 PyTorch autograd 保留英文。 |
 | gradient accumulation | 梯度累積 | 否 |  |  |
 | gradient clipping | 梯度裁剪 | 否 |  |  |
 | activation function | 活化函數 | 否 | 激活函數 |  |
