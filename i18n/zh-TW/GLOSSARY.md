@@ -422,6 +422,13 @@
 | linear algebra | 線性代數 | 否 |  |  |
 | linear system | 線性方程組 | 否 | — | Ax=b 語境。 |
 | vector | 向量 | 否 |  |  |
+| broadcasting | 廣播 | 否 |  | NumPy／框架把小陣列延展成相符形狀的機制。 |
+| element-wise | 逐元素 | 否 |  | 對相同位置的元素逐一運算。 |
+| dense layer | 密集層 | 否 |  | 每個輸入都連到每個輸出的神經網路層；又稱全連接層。 |
+| hidden layer | 隱藏層 | 否 |  | 輸入與輸出層之間的層。 |
+| residual connection | 殘差連接 | 否 |  | 把層的輸入直接加回輸出的連線，如 ResNet。 |
+| initialization | 初始化 | 否 |  | 設定參數初始值。 |
+| BLAS | BLAS | 是 |  | 線性代數運算函式庫標準。 |
 | matrix | 矩陣 | 否 |  |  |
 | tensor | 張量 | 否 |  |  |
 | scalar | 純量 | 否 | — |  |
