@@ -614,6 +614,23 @@
 | likelihood | 概似 | 否 | 似然 |  |
 | maximum likelihood estimation (MLE) | 最大概似估計 | 否 |  |  |
 | maximum a posteriori (MAP) | 最大後驗機率估計 | 否 |  |  |
+| Bayes' theorem | 貝氏定理 | 否 | 貝葉斯定理 |  |
+| evidence | 證據 | 否 |  | 貝氏定理分母語境。 |
+| naive Bayes | 單純貝氏 | 否 | 朴素貝叶斯 |  |
+| Laplace smoothing | 拉普拉斯平滑 | 否 |  |  |
+| false positive | 偽陽性 | 否 | 假陽性 | 檢定誤報語境；台灣醫檢用偽陽性。 |
+| false negative | 偽陰性 | 否 | 假陰性 |  |
+| conjugate prior | 共軛先驗 | 否 |  |  |
+| Beta distribution | Beta 分布 | 否 |  | 希臘字母名保留英文。 |
+| frequentist | 頻率學派 | 否 |  | 與貝氏學派對比。 |
+| Bayesian | 貝氏 | 否 | 貝葉斯 | 台灣譯貝氏。 |
+| credible interval | 可信度區間 | 否 |  | 貝氏語境。 |
+| confidence interval | 信賴區間 | 否 | 置信區間 | 頻率學派語境。 |
+| Thompson sampling | 湯普森取樣 | 否 |  |  |
+| bandit | bandit | 是 |  | multi-armed bandit 語境保留英文。 |
+| online learning | 線上學習 | 否 |  | 逐步更新語境。 |
+| A/B testing | A/B 測試 | 否 |  |  |
+| base rate | 基礎率 | 否 |  | base rate fallacy 語境。 |
 | sampling | 抽樣 | 否 | 采样 |  |
 | distribution | 分布 | 否 | — |  |
 | model complexity | 模型複雜度 | 否 |  |  |
