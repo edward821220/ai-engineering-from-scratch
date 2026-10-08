@@ -42,7 +42,7 @@ s0-secret-inject
 
 ### 步驟 1：安全儲存 API 金鑰
 
-不要把 API 金鑰寫進程式碼。請使用環境變數。
+不要把 API 金鑰寫在程式碼裡。請使用環境變數。
 
 ```bash
 export ANTHROPIC_API_KEY="sk-ant-..."
