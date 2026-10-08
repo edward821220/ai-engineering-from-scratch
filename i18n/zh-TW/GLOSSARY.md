@@ -541,7 +541,6 @@
 | loss landscape | 損失地景 | 否 |  | 損失函數隨參數變化的地形。 |
 | contour plot | 等高線圖 | 否 |  | 以等值線表示函數值的圖。 |
 | MSE | MSE | 是 |  | mean squared error 縮寫。 |
-
 | numerical gradient | 數值梯度 | 否 |  |  |
 | gradient checking | 梯度檢查 | 否 |  |  |
 | gradient accumulation | 梯度累積 | 否 |  |  |
