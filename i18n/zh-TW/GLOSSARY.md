@@ -475,6 +475,22 @@
 | attention score | 注意力分數 | 否 |  |  |
 | Euclidean distance | 歐幾里得距離 | 否 | — |  |
 | dimensionality reduction | 降維 | 否 |  |  |
+| curse of dimensionality | 維度災難 | 否 | 維數災難 |  |
+| explained variance ratio | 解釋變異比例 | 否 |  | PCA 語境。 |
+| elbow method | 手肘法 | 否 |  |  |
+| kernel PCA | 核主成分分析 | 否 |  |  |
+| kernel function | 核函數 | 否 |  | 與 Jupyter kernel 區分。 |
+| kernel trick | 核技巧 | 否 |  |  |
+| RBF kernel | RBF 核 | 否 |  | 徑向基底函數核。 |
+| manifold | 流形 | 否 |  |  |
+| reconstruction error | 重建誤差 | 否 |  |  |
+| t-SNE | t-SNE | 是 |  | 方法名稱。 |
+| UMAP | UMAP | 是 |  | 方法名稱。 |
+| nearest neighbor | 最近鄰 | 否 | 最近邻 |  |
+| positive semi-definite | 半正定 | 否 |  |  |
+| hypercube | 超立方體 | 否 |  |  |
+| pre-image | 原像 | 否 |  |  |
+| feature space | 特徵空間 | 否 |  |  |
 | transpose | 轉置 | 否 |  | 動詞或運算。 |
 | inverse | 反矩陣 | 否 | — | 指矩陣運算時。 |
 | identity matrix | 單位矩陣 | 否 |  |  |
