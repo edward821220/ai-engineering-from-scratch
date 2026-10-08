@@ -87,6 +87,45 @@ test('translateText swaps only the trimmed core and keeps surrounding whitespace
   assert.equal(i18n.translateText('Contents', null), 'Contents');
 });
 
+test('UI dictionaries prefer a local checkout and fall back to its translations branch', async () => {
+  const requested = [];
+  const remote = 'https://raw.githubusercontent.com/example-owner/course/translations/i18n/';
+  globalThis.AIFSContentSource = {
+    isLocal: () => true,
+    translationUrls: (lang, file) => [`../i18n/${lang}/${file}`, `${remote}${lang}/ui.json`],
+  };
+  globalThis.fetch = async (url, options) => {
+    assert.deepEqual(options, { cache: 'no-store' });
+    requested.push(url);
+    if (url === '../i18n/zh-TW-local/ui.json') {
+      return { ok: true, json: async () => ({ strings: { Contents: '本機版' }, pinned: ['Contents'] }) };
+    }
+    if (url === '../i18n/zh-TW-missing/ui.json') return { ok: false };
+    if (url === `${remote}zh-TW-missing/ui.json`) {
+      return { ok: true, json: async () => ({ strings: { Contents: '遠端版' }, pinned: [] }) };
+    }
+    throw new Error(`unexpected UI dictionary URL: ${url}`);
+  };
+  try {
+    i18n.preload('zh-TW-local', null);
+    i18n.preload('zh-TW-missing', null);
+    const local = await new Promise((resolve) => i18n.loadDictionary('zh-TW-local', resolve));
+    const fallback = await new Promise((resolve) => i18n.loadDictionary('zh-TW-missing', resolve));
+    assert.deepEqual(local, { Contents: '本機版' });
+    assert.deepEqual(fallback, { Contents: '遠端版' });
+    assert.deepEqual(requested, [
+      '../i18n/zh-TW-local/ui.json',
+      '../i18n/zh-TW-missing/ui.json',
+      `${remote}zh-TW-missing/ui.json`,
+    ]);
+  } finally {
+    delete globalThis.fetch;
+    delete globalThis.AIFSContentSource;
+    i18n.preload('zh-TW-local', null);
+    i18n.preload('zh-TW-missing', null);
+  }
+});
+
 test('dictionaries come from the translations branch, English and unknown languages resolve to none', async () => {
   assert.equal(i18n.TRANSLATIONS_BASE, 'https://raw.githubusercontent.com/rohitg00/ai-engineering-from-scratch/translations/i18n/');
   assert.equal(i18n.dictionaryFor('en'), null);

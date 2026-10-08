@@ -10,7 +10,8 @@
   var CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
   var NARROW_HEADER_QUERY = '(max-width: 820px)';
   var NARRATION_VERSION = '20260829a';
-  var UI_I18N_VERSION = '20261007a';
+  var UI_I18N_VERSION = '20261008a';
+  var CONTENT_SOURCE_VERSION = '20261008a';
   var navId = 0;
 
   function isStaticPreview(locationValue) {
@@ -162,12 +163,41 @@
   }
 
   function ensureUiI18n() {
-    if (window.AIFSUiI18n || document.querySelector('script[data-aifs-ui-i18n="' + UI_I18N_VERSION + '"]')) return;
-    var script = document.createElement('script');
-    script.src = 'ui-i18n.js?v=' + UI_I18N_VERSION;
-    script.async = true;
-    script.setAttribute('data-aifs-ui-i18n', UI_I18N_VERSION);
-    document.head.appendChild(script);
+    var uiSelector = 'script[data-aifs-ui-i18n="' + UI_I18N_VERSION + '"]';
+    if (window.AIFSUiI18n || document.querySelector(uiSelector)) return;
+
+    function loadUiI18n() {
+      if (window.AIFSUiI18n || document.querySelector(uiSelector)) return;
+      var script = document.createElement('script');
+      script.src = 'ui-i18n.js?v=' + UI_I18N_VERSION;
+      script.async = true;
+      script.setAttribute('data-aifs-ui-i18n', UI_I18N_VERSION);
+      document.head.appendChild(script);
+    }
+
+    function loadContentSource() {
+      if (window.AIFSContentSource) {
+        loadUiI18n();
+        return;
+      }
+      var script = document.createElement('script');
+      script.src = 'content-source.js?v=' + CONTENT_SOURCE_VERSION;
+      script.async = true;
+      script.onload = loadUiI18n;
+      script.onerror = loadUiI18n;
+      document.head.appendChild(script);
+    }
+
+    if (window.__AIFS_SOURCE) {
+      loadContentSource();
+      return;
+    }
+    var metadata = document.createElement('script');
+    metadata.src = 'build-meta.js';
+    metadata.async = true;
+    metadata.onload = loadContentSource;
+    metadata.onerror = loadContentSource;
+    document.head.appendChild(metadata);
   }
 
   function ensureNewsletter() {

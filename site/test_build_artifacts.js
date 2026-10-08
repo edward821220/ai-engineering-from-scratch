@@ -474,7 +474,8 @@ test('curated reviewed languages appear in the switcher without joining lesson C
 test('shared site asset families use the expected cache keys on every page', () => {
   const release = '20260822a';
   const styleRelease = '20260824a';
-  const navigationRelease = '20261007a';
+  const navigationRelease = '20261008a';
+  const contentSourceRelease = '20261008a';
   const narrationRelease = '20260829a';
   const homepageRelease = '20260927a';
   const pages = [
@@ -511,15 +512,37 @@ test('shared site asset families use the expected cache keys on every page', () 
     if (source.includes('header.js')) {
       assert.equal(versionFor(source, 'header.js'), navigationRelease, `${page} has stale header.js`);
     }
+    if (source.includes('content-source.js?v=')) {
+      assert.equal(versionFor(source, 'content-source.js'), contentSourceRelease, `${page} has stale content-source.js`);
+    }
   }
 
   assert.equal(versionFor(sourceFor('index.html'), 'app.js'), homepageRelease);
   assert.equal(versionFor(sourceFor('prereqs.html'), 'roadmap.css'), release);
   assert.equal(versionFor(sourceFor('prereqs.html'), 'roadmap.js'), release);
-  assert.match(
-    fs.readFileSync(path.join(__dirname, 'header.js'), 'utf8'),
-    new RegExp(`NARRATION_VERSION = '${narrationRelease}'`)
-  );
+  const headerSource = fs.readFileSync(path.join(__dirname, 'header.js'), 'utf8');
+  assert.match(headerSource, new RegExp(`NARRATION_VERSION = '${narrationRelease}'`));
+  assert.match(headerSource, new RegExp(`UI_I18N_VERSION = '${navigationRelease}'`));
+  assert.match(headerSource, new RegExp(`CONTENT_SOURCE_VERSION = '${contentSourceRelease}'`));
+});
+
+test('shared header loads build metadata and content source before UI localization', () => {
+  const headerSource = fs.readFileSync(path.join(__dirname, 'header.js'), 'utf8');
+  const start = headerSource.indexOf('function ensureUiI18n() {');
+  const end = headerSource.indexOf('\n  function ensureNewsletter()', start);
+  assert.ok(start >= 0 && end > start, 'ensureUiI18n should be defined');
+  const loader = headerSource.slice(start, end);
+  assert.match(loader, /metadata\.src = 'build-meta\.js'[\s\S]*?metadata\.onload = loadContentSource/);
+  assert.match(loader, /window\.__AIFS_SOURCE[\s\S]*?loadContentSource\(\)/);
+  assert.match(loader, /script\.src = 'content-source\.js\?v=' \+ CONTENT_SOURCE_VERSION[\s\S]*?script\.onload = loadUiI18n/);
+  assert.match(loader, /script\.src = 'ui-i18n\.js\?v=' \+ UI_I18N_VERSION/);
+});
+
+test('lesson translations use shared source URLs before falling back to English', () => {
+  const lessonSource = fs.readFileSync(path.join(__dirname, 'lesson.html'), 'utf8');
+  assert.match(lessonSource, /function fetchTranslationFile\(lang, relativePath\)[\s\S]*?source\.translationUrls\(lang, relativePath\)[\s\S]*?return next\(\)/);
+  assert.match(lessonSource, /fetchTranslationFile\(lang, translatedPath\)[\s\S]*?fetchRepositoryFile\(enPath\)/);
+  assert.doesNotMatch(lessonSource, /raw\.githubusercontent\.com\/rohitg00\/ai-engineering-from-scratch\/translations\/i18n\//);
 });
 
 test('build-time SEO manifests cover every readable lesson and expose canonical no-JavaScript discovery links', () => {
@@ -897,6 +920,41 @@ test('remote content source rejects dot-segment repositories and revisions', () 
     valid.rawRepoUrl('README.md'),
     'https://raw.githubusercontent.com/example-owner/course.repo/feature/lesson-copy/README.md'
   );
+});
+
+test('translation URLs prefer local checkout and use the fork translations branch remotely', () => {
+  const local = loadContentSource();
+  assert.deepEqual(Array.from(local.translationUrls('zh-TW', 'ui.json')), [
+    '../i18n/zh-TW/ui.json',
+    'https://raw.githubusercontent.com/rohitg00/ai-engineering-from-scratch/translations/i18n/zh-TW/ui.json',
+  ]);
+  assert.deepEqual(Array.from(local.translationUrls('zh-TW', 'phases/00-setup-and-tooling/01-dev-environment/docs/zh-TW.md')), [
+    '../i18n/zh-TW/phases/00-setup-and-tooling/01-dev-environment/docs/zh-TW.md',
+    'https://raw.githubusercontent.com/rohitg00/ai-engineering-from-scratch/translations/i18n/zh-TW/phases/00-setup-and-tooling/01-dev-environment/docs/zh-TW.md',
+  ]);
+
+  const remote = loadContentSource({
+    hostname: 'preview.example',
+    source: { owner: 'edward821220', repo: 'ai-engineering-from-scratch', revision: 'feature/preview' },
+    ref: 'feature/preview',
+  });
+  assert.deepEqual(Array.from(remote.translationUrls('zh-TW', 'ui.json')), [
+    'https://raw.githubusercontent.com/edward821220/ai-engineering-from-scratch/translations/i18n/zh-TW/ui.json',
+  ]);
+
+  const invalid = loadContentSource({ hostname: 'preview.example' });
+  assert.equal(invalid.translationUrls('../evil', 'ui.json').length, 0);
+  assert.equal(invalid.translationUrls('zh-TW', 'phases/00/../README.md').length, 0);
+  assert.equal(invalid.translationUrls('zh-TW', 'phases/%2e%2e/README.md').length, 0);
+  assert.equal(invalid.translationUrls('zh-TW', 'ui.json?raw=1').length, 0);
+
+  const invalidSource = loadContentSource({
+    hostname: 'preview.example',
+    source: { owner: 'not/an-owner', repo: '..', revision: 'feature/preview' },
+  });
+  assert.deepEqual(Array.from(invalidSource.translationUrls('zh-TW', 'ui.json')), [
+    'https://raw.githubusercontent.com/rohitg00/ai-engineering-from-scratch/translations/i18n/zh-TW/ui.json',
+  ]);
 });
 
 test('learning path manifests preserve route order and use canonical lesson titles', t => {

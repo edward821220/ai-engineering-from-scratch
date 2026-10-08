@@ -2671,7 +2671,7 @@
       });
     }());
   </script>
-  <script src="content-source.js?v=20260821a"></script>
+  <script src="content-source.js?v=20261008a"></script>
   <script src="progress.js?v=20260822a"></script>
   <script id="learningPathProgressRuntime">
     (function (root) {
@@ -2772,7 +2772,7 @@
       root.AIFSLearningPathProgress = createStore(root.localStorage);
     }(window));
   </script>
-  <script src="header.js?v=20261007a" defer></script>
+  <script src="header.js?v=20261008a" defer></script>
   <script src="cmdpalette.js?v=20260821a" defer></script>
   <script src="lesson-figures.js?v=843871fd2942"></script>
   <script src="figure-manifest.js?v=b3744fdea707"></script>
@@ -3585,6 +3585,30 @@
         });
       }
 
+      function fetchTranslationFile(lang, relativePath) {
+        var source = window.AIFSContentSource;
+        var urls = source && typeof source.translationUrls === 'function'
+          ? source.translationUrls(lang, relativePath)
+          : [];
+        if (!Array.isArray(urls) || !urls.length) return Promise.reject(new Error('fetch-failed'));
+        var fetchOptions = source && typeof source.isLocal === 'function' && source.isLocal()
+          ? { cache: 'no-store' }
+          : undefined;
+        var index = 0;
+
+        function next() {
+          if (index >= urls.length) return Promise.reject(new Error('fetch-failed'));
+          return fetch(urls[index++], fetchOptions).then(function (response) {
+            if (!response.ok) throw new Error('fetch-failed');
+            return response;
+          }).catch(function () {
+            return next();
+          });
+        }
+
+        return next();
+      }
+
       var lessonFetchSequence = 0;
 
       function fetchLesson(path, retried, requestSequence) {
@@ -3611,8 +3635,7 @@
         // missing local file use the branch-aware raw source from build-meta.
         var enPath = path + '/docs/en.md';
         var lang = currentLang();
-        var translatedUrl = 'https://raw.githubusercontent.com/rohitg00/ai-engineering-from-scratch/translations/i18n/'
-          + lang + '/' + path + '/docs/' + lang + '.md';
+        var translatedPath = path + '/docs/' + lang + '.md';
 
         if (!retried || !lessonQuizPromise) {
           lessonQuizPromise = fetchRepositoryFile(path + '/quiz.json')
@@ -3625,8 +3648,7 @@
           ? fetchRepositoryFile(enPath).then(function (response) {
               return { response: response, lang: 'en' };
             })
-          : fetch(translatedUrl).then(function (response) {
-              if (!response.ok) throw new Error('fetch-failed');
+          : fetchTranslationFile(lang, translatedPath).then(function (response) {
               return { response: response, lang: lang };
             }).catch(function () {
               return fetchRepositoryFile(enPath).then(function (response) {

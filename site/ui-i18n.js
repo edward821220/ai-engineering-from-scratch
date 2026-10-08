@@ -39,17 +39,40 @@
       return;
     }
     pending[lang] = [done];
-    root.fetch(TRANSLATIONS_BASE + encodeURIComponent(lang) + '/ui.json')
-      .then(function (response) {
+    var source = root.AIFSContentSource;
+    var urls = source && typeof source.translationUrls === 'function'
+      ? source.translationUrls(lang, 'ui.json')
+      : [TRANSLATIONS_BASE + encodeURIComponent(lang) + '/ui.json'];
+    var fetchOptions = source && typeof source.isLocal === 'function' && source.isLocal()
+      ? { cache: 'no-store' }
+      : undefined;
+    if (!Array.isArray(urls)) urls = [];
+
+    function finish() {
+      var callbacks = pending[lang] || [];
+      delete pending[lang];
+      for (var i = 0; i < callbacks.length; i++) callbacks[i](dictionaryFor(lang));
+    }
+
+    function fetchAt(index) {
+      if (index >= urls.length) {
+        finish();
+        return;
+      }
+      Promise.resolve().then(function () {
+        return root.fetch(urls[index], fetchOptions);
+      }).then(function (response) {
         if (!response.ok) throw new Error('missing');
         return response.json();
-      })
-      .then(function (json) { preload(lang, json); }, function () {})
-      .then(function () {
-        var callbacks = pending[lang] || [];
-        delete pending[lang];
-        for (var i = 0; i < callbacks.length; i++) callbacks[i](dictionaryFor(lang));
+      }).then(function (json) {
+        preload(lang, json);
+        finish();
+      }, function () {
+        fetchAt(index + 1);
       });
+    }
+
+    fetchAt(0);
   }
 
   function translateText(text, dict) {

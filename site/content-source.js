@@ -23,26 +23,50 @@
     });
   }
 
+  function sourceRepository() {
+    var configured = window.__AIFS_SOURCE || {};
+    return {
+      owner: /^[A-Za-z0-9-]+$/.test(configured.owner || '') ? configured.owner : 'rohitg00',
+      repo: /^[A-Za-z0-9_.-]+$/.test(configured.repo || '') && !hasDotSegment(configured.repo)
+        ? configured.repo
+        : 'ai-engineering-from-scratch',
+    };
+  }
+
   function rawRepoUrl(path) {
     var safe = clean(path);
+    var repository = sourceRepository();
     var configured = window.__AIFS_SOURCE || {};
-    var owner = /^[A-Za-z0-9-]+$/.test(configured.owner || '') ? configured.owner : 'rohitg00';
-    var repo = /^[A-Za-z0-9_.-]+$/.test(configured.repo || '') && !hasDotSegment(configured.repo)
-      ? configured.repo
-      : 'ai-engineering-from-scratch';
     var fallbackRevision = /^[A-Za-z0-9._/-]+$/.test(window.__AIFS_REF || '') && !hasDotSegment(window.__AIFS_REF)
       ? window.__AIFS_REF
       : 'main';
     var revision = /^[A-Za-z0-9._/-]+$/.test(configured.revision || '') && !hasDotSegment(configured.revision)
       ? configured.revision
       : fallbackRevision;
-    return 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + revision + '/' + safe;
+    return 'https://raw.githubusercontent.com/' + repository.owner + '/' + repository.repo + '/' + revision + '/' + safe;
   }
 
   function repoUrl(path) {
     var safe = clean(path);
     if (isLocal()) return '../' + safe;
     return rawRepoUrl(safe);
+  }
+
+  function translationUrls(lang, relativePath) {
+    var language = String(lang || '');
+    var path = String(relativePath || '');
+    var segments = path.split('/');
+    if (!/^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$/.test(language) || !path || path.charAt(0) === '/' || path.indexOf('\\') !== -1 || /[?#]/.test(path)) return [];
+    if (segments.some(function (segment) {
+      return !segment || segment === '.' || segment === '..' || !/^[A-Za-z0-9_.-]+$/.test(segment);
+    })) return [];
+
+    var encodedPath = segments.map(encodeURIComponent).join('/');
+    var suffix = 'i18n/' + encodeURIComponent(language) + '/' + encodedPath;
+    var localUrl = '../' + suffix;
+    var repository = sourceRepository();
+    var remoteUrl = 'https://raw.githubusercontent.com/' + repository.owner + '/' + repository.repo + '/translations/' + suffix;
+    return isLocal() ? [localUrl, remoteUrl] : [remoteUrl];
   }
 
   function localDirectoryFiles(path) {
@@ -158,6 +182,7 @@
     isLocal: isLocal,
     repoUrl: repoUrl,
     rawRepoUrl: rawRepoUrl,
+    translationUrls: translationUrls,
     localDirectoryFiles: localDirectoryFiles,
     mergeLessonOutputs: mergeLessonOutputs,
   };
