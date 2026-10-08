@@ -3,5 +3,6 @@
   "phases/00-setup-and-tooling/02-git-and-collaboration/docs/en.md": "1b219057e92a910cb897b792b14d05bbe2dc7c3fcac5b57cb390071caefb8c96",
   "phases/00-setup-and-tooling/03-gpu-setup-and-cloud/docs/en.md": "d7420f66a80b101850985748bc768744956b0ba042fe92a406fe6b8becb33ba2",
   "phases/00-setup-and-tooling/04-apis-and-keys/docs/en.md": "41284f112ad4da828709d3c5f1b3094876c5b10aa1a64a082d316dcf372a6b8f",
-  "phases/00-setup-and-tooling/06-python-environments/docs/en.md": "eafe05c7f0cc6d66440c773d6e4e38b39c5fb099be6e031512c144a59e0c2ed9"
+  "phases/00-setup-and-tooling/06-python-environments/docs/en.md": "eafe05c7f0cc6d66440c773d6e4e38b39c5fb099be6e031512c144a59e0c2ed9",
+  "phases/00-setup-and-tooling/05-jupyter-notebooks/docs/en.md": "6f0e391d6e853320124a3a8954e8b8ce8e28163d6cb0749b5e831fb05449acff"
 }
