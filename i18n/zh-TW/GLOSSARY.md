@@ -74,9 +74,21 @@
 | merge | merge | 是 |  | Git 專有術語依台灣開發者慣例保留英文；一般描述仍可依語境使用「合併」。 |
 | remote | remote | 是 | 遠程 | Git remote 名稱與概念保留英文。 |
 | container | 容器 | 否 |  | Docker 語境。 |
+| image | 映像 | 否 | 鏡像 | Docker 映像。 |
+| container image | 容器映像 | 否 | 容器鏡像 |  |
+| Dockerfile | Dockerfile | 是 |  | Docker 組態檔名稱，保留英文。 |
+| Docker Compose | Docker Compose | 是 |  | Docker 官方多容器編排工具名稱。 |
 | image layer | 映像層 | 否 | 鏡像層 | Docker 語境。 |
 | base image | 基礎映像 | 否 | 基礎鏡像 | Docker 語境。 |
+| volume | 磁碟區 | 否 | 卷 | Docker 持續性儲存空間。 |
 | volume mount | 磁碟區掛載 | 否 | 卷掛載 | Docker 語境。 |
+| host | 主機 | 否 | 宿主機 | 執行容器的機器。 |
+| port | 通訊埠 | 否 | 端口 | 網路通訊語境。 |
+| orchestrate | 編排 | 否 |  | 協調多個服務或容器。 |
+| orchestration | 編排 | 否 |  | 協調多個服務或容器。 |
+| GPU passthrough | GPU 直通 | 否 | GPU 穿透 |  |
+| NVIDIA Container Toolkit | NVIDIA Container Toolkit | 是 | NVIDIA 容器工具包 | NVIDIA 產品名稱，保留英文。 |
+| load balancer | 負載平衡器 | 否 | 負載均衡器 |  |
 | API | API | 是 |  | 在技術文件中保留縮寫。 |
 | API call | API 呼叫 | 否 |  |  |
 | API server | API 伺服器 | 否 |  |  |
