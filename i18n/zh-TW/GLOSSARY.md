@@ -115,6 +115,22 @@
 | cell | 儲存格 | 否 | 單元格 | Jupyter 語境。 |
 | kernel | 核心 | 否 | 內核 | Jupyter 語境；不是作業系統 kernel 時仍依上下文。 |
 | magic command | magic command | 是 | 魔法命令 | Jupyter 專有用法。 |
+| Markdown | Markdown | 是 |  | 標記語言名稱，保留英文。 |
+| script | 程式檔案 | 否 |  | 指可執行的程式碼檔案。 |
+| keyboard shortcut | 快捷鍵 | 否 |  |  |
+| command mode | 命令模式 | 否 |  | Jupyter 介面模式。 |
+| edit mode | 編輯模式 | 否 |  | Jupyter 介面模式。 |
+| out-of-order execution | 不依序執行 | 否 |  | 指以不同於由上而下的順序執行 notebook 儲存格。 |
+| hidden state | 隱藏狀態 | 否 |  | 變數仍保留在 kernel 記憶體、但目前可見儲存格沒有建立它的狀況。 |
+| memory leak | 記憶體洩漏 | 否 |  |  |
+| DataFrame | DataFrame | 是 |  | pandas 資料表物件；保留類別名稱。 |
+| metadata | 中繼資料 | 否 | 元資料 |  |
+| process | 行程 | 否 | 進程 | 作業系統中執行中的程式執行個體。 |
+| variable | 變數 | 否 |  |  |
+| prototype | 原型 | 否 |  |  |
+| HTML | HTML | 是 |  | 標記語言縮寫，保留英文。 |
+| CSV | CSV | 是 |  | 檔案格式縮寫，保留英文。 |
+| IDE | IDE | 是 | 整合開發環境 | 保留縮寫。 |
 | tmux | tmux | 是 |  | 專案名稱。 |
 | SSH | SSH | 是 |  | 協定縮寫。 |
 | PID | PID | 是 |  | process ID 的縮寫。 |
