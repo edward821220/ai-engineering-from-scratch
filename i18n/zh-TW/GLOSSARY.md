@@ -417,6 +417,8 @@
 | data leakage | 資料洩漏 | 否 | 數據洩露 |  |
 | preprocessing | 前處理 | 否 | 預處理 |  |
 | target encoding | 目標編碼 | 否 |  |  |
+| numeric column | 數值欄位 | 否 |  |  |
+| categorical column | 類別欄位 | 否 |  |  |
 | out-of-fold encoding | 折外編碼 | 否 |  | 僅以未參與編碼的訓練折產生訓練資料的編碼，避免資料洩漏。 |
 | training fold | 訓練折 | 否 |  | 交叉驗證切分出的訓練資料子集。 |
 | median imputation | 中位數補值 | 否 |  | 以中位數補上缺失的數值。 |
@@ -485,6 +487,7 @@
 | true negative | 真陰性 | 否 |  | 實際為負類且預測為負類的樣本。 |
 | true positive rate | 真陽性率 | 否 |  | 真陽性占所有實際正類樣本的比例；亦稱召回率。 |
 | F1 score | F1 分數 | 否 |  |  |
+| harmonic mean | 調和平均數 | 否 |  |  |
 | confusion matrix | 混淆矩陣 | 否 |  |  |
 | threshold | 閾值 | 否 | 閥值 |  |
 | decision boundary | 決策邊界 | 否 |  |  |
