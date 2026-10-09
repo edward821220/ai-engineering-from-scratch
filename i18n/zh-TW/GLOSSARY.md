@@ -1613,3 +1613,11 @@
 | precision at k | Precision@k | 是 |  | 前 k 個最可疑點裡真正異常的比例。 |
 | AUPRC | AUPRC | 是 |  | 精確率–召回率曲線下面積；不平衡時比 AUROC 有用。 |
 | reachability density | 可達密度 | 否 |  | LOF 用來描述鄰域有多密的量。 |
+| SMOTE | SMOTE | 是 |  | Synthetic Minority Oversampling Technique；在少數類鄰居之間插值產生新樣本。 |
+| class weight | 類別權重 | 否 |  | 依類別放大損失，讓少數類的錯誤更貴。 |
+| oversampling | 過採樣 | 否 |  | 增加少數類樣本數。 |
+| undersampling | 欠採樣 | 否 |  | 減少多數類樣本數。 |
+| Matthews correlation coefficient | Matthews 相關係數 | 否 |  | 兩類都表現好才會高分的相關係數，範圍 -1 到 1。 |
+| MCC | MCC | 是 |  | Matthews correlation coefficient 縮寫。 |
+| cost-sensitive learning | 成本敏感學習 | 否 |  | 把不同誤分類的真實成本放進訓練目標。 |
+| resampling | 重新抽樣 | 否 |  | 改變類別樣本數的抽樣策略。 |
