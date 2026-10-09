@@ -1529,6 +1529,10 @@
 | inverse document frequency | 逆文件頻率 | 否 |  | 詞在所有文件中的稀有程度指標。 |
 | count vectorizer | 計數向量化器 | 否 |  | 統計各詞在文件中出現次數的文字特徵方法。 |
 | bag of words | 詞袋 | 否 |  | 只計詞頻、不計順序的文字表示法。 |
+| document frequency | 文件頻率 | 否 |  | 含有該詞的文件數。 |
+| n-gram | n-gram | 是 |  | 連續 n 個 token。 |
+| sparse vector | 稀疏向量 | 否 |  | 大部分元素為零的向量。 |
+| stopword | 停用詞 | 否 |  | 功能詞；情感分析常常不該刪掉否定詞。 |
 | corpus | 語料庫 | 否 |  | 文件的集合。 |
 | document | 文件 | 否 |  | 文字分析中的單一文本單位。 |
 | word count | 詞數 | 否 |  |  |
