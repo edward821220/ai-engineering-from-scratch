@@ -402,6 +402,9 @@
 | penalty term | 懲罰項 | 否 |  | 加入成本函數以限制模型參數的項。 |
 | lasso regression | LASSO 迴歸 | 否 |  | 使用 L1 正則化的線性迴歸。 |
 | logistic regression | 邏輯斯迴歸 | 否 | — |  |
+| logistic function | 邏輯斯函數 | 否 |  | 又稱 sigmoid 函數。 |
+| binary classification | 二元分類 | 否 |  |  |
+| multi-class classification | 多類別分類 | 否 |  |  |
 | decision tree | 決策樹 | 否 |  |  |
 | model training | 模型訓練 | 否 |  |  |
 | training set | 訓練集 | 否 |  |  |
@@ -413,6 +416,12 @@
 | dataset split | 資料集切分 | 否 |  |  |
 | data leakage | 資料洩漏 | 否 | 數據洩露 |  |
 | preprocessing | 前處理 | 否 | 預處理 |  |
+| target encoding | 目標編碼 | 否 |  |  |
+| out-of-fold encoding | 折外編碼 | 否 |  | 僅以未參與編碼的訓練折產生訓練資料的編碼，避免資料洩漏。 |
+| training fold | 訓練折 | 否 |  | 交叉驗證切分出的訓練資料子集。 |
+| median imputation | 中位數補值 | 否 |  | 以中位數補上缺失的數值。 |
+| mode imputation | 眾數補值 | 否 |  | 以眾數補上缺失的類別值。 |
+| solver | 求解器 | 否 |  | 以演算法求解模型參數的程式元件。 |
 | data exploration | 資料探索 | 否 |  |  |
 | data drift | 資料漂移 | 否 | 數據漂移 |  |
 | generalization | 泛化 | 否 |  |  |
@@ -471,6 +480,10 @@
 | accuracy | 準確率 | 否 |  |  |
 | precision | 精確率 | 否 |  |  |
 | recall | 召回率 | 否 |  |  |
+| sensitivity | 敏感度 | 否 |  | 二元分類中的召回率別名。 |
+| true positive | 真陽性 | 否 |  | 實際為正類且預測為正類的樣本。 |
+| true negative | 真陰性 | 否 |  | 實際為負類且預測為負類的樣本。 |
+| true positive rate | 真陽性率 | 否 |  | 真陽性占所有實際正類樣本的比例；亦稱召回率。 |
 | F1 score | F1 分數 | 否 |  |  |
 | confusion matrix | 混淆矩陣 | 否 |  |  |
 | threshold | 閾值 | 否 | 閥值 |  |
@@ -563,6 +576,9 @@
 | sparsity | 稀疏性 | 否 |  |  |
 | sparse solution | 稀疏解 | 否 |  | 大部分參數為零或接近零的解。 |
 | outlier | 離群值 | 否 |  |  |
+| concentric circle | 同心圓 | 否 |  |  |
+| linearly separable | 線性可分 | 否 |  | 可由線性決策邊界正確區分的類別。 |
+| threshold tuning | 閾值調整 | 否 |  | 調整分類機率的決策閾值，以取捨精確率與召回率。 |
 | whitening | 白化 | 否 |  | 將特徵去相關並正規化。 |
 | Mahalanobis distance | 馬氏距離 | 否 |  |  |
 | Jaccard similarity | Jaccard 相似度 | 否 |  |  |
@@ -944,6 +960,12 @@
 | ReLU | ReLU | 是 |  | 函數名稱保留。 |
 | softmax | softmax | 是 |  | 函數名稱保留。 |
 | sigmoid function | sigmoid 函數 | 否 |  | 函數名稱常保留英文。 |
+| binary cross-entropy | 二元交叉熵 | 否 |  | 二元分類常用的機率預測損失。 |
+| binary cross-entropy loss | 二元交叉熵損失 | 否 |  | 又稱 log loss。 |
+| log loss | 對數損失 | 否 |  | 二元交叉熵損失的別名。 |
+| categorical cross-entropy | 類別交叉熵 | 否 |  | 多類別分類常用的損失函數。 |
+| convex cost surface | 凸成本曲面 | 否 |  |  |
+| non-convex cost surface | 非凸成本曲面 | 否 |  |  |
 | cross-entropy | 交叉熵 | 否 |  |  |
 | entropy | 熵 | 否 |  |  |
 | KL divergence | KL 散度 | 否 | — |  |
@@ -1015,6 +1037,7 @@
 | covariance matrix | 共變異數矩陣 | 否 | 協方差矩陣 |  |
 | correlation | 相關性 | 否 |  |  |
 | one-hot encoding | one-hot 編碼 | 否 | — | 業界常保留 one-hot。 |
+| one-vs-rest | 一對多 | 否 |  | 多類別分類策略，逐一將一個類別與其他類別區分。 |
 | clustering | 分群 | 否 | 聚類 |  |
 | cluster | 群集 | 否 |  | 動詞依句型譯為「分群」。 |
 | centroid | 質心 | 否 |  |  |
@@ -1138,6 +1161,9 @@
 | Type I error | 第一類錯誤 | 否 |  | 虛無假設為真卻被拒絕。 |
 | Type II error | 第二類錯誤 | 否 |  | 虛無假設為假卻未被拒絕。 |
 | false positive rate | 偽陽性率 | 否 |  |  |
+| ROC curve | ROC 曲線 | 否 |  | 以不同分類閾值下的真陽性率與偽陽性率描繪的曲線。 |
+| area under the curve | 曲線下面積 | 否 |  | 分類模型 ROC 曲線下面積的 AUC。 |
+| trapezoidal rule | 梯形法則 | 否 |  | 以梯形近似曲線下積分的數值方法。 |
 | statistical power | 檢定力 | 否 |  | 正確拒絕虛無假設的機率。 |
 | right skew | 右偏 | 否 |  | 數值較多集中在較小值，尾部向右延伸。 |
 | left skew | 左偏 | 否 |  | 數值較多集中在較大值，尾部向左延伸。 |
