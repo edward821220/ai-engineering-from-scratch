@@ -1098,6 +1098,7 @@
 | dual formulation | 對偶形式 | 否 |  | 最佳化問題語境。 |
 | Lagrangian dual | 拉格朗日對偶 | 否 |  |  |
 | quadratic program | 二次規劃問題 | 否 |  |  |
+| convex quadratic program | 凸二次規劃問題 | 否 |  |  |
 | linear kernel | 線性核 | 否 |  |  |
 | polynomial kernel | 多項式核 | 否 |  |  |
 | support vector regression | 支援向量迴歸 | 否 |  | 可縮寫為 SVR。 |
