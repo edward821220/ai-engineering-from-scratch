@@ -13,5 +13,6 @@
   "phases/04-computer-vision/12-video-understanding/docs/en.md": "34e81835e8d37aa76defa8bdc0940b3b04ff308755b27aec9db7d2236755d3fa",
   "phases/04-computer-vision/13-3d-vision-nerf/docs/en.md": "c91398ef171ce0b74699c08f47544c013b8fb0db493fa8719034051d08c3b169",
   "phases/04-computer-vision/14-vision-transformers/docs/en.md": "170c3c598b6f80c58cf371afa9002b5fb47bd4fbeaa9400b84293afee02eb2c0",
-  "phases/04-computer-vision/15-real-time-edge/docs/en.md": "67456ce0e428e1ffa31eacece531fc95a2eec306f375a994f21571109e76642e"
+  "phases/04-computer-vision/15-real-time-edge/docs/en.md": "67456ce0e428e1ffa31eacece531fc95a2eec306f375a994f21571109e76642e",
+  "phases/04-computer-vision/16-vision-pipeline-capstone/docs/en.md": "8f658578957bb2c27e48dd1926960ebc448d5030d5c21e3dd8398443689f9b73"
 }
