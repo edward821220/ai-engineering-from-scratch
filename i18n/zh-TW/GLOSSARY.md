@@ -9,6 +9,7 @@
 | agent | agent | 是 | 智慧體、代理程式 | AI agent 語境中保留英文；一般法律／人員語境另依上下文。 |
 | fine-tuning | fine-tuning | 是 | 微調 | 依使用者指定保留英文。 |
 | embedding | embedding | 是 | 嵌入、嵌入向量 | 依使用者指定保留英文。 |
+| eager execution | 立即執行 | 否 |  | PyTorch 的設計：呼叫當下就算出結果。 |
 | transformer | transformer | 是 | 轉換器 | 依使用者指定保留英文；模型架構名不翻。 |
 | AI engineering | AI 工程 | 否 |  |  |
 | repository | 儲存庫 | 否 | — | Git 專案語境。 |
