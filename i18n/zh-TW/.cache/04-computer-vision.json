@@ -9,5 +9,6 @@
   "phases/04-computer-vision/08-instance-segmentation-mask-rcnn/docs/en.md": "b7ced123dcc47406affd5cc13916ffb6954f8417a29d8b99526c61ec97a4168b",
   "phases/04-computer-vision/09-image-generation-gans/docs/en.md": "dcdc65b519fc2a23620cde11212f4d3269b63bd52d568d72ef08c04867c33409",
   "phases/04-computer-vision/10-image-generation-diffusion/docs/en.md": "596c04cae482ef2dd4aae5b11e7452c9fa9bfe74a44047286ed296a5ea5634cd",
-  "phases/04-computer-vision/11-stable-diffusion/docs/en.md": "f2940ee23e490fe19538347b5848aa5ebdee87848e8e2edcca1377f557c6ff09"
+  "phases/04-computer-vision/11-stable-diffusion/docs/en.md": "f2940ee23e490fe19538347b5848aa5ebdee87848e8e2edcca1377f557c6ff09",
+  "phases/04-computer-vision/12-video-understanding/docs/en.md": "34e81835e8d37aa76defa8bdc0940b3b04ff308755b27aec9db7d2236755d3fa"
 }
