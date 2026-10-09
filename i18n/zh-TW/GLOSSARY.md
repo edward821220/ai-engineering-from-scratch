@@ -1024,6 +1024,10 @@
 | information theory | 資訊理論 | 否 |  |  |
 | perplexity | 困惑度 | 否 |  | 語言模型評估指標。 |
 | label smoothing | 標籤平滑 | 否 |  |  |
+| focal loss | 焦點損失 | 否 |  | 用 (1-p_t)^gamma 降低簡單樣本的權重。 |
+| InfoNCE | InfoNCE | 是 |  | 對比學習常用的損失，又稱 NT-Xent。 |
+| Huber loss | Huber 損失 | 否 |  | 小誤差用 MSE、大誤差用 MAE。 |
+| distribution shift | 分布偏移 | 否 |  | 訓練與實際使用時資料分布不同。 |
 | soft target | 軟目標 | 否 |  |  |
 | hard target | 硬目標 | 否 |  |  |
 | negative log-likelihood | 負對數概似 | 否 |  |  |
