@@ -13,5 +13,6 @@
   "phases/02-ml-fundamentals/12-hyperparameter-tuning/docs/en.md": "ec61d03f29614e7a330e9fbee1c08deb4da99e42efc6984dc83d55142615ee85",
   "phases/02-ml-fundamentals/13-ml-pipelines/docs/en.md": "058d092b6ad38b5a9eaf4a3fc296aac5867d0e99e60ba40ce0cc20b7326820d9",
   "phases/02-ml-fundamentals/14-naive-bayes/docs/en.md": "cda8fef9420715c6fd52a94ea81e2d3a93ae60d32e08a4170ddf8e56696b5a63",
-  "phases/02-ml-fundamentals/15-time-series/docs/en.md": "48ffca9e2410801a507c35ebc6769ba0ecf075a51bb943684c219198a75b9d81"
+  "phases/02-ml-fundamentals/15-time-series/docs/en.md": "48ffca9e2410801a507c35ebc6769ba0ecf075a51bb943684c219198a75b9d81",
+  "phases/02-ml-fundamentals/16-anomaly-detection/docs/en.md": "fd2418cd6ece3eb747a71ab926fe1b05f2c1c0e4fb07fafd8506081354a99106"
 }
