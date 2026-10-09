@@ -171,7 +171,7 @@ class DiTBlock(nn.Module):
         return x
 ```
 
-`AdaLNZero` 一開始是恆等映射，因為它的 MLP 權重初始化成 0。訓練再把區塊從恆等推開。這讓深的 transformer 擴散模型穩非常多。
+`AdaLNZero` 一開始是恆等映射，因為它的 MLP 權重初始化成 0。訓練再把區塊從恆等推開。這讓深的 transformer 擴散模型穩得非常多。
 
 ### 步驟 2：很小的 DiT
 
