@@ -11,5 +11,6 @@
   "phases/04-computer-vision/10-image-generation-diffusion/docs/en.md": "596c04cae482ef2dd4aae5b11e7452c9fa9bfe74a44047286ed296a5ea5634cd",
   "phases/04-computer-vision/11-stable-diffusion/docs/en.md": "f2940ee23e490fe19538347b5848aa5ebdee87848e8e2edcca1377f557c6ff09",
   "phases/04-computer-vision/12-video-understanding/docs/en.md": "34e81835e8d37aa76defa8bdc0940b3b04ff308755b27aec9db7d2236755d3fa",
-  "phases/04-computer-vision/13-3d-vision-nerf/docs/en.md": "c91398ef171ce0b74699c08f47544c013b8fb0db493fa8719034051d08c3b169"
+  "phases/04-computer-vision/13-3d-vision-nerf/docs/en.md": "c91398ef171ce0b74699c08f47544c013b8fb0db493fa8719034051d08c3b169",
+  "phases/04-computer-vision/14-vision-transformers/docs/en.md": "170c3c598b6f80c58cf371afa9002b5fb47bd4fbeaa9400b84293afee02eb2c0"
 }
