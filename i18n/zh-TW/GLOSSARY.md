@@ -1426,3 +1426,39 @@
 | large language model (LLM) | 大型語言模型（LLM） | 否 |  |  |
 | discrete distribution | 離散分布 | 否 |  |  |
 | bimodal distribution | 雙峰分布 | 否 |  |  |
+| Lloyd's algorithm | Lloyd 演算法 | 否 |  | K-Means 的標準迭代演算法名稱。 |
+| inertia | 慣性 | 否 |  | K-Means 的目標值，為所有資料點到所屬質心的平方距離總和。 |
+| silhouette score | 輪廓分數 | 否 |  | 分群品質指標；通常是各資料點輪廓係數的平均值。 |
+| silhouette coefficient | 輪廓係數 | 否 |  | 單一資料點的分群品質指標。 |
+| DBSCAN | DBSCAN | 是 |  | 密度式分群演算法名稱。 |
+| density | 密度 | 否 |  |  |
+| density-based clustering | 密度式分群 | 否 |  |  |
+| eps | eps | 是 |  | DBSCAN 的鄰域半徑參數；程式識別字保留。 |
+| min_samples | min_samples | 是 |  | DBSCAN 的最小鄰域樣本數參數；程式識別字保留。 |
+| neighborhood radius | 鄰域半徑 | 否 |  | DBSCAN eps 語境。 |
+| core point | 核心點 | 否 |  | DBSCAN 中鄰域樣本數達 min_samples 的點。 |
+| border point | 邊界點 | 否 |  | DBSCAN 中位於核心點鄰域、但自身不是核心點的點。 |
+| noise point | 雜訊點 | 否 | 噪聲點 | DBSCAN 中不屬於任何群集的點。 |
+| hierarchical clustering | 階層式分群 | 否 |  | 建立巢狀群集樹狀結構的分群方法。 |
+| agglomerative clustering | 凝聚式分群 | 否 |  | 由下而上合併群集的階層式分群方法。 |
+| dendrogram | 樹狀圖 | 否 |  | 顯示階層式分群合併順序的樹狀圖。 |
+| linkage | 連結法 | 否 | 鏈結法 | 衡量兩個群集間距離的方式。 |
+| single linkage | 單一連結法 | 否 |  | 以兩群集間最小點對距離為準。 |
+| complete linkage | 完全連結法 | 否 |  | 以兩群集間最大點對距離為準。 |
+| average linkage | 平均連結法 | 否 |  | 以兩群集間所有點對距離的平均值為準。 |
+| Ward's method | Ward 法 | 否 |  | 合併後使群內變異數增加量最小的連結方法。 |
+| within-cluster variance | 群內變異數 | 否 |  |  |
+| Gaussian mixture model | 高斯混合模型 | 否 |  |  |
+| GMM | GMM | 是 |  | Gaussian mixture model 縮寫。 |
+| expectation-maximization algorithm | 期望最大化演算法 | 否 |  |  |
+| EM algorithm | 期望最大化演算法 | 否 |  | Expectation-Maximization 演算法的縮寫。 |
+| E-step | E 步驟 | 否 |  | EM 演算法中計算成分責任機率的步驟。 |
+| M-step | M 步驟 | 否 |  | EM 演算法中更新參數的步驟。 |
+| mixing weight | 混合權重 | 否 |  | 高斯混合模型中各成分的權重。 |
+| hard assignment | 硬式指派 | 否 |  | 每個資料點只指派給單一群集。 |
+| soft assignment | 軟式指派 | 否 |  | 以機率表示資料點屬於各群集的程度。 |
+| spherical cluster | 球形群集 | 否 |  |  |
+| elliptical cluster | 橢圓形群集 | 否 |  |  |
+| overlapping cluster | 重疊群集 | 否 |  |  |
+| anomaly | 異常 | 否 |  | 不符合預期模式的資料點或狀態。 |
+| K-Means++ | K-Means++ | 是 |  | K-Means 的質心初始化方法名稱。 |
