@@ -1162,6 +1162,7 @@
 | exponential decay | 指數衰減 | 否 |  |  |
 | cosine annealing | 餘弦退火 | 否 |  | 學習率排程語境。 |
 | warmup | 預熱 | 否 |  | 學習率暖身語境。 |
+| 1cycle policy | 1cycle 策略 | 否 |  | Leslie Smith 的單週期學習率排程。 |
 | convex function | 凸函數 | 否 |  |  |
 | non-convex | 非凸 | 否 |  |  |
 | convex set | 凸集合 | 否 |  |  |
