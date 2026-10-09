@@ -1,5 +1,6 @@
 {
   "phases/06-speech-and-audio/01-audio-fundamentals/docs/en.md": "9ef0e33271e866ee2ec72280d40ffed14a488cce7941780b2495ccbadf77f7ee",
   "phases/06-speech-and-audio/02-spectrograms-mel-features/docs/en.md": "c3ccb984a9bcf8aefcfb077ccafee53704c504b5cc8c7bf3e394f2ccf48af525",
-  "phases/06-speech-and-audio/03-audio-classification/docs/en.md": "7d7e56fcd223b527e87ba1b7d12bd6bf4ff2d9e27bfd89c9c0a0a944293adeca"
+  "phases/06-speech-and-audio/03-audio-classification/docs/en.md": "7d7e56fcd223b527e87ba1b7d12bd6bf4ff2d9e27bfd89c9c0a0a944293adeca",
+  "phases/06-speech-and-audio/04-speech-recognition-asr/docs/en.md": "8636c6f5f698e085af96b807aff2733d606e41728a174fe1b80e31508c02f721"
 }
