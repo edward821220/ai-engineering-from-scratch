@@ -1462,3 +1462,35 @@
 | overlapping cluster | 重疊群集 | 否 |  |  |
 | anomaly | 異常 | 否 |  | 不符合預期模式的資料點或狀態。 |
 | K-Means++ | K-Means++ | 是 |  | K-Means 的質心初始化方法名稱。 |
+| numerical feature | 數值特徵 | 否 |  | 值為數字的特徵。 |
+| min-max scaling | 最小–最大縮放 | 否 |  | 將特徵線性映射到 [0, 1] 區間。 |
+| z-score | z 分數 | 否 |  | 標準化後的數值；(x - mean) / std。 |
+| log transform | 對數轉換 | 否 |  | 對右偏分布套用 log 壓縮的變換。 |
+| label encoding | 標籤編碼 | 否 |  | 將各類別映射為整數；會引入虛假順序。 |
+| ordinal encoding | 序數編碼 | 否 |  | 有自然順序類別的整數編碼。 |
+| cardinality | 基數 | 否 |  | 類別特徵的相異值個數。 |
+| missing value | 缺失值 | 否 |  |  |
+| imputation | 補值 | 否 |  | 以估計值取代缺失值。 |
+| mean imputation | 平均數補值 | 否 |  | 以平均數補上缺失的數值。 |
+| indicator column | 指標欄 | 否 |  | 標記原值是否缺失的二元欄位。 |
+| forward fill | 向前填補 | 否 |  | 時間序列以前一個有效值填補缺失。 |
+| TF-IDF | TF-IDF | 是 |  | Term Frequency-Inverse Document Frequency；詞頻–逆文件頻率。 |
+| term frequency | 詞頻 | 否 |  | 詞在單一文件中出現的頻率。 |
+| inverse document frequency | 逆文件頻率 | 否 |  | 詞在所有文件中的稀有程度指標。 |
+| count vectorizer | 計數向量化器 | 否 |  | 統計各詞在文件中出現次數的文字特徵方法。 |
+| bag of words | 詞袋 | 否 |  | 只計詞頻、不計順序的文字表示法。 |
+| corpus | 語料庫 | 否 |  | 文件的集合。 |
+| document | 文件 | 否 |  | 文字分析中的單一文本單位。 |
+| word count | 詞數 | 否 |  |  |
+| filter method | 過濾法 | 否 |  | 訓練模型前以統計指標篩選特徵的方法。 |
+| wrapper method | 包裝法 | 否 |  | 以模型表現來篩選特徵的方法。 |
+| variance threshold | 變異數閾值 | 否 |  | 移除變異數低於閾值特徵的過濾法。 |
+| recursive feature elimination | 遞迴特徵消除 | 否 |  | 反覆移除最不重要特徵的包裝法。 |
+| redundant | 冗餘 | 否 |  |  |
+| smoothing | 平滑化 | 否 |  |  |
+| leave-one-out | 留一法 | 否 |  | 每次排除一筆資料的驗證或編碼策略。 |
+| hashing | 雜湊 | 否 | 哈希 |  |
+| dummy variable | 虛擬變數 | 否 |  | one-hot 編碼產生的二元變數。 |
+| cyclical encoding | 循環編碼 | 否 |  | 以小時、星期等週期性特徵的三角函數編碼。 |
+| robust scaling | 穩健縮放 | 否 |  | 以中位數與四分位距縮放，對離群值穩健。 |
+| target variable | 目標變數 | 否 |  | 模型要預測的變數。 |
