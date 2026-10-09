@@ -1569,3 +1569,17 @@
 | plateau | 高原期 | 否 |  | 指標停止改善的階段。 |
 | hyperparameter tuning | 超參數調校 | 否 |  | 為模型選擇超參數的過程。 |
 | patience | 容忍輪數 | 否 |  | 提前停止前允許的不改善輪數。 |
+| experiment tracking | 實驗追蹤 | 否 |  | 記錄每次訓練的參數、指標、產物與程式版本。 |
+| model registry | 模型登錄 | 否 |  | 以版本號與階段標籤管理模型版本的系統。 |
+| model versioning | 模型版本管理 | 否 |  | 追蹤並管理不同版本模型何者上線的作法。 |
+| data versioning | 資料版本管理 | 否 |  | 對資料集做版本控制，DVC 是代表工具。 |
+| model serving | 模型服務 | 否 |  | 把訓練好的模型放上線供預測請求使用。 |
+| training-serving skew | 訓練／服務落差 | 否 |  | 訓練與線上推論前處理不一致造成的靜默錯誤。 |
+| serialization | 序列化 | 否 |  | 把物件轉成可儲存或傳輸格式的過程。 |
+| artifact | 產物 | 否 |  | 訓練或建置過程產出的檔案或物件。 |
+| deployment | 部署 | 否 |  | 把模型或系統放上正式環境。 |
+| config file | 設定檔 | 否 |  | 集中存放超參數與設定的檔案。 |
+| approval workflow | 核准流程 | 否 |  | 上線前需經人工核准的流程。 |
+| rollback | 回滾 | 否 |  | 回到先前版本的動作。 |
+| unit test | 單元測試 | 否 |  | 針對單一元件的測試。 |
+| integration test | 整合測試 | 否 |  | 針對多元件協作的測試。 |
