@@ -527,6 +527,11 @@
 | stochastic gradient descent (SGD) | 隨機梯度下降法 | 否 |  |  |
 | mean squared error | 均方誤差 | 否 |  |  |
 | accuracy | 準確率 | 否 |  |  |
+| object detection | 物件偵測 | 否 | 目標檢測 | 影像裡找出每個物體的框與類別。 |
+| bounding box | 邊界框 | 否 |  |  |
+| anchor box | 錨框 | 否 |  | 偵測裡預先給定的框形狀。 |
+| non-maximum suppression | 非極大值抑制 | 否 |  | 常縮寫 NMS。 |
+| objectness | 物件性 | 否 |  | 這個格子中心有沒有物體。 |
 | precision | 精確率 | 否 |  |  |
 | recall | 召回率 | 否 |  |  |
 | sensitivity | 敏感度 | 否 |  | 二元分類中的召回率別名。 |
