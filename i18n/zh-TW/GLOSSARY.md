@@ -962,6 +962,7 @@
 | activation function | 活化函數 | 否 | 激活函數 |  |
 | ReLU | ReLU | 是 |  | 函數名稱保留。 |
 | softmax | softmax | 是 |  | 函數名稱保留。 |
+| softmax regression | softmax 迴歸 | 否 |  | 以 softmax 函數擴展至多類別分類的線性模型。 |
 | sigmoid function | sigmoid 函數 | 否 |  | 函數名稱常保留英文。 |
 | binary cross-entropy | 二元交叉熵 | 否 |  | 二元分類常用的機率預測損失。 |
 | binary cross-entropy loss | 二元交叉熵損失 | 否 |  | 又稱 log loss。 |
