@@ -207,7 +207,7 @@ flowchart LR
     B --> C[為所有測試資料評分]
     C --> D[依異常分數排序]
     D --> E[評估前 K 個被標記的項目]
-    E --> F[Precision@k / AUPRC]
+    E --> F["Precision@k / AUPRC"]
 
     style A fill:#f9f,stroke:#333
     style F fill:#9f9,stroke:#333
