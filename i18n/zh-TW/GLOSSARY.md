@@ -1494,3 +1494,24 @@
 | cyclical encoding | 循環編碼 | 否 |  | 以小時、星期等週期性特徵的三角函數編碼。 |
 | robust scaling | 穩健縮放 | 否 |  | 以中位數與四分位距縮放，對離群值穩健。 |
 | target variable | 目標變數 | 否 |  | 模型要預測的變數。 |
+| model evaluation | 模型評估 | 否 |  |  |
+| metric | 指標 | 否 |  | 評估模型表現的量化標準。 |
+| fold | 折 | 否 |  | 交叉驗證中資料的一個分割。 |
+| K-fold | K 折 | 否 |  | K 折交叉驗證的資料分割方式。 |
+| K-fold cross-validation | K 折交叉驗證 | 否 |  | 將資料分成 K 折輪流驗證的方法。 |
+| stratified | 分層 | 否 |  | 保持各類別比例一致的分割方式。 |
+| stratified K-fold | 分層 K 折 | 否 |  | 每折保持類別分布的 K 折交叉驗證。 |
+| stratification | 分層 | 否 |  | 在分割中保持類別比例的做法。 |
+| AUC-ROC | AUC-ROC | 是 |  | ROC 曲線下面積；模型評估指標名稱保留英文。 |
+| RMSE | RMSE | 是 |  | Root Mean Squared Error；MSE 的平方根；比照 MSE、MAE 保留英文。 |
+| learning curve | 學習曲線 | 否 |  | 訓練與驗證分數隨訓練資料量變化的圖。 |
+| validation curve | 驗證曲線 | 否 |  | 訓練與驗證分數隨超參數變化的圖。 |
+| high bias | 高偏差 | 否 |  | 模型過於簡單而欠擬合的狀態。 |
+| high variance | 高變異 | 否 |  | 模型過於複雜而過度擬合的狀態。 |
+| hold-out | 保留集 | 否 |  | 保留不給訓練使用的資料分割。 |
+| permutation test | 置換檢定 | 否 |  | 打亂標籤建立虛無分布的統計檢定。 |
+| nested cross-validation | 巢狀交叉驗證 | 否 |  | 外層評估、內層調參的交叉驗證。 |
+| average precision | 平均精確率 | 否 |  | PR 曲線下面積的近似值。 |
+| null distribution | 虛無分布 | 否 |  | 假設無效應時的參照分布。 |
+| minority class | 少數類 | 否 |  | 不平衡資料中樣本較少的類別。 |
+| majority class | 多數類 | 否 |  | 不平衡資料中樣本較多的類別。 |
