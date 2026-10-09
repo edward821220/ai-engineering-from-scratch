@@ -8,6 +8,17 @@ on:
       - "book/**"
       - "scripts/build_book.py"
   workflow_dispatch:
+    inputs:
+      lang:
+        description: Edition language. Use zh-TW for the Traditional Chinese volume.
+        required: false
+        default: en
+        type: string
+      volume:
+        description: Volume slug. foundations is Volume 1. Leave empty to build every volume.
+        required: false
+        default: ""
+        type: string
   release:
     types: [published]
 
@@ -37,6 +48,10 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y -q texlive-xetex texlive-fonts-recommended fonts-dejavu librsvg2-bin poppler-utils
 
+      - name: Install CJK fonts
+        if: github.event.inputs.lang == 'zh-TW' || github.event.inputs.lang == 'zh' || github.event.inputs.lang == 'ja' || github.event.inputs.lang == 'ko'
+        run: sudo apt-get install -y -q fonts-noto-cjk
+
       - name: Validate book rendering
         run: python3 scripts/test_book_rendering.py
 
@@ -46,7 +61,15 @@ jobs:
 
       - name: Build EPUB and PDF volumes
         if: github.event_name != 'push'
-        run: python3 scripts/build_book.py --pdf
+        env:
+          BOOK_LANG: ${{ github.event.inputs.lang || 'en' }}
+          BOOK_VOLUME: ${{ github.event.inputs.volume || '' }}
+        run: |
+          args=(--pdf --lang "$BOOK_LANG")
+          if [ -n "$BOOK_VOLUME" ]; then
+            args+=(--volume "$BOOK_VOLUME")
+          fi
+          python3 scripts/build_book.py "${args[@]}"
 
       - name: Upload EPUBs
         uses: actions/upload-artifact@v4
