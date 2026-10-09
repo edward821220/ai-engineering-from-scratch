@@ -565,6 +565,9 @@
 | row-major | 列優先 | 否 |  | C order。 |
 | column-major | 欄優先 | 否 |  | Fortran order。 |
 | batch normalization | 批次正規化 | 否 |  |  |
+| layer normalization | 層正規化 | 否 |  | 對單一筆樣本的特徵做正規化，不依賴批次。 |
+| RMSNorm | RMSNorm | 是 |  | 層正規化去掉減均值。 |
+| generalization gap | 泛化差距 | 否 |  | 訓練表現與測試表現的差。 |
 | scalar | 純量 | 否 | — |  |
 | dot product | 內積 | 否 |  |  |
 | matrix multiplication | 矩陣乘法 | 否 |  |  |
