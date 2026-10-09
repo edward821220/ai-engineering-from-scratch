@@ -203,6 +203,9 @@
 | profiler | 效能分析器 | 否 |  | 執行效能分析的工具。 |
 | memory profiling | 記憶體分析 | 否 |  | 測量程式記憶體使用的分析。 |
 | bottleneck | 瓶頸 | 否 |  | 限制整體效能的環節。 |
+| backbone | 骨幹 | 否 |  | 視覺模型裡產生特徵圖、再交給任務頭的卷積堆疊。 |
+| transfer learning | 遷移學習 | 否 |  |  |
+| skip connection | 跳躍連接 | 否 |  | 把輸入直接加回區塊輸出的連線。 |
 | stack trace | 堆疊追蹤 | 否 | 堆棧跟蹤 | 程式錯誤時列出的呼叫序列。 |
 | runtime error | 執行階段錯誤 | 否 | 運行時錯誤 | 程式執行中才發生的錯誤。 |
 | timestamp | 時間戳記 | 否 | — |  |
