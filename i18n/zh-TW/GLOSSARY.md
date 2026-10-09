@@ -1111,6 +1111,28 @@
 | scalability | 可擴充性 | 否 |  |  |
 | feature mapping | 特徵映射 | 否 |  | 核方法語境；將輸入映射到特徵空間。 |
 | K-nearest neighbors | k 最近鄰法 | 否 |  | 可保留 KNN 縮寫。 |
+| L1 distance | L1 距離 | 否 |  |  |
+| L2 distance | L2 距離 | 否 |  |  |
+| Minkowski distance | Minkowski 距離 | 否 |  | 專有名稱保留英文拼寫。 |
+| distance weighting | 距離加權 | 否 |  |  |
+| distance-weighted voting | 距離加權投票 | 否 |  |  |
+| distance-weighted KNN | 距離加權 KNN | 否 |  |  |
+| weighted KNN | 加權 KNN | 否 |  |  |
+| lazy learning | 惰性學習 | 否 |  |  |
+| eager learning | 積極式學習 | 否 |  | 指訓練時計算並建立模型；與 active learning 區分。 |
+| lazy learner | 惰性學習器 | 否 |  |  |
+| eager learner | 積極式學習器 | 否 |  | 指訓練時計算並建立模型；與 active learner 區分。 |
+| non-parametric algorithm | 非參數演算法 | 否 |  |  |
+| brute force search | 暴力搜尋 | 否 |  |  |
+| hypersphere | 超球面 | 否 |  |  |
+| intrinsic dimensionality | 內在維度 | 否 |  |  |
+| query point | 查詢點 | 否 |  |  |
+| Voronoi diagram | Voronoi 圖 | 否 |  |  |
+| piecewise-constant | 分段常數 | 否 |  |  |
+| piecewise-smooth | 分段平滑 | 否 |  |  |
+| extrapolation | 外插 | 否 |  | 機器學習預測語境。 |
+| retrieval-augmented generation | 檢索增強生成 | 否 |  | RAG 的全名。 |
+| KNN regression | KNN 迴歸 | 否 |  |  |
 | anomaly detection | 異常偵測 | 否 |  |  |
 | weight decay | 權重衰減 | 否 | — |  |
 | momentum | 動量 | 否 |  |  |
