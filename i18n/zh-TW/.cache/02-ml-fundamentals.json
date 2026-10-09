@@ -5,5 +5,6 @@
   "phases/02-ml-fundamentals/04-decision-trees/docs/en.md": "012e6e8f09a1eda4f03ca395221e5aa30287a782b885a197d563ff79b5ca750c",
   "phases/02-ml-fundamentals/05-support-vector-machines/docs/en.md": "4032f704f9675d31f9c0a1dfbf768283b9c50b5699ccebc90fa5813819136ddd",
   "phases/02-ml-fundamentals/06-knn-and-distances/docs/en.md": "f18a8624854931bd3757829e4d4626d4dc3b6f10f0ad2cf3c2011e983172f1d4",
-  "phases/02-ml-fundamentals/07-unsupervised-learning/docs/en.md": "5e26db25c8145c483fe715d119cb472956305f42597061fc5841a1838999af38"
+  "phases/02-ml-fundamentals/07-unsupervised-learning/docs/en.md": "5e26db25c8145c483fe715d119cb472956305f42597061fc5841a1838999af38",
+  "phases/02-ml-fundamentals/08-feature-engineering/docs/en.md": "964a9b0cd007a7d7e78196fb390fbc8bd84d227bdfcadf3c7db9e7749e70ca9c"
 }
