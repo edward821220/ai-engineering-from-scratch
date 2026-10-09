@@ -1590,3 +1590,16 @@
 | Bernoulli naive Bayes | 伯努利單純貝氏 | 否 |  | 以出現或未出現的二元特徵建模。 |
 | class prior | 類別先驗 | 否 |  | 觀察特徵前各類別的機率。 |
 | Dirichlet prior | 狄利克雷先驗 | 否 |  | 多項分布的共軛先驗；拉普拉斯平滑的貝氏解釋。 |
+| stationarity | 定態 | 否 |  | 時間序列的平均數、變異數與自相關不隨時間改變。不要用平穩，以免和隨機過程的平穩分布衝突。 |
+| seasonality | 季節性 | 否 |  | 固定間隔重複的日、週、年模式。 |
+| trend | 趨勢 | 否 |  | 時間序列的長期方向。 |
+| lag | 落後 | 否 |  | 時間序列往前數的期數；lag-1 是前一期。 |
+| differencing | 差分 | 否 |  | 相鄰觀測值相減，用來去掉趨勢、達成定態。 |
+| white noise | 白雜訊 | 否 | 白噪声 | 沒有可預測結構的隨機殘差。 |
+| walk-forward validation | 逐步向前驗證 | 否 |  | 訓練資料一律早於測試資料的時間序列驗證。 |
+| partial autocorrelation | 偏自相關 | 否 |  | 去掉較短落後期影響後，某一落後期的直接相關。 |
+| expanding window | 擴張視窗 | 否 |  | 每折都使用截至當時的全部歷史來訓練。 |
+| sliding window | 滑動視窗 | 否 |  | 固定長度的訓練視窗往前移動。 |
+| exponential smoothing | 指數平滑 | 否 |  | 對近期觀測給較高權重的平滑法。 |
+| forecasting horizon | 預測期距 | 否 |  | 一次要往前預測幾步。 |
+| structural break | 結構斷裂 | 否 |  | 序列行為突然改變的時點。 |
