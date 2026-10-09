@@ -256,7 +256,7 @@ def combined_loss(logits, targets, num_classes, lam=1.0):
     return ce + lam * dc, {"ce": ce.item(), "dice": dc.item()}
 ```
 
-Dice 先按類別算，再平均，這是宏平均 Dice。`eps` 避免批次裡沒有出現的類別除以 0。
+Dice 先按類別算，再平均，這是巨觀平均（macro-average）Dice。`eps` 避免批次裡沒有出現的類別除以 0。
 
 ### 步驟 5：IoU 指標
 

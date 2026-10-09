@@ -169,7 +169,7 @@ while True:
 | 喚醒詞 | 「Hey assistant」 | 短的關鍵詞偵測器。Porcupine、Snowboy、openWakeWord。 |
 | 結束點 | 輪次結束 | VAD 加最短靜音，判定使用者說完了。 |
 | 預捲 | 語音前緩衝 | VAD 觸發前留 200 到 400 毫秒音訊，避免第一個字被切掉。 |
-| 工具呼叫 | 函式調用 | LLM 發出 JSON。執行環境分派。結果在迴圈裡送回去。 |
+| 工具呼叫 | 函式呼叫 | LLM 發出 JSON。執行環境分派。結果在迴圈裡送回去。 |
 
 ## Further Reading｜延伸閱讀
 

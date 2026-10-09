@@ -39,7 +39,7 @@ ESC-50：50 類，每類 40 段，平衡，容易。UrbanSound8K：10 類，不�
 
 - 互斥的多類（Speech Commands）：top-1 準度、top-5 準度。
 - 多標籤的多類（AudioSet、UrbanSound 風格）：平均精度均值（mAP）。
-- 嚴重不平衡：每一類的召回加宏觀 F1。
+- 嚴重不平衡：每一類的召回加巨觀 F1（macro-F1）。
 
 2026 年你該知道的數字：
 
