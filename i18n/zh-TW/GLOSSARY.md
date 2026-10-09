@@ -1625,3 +1625,6 @@
 | forward selection | 前向選擇 | 否 |  | 從空集合開始，逐一加入最有幫助的特徵。 |
 | backward elimination | 後向消除 | 否 |  | 從全部特徵開始，逐一移除最沒有幫助的特徵。 |
 | stability selection | 穩定性選擇 | 否 |  | 多次子抽樣後，只保留經常被選中的特徵。 |
+| perceptron | 感知器 | 否 | 感知機 | 單一線性分類器；多層形式見 multi-layer perceptron。 |
+| step function | 階躍函數 | 否 |  | 感知器在加權總和之後使用的不連續活化函數。 |
+| linear classifier | 線性分類器 | 否 |  | 以超平面把輸入分成兩類的模型。 |
