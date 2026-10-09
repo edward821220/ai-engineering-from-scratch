@@ -10,5 +10,6 @@
   "phases/03-deep-learning-core/09-learning-rate-schedules/docs/en.md": "192874a3732b8f75bf87c252b2cabefb58a8df22db14a5ca0118bf8e812e2551",
   "phases/03-deep-learning-core/10-mini-framework/docs/en.md": "94d283931d471f9a757d50d4f12656d497b3cb78aacebeb7619a55e5c0e67325",
   "phases/03-deep-learning-core/11-intro-to-pytorch/docs/en.md": "9c1d3d3a389c673ccc0b0491dba0401ef37bac7d7e885ce22d4309f0adb2ea0e",
-  "phases/03-deep-learning-core/12-intro-to-jax/docs/en.md": "9fe3133043ee5c5841555859f2e60f3cd11c6ee194ae7dd4ff6788a97d307a50"
+  "phases/03-deep-learning-core/12-intro-to-jax/docs/en.md": "9fe3133043ee5c5841555859f2e60f3cd11c6ee194ae7dd4ff6788a97d307a50",
+  "phases/03-deep-learning-core/13-debugging-neural-networks/docs/en.md": "93a9c9e91cc1312801ca02385de5891b2858f45a28a70a3dd099ce5848f21753"
 }
