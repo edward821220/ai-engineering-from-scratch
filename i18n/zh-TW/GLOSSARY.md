@@ -317,6 +317,7 @@
 | numeric feature | 數值特徵 | 否 |  |  |
 | categorical feature | 類別特徵 | 否 |  |  |
 | nonlinear relationship | 非線性關係 | 否 |  |  |
+| nonlinear model | 非線性模型 | 否 |  |  |
 | feature interaction | 特徵交互作用 | 否 |  | 一個特徵的影響會依其他特徵的值而改變。 |
 | hyperparameter sensitivity | 超參數敏感度 | 否 |  | 模型表現對超參數設定變化的敏感程度。 |
 | interpretability | 可解釋性 | 否 |  | 模型決策能否由人理解。 |
@@ -429,6 +430,7 @@
 | split point | 分割點 | 否 |  | 特徵值中用來切分資料的位置。 |
 | maximum depth | 最大深度 | 否 |  | 決策樹從根節點到最深葉節點的最大層數。 |
 | max depth | 最大深度 | 否 |  | 決策樹深度上限的超參數簡稱。 |
+| min samples | 最小樣本數 | 否 |  | 決策樹預剪枝控制的樣本數門檻簡稱。 |
 | minimum samples per leaf | 葉節點最小樣本數 | 否 |  | 每個葉節點必須包含的最少樣本數。 |
 | minimum information gain | 最低資訊增益 | 否 |  | 允許切分所需達到的最低資訊增益。 |
 | maximum leaf nodes | 葉節點數上限 | 否 |  | 決策樹可包含的葉節點數量上限。 |
@@ -1011,6 +1013,7 @@
 | conditional entropy | 條件熵 | 否 |  |  |
 | joint entropy | 聯合熵 | 否 |  |  |
 | information content | 資訊量 | 否 |  |  |
+| information theory | 資訊理論 | 否 |  |  |
 | perplexity | 困惑度 | 否 |  | 語言模型評估指標。 |
 | label smoothing | 標籤平滑 | 否 |  |  |
 | soft target | 軟目標 | 否 |  |  |
