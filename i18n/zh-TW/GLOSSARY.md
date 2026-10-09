@@ -542,6 +542,12 @@
 | hidden layer | 隱藏層 | 否 |  | 輸入與輸出層之間的層。 |
 | residual connection | 殘差連接 | 否 |  | 把層的輸入直接加回輸出的連線，如 ResNet。 |
 | initialization | 初始化 | 否 |  | 設定參數初始值。 |
+| weight initialization | 權重初始化 | 否 |  | 決定網路能不能開始訓練的初始權重策略。 |
+| Xavier initialization | Xavier 初始化 | 否 |  | 又稱 Glorot。給 sigmoid 與 tanh 用。 |
+| Kaiming initialization | Kaiming 初始化 | 否 |  | 又稱 He。給 ReLU 用。 |
+| fan-in | fan-in | 是 |  | 一個神經元的輸入連接數。 |
+| fan-out | fan-out | 是 |  | 一個神經元的輸出連接數。 |
+| residual stream | 殘差流 | 否 |  | 殘差連接一路累加的那條表徵。 |
 | BLAS | BLAS | 是 |  | 線性代數運算函式庫標準。 |
 | matrix | 矩陣 | 否 |  |  |
 | tensor | 張量 | 否 |  |  |
