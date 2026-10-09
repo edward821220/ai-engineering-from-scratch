@@ -1621,3 +1621,7 @@
 | MCC | MCC | 是 |  | Matthews correlation coefficient 縮寫。 |
 | cost-sensitive learning | 成本敏感學習 | 否 |  | 把不同誤分類的真實成本放進訓練目標。 |
 | resampling | 重新抽樣 | 否 |  | 改變類別樣本數的抽樣策略。 |
+| embedded method | 內嵌法 | 否 |  | 在模型訓練過程中一併選特徵。不要寫「嵌入」，那是 embedding 的禁用詞。 |
+| forward selection | 前向選擇 | 否 |  | 從空集合開始，逐一加入最有幫助的特徵。 |
+| backward elimination | 後向消除 | 否 |  | 從全部特徵開始，逐一移除最沒有幫助的特徵。 |
+| stability selection | 穩定性選擇 | 否 |  | 多次子抽樣後，只保留經常被選中的特徵。 |
