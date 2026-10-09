@@ -1535,3 +1535,16 @@
 | sample-wise double descent | 樣本維度雙重下降 | 否 |  | 增加樣本數在插值區間反而讓測試誤差上升的現象。 |
 | epoch-wise double descent | epoch 維度雙重下降 | 否 |  | 增加訓練 epoch 數引發的雙重下降。 |
 | shallow stump | 淺層樹樁 | 否 |  | 深度很淺的決策樹，常用作 boosting 的基模型。 |
+| strong learner | 強學習器 | 否 |  | 預測能力強的模型；弱學習器集成後的目標。 |
+| decision stump | 決策樹樁 | 否 |  | 只有單一分割的深度 1 決策樹。 |
+| hard voting | 硬投票 | 否 |  | 直接對類別標籤做多數決的集成投票方式。 |
+| soft voting | 軟投票 | 否 |  | 對各模型預測機率取平均的投票方式。 |
+| ensemble diversity | 集成多樣性 | 否 |  | 各基模型犯不同錯誤的程度。 |
+| pseudo-residual | 偽殘差 | 否 |  | gradient boosting 中損失函數的負梯度值。 |
+| shrinkage | 縮減 | 否 |  | boosting 中縮小每棵樹貢獻的學習率機制。 |
+| leaf weight | 葉權重 | 否 |  | 決策樹葉節點輸出的數值。 |
+| column subsampling | 欄位子取樣 | 否 |  | 每次分割只考慮部分特徵的做法。 |
+| weighted quantile sketch | 加權分位數草圖 | 否 |  | XGBoost 在分散式資料上找分割點的近似演算法。 |
+| out-of-bag error | 袋外誤差 | 否 |  | 用袋外樣本計算的免費驗證誤差。 |
+| weighted sum | 加權總和 | 否 |  |  |
+| sample weight | 樣本權重 | 否 |  | AdaBoost 中各訓練樣本的權重。 |
