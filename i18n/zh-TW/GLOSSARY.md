@@ -797,6 +797,9 @@
 | convolution kernel | 卷積核 | 否 |  | 卷積層套用於輸入的權重。 |
 | signal filter | 訊號濾波器 | 否 |  | 用來改變或選取訊號頻率成分的系統。 |
 | receptive field | 感受野 | 否 |  | 卷積輸出位置所能涵蓋的輸入範圍。 |
+| padding | 填充 | 否 |  | 卷積在輸入邊緣補上的值。 |
+| depthwise convolution | 深度卷積 | 否 |  | groups 等於輸入通道數的卷積。 |
+| translation equivariance | 平移等變 | 否 |  | 輸入平移時，輸出跟著平移。 |
 | feature map | 特徵圖 | 否 |  | 神經網路中間層輸出的空間或序列表示。 |
 | convolutional layer | 卷積層 | 否 |  | 以卷積核對輸入執行卷積的神經網路層。 |
 | window | 視窗 | 否 |  | 訊號處理中指擷取的訊號片段；軟體介面語境亦譯為視窗。 |
