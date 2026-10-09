@@ -1550,11 +1550,11 @@
 | sample weight | 樣本權重 | 否 |  | AdaBoost 中各訓練樣本的權重。 |
 | grid search | 網格搜尋 | 否 |  | 對所有超參數組合窮畢的搜尋方法。 |
 | random search | 隨機搜尋 | 否 |  | 從分布中隨機抽樣超參數的搜尋方法。 |
-| Bayesian optimization | 貝氏最佳化 | 否 |  | 用代理模型與獲取函數引導的超參數搜尋。 |
+| Bayesian optimization | 貝氏最佳化 | 否 |  | 用代理模型與獲得函數引導的超參數搜尋。 |
 | surrogate model | 代理模型 | 否 |  | 用來近似昂貴目標函數的便宜模型，常用高斯過程。 |
-| acquisition function | 獲取函數 | 否 |  | 貝氏最佳化中決定下一個評估點的函數。 |
-| expected improvement | 期望改善 | 否 |  | 常用獲取函數；對目前最佳點的期望改善幅度。 |
-| upper confidence bound | 信賴上界 | 否 |  | 預測值加上不確定性倍數的獲取函數。 |
+| acquisition function | 獲得函數 | 否 |  | 貝氏最佳化中決定下一個評估點的函數。 |
+| expected improvement | 期望改善 | 否 |  | 常用獲得函數；對目前最佳點的期望改善幅度。 |
+| upper confidence bound | 信賴上界 | 否 |  | 預測值加上不確定性倍數的獲得函數。 |
 | probability of improvement | 改善機率 | 否 |  | 候選點勝過目前最佳值的機率。 |
 | Hyperband | Hyperband | 是 |  | 超參數搜尋的資源分配演算法名稱。 |
 | median pruning | 中位數剪枝 | 否 |  | 試驗中途表現不如已完成試驗中位數時提早停止。 |
