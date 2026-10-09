@@ -1548,3 +1548,24 @@
 | out-of-bag error | 袋外誤差 | 否 |  | 用袋外樣本計算的免費驗證誤差。 |
 | weighted sum | 加權總和 | 否 |  |  |
 | sample weight | 樣本權重 | 否 |  | AdaBoost 中各訓練樣本的權重。 |
+| grid search | 網格搜尋 | 否 |  | 對所有超參數組合窮畢的搜尋方法。 |
+| random search | 隨機搜尋 | 否 |  | 從分布中隨機抽樣超參數的搜尋方法。 |
+| Bayesian optimization | 貝氏最佳化 | 否 |  | 用代理模型與獲取函數引導的超參數搜尋。 |
+| surrogate model | 代理模型 | 否 |  | 用來近似昂貴目標函數的便宜模型，常用高斯過程。 |
+| acquisition function | 獲取函數 | 否 |  | 貝氏最佳化中決定下一個評估點的函數。 |
+| expected improvement | 期望改善 | 否 |  | 常用獲取函數；對目前最佳點的期望改善幅度。 |
+| upper confidence bound | 信賴上界 | 否 |  | 預測值加上不確定性倍數的獲取函數。 |
+| probability of improvement | 改善機率 | 否 |  | 候選點勝過目前最佳值的機率。 |
+| Hyperband | Hyperband | 是 |  | 超參數搜尋的資源分配演算法名稱。 |
+| median pruning | 中位數剪枝 | 否 |  | 試驗中途表現不如已完成試驗中位數時提早停止。 |
+| Optuna | Optuna | 是 |  | 超參數調校函式庫名稱。 |
+| search space | 搜尋空間 | 否 |  | 超參數所有候選值的範圍。 |
+| trial | 試驗 | 否 |  | 超參數搜尋中的一次評估。 |
+| batch size | 批次大小 | 否 |  | 每次權重更新使用的樣本數。 |
+| log scale | 對數尺度 | 否 |  | 以對數間隔取值的搜尋尺度。 |
+| log-uniform | 對數均勻 | 否 |  | 在對數尺度上均勻取樣的分布。 |
+| subsample ratio | 子取樣比例 | 否 |  | 每棵樹使用的訓練樣本比例。 |
+| one-cycle | 一循環 | 否 |  | 學習率先升後降的一循環排程。 |
+| plateau | 高原期 | 否 |  | 指標停止改善的階段。 |
+| hyperparameter tuning | 超參數調校 | 否 |  | 為模型選擇超參數的過程。 |
+| patience | 容忍輪數 | 否 |  | 提前停止前允許的不改善輪數。 |
