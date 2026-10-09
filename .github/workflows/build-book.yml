@@ -42,6 +42,12 @@ jobs:
         continue-on-error: true
         run: npm install -g @mermaid-js/mermaid-cli
 
+      - name: Allow Chromium's user-namespace sandbox on Ubuntu
+        run: |
+          if command -v mmdc >/dev/null && [[ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+
       - name: Install xelatex
         if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
         run: |
@@ -50,7 +56,7 @@ jobs:
 
       - name: Install CJK fonts
         if: github.event.inputs.lang == 'zh-TW' || github.event.inputs.lang == 'zh' || github.event.inputs.lang == 'ja' || github.event.inputs.lang == 'ko'
-        run: sudo apt-get install -y -q fonts-noto-cjk
+        run: sudo apt-get install -y -q texlive-lang-chinese fonts-noto-cjk
 
       - name: Validate book rendering
         run: python3 scripts/test_book_rendering.py
@@ -74,7 +80,7 @@ jobs:
       - name: Upload EPUBs
         uses: actions/upload-artifact@v4
         with:
-          name: book-epub
+          name: book-epub${{ github.event.inputs.lang && format('-{0}', github.event.inputs.lang) || '' }}
           path: dist/book/*.epub
           retention-days: 30
 
@@ -82,7 +88,7 @@ jobs:
         if: github.event_name != 'push'
         uses: actions/upload-artifact@v4
         with:
-          name: book-pdf
+          name: book-pdf${{ github.event.inputs.lang && format('-{0}', github.event.inputs.lang) || '' }}
           path: dist/book/*.pdf
           retention-days: 90
 
