@@ -9,5 +9,6 @@
   "phases/06-speech-and-audio/08-voice-cloning-conversion/docs/en.md": "dc41114b9bfa5d8fdc151f0efebe947230683806c1d2f888031a457c9bb8a480",
   "phases/06-speech-and-audio/09-music-generation/docs/en.md": "eca9c3e4de1e7d92a60cd7ad0ebcf3e15cfc67c1999e3a5e7ec154fee581331a",
   "phases/06-speech-and-audio/10-audio-language-models/docs/en.md": "a32837dad7c1099f98828124d16ed2bc97576711bfbaea7f503127db3f6d4c84",
-  "phases/06-speech-and-audio/11-real-time-audio-processing/docs/en.md": "38770fe883e05dd7bc541c3d3dbca612686e46d48c7d9a2f4ab2b8b9bb9735db"
+  "phases/06-speech-and-audio/11-real-time-audio-processing/docs/en.md": "38770fe883e05dd7bc541c3d3dbca612686e46d48c7d9a2f4ab2b8b9bb9735db",
+  "phases/06-speech-and-audio/12-voice-assistant-pipeline/docs/en.md": "42adee0778ecf907bc8312c65cde0d75a8cc6db9ee3780bcc441cbc768a884ee"
 }
