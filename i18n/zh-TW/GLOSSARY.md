@@ -312,6 +312,14 @@
 | lookup table | 查表 | 否 |  |  |
 | feature selection | 特徵選擇 | 否 |  |  |
 | feature importance | 特徵重要度 | 否 |  |  |
+| tree-based model | 樹模型 | 否 |  | 以決策樹為基礎的模型。 |
+| tabular data | 表格資料 | 否 |  | 以列和欄組織的資料。 |
+| numeric feature | 數值特徵 | 否 |  |  |
+| categorical feature | 類別特徵 | 否 |  |  |
+| nonlinear relationship | 非線性關係 | 否 |  |  |
+| feature interaction | 特徵交互作用 | 否 |  | 一個特徵的影響會依其他特徵的值而改變。 |
+| hyperparameter sensitivity | 超參數敏感度 | 否 |  | 模型表現對超參數設定變化的敏感程度。 |
+| interpretability | 可解釋性 | 否 |  | 模型決策能否由人理解。 |
 | label | 標籤 | 否 |  | 機器學習的目標標籤。 |
 | model | 模型 | 否 |  |  |
 | classifier | 分類器 | 否 |  |  |
@@ -407,6 +415,30 @@
 | binary classification | 二元分類 | 否 |  |  |
 | multi-class classification | 多類別分類 | 否 |  |  |
 | decision tree | 決策樹 | 否 |  |  |
+| classification tree | 分類樹 | 否 |  | 以類別為目標的決策樹。 |
+| regression tree | 迴歸樹 | 否 |  | 以數值為目標的決策樹。 |
+| random forest | 隨機森林 | 否 |  | 由多棵決策樹集成而成的模型。 |
+| internal node | 內部節點 | 否 |  | 決策樹中進行特徵判斷、非葉節點的節點。 |
+| root node | 根節點 | 否 |  | 決策樹的起始節點。 |
+| rectangular region | 矩形區域 | 否 |  | 決策樹依序切分特徵空間形成的區域。 |
+| split criterion | 分割準則 | 否 |  | 用來評估資料切分品質的指標。 |
+| impurity | 不純度 | 否 |  | 節點中類別混雜程度的量化指標。 |
+| class distribution | 類別分布 | 否 |  | 各類別在資料中的比例。 |
+| greedy algorithm | 貪婪演算法 | 否 |  | 每一步都選擇當下最佳選項的演算法。 |
+| NP-hard | NP-hard | 是 |  | 計算複雜度分類，保留英文寫法。 |
+| split point | 分割點 | 否 |  | 特徵值中用來切分資料的位置。 |
+| maximum depth | 最大深度 | 否 |  | 決策樹從根節點到最深葉節點的最大層數。 |
+| max depth | 最大深度 | 否 |  | 決策樹深度上限的超參數簡稱。 |
+| minimum samples per leaf | 葉節點最小樣本數 | 否 |  | 每個葉節點必須包含的最少樣本數。 |
+| minimum information gain | 最低資訊增益 | 否 |  | 允許切分所需達到的最低資訊增益。 |
+| maximum leaf nodes | 葉節點數上限 | 否 |  | 決策樹可包含的葉節點數量上限。 |
+| pre-pruning | 預剪枝 | 否 |  | 在樹完全長成前，依條件停止繼續切分。 |
+| post-pruning | 後剪枝 | 否 |  | 完整長成決策樹後，再移除部分子樹。 |
+| pruning | 剪枝 | 否 |  | 限制或縮減決策樹以改善泛化能力。 |
+| cost-complexity pruning | 成本複雜度剪枝 | 否 |  | 以葉節點數量的懲罰項控制樹的大小。 |
+| reduced error pruning | 減少錯誤剪枝 | 否 |  | 若移除子樹不增加驗證誤差，就將其剪除。 |
+| validation error | 驗證誤差 | 否 |  | 模型在驗證資料上的預測誤差。 |
+| variance reduction | 變異數減少 | 否 |  | 切分後目標值變異數的加權下降量。 |
 | model training | 模型訓練 | 否 |  |  |
 | training set | 訓練集 | 否 |  |  |
 | validation set | 驗證集 | 否 |  |  |
@@ -973,6 +1005,7 @@
 | non-convex cost surface | 非凸成本曲面 | 否 |  |  |
 | cross-entropy | 交叉熵 | 否 |  |  |
 | entropy | 熵 | 否 |  |  |
+| Gini impurity | 基尼不純度 | 否 |  | 根據類別比例計算節點中樣本被誤分類的機率。 |
 | KL divergence | KL 散度 | 否 | — |  |
 | mutual information | 互資訊 | 否 |  |  |
 | conditional entropy | 條件熵 | 否 |  |  |
@@ -1175,8 +1208,25 @@
 | p-hacking | p-hacking | 是 |  | 反覆嘗試分析方式以取得顯著結果，保留英文。 |
 | fairness metric | 公平性指標 | 否 |  |  |
 | AUC | AUC | 是 |  | area under the curve 縮寫。 |
+| mean decrease in impurity | 平均不純度下降 | 否 |  | 特徵在樹中帶來的不純度減少量總和。 |
+| MDI | MDI | 是 |  | mean decrease in impurity 的縮寫。 |
+| high-cardinality feature | 高基數特徵 | 否 |  | 具有許多不同取值的特徵。 |
+| permutation importance | 置換重要度 | 否 |  | 打亂一個特徵後，以模型準確率下降量衡量其重要度。 |
+| gradient boosted tree | 梯度提升樹 | 否 |  | 以逐步修正前一棵樹錯誤的方式建立的樹模型。 |
 | sampling distribution | 抽樣分布 | 否 |  |  |
 | bootstrap | bootstrap | 是 |  | 統計重抽樣方法，保留英文。 |
+| bootstrap sample | bootstrap 樣本 | 否 |  | 從訓練資料中有放回抽出的樣本集合。 |
+| bootstrap sampling | bootstrap 抽樣 | 否 |  | 以有放回抽樣建立 bootstrap 樣本。 |
+| bootstrap aggregating | bootstrap 聚合 | 否 |  | bagging 名稱的完整形式。 |
+| bagging | bagging | 是 |  | bootstrap aggregating 的縮寫，保留英文。 |
+| out-of-bag sample | 袋外樣本 | 否 |  | 未被抽入某棵樹 bootstrap 樣本的原始樣本。 |
+| feature randomization | 特徵隨機化 | 否 |  | 在每次切分時隨機挑選可考慮的特徵子集。 |
+| decorrelated trees | 去相關的樹 | 否 |  | 彼此輸出相關性較低的決策樹。 |
+| ensemble | 集成 | 否 |  | 將多個模型的預測合併。 |
+| ensemble method | 集成方法 | 否 |  | 結合多個模型以產生預測的方法。 |
+| weak learner | 弱學習器 | 否 |  | 單獨預測能力有限、可透過集成提升表現的模型。 |
+| majority vote | 多數決 | 否 |  | 以票數最多的類別作為分類結果。 |
+| weighted average | 加權平均 | 否 |  | 依各項目權重計算的平均值。 |
 | resampling with replacement | 有放回重抽樣 | 否 |  |  |
 | percentile method | 百分位數法 | 否 |  |  |
 | point estimate | 點估計 | 否 |  |  |
