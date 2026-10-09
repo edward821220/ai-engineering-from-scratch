@@ -86,7 +86,7 @@ wav = model.generate(["upbeat synthwave with driving drums, 128 BPM"])
 torchaudio.save("out.wav", wav[0].cpu(), 32000)
 ```
 
-三種大小：`small`（3 億，快）、`medium`（15 億）、`large`（33 億）。Small 夠用來問「點子站不站得住」。
+三種大小：`small`（3 億，快）、`medium`（15 億）、`large`（33 億）。Small 夠用來問「點子聽不聽得過去」。
 
 ### 步驟 2：旋律條件
 
@@ -136,7 +136,7 @@ music = musicgen.generate([description], duration=30)
 ## 2026 年仍然會交付出去的坑
 
 - **洗版權的 prompt。** 「Song in the style of Taylor Swift」。商業的 Suno／Udio 現在會擋。開放模型不會。自己加一份過濾清單。
-- **超過 30 秒就重複、就漂。** 自迴歸模型會繞圈。把多次生成交叉淡化，或用 ACE-Step 維持結構。
+- **超過 30 秒就重複、就漂掉。** 自迴歸模型會繞圈。把多次生成交叉淡化，或用 ACE-Step 維持結構。
 - **速度漂掉。** 模型會離開 BPM。prompt 裡寫 BPM 標籤，再用 librosa 的 `beat_track` 事後過濾。
 - **人聲可懂度。** Suno 很好。開放模型的字常常糊掉。歌詞要緊就用商業 API，或 fine-tune。
 - **單聲道輸出。** 開放模型產出單聲道或假立體聲。再用正式的立體聲重建補上（ezst、Cartesia 的立體聲擴散）。
