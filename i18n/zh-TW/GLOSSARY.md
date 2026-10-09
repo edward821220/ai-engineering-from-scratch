@@ -1582,3 +1582,11 @@
 | rollback | 回滾 | 否 |  | 回到先前版本的動作。 |
 | unit test | 單元測試 | 否 |  | 針對單一元件的測試。 |
 | integration test | 整合測試 | 否 |  | 針對多元件協作的測試。 |
+| conditional independence | 條件獨立 | 否 |  | 給定類別後，特徵彼此獨立。 |
+| generative model | 生成模型 | 否 |  | 學習給定類別下的資料分布與類別機率，再用貝氏定理得到後驗。 |
+| discriminative model | 判別式模型 | 否 | 判別模型 | 直接學習後驗或決策邊界，不建模資料如何生成。 |
+| multinomial naive Bayes | 多項單純貝氏 | 否 | 多項式單純貝氏 | 以詞頻計數建模；多項分布，不是多項式。 |
+| Gaussian naive Bayes | 高斯單純貝氏 | 否 |  | 以常態分布建模連續特徵。 |
+| Bernoulli naive Bayes | 伯努利單純貝氏 | 否 |  | 以出現或未出現的二元特徵建模。 |
+| class prior | 類別先驗 | 否 |  | 觀察特徵前各類別的機率。 |
+| Dirichlet prior | 狄利克雷先驗 | 否 |  | 多項分布的共軛先驗；拉普拉斯平滑的貝氏解釋。 |
