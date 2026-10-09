@@ -510,7 +510,7 @@ print(f"Ridge R-squared: {r2_score(y_test, ridge.predict(X_test_scaled)):.4f}")
 print(f"Ridge coefficient: {ridge.coef_[0]:.4f}")
 ```
 
-從頭實作的版本與 scikit-learn 會得到相同結果。差別在於 scikit-learn 處理了邊界情況、數值穩定性與效能最佳化。生產環境使用函式庫；從頭實作的版本則能幫你理解背後的運作方式。
+從頭實作的版本與 scikit-learn 會得到相同結果。差別在於 scikit-learn 處理了邊界情況、數值穩定性與效能最佳化。正式環境使用函式庫；從頭實作的版本則能幫你理解背後的運作方式。
 
 ## Ship It｜交付成果
 
@@ -533,10 +533,10 @@ print(f"Ridge coefficient: {ridge.coef_[0]:.4f}")
 | 成本函數（cost function） | 「模型有多糟」 | 將模型參數映射為單一數值，以衡量預測誤差，再由最佳化程序將其最小化 |
 | 均方誤差（mean squared error） | 「平方誤差的平均數」 | (1/n) * sum((predicted - actual)^2)；大誤差受到的懲罰會不成比例地加重 |
 | 梯度下降法（gradient descent） | 「往下坡走」 | 反覆沿著能降低成本函數的方向調整參數，並使用偏導數計算方向 |
-| 學習率（learning rate） | 「步長」 | 控制每次梯度下降更新中參數改變幅度的純量 |
+| 學習率（learning rate） | 「步長」 | 控制每次梯度下降法更新中參數改變幅度的純量 |
 | 正規方程組（normal equation） | 「直接求解」 | 封閉解 w = (X^T X)^-1 X^T y，不需迭代就能求得最佳權重 |
 | R 平方分數（R-squared） | 「擬合得有多好」 | 模型能解釋的 y 變異比例，範圍從負無限大到 1.0 |
-| 特徵縮放（feature scaling） | 「讓特徵尺度一致」 | 將特徵轉換至相近範圍（例如平均數為 0、變異數為 1），使梯度下降更快收斂 |
+| 特徵縮放（feature scaling） | 「讓特徵尺度一致」 | 將特徵轉換至相近範圍（例如平均數為 0、變異數為 1），使梯度下降法更快收斂 |
 | 正則化（regularization） | 「懲罰模型複雜度」 | 在成本函數中加入一項以縮小權重，避免過度擬合 |
 | 嶺迴歸（Ridge regression） | 「L2 正則化」 | 在線性迴歸的 MSE 上加入 lambda * sum(w_i^2) 懲罰項 |
 | 多項式迴歸（polynomial regression） | 「用線性數學擬合曲線」 | 在多項式特徵（x、x^2、x^3、...）上套用線性迴歸；模型對權重而言仍是線性的 |

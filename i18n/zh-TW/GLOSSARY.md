@@ -9,6 +9,15 @@
 | agent | agent | 是 | 智慧體、代理程式 | AI agent 語境中保留英文；一般法律／人員語境另依上下文。 |
 | fine-tuning | fine-tuning | 是 | 微調 | 依使用者指定保留英文。 |
 | embedding | embedding | 是 | 嵌入、嵌入向量 | 依使用者指定保留英文。 |
+| eager execution | 立即執行 | 否 |  | PyTorch 的設計：呼叫當下就算出結果。 |
+| pure function | 純函式 | 否 |  | 輸出只取決於輸入，沒有副作用。 |
+| pytree | pytree | 是 |  | JAX 可走訪的巢狀清單、tuple、dict 與陣列。 |
+| pixel | 像素 | 否 |  | 影像網格上的一個光強度樣本。 |
+| channel | 通道 | 否 | 頻道 | 影像張量裡並列的空間網格。軟體發行頻道不用這個譯法。 |
+| color space | 色彩空間 | 否 |  | RGB、HSV、YCbCr 這類表示。 |
+| quantization | 量化 | 否 |  | 把連續量分成有限位元。 |
+| interpolation | 內插 | 否 |  | 新網格對不齊舊網格時，怎麼算出中間像素。 |
+| aspect ratio | 長寬比 | 否 |  | 寬除以高。 |
 | transformer | transformer | 是 | 轉換器 | 依使用者指定保留英文；模型架構名不翻。 |
 | AI engineering | AI 工程 | 否 |  |  |
 | repository | 儲存庫 | 否 | — | Git 專案語境。 |
@@ -194,6 +203,9 @@
 | profiler | 效能分析器 | 否 |  | 執行效能分析的工具。 |
 | memory profiling | 記憶體分析 | 否 |  | 測量程式記憶體使用的分析。 |
 | bottleneck | 瓶頸 | 否 |  | 限制整體效能的環節。 |
+| backbone | 骨幹 | 否 |  | 視覺模型裡產生特徵圖、再交給任務頭的卷積堆疊。 |
+| transfer learning | 遷移學習 | 否 |  |  |
+| skip connection | 跳躍連接 | 否 |  | 把輸入直接加回區塊輸出的連線。 |
 | stack trace | 堆疊追蹤 | 否 | 堆棧跟蹤 | 程式錯誤時列出的呼叫序列。 |
 | runtime error | 執行階段錯誤 | 否 | 運行時錯誤 | 程式執行中才發生的錯誤。 |
 | timestamp | 時間戳記 | 否 | — |  |
@@ -487,7 +499,7 @@
 | median | 中位數 | 否 |  |  |
 | standard deviation | 標準差 | 否 |  |  |
 | gradient | 梯度 | 否 |  |  |
-| gradient descent | 梯度下降法 | 否 |  |  |
+| gradient descent | 梯度下降法 | 否 |  | 一律寫完整的「梯度下降法」。不能把較短的寫法放進禁用欄，否則會誤中偏好詞。 |
 | least-squares solution | 最小平方法解 | 否 | 最小二乘解 |  |
 | ridge regression | 嶺迴歸 | 否 |  |  |
 | Gram-Schmidt process | Gram-Schmidt 正交化過程 | 否 |  | 保留演算法名稱。 |
@@ -515,6 +527,16 @@
 | stochastic gradient descent (SGD) | 隨機梯度下降法 | 否 |  |  |
 | mean squared error | 均方誤差 | 否 |  |  |
 | accuracy | 準確率 | 否 |  |  |
+| object detection | 物件偵測 | 否 | 目標檢測 | 影像裡找出每個物體的框與類別。 |
+| semantic segmentation | 語意分割 | 否 | 語義分割 | 每個像素一個類別，同類個體不分開。 |
+| instance segmentation | 實例分割 | 否 |  | 同一類別的不同個體分開。 |
+| panoptic segmentation | 全景分割 | 否 |  | 每個像素有類別，每個可數物體另有唯一 id。 |
+| Dice loss | Dice 損失 | 否 |  | Dice 保留英文。 |
+| transposed convolution | 轉置卷積 | 否 | 反捲積 | 可學習的上採樣。反卷積是常見誤稱。 |
+| bounding box | 邊界框 | 否 |  |  |
+| anchor box | 錨框 | 否 |  | 偵測裡預先給定的框形狀。 |
+| non-maximum suppression | 非極大值抑制 | 否 |  | 常縮寫 NMS。 |
+| objectness | 物件性 | 否 |  | 這個格子中心有沒有物體。 |
 | precision | 精確率 | 否 |  |  |
 | recall | 召回率 | 否 |  |  |
 | sensitivity | 敏感度 | 否 |  | 二元分類中的召回率別名。 |
@@ -542,6 +564,12 @@
 | hidden layer | 隱藏層 | 否 |  | 輸入與輸出層之間的層。 |
 | residual connection | 殘差連接 | 否 |  | 把層的輸入直接加回輸出的連線，如 ResNet。 |
 | initialization | 初始化 | 否 |  | 設定參數初始值。 |
+| weight initialization | 權重初始化 | 否 |  | 決定網路能不能開始訓練的初始權重策略。 |
+| Xavier initialization | Xavier 初始化 | 否 |  | 又稱 Glorot。給 sigmoid 與 tanh 用。 |
+| Kaiming initialization | Kaiming 初始化 | 否 |  | 又稱 He。給 ReLU 用。 |
+| fan-in | fan-in | 是 |  | 一個神經元的輸入連接數。 |
+| fan-out | fan-out | 是 |  | 一個神經元的輸出連接數。 |
+| residual stream | 殘差流 | 否 |  | 殘差連接一路累加的那條表徵。 |
 | BLAS | BLAS | 是 |  | 線性代數運算函式庫標準。 |
 | matrix | 矩陣 | 否 |  |  |
 | tensor | 張量 | 否 |  |  |
@@ -565,6 +593,9 @@
 | row-major | 列優先 | 否 |  | C order。 |
 | column-major | 欄優先 | 否 |  | Fortran order。 |
 | batch normalization | 批次正規化 | 否 |  |  |
+| layer normalization | 層正規化 | 否 |  | 對單一筆樣本的特徵做正規化，不依賴批次。 |
+| RMSNorm | RMSNorm | 是 |  | 層正規化去掉減均值。 |
+| generalization gap | 泛化差距 | 否 |  | 訓練表現與測試表現的差。 |
 | scalar | 純量 | 否 | — |  |
 | dot product | 內積 | 否 |  |  |
 | matrix multiplication | 矩陣乘法 | 否 |  |  |
@@ -779,6 +810,9 @@
 | convolution kernel | 卷積核 | 否 |  | 卷積層套用於輸入的權重。 |
 | signal filter | 訊號濾波器 | 否 |  | 用來改變或選取訊號頻率成分的系統。 |
 | receptive field | 感受野 | 否 |  | 卷積輸出位置所能涵蓋的輸入範圍。 |
+| padding | 填充 | 否 |  | 卷積在輸入邊緣補上的值。 |
+| depthwise convolution | 深度卷積 | 否 |  | groups 等於輸入通道數的卷積。 |
+| translation equivariance | 平移等變 | 否 |  | 輸入平移時，輸出跟著平移。 |
 | feature map | 特徵圖 | 否 |  | 神經網路中間層輸出的空間或序列表示。 |
 | convolutional layer | 卷積層 | 否 |  | 以卷積核對輸入執行卷積的神經網路層。 |
 | window | 視窗 | 否 |  | 訊號處理中指擷取的訊號片段；軟體介面語境亦譯為視窗。 |
@@ -996,6 +1030,14 @@
 | gradient clipping | 梯度裁剪 | 否 |  |  |
 | activation function | 活化函數 | 否 | 激活函數 |  |
 | ReLU | ReLU | 是 |  | 函數名稱保留。 |
+| tanh | tanh | 是 |  | 函數名稱保留。 |
+| GELU | GELU | 是 |  | Gaussian Error Linear Unit，函數名稱保留。 |
+| Leaky ReLU | Leaky ReLU | 是 |  | 負側保留小斜率。 |
+| Swish | Swish | 是 |  | x * sigmoid(x)。 |
+| SiLU | SiLU | 是 |  | Swish 的另一個名稱。 |
+| dead neuron | 死亡神經元 | 否 |  | ReLU 輸入恆為負，輸出與梯度皆為 0。 |
+| saturation | 飽和 | 否 |  | 活化函數導數接近 0 的區域。 |
+| nonlinearity | 非線性 | 否 |  |  |
 | softmax | softmax | 是 |  | 函數名稱保留。 |
 | softmax regression | softmax 迴歸 | 否 |  | 以 softmax 函數擴展至多類別分類的線性模型。 |
 | sigmoid function | sigmoid 函數 | 否 |  | 函數名稱常保留英文。 |
@@ -1016,6 +1058,10 @@
 | information theory | 資訊理論 | 否 |  |  |
 | perplexity | 困惑度 | 否 |  | 語言模型評估指標。 |
 | label smoothing | 標籤平滑 | 否 |  |  |
+| focal loss | 焦點損失 | 否 |  | 用 (1-p_t)^gamma 降低簡單樣本的權重。 |
+| InfoNCE | InfoNCE | 是 |  | 對比學習常用的損失，又稱 NT-Xent。 |
+| Huber loss | Huber 損失 | 否 |  | 小誤差用 MSE、大誤差用 MAE。 |
+| distribution shift | 分布偏移 | 否 |  | 訓練與實際使用時資料分布不同。 |
 | soft target | 軟目標 | 否 |  |  |
 | hard target | 硬目標 | 否 |  |  |
 | negative log-likelihood | 負對數概似 | 否 |  |  |
@@ -1141,6 +1187,7 @@
 | exponential decay | 指數衰減 | 否 |  |  |
 | cosine annealing | 餘弦退火 | 否 |  | 學習率排程語境。 |
 | warmup | 預熱 | 否 |  | 學習率暖身語境。 |
+| 1cycle policy | 1cycle 策略 | 否 |  | Leslie Smith 的單週期學習率排程。 |
 | convex function | 凸函數 | 否 |  |  |
 | non-convex | 非凸 | 否 |  |  |
 | convex set | 凸集合 | 否 |  |  |
@@ -1160,6 +1207,8 @@
 | velocity | 速度 | 否 |  | 動量語境。 |
 | bias correction | 偏差校正 | 否 |  | Adam 語境。 |
 | Adam | Adam | 是 |  | 最佳化演算法名稱。 |
+| AdamW | AdamW | 是 |  | 把權重衰減從 Adam 的自適應縮放裡拆開。 |
+| RMSProp | RMSProp | 是 |  | 依每個參數近期梯度的均方根調整學習率。 |
 | SGD | SGD | 是 |  | 首次寫「隨機梯度下降法（SGD）」。 |
 | logit | logit | 是 |  | 多個值用 logits；AI 工程語境保留。 |
 | logits | logits | 是 |  |  |
@@ -1577,6 +1626,7 @@
 | serialization | 序列化 | 否 |  | 把物件轉成可儲存或傳輸格式的過程。 |
 | artifact | 產物 | 否 |  | 訓練或建置過程產出的檔案或物件。 |
 | deployment | 部署 | 否 |  | 把模型或系統放上正式環境。 |
+| production environment | 正式環境 | 否 | 生產環境 | 上線後實際在跑的環境。本專案統一用「正式環境」。 |
 | config file | 設定檔 | 否 |  | 集中存放超參數與設定的檔案。 |
 | approval workflow | 核准流程 | 否 |  | 上線前需經人工核准的流程。 |
 | rollback | 回滾 | 否 |  | 回到先前版本的動作。 |
@@ -1625,3 +1675,11 @@
 | forward selection | 前向選擇 | 否 |  | 從空集合開始，逐一加入最有幫助的特徵。 |
 | backward elimination | 後向消除 | 否 |  | 從全部特徵開始，逐一移除最沒有幫助的特徵。 |
 | stability selection | 穩定性選擇 | 否 |  | 多次子抽樣後，只保留經常被選中的特徵。 |
+| perceptron | 感知器 | 否 | 感知機 | 單一線性分類器；多層形式見 multi-layer perceptron。 |
+| step function | 階躍函數 | 否 |  | 感知器在加權總和之後使用的不連續活化函數。 |
+| linear classifier | 線性分類器 | 否 |  | 以超平面把輸入分成兩類的模型。 |
+| input layer | 輸入層 | 否 |  | 只存放原始輸入、不做計算的那一層。 |
+| output layer | 輸出層 | 否 |  | 網路最後給出答案的那一層。 |
+| multi-layer network | 多層網路 | 否 | 多層網絡 | 由多層神經元依序堆疊而成的網路。 |
+| bias vector | 偏置向量 | 否 |  | 矩陣乘法之後加上的偏置。 |
+| universal approximation | 通用近似 | 否 |  | 單一隱藏層在神經元夠多時可近似任何連續函數。 |

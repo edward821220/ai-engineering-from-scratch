@@ -164,10 +164,10 @@ x_{t+1} = x_t - dt * gradient(U(x_t)) + sqrt(2 * T * dt) * z_t
 ```
 
 粒子受到兩種力：
-1. **梯度力（gradient force）**（-dt * gradient(U)）：將粒子推向低能量處（類似梯度下降）
+1. **梯度力（gradient force）**（-dt * gradient(U)）：將粒子推向低能量處（類似梯度下降法）
 2. **隨機力（random force）**（sqrt(2*T*dt) * z）：推動粒子朝隨機方向移動，藉此探索（exploration）
 
-當溫度 T = 0 時，這就是純粹的梯度下降。溫度很高時，它就近似隨機漫步。在適當的溫度下，粒子會探索整個能量地形（energy landscape），並在低能量區域停留較久。
+當溫度 T = 0 時，這就是純粹的梯度下降法。溫度很高時，它就近似隨機漫步。在適當的溫度下，粒子會探索整個能量地形（energy landscape），並在低能量區域停留較久。
 
 **與擴散模型的連結。** 擴散模型的前向過程為：
 
@@ -421,7 +421,7 @@ p_theta(x_{t-1} | x_t) = N(x_{t-1}; mu_theta(x_t, t), sigma_t^2 * I)
 
 生成過程的每一步，都是一條已學得的馬可夫鏈中的一步。理解馬可夫鏈，就能理解擴散模型如何、以及為何能生成資料。
 
-SGLD（Stochastic Gradient Langevin Dynamics，隨機梯度 Langevin 動力學）結合小批次梯度下降與 Langevin 雜訊。你不必計算完整梯度，而是使用隨機估計值並加入經校準的雜訊。隨著學習率遞減，SGLD 會從最佳化逐漸轉為抽樣——免費取得近似的貝氏後驗樣本。這是從神經網路取得不確定性估計最簡單的方法之一。
+SGLD（Stochastic Gradient Langevin Dynamics，隨機梯度 Langevin 動力學）結合小批次梯度下降法與 Langevin 雜訊。你不必計算完整梯度，而是使用隨機估計值並加入經校準的雜訊。隨著學習率遞減，SGLD 會從最佳化逐漸轉為抽樣——免費取得近似的貝氏後驗樣本。這是從神經網路取得不確定性估計最簡單的方法之一。
 
 這些連結背後的關鍵洞見是：隨機過程不只是理論工具，也是現代 AI 系統內部的計算機制。調整 LLM 的溫度，就是在調整馬可夫鏈；訓練擴散模型，就是在學習反轉類似布朗運動的過程；執行貝氏推論，就是在建構一條會收斂至後驗分布的鏈。
 
@@ -446,7 +446,7 @@ SGLD（Stochastic Gradient Langevin Dynamics，隨機梯度 Langevin 動力學�
 | 轉移矩陣（transition matrix） | 「機率表」 | P[i][j] = 從狀態 i 移動到狀態 j 的機率 |
 | 平穩分布（stationary distribution） | 「長期平均」 | 滿足 pi*P = pi 的分布；也就是鏈的平衡分布 |
 | 布朗運動（Brownian motion） | 「隨機抖動」 | 隨機漫步在連續時間下的極限，B(t) ~ N(0, t) |
-| Langevin 動力學（Langevin dynamics） | 「加上雜訊的梯度下降」 | 結合確定性梯度與隨機擾動的更新規則 |
+| Langevin 動力學（Langevin dynamics） | 「加上雜訊的梯度下降法」 | 結合確定性梯度與隨機擾動的更新規則 |
 | MCMC | 「朝目標漫步」 | 建構平穩分布等於目標分布的馬可夫鏈 |
 | Metropolis-Hastings | 「提出並接受／拒絕」 | 使用接受比率確保收斂的 MCMC 演算法 |
 | 溫度（temperature） | 「隨機性旋鈕」 | 控制探索與利用（exploitation）之間取捨的參數 |

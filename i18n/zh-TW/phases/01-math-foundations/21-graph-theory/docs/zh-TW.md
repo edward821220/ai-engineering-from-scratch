@@ -412,7 +412,7 @@ top_nodes = sorted(pr.items(), key=lambda x: x[1], reverse=True)[:5]
 print(f"Top 5 PageRank nodes: {top_nodes}")
 ```
 
-NetworkX 能透過最佳化的 C 後端處理任何規模的圖，適合用於生產環境。自己從頭實作，則能幫助你理解它的運作方式。
+NetworkX 能透過最佳化的 C 後端處理任何規模的圖，適合用於正式環境。自己從頭實作，則能幫助你理解它的運作方式。
 
 ### NumPy 譜分析
 
