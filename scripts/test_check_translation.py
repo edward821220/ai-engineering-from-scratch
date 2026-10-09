@@ -133,6 +133,13 @@ class TranslationDocumentTest(unittest.TestCase):
         altered_id = translation.replace("participant WD as", "participant W as")
         self.assert_has_finding(check_document(source, altered_id), "mermaid")
 
+    def test_mermaid_subgraphs_and_inner_bracket_labels_may_translate(self) -> None:
+        source = '''# Complex Mermaid\n\n```mermaid\ngraph TD\n    subgraph "Graph to Matrices"\n        A["e1 = [1, 0] (along x)"] --> B\n    end\n    subgraph Grid Search\n        B --> C\n    end\n```\n'''
+        translation = '''# Complex Mermaid\n\n```mermaid\ngraph TD\n    subgraph "從圖到矩陣"\n        A["e1 = [1, 0] (沿 x 軸)"] --> B\n    end\n    subgraph 網格搜尋\n        B --> C\n    end\n```\n'''
+        self.assertEqual([], check_document(source, translation))
+        altered_id = translation.replace('A["e1 = [1, 0] (沿 x 軸)"]', 'X["e1 = [1, 0] (沿 x 軸)"]')
+        self.assert_has_finding(check_document(source, altered_id), "mermaid")
+
     def test_mermaid_edge_labels_must_remain_verbatim(self) -> None:
         altered = TRANSLATION.replace("|source edge|", "|translated edge|")
         self.assert_has_finding(check_document(SOURCE, altered), "mermaid")
@@ -173,7 +180,7 @@ class TranslationDocumentTest(unittest.TestCase):
         self.assert_has_finding(check_document(SOURCE, mainland), "mainland")
         ambiguous = TRANSLATION.replace("一段原始文字。", "這段配置很清楚。")
         self.assertEqual([], check_document(SOURCE, ambiguous))
-        shared_traditional = TRANSLATION.replace("一段原始文字。", "皇后就在 3 公里外，只有一個人；兩者互相呼應。")
+        shared_traditional = TRANSLATION.replace("一段原始文字。", "皇后就在 3 公里外，只有一個人；兩者互相呼應，克服困難。")
         self.assertEqual([], check_document(SOURCE, shared_traditional))
 
     def test_glossary_forbidden_variants_are_reported_with_lesson_path(self) -> None:
