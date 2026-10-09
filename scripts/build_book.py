@@ -133,7 +133,9 @@ def transform_lesson(phase, lesson_dir):
             elif info == "mermaid":
                 rendered = render_mermaid(block)
                 if rendered:
-                    out += ["", f"![diagram]({rendered})", ""]
+                    # Empty alt keeps this an illustration. A caption of
+                    # "diagram" becomes a numbered figure (图 N: diagram).
+                    out += ["", f"![]({rendered})", ""]
                 else:
                     out += fenced_div(
                         "interactive-figure",
@@ -202,15 +204,24 @@ def render_mermaid(block):
         return None
     assets = BUILD / "diagrams"
     assets.mkdir(parents=True, exist_ok=True)
-    stem = hashlib.sha1("\n".join(block).encode()).hexdigest()[:16]
+    config = ROOT / "book" / "mermaid.json"
+    payload = "\n".join(block)
+    if config.is_file():
+        payload += "\n" + config.read_text(encoding="utf-8")
+    stem = hashlib.sha1(payload.encode()).hexdigest()[:16]
     svg = assets / f"{stem}.svg"
     if svg.is_file():
         return str(svg.relative_to(ROOT))
     mmd = assets / f"{stem}.mmd"
     mmd.write_text("\n".join(block), encoding="utf-8")
+    cmd = ["mmdc", "-i", str(mmd), "-o", str(svg), "-b", "transparent", "--quiet"]
+    if config.is_file():
+        # htmlLabels off: real SVG text. foreignObject HTML is dropped by
+        # XeLaTeX, which is why CJK labels came out as empty boxes.
+        cmd[1:1] = ["-c", str(config)]
     try:
         subprocess.run(
-            ["mmdc", "-i", str(mmd), "-o", str(svg), "-b", "transparent", "--quiet"],
+            cmd,
             check=True, capture_output=True, timeout=60,
         )
         return str(svg.relative_to(ROOT))
