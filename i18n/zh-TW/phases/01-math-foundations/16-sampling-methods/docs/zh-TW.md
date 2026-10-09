@@ -32,7 +32,7 @@
 
 **生成。** 語言模型、擴散模型和生成對抗網路（generative adversarial network，GAN）都透過抽樣產生輸出。抽樣演算法會直接控制創意、連貫性和多樣性。工程師每天都會調整溫度、top-k 和核取樣等參數。
 
-**訓練。** 隨機梯度下降（stochastic gradient descent）會抽樣選取小批次（mini-batch）。dropout 會抽樣選擇要停用的神經元。資料增強（data augmentation）會抽樣選擇隨機變換。在強化學習（PPO、TRPO）中，重要性取樣會重新加權樣本，以降低梯度變異數。
+**訓練。** 隨機梯度下降法（stochastic gradient descent）會抽樣選取小批次（mini-batch）。dropout 會抽樣選擇要停用的神經元。資料增強（data augmentation）會抽樣選擇隨機變換。在強化學習（PPO、TRPO）中，重要性取樣會重新加權樣本，以降低梯度變異數。
 
 **估計。** 機器學習中的許多量沒有封閉解，例如資料分布上的期望損失、能量模型的配分函數（partition function）、貝氏推論（Bayesian inference）中的證據。蒙地卡羅估計會對樣本取平均，近似計算這些量。
 
