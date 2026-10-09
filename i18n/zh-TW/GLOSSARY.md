@@ -1160,8 +1160,7 @@
 | velocity | 速度 | 否 |  | 動量語境。 |
 | bias correction | 偏差校正 | 否 |  | Adam 語境。 |
 | Adam | Adam | 是 |  | 最佳化演算法名稱。 |
-| SGD | SGD | 是 |  | 首次寫「隨機梯度下降（SGD）」。 |
-| stochastic gradient descent | 隨機梯度下降 | 否 |  |  |
+| SGD | SGD | 是 |  | 首次寫「隨機梯度下降法（SGD）」。 |
 | logit | logit | 是 |  | 多個值用 logits；AI 工程語境保留。 |
 | logits | logits | 是 |  |  |
 | probability density function (PDF) | 機率密度函數 | 否 | 概率密度函数 | 數學語境；避免與 PDF 檔案格式混淆。 |
