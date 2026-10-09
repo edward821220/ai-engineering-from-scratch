@@ -1172,6 +1172,8 @@
 | velocity | 速度 | 否 |  | 動量語境。 |
 | bias correction | 偏差校正 | 否 |  | Adam 語境。 |
 | Adam | Adam | 是 |  | 最佳化演算法名稱。 |
+| AdamW | AdamW | 是 |  | 把權重衰減從 Adam 的自適應縮放裡拆開。 |
+| RMSProp | RMSProp | 是 |  | 依每個參數近期梯度的均方根調整學習率。 |
 | SGD | SGD | 是 |  | 首次寫「隨機梯度下降法（SGD）」。 |
 | logit | logit | 是 |  | 多個值用 logits；AI 工程語境保留。 |
 | logits | logits | 是 |  |  |
