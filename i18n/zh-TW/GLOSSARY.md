@@ -12,6 +12,12 @@
 | eager execution | 立即執行 | 否 |  | PyTorch 的設計：呼叫當下就算出結果。 |
 | pure function | 純函式 | 否 |  | 輸出只取決於輸入，沒有副作用。 |
 | pytree | pytree | 是 |  | JAX 可走訪的巢狀清單、tuple、dict 與陣列。 |
+| pixel | 像素 | 否 |  | 影像網格上的一個光強度樣本。 |
+| channel | 通道 | 否 | 頻道 | 影像張量裡並列的空間網格。軟體發行頻道不用這個譯法。 |
+| color space | 色彩空間 | 否 |  | RGB、HSV、YCbCr 這類表示。 |
+| quantization | 量化 | 否 |  | 把連續量分成有限位元。 |
+| interpolation | 內插 | 否 |  | 新網格對不齊舊網格時，怎麼算出中間像素。 |
+| aspect ratio | 長寬比 | 否 |  | 寬除以高。 |
 | transformer | transformer | 是 | 轉換器 | 依使用者指定保留英文；模型架構名不翻。 |
 | AI engineering | AI 工程 | 否 |  |  |
 | repository | 儲存庫 | 否 | — | Git 專案語境。 |
