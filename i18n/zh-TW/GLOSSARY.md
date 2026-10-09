@@ -499,7 +499,7 @@
 | median | 中位數 | 否 |  |  |
 | standard deviation | 標準差 | 否 |  |  |
 | gradient | 梯度 | 否 |  |  |
-| gradient descent | 梯度下降法 | 否 |  |  |
+| gradient descent | 梯度下降法 | 否 |  | 一律寫完整的「梯度下降法」。不能把較短的寫法放進禁用欄，否則會誤中偏好詞。 |
 | least-squares solution | 最小平方法解 | 否 | 最小二乘解 |  |
 | ridge regression | 嶺迴歸 | 否 |  |  |
 | Gram-Schmidt process | Gram-Schmidt 正交化過程 | 否 |  | 保留演算法名稱。 |
@@ -1626,6 +1626,7 @@
 | serialization | 序列化 | 否 |  | 把物件轉成可儲存或傳輸格式的過程。 |
 | artifact | 產物 | 否 |  | 訓練或建置過程產出的檔案或物件。 |
 | deployment | 部署 | 否 |  | 把模型或系統放上正式環境。 |
+| production environment | 正式環境 | 否 | 生產環境 | 上線後實際在跑的環境。本專案統一用「正式環境」。 |
 | config file | 設定檔 | 否 |  | 集中存放超參數與設定的檔案。 |
 | approval workflow | 核准流程 | 否 |  | 上線前需經人工核准的流程。 |
 | rollback | 回滾 | 否 |  | 回到先前版本的動作。 |
