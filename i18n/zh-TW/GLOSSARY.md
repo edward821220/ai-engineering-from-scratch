@@ -1084,6 +1084,28 @@
 | centroid | 質心 | 否 |  |  |
 | support vector machine | 支援向量機 | 否 |  |  |
 | support vector | 支援向量 | 否 |  | SVM 語境。 |
+| maximum margin | 最大間隔 | 否 |  | SVM 分類邊界語境。 |
+| maximum margin classifier | 最大間隔分類器 | 否 |  |  |
+| maximum margin principle | 最大間隔原則 | 否 |  |  |
+| margin | 間隔 | 否 |  | SVM 語境；與 decision boundary 區分。 |
+| margin width | 間隔寬度 | 否 |  |  |
+| margin violation | 間隔違規 | 否 |  |  |
+| soft margin | 軟間隔 | 否 |  | 允許資料點違反間隔條件的 SVM formulation。 |
+| slack variable | 鬆弛變數 | 否 |  |  |
+| C parameter | C 參數 | 否 |  | SVM 正則化取捨參數。 |
+| regularization strength | 正則化強度 | 否 |  |  |
+| primal formulation | 原始形式 | 否 |  | 最佳化問題語境。 |
+| dual formulation | 對偶形式 | 否 |  | 最佳化問題語境。 |
+| Lagrangian dual | 拉格朗日對偶 | 否 |  |  |
+| quadratic program | 二次規劃問題 | 否 |  |  |
+| linear kernel | 線性核 | 否 |  |  |
+| polynomial kernel | 多項式核 | 否 |  |  |
+| support vector regression | 支援向量迴歸 | 否 |  | 可縮寫為 SVR。 |
+| epsilon tube | ε 管狀區域 | 否 |  | SVR 語境。 |
+| epsilon-insensitive loss | ε 不敏感損失 | 否 |  | SVR 語境。 |
+| one-class SVM | 單類別 SVM | 否 |  | 異常偵測方法。 |
+| gamma parameter | gamma 參數 | 否 |  | RBF 核語境。 |
+| feature mapping | 特徵映射 | 否 |  | 核方法語境；將輸入映射到特徵空間。 |
 | K-nearest neighbors | k 最近鄰法 | 否 |  | 可保留 KNN 縮寫。 |
 | anomaly detection | 異常偵測 | 否 |  |  |
 | weight decay | 權重衰減 | 否 | — |  |
