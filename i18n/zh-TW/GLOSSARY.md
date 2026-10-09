@@ -1515,3 +1515,23 @@
 | null distribution | 虛無分布 | 否 |  | 假設無效應時的參照分布。 |
 | minority class | 少數類 | 否 |  | 不平衡資料中樣本較少的類別。 |
 | majority class | 多數類 | 否 |  | 不平衡資料中樣本較多的類別。 |
+| decomposition | 分解 | 否 |  | 將總量拆解為組成成分；bias-variance decomposition 譯為偏差－變異分解。 |
+| irreducible error | 不可約誤差 | 否 |  | 資料生成過程固有隨機性造成的誤差下限。 |
+| expected prediction error | 期望預測誤差 | 否 |  | 在不同訓練集上預測誤差的期望值。 |
+| training error | 訓練誤差 | 否 |  | 模型在訓練資料上的誤差。 |
+| test error | 測試誤差 | 否 |  | 模型在測試資料上的誤差。 |
+| model capacity | 模型容量 | 否 |  | 模型可擬合函數的複雜度上限。 |
+| polynomial degree | 多項式次數 | 否 |  | 多項式的最高次方；與圖論的 degree（度數）區分。 |
+| sweet spot | 甜蜜點 | 否 |  | 偏差與變異平衡的最佳複雜度位置。 |
+| boosting | boosting | 是 |  | 依序建模、每個新模型修正集成目前錯誤的方法；保留英文。 |
+| gradient boosting | gradient boosting | 是 |  | 梯度提升；常用英文名稱。 |
+| AdaBoost | AdaBoost | 是 |  | boosting 演算法名稱。 |
+| stacking | stacking | 是 |  | 以元學習器合併基模型輸出的集成方法；保留英文。 |
+| meta-learner | 元學習器 | 否 |  | stacking 中合併基模型輸出的模型。 |
+| base model | 基模型 | 否 |  | 集成方法中的個別模型。 |
+| interpolation threshold | 插值閾值 | 否 |  | 參數數量剛好足以完美擬合訓練資料的臨界點。 |
+| overparameterized | 過度參數化 | 否 |  | 參數數量遠多於訓練樣本的狀態。 |
+| double descent | 雙重下降 | 否 |  | 容量超過插值閾值後測試誤差再度下降的現象。 |
+| sample-wise double descent | 樣本維度雙重下降 | 否 |  | 增加樣本數在插值區間反而讓測試誤差上升的現象。 |
+| epoch-wise double descent | epoch 維度雙重下降 | 否 |  | 增加訓練 epoch 數引發的雙重下降。 |
+| shallow stump | 淺層樹樁 | 否 |  | 深度很淺的決策樹，常用作 boosting 的基模型。 |
