@@ -528,6 +528,11 @@
 | mean squared error | 均方誤差 | 否 |  |  |
 | accuracy | 準確率 | 否 |  |  |
 | object detection | 物件偵測 | 否 | 目標檢測 | 影像裡找出每個物體的框與類別。 |
+| semantic segmentation | 語意分割 | 否 | 語義分割 | 每個像素一個類別，同類個體不分開。 |
+| instance segmentation | 實例分割 | 否 |  | 同一類別的不同個體分開。 |
+| panoptic segmentation | 全景分割 | 否 |  | 每個像素有類別，每個可數物體另有唯一 id。 |
+| Dice loss | Dice 損失 | 否 |  | Dice 保留英文。 |
+| transposed convolution | 轉置卷積 | 否 | 反捲積 | 可學習的上採樣。反卷積是常見誤稱。 |
 | bounding box | 邊界框 | 否 |  |  |
 | anchor box | 錨框 | 否 |  | 偵測裡預先給定的框形狀。 |
 | non-maximum suppression | 非極大值抑制 | 否 |  | 常縮寫 NMS。 |
