@@ -351,6 +351,7 @@
 | hyperparameter | 超參數 | 否 |  |  |
 | weight | 權重 | 否 | 重量 | 神經網路參數；不得譯成物理重量。 |
 | weight matrix | 權重矩陣 | 否 |  |  |
+| weight vector | 權重向量 | 否 |  | 模型對特徵套用的權重所構成的向量。 |
 | weight update | 權重更新 | 否 |  |  |
 | bias (model parameter) | 偏置 | 否 | — | 模型的截距參數。 |
 | bias (statistical error) | 偏差 | 否 | — | bias–variance 語境。 |
