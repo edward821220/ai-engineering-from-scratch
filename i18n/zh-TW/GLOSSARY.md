@@ -1603,3 +1603,13 @@
 | exponential smoothing | 指數平滑 | 否 |  | 對近期觀測給較高權重的平滑法。 |
 | forecasting horizon | 預測期距 | 否 |  | 一次要往前預測幾步。 |
 | structural break | 結構斷裂 | 否 |  | 序列行為突然改變的時點。 |
+| point anomaly | 點異常 | 否 |  | 不論情境，單一觀測值本身就異常。 |
+| contextual anomaly | 情境異常 | 否 |  | 同一個值在別的情境正常，在此情境異常。 |
+| collective anomaly | 集合異常 | 否 |  | 個別點正常，但一連串放在一起異常。 |
+| isolation forest | 隔離森林 | 否 |  | 用隨機分割把異常點較快隔離出來的樹集成。 |
+| local outlier factor | 局部離群因子 | 否 |  | 比較一點與其鄰居的局部密度。 |
+| LOF | LOF | 是 |  | local outlier factor 縮寫。 |
+| contamination | 預期異常比例 | 否 |  | 偵測器預期要標記為異常的資料比例；只影響閾值。 |
+| precision at k | Precision@k | 是 |  | 前 k 個最可疑點裡真正異常的比例。 |
+| AUPRC | AUPRC | 是 |  | 精確率–召回率曲線下面積；不平衡時比 AUROC 有用。 |
+| reachability density | 可達密度 | 否 |  | LOF 用來描述鄰域有多密的量。 |
