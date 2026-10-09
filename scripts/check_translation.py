@@ -219,6 +219,13 @@ def _mermaid_syntax(raw: str) -> str:
         r'\1"<subgraph-label>"\2',
         body,
     )
+    # A bare `subgraph <text>` line uses the text as both id and display
+    # label, so the whole remainder is display text.
+    body = re.sub(
+        r'(?m)^(\s*subgraph\s+)[^"\[\]\n]+$',
+        r'\1<subgraph-title>',
+        body,
+    )
     # Quoted labels may contain bracket/paren characters (e.g. `id["[1, 0] (x)"]`).
     # Strip the whole quoted span first so the inner delimiters cannot confuse the
     # per-shape loop below.

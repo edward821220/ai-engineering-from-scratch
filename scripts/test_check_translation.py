@@ -137,6 +137,17 @@ class TranslationDocumentTest(unittest.TestCase):
         )
         self.assertEqual([], check_document(source, translation))
 
+    def test_mermaid_bare_subgraph_titles_may_translate(self) -> None:
+        source = SOURCE.replace(
+            "    A[Source label] -->|source edge| B[Target label]",
+            "    subgraph Source Group\n        A[Source label] -->|source edge| B[Target label]\n    end",
+        )
+        translation = TRANSLATION.replace(
+            "    A[來源標籤] -->|source edge| B[目標標籤]",
+            "    subgraph 來源群組\n        A[起點] -->|source edge| B[終點]\n    end",
+        )
+        self.assertEqual([], check_document(source, translation))
+
     def test_mermaid_sequence_participant_labels_may_translate(self) -> None:
         source = '''# Sequence Diagram\n\n```mermaid\nsequenceDiagram\n    participant WD as Working Directory\n    participant SA as Staging Area\n    WD->>SA: git add\n```\n'''
         translation = source.replace("Working Directory", "工作目錄").replace("Staging Area", "暫存區")
