@@ -1547,7 +1547,7 @@
 | out-of-bag error | 袋外誤差 | 否 |  | 用袋外樣本計算的免費驗證誤差。 |
 | weighted sum | 加權總和 | 否 |  |  |
 | sample weight | 樣本權重 | 否 |  | AdaBoost 中各訓練樣本的權重。 |
-| grid search | 網格搜尋 | 否 |  | 對所有超參數組合窮畢的搜尋方法。 |
+| grid search | 網格搜尋 | 否 |  | 對所有超參數組合窮舉的搜尋方法。 |
 | random search | 隨機搜尋 | 否 |  | 從分布中隨機抽樣超參數的搜尋方法。 |
 | Bayesian optimization | 貝氏最佳化 | 否 |  | 用代理模型與獲得函數引導的超參數搜尋。 |
 | surrogate model | 代理模型 | 否 |  | 用來近似昂貴目標函數的便宜模型，常用高斯過程。 |
