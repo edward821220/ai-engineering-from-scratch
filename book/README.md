@@ -23,7 +23,7 @@ python3 scripts/build_book.py --volume language
 python3 scripts/build_book.py --pdf            # adds PDF (needs xelatex + DejaVu fonts)
 ```
 
-Requires pandoc. Optional: `@mermaid-js/mermaid-cli` (mmdc) to render mermaid diagrams as images; without it they become web-edition pointers. Output lands in `dist/book/`.
+Requires pandoc. Mermaid diagrams are not embedded; each one becomes a pointer to the web edition, where the browser draws it. Output lands in `dist/book/`.
 
 CI (`.github/workflows/build-book.yml`) builds EPUBs on every push that touches `phases/`, and EPUB + PDF on releases, attaching both to the release.
 
@@ -31,7 +31,7 @@ CI (`.github/workflows/build-book.yml`) builds EPUBs on every push that touches 
 
 - Lesson `# title` becomes a chapter; phases become unnumbered part pages.
 - `figure` blocks (interactive JS widgets) become boxed pointers to the lesson's web edition.
-- Mermaid blocks render to SVG when mmdc is available, otherwise become web pointers.
+- Mermaid blocks become web pointers. Embedding the SVG drops CJK labels in XeLaTeX and leaves empty boxes.
 - `## Ship It` sections are replaced with a pointer to the repo artifact.
 - `## Exercises` gains a starter-code link into the lesson's `code/` directory.
 - Every chapter closes with a Continue Online box: web edition, code, quiz.

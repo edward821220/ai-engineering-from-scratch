@@ -38,16 +38,6 @@ jobs:
           echo "b419369915e0f3181be0afdb040ec8ecc6b70e72e5992652a0d83aed9e6bc109  /tmp/pandoc.deb" | sha256sum -c -
           sudo dpkg -i /tmp/pandoc.deb
 
-      - name: Install mermaid renderer
-        continue-on-error: true
-        run: npm install -g @mermaid-js/mermaid-cli
-
-      - name: Allow Chromium's user-namespace sandbox on Ubuntu
-        run: |
-          if command -v mmdc >/dev/null && [[ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]]; then
-            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-          fi
-
       - name: Install xelatex
         if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
         run: |

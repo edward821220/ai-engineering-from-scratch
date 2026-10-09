@@ -1,8 +1,0 @@
-{
-  "themeVariables": {
-    "fontFamily": "\"Noto Sans CJK TC\", \"Noto Sans CJK JP\", \"DejaVu Sans\""
-  },
-  "flowchart": { "htmlLabels": false },
-  "class": { "htmlLabels": false },
-  "state": { "htmlLabels": false }
-}

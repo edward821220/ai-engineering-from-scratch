@@ -14,7 +14,6 @@ every chapter ends with the links that take the reader there.
 
 import argparse
 import functools
-import hashlib
 import json
 import re
 import shutil
@@ -38,7 +37,6 @@ FENCE = re.compile(r"^```")
 ASSET_IMG = re.compile(r"\]\(\.\./assets/")
 HEADING2 = re.compile(r"^## ")
 
-MERMAID_OK = shutil.which("mmdc") is not None
 ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"]
 
 
@@ -131,16 +129,13 @@ def transform_lesson(phase, lesson_dir):
                     f"**Interactive figure: `{fig_id}`.** This one moves. Watch it animate and drag its controls in the web edition: <{u['web']}>",
                 )
             elif info == "mermaid":
-                rendered = render_mermaid(block)
-                if rendered:
-                    # Empty alt keeps this an illustration. A caption of
-                    # "diagram" becomes a numbered figure (图 N: diagram).
-                    out += ["", f"![]({rendered})", ""]
-                else:
-                    out += fenced_div(
-                        "interactive-figure",
-                        f"**Diagram.** Rendered live in the web edition: <{u['web']}>",
-                    )
+                # Never embed these. XeLaTeX drops the HTML layer inside a
+                # Mermaid SVG, so a "successful" render still ships empty
+                # boxes. The web edition draws them in the browser.
+                out += fenced_div(
+                    "interactive-figure",
+                    f"**Diagram.** Rendered live in the web edition: <{u['web']}>",
+                )
             else:
                 out += src[i : end + 1]
             i = end + 1
@@ -197,41 +192,6 @@ def pick_font(candidates):
         if c in families:
             return c
     return None
-
-
-def render_mermaid(block):
-    if not MERMAID_OK:
-        return None
-    assets = BUILD / "diagrams"
-    assets.mkdir(parents=True, exist_ok=True)
-    config = ROOT / "book" / "mermaid.json"
-    payload = "\n".join(block)
-    if config.is_file():
-        payload += "\n" + config.read_text(encoding="utf-8")
-    stem = hashlib.sha1(payload.encode()).hexdigest()[:16]
-    svg = assets / f"{stem}.svg"
-    if svg.is_file():
-        return str(svg.relative_to(ROOT))
-    mmd = assets / f"{stem}.mmd"
-    mmd.write_text("\n".join(block), encoding="utf-8")
-    cmd = ["mmdc", "-i", str(mmd), "-o", str(svg), "-b", "transparent", "--quiet"]
-    if config.is_file():
-        # htmlLabels off: real SVG text. foreignObject HTML is dropped by
-        # XeLaTeX, which is why CJK labels came out as empty boxes.
-        cmd[1:1] = ["-c", str(config)]
-    try:
-        subprocess.run(
-            cmd,
-            check=True, capture_output=True, timeout=60,
-        )
-        return str(svg.relative_to(ROOT))
-    except subprocess.CalledProcessError as exc:
-        detail = (exc.stderr or b"").decode(errors="replace").strip()[:300]
-        print(f"warning: mermaid render failed for {mmd.name}: {detail}", file=sys.stderr)
-        return None
-    except subprocess.TimeoutExpired:
-        print(f"warning: mermaid render timed out for {mmd.name}", file=sys.stderr)
-        return None
 
 
 @functools.lru_cache(maxsize=None)
