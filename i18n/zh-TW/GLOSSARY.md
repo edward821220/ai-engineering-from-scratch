@@ -1628,3 +1628,8 @@
 | perceptron | 感知器 | 否 | 感知機 | 單一線性分類器；多層形式見 multi-layer perceptron。 |
 | step function | 階躍函數 | 否 |  | 感知器在加權總和之後使用的不連續活化函數。 |
 | linear classifier | 線性分類器 | 否 |  | 以超平面把輸入分成兩類的模型。 |
+| input layer | 輸入層 | 否 |  | 只存放原始輸入、不做計算的那一層。 |
+| output layer | 輸出層 | 否 |  | 網路最後給出答案的那一層。 |
+| multi-layer network | 多層網路 | 否 | 多層網絡 | 由多層神經元依序堆疊而成的網路。 |
+| bias vector | 偏置向量 | 否 |  | 矩陣乘法之後加上的偏置。 |
+| universal approximation | 通用近似 | 否 |  | 單一隱藏層在神經元夠多時可近似任何連續函數。 |
