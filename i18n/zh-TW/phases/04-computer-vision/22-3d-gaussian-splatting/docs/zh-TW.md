@@ -1,6 +1,6 @@
-# 從零做 3D Gaussian Splatting
+# 從零做 3D 高斯濺射（3D Gaussian Splatting）
 
-> 一個場景是幾百萬個 3D 高斯組成的雲。每一個都有位置、朝向、尺度、不透明度，以及隨觀看方向改變的顏色。把它們光柵化（rasterise），再對光柵化做反向傳播（backpropagation），就完成了。
+> 一個場景是幾百萬個 3D 高斯組成的雲。每一個都有位置、方向、尺度、不透明度（opacity），以及依觀看方向改變的顏色（colour）。把它們光柵化（rasterise），再對光柵化做反向傳播（backpropagation），就完成了。
 
 **Type:** Build
 **Languages:** Python
@@ -9,18 +9,18 @@
 
 ## Learning Objectives｜學習目標
 
-- 說明為什麼 3D Gaussian Splatting 在 2026 年取代 NeRF，成為照片級真實 3D 重建在正式環境的預設
-- 說出每個高斯的六個參數（parameter）：位置、旋轉四元數、尺度、不透明度、球諧顏色、可選特徵（feature）。以及各自貢獻幾個浮點數
-- 用 `alpha` 合成從零實作一個 2D 高斯光柵化器，再顯示 3D 的情況投影之後是同一個迴圈
-- 用 `nerfstudio`、`gsplat` 或 `SuperSplat`，從 20 到 50 張照片重建一個場景，並匯出成 `KHR_gaussian_splatting` 這個 glTF 擴充，或 OpenUSD 26.03 的 `UsdVolParticleField3DGaussianSplat` 結構描述
+- 說明為什麼 2026 年，照片級 3D 重建在正式環境的預設從 NeRF 換成了 3D 高斯濺射
+- 說出每個高斯的六個參數：位置、旋轉四元數（quaternion）、尺度、不透明度、球諧（spherical harmonics）顏色、可選特徵（feature）。各自貢獻幾個浮點數
+- 用 `alpha` 合成從零實作一個 2D 高斯濺射的光柵器，再顯示 3D 的情況投影之後是同一個迴圈
+- 用 `nerfstudio`、`gsplat` 或 `SuperSplat`，從 20 到 50 張照片重建一個場景，並匯出成 `KHR_gaussian_splatting` 這個 glTF 擴充，或 OpenUSD 26.03 的 `UsdVolParticleField3DGaussianSplat` schema
 
 ## The Problem｜問題
 
-NeRF 把場景存在 MLP 的權重（weight）裡。每個渲染出來的像素（pixel）都是射線上幾百次 MLP 查詢。訓練要幾小時，渲染要幾秒，權重也不能改。你想把場景裡的椅子搬開，就得重新訓練。
+NeRF 把場景存在 MLP 的權重（weight）裡。每個渲染出來的像素（pixel），都是射線上幾百次 MLP 查詢。訓練要幾小時，渲染要幾秒，權重也不能直接改。想把場景裡的椅子搬一下，就得重新訓練。
 
-3D Gaussian Splatting（Kerbl、Kopanas、Leimkühler、Drettakis，SIGGRAPH 2023）把這些都換掉了。場景是一組顯式的 3D 高斯。渲染是 GPU 光柵化，每秒 100 影格以上。訓練要幾分鐘。編輯是直接的：平移一部分高斯，椅子就搬走了。到 2026 年，Khronos Group 已核准高斯 splat 的 glTF 擴充，OpenUSD 26.03 帶了高斯 splat 的結構描述，Zillow 和 Apartments.com 用它們渲染不動產，大多數新的 3D 重建論文都是核心 3DGS 想法的變體。
+3D 高斯濺射（Kerbl、Kopanas、Leimkühler、Drettakis，SIGGRAPH 2023）把這些都換掉了。場景是一組顯式的 3D 高斯。渲染是 GPU 光柵化，每秒 100 影格以上。訓練只要幾分鐘。編輯是直接的：平移一部分高斯，椅子就搬走了。到 2026 年，Khronos Group 已核定高斯濺射的 glTF 擴充，OpenUSD 26.03 帶了高斯濺射的 schema，Zillow 和 Apartments.com 用它們渲染不動產，大多數新的 3D 重建論文都是核心 3DGS 想法的變體。
 
-心智模型很簡單。數學裡會動的部分夠多，所以多數介紹從光柵化開始，把投影和球諧跳過去。本課把整件事做完：先做 2D 版，再擴到 3D。
+心智模型很簡單。數學裡活動的部分夠多，所以大多數介紹從光柵化開始，把投影和球諧跳過去。本課把整件事做出來。先做 2D，再延伸到 3D。
 
 ## The Concept｜核心概念
 
@@ -36,9 +36,9 @@ opacity          alpha      (1,)    post-sigmoid opacity [0, 1]
 SH coefficients  c_lm       (3 * (L+1)^2,)   view-dependent colour
 ```
 
-旋轉加尺度組成一個 3x3 的共變異（covariance）：`Sigma = R S S^T R^T`。那就是這個高斯在 3D 裡的形狀。球諧讓顏色隨觀看方向改變，鏡面高光、淡淡的光澤、隨視角的發光，都不用存每個視角的紋理。球諧次數 3 時，每個顏色通道 16 個係數，光是顏色一個高斯就有 48 個浮點數。
+旋轉加尺度做出一個 3x3 的共變異數（covariance）：`Sigma = R S S^T R^T`。那就是這個高斯在 3D 裡的形狀。球諧讓顏色隨觀看方向改變，鏡面高光、微微的光澤、依視角的光暈，都不用為每個視角存一張紋理。球諧 3 階時，每個顏色通道 16 個係數，光是顏色，每個高斯就有 48 個浮點數。
 
-一個場景通常有 100 萬到 500 萬個高斯。每個大約存 60 個浮點數（3 + 4 + 3 + 1 + 48，再加上雜項）。500 萬個高斯的場景是 240 MB。比帶逐點紋理的同等點雲小很多，也比高解析度重渲染時 NeRF 的 MLP 權重小一個數量級。
+一個場景通常有 100 萬到 500 萬個高斯。每個大約存 60 個浮點數（3 + 4 + 3 + 1 + 48，再加上其他）。500 萬個高斯的場景是 240 MB。比帶逐點紋理的對等點雲小得多，也比在高解析度下重渲的 NeRF MLP 權重小一個數量級。
 
 ### 光柵化，不是沿射線走
 
@@ -47,7 +47,7 @@ flowchart LR
     SCENE["幾百萬個 3D 高斯<br/>（位置、旋轉、尺度、<br/>不透明度、球諧顏色）"] --> PROJ["投影到 2D<br/>（相機外參加內參）"]
     PROJ --> TILES["分到小塊<br/>（螢幕空間 16x16）"]
     TILES --> SORT["每個小塊<br/>依深度排序"]
-    SORT --> ALPHA["Alpha 合成<br/>由前到後"]
+    SORT --> ALPHA["alpha 合成<br/>由前到後"]
     ALPHA --> PIX["像素顏色"]
 
     style SCENE fill:#dbeafe,stroke:#2563eb
@@ -57,9 +57,9 @@ flowchart LR
 
 五步，都對 GPU 友善。沒有每個像素一次的 MLP 查詢。一張 RTX 3080 Ti 以每秒 147 影格渲染 600 萬個 splat。
 
-### 投影這一步
+### 投影那一步
 
-世界位置 `mu`、3D 共變異 `Sigma` 的高斯，投影成螢幕位置 `mu'`、2D 共變異 `Sigma'` 的 2D 高斯：
+世界座標在 `mu`、3D 共變異數是 `Sigma` 的高斯，投影成螢幕位置 `mu'`、2D 共變異數 `Sigma'` 的 2D 高斯：
 
 ```
 mu' = project(mu)
@@ -69,11 +69,11 @@ W = viewing transform (rotation + translation of camera)
 J = Jacobian of the perspective projection at mu'
 ```
 
-2D 高斯的足跡是一個橢圓，軸是 `Sigma'` 的特徵向量。橢圓裡的每個像素都收到這個高斯的貢獻，權重是 `exp(-0.5 * (p - mu')^T Sigma'^-1 (p - mu'))`。
+這個 2D 高斯的足跡是一個橢圓，軸是 `Sigma'` 的特徵向量（eigenvector）。橢圓裡的每個像素都收到這個高斯的貢獻，乘上的因子是 `exp(-0.5 * (p - mu')^T Sigma'^-1 (p - mu'))`。
 
-### alpha 合成規則
+### alpha 合成的規則
 
-對一個像素，蓋住它的高斯由後到前排序（或由前到後，公式倒過來，兩者等價）。顏色用 1980 年代以來每個半透明光柵化器都在用的同一個式子合成：
+對一個像素，蓋住它的高斯由後往前排序（或用倒過來的公式，由前往後）。顏色的合成，和 1980 年代以來每個半透明光柵器是同一個式子：
 
 ```
 C_pixel = sum_i alpha_i * T_i * c_i
@@ -83,25 +83,25 @@ alpha_i = opacity_i * exp(-0.5 * d^T Sigma'^-1 d)   local contribution
 c_i = eval_SH(SH_i, view_direction)    view-dependent colour
 ```
 
-這和 **NeRF 的體積渲染是同一個式子**，只是改在一組顯式、稀疏的高斯上積分，不是沿射線的稠密樣本。這個等同，就是渲染品質對得上 NeRF 的原因。兩者都在積同一個輻射場方程式。
+這**和 NeRF 的體積渲染是同一個式子**，只是積在一組顯式、稀疏的高斯上，不是射線上的稠密樣本。這個等同，就是渲染品質對得上 NeRF 的原因。兩者都在積同一個輻射場方程。
 
 ### 為什麼這可以微分
 
-每一步，投影、分到小塊、alpha 合成、球諧求值，對高斯參數都可微。給一張標準結果影像，算渲染像素的損失（loss），對光柵化器做反向傳播，用梯度下降法更新全部的 `(mu, q, s, alpha, c_lm)`。大約 3 萬次迭代之後，高斯找到對的位置、尺度和顏色。
+每一步，投影、分到小塊、alpha 合成、球諧求值，對高斯參數都可微。給一張標準結果影像，算渲染像素的損失，對光柵器做反向傳播，用梯度下降法更新全部的 `(mu, q, s, alpha, c_lm)`。大約 3 萬次迭代之後，高斯找到對的位置、尺度和顏色。
 
-### 增密和剪枝
+### 緻密化和剪枝
 
-固定的一組高斯蓋不住複雜場景。訓練有兩個適應機制：
+固定的一組高斯蓋不住複雜場景。訓練裡有兩個會適應的機制：
 
-- **複製**。梯度量級高、但尺度小的時候，在目前位置複製一個高斯。這裡的重建需要更多細節。
-- **分裂**。梯度高的時候，把一個大尺度高斯分成兩個較小的。一個大高斯太平滑，擬合不了這個區域。
-- **剪掉**。不透明度掉到門檻以下的高斯。它們沒有貢獻。
+- 梯度量級高、尺度卻小的時候，在目前位置**複製**一個高斯。重建在這裡需要更多細節。
+- 梯度高的時候，把尺度大的高斯**切開**成兩個較小的。一個大高斯太平滑，擬合不了那個區域。
+- 不透明度掉到門檻以下就**剪掉**。它們沒有貢獻。
 
-增密每 N 次迭代跑一次。場景通常從大約 10 萬個初始高斯（從 SfM 點種出來）長到訓練結束時的 100 萬到 500 萬個。
+緻密化每 N 次迭代跑一次。場景通常從 SfM 點種下的約 10 萬個高斯，長到訓練結束時的 100 萬到 500 萬個。
 
 ### 一段話講完球諧
 
-隨視角的顏色是單位球上的函數 `c(direction)`。球諧是球上的傅立葉基底。截到次數 `L`，每個通道有 `(L+1)^2` 個基底函數。新視角的顏色，是學來的球諧係數和在觀看方向上求出的基底的點積。次數 0 是一個係數，顏色是常數。次數 3 是 16 個係數，夠抓住朗伯著色、鏡面反射和輕微的反射。SD 的 Gaussian Splatting 論文預設用次數 3。
+依視角的顏色是單位球上的函數（function） `c(direction)`。球諧是球面的傅立葉基底。在 `L` 階截斷，每個通道有 `(L+1)^2` 個基底函數。新視角的顏色，是學來的球諧係數和在觀看方向上求出的基底之間的點積。0 階是一個係數，顏色是常數。3 階是 16 個係數，夠抓住朗伯著色、鏡面和輕微反射。SD Gaussian Splatting 的論文預設用 3 階。
 
 ### 2026 年正式環境的堆疊
 
@@ -116,8 +116,8 @@ c_i = eval_SH(SH_i, view_direction)    view-dependent colour
 
 ### 4D 和生成式變體
 
-- **4D Gaussian Splatting**。高斯是時間的函數。用來做體積影片（《超人》2026、A$AP Rocky 的〈Helicopter〉）。
-- **生成式 splat**。文字到 splat 的模型（World Labs 的 Marble）生出整場場景。
+- **4D 高斯濺射**。高斯是時間的函數。用來做體積影片（2026 年的 Superman、A$AP Rocky 的 "Helicopter"）。
+- **生成式 splat**。文字到 splat 的模型（World Labs 的 Marble）會把整個場景憑空生出來。
 - **3D Gaussian Unscented Transform**。NVIDIA NuRec 給自駕模擬用的變體。
 
 ```figure
@@ -128,7 +128,7 @@ cv3-gaussian-splat
 
 ### 步驟 1：一個 2D 高斯
 
-先做 2D 光柵化器。3D 的情況在投影之後就變成它。
+先做 2D 光柵器。投影之後，3D 的情況就回到它。
 
 ```python
 import torch
@@ -155,9 +155,9 @@ def eval_2d_gaussian(means, covs, points):
 
 `einsum` 對每一組（高斯、像素）算二次型 `diff^T Sigma^-1 diff`。
 
-### 步驟 2：2D splat 光柵化器
+### 步驟 2：2D 濺射光柵器
 
-由前到後做 alpha 合成。2D 裡深度沒有意義，所以用一個學來的、每個高斯一個的純量來決定順序。
+由前到後做 alpha 合成。2D 裡深度沒有意義，所以用每個高斯一個學來的純量來排序。
 
 ```python
 def rasterise_2d(means, covs, colours, opacities, depths, image_size):
@@ -195,7 +195,7 @@ def rasterise_2d(means, covs, colours, opacities, depths, image_size):
     return out
 ```
 
-不快。真正的實作用以小塊為單位的 CUDA 核。但數學是對的，而且完全可微。
+不快。真正的實作用以小塊為單位的 CUDA 核。但數學是對的，而且全程可微。
 
 ### 步驟 3：可訓練的 2D splat 場景
 
@@ -229,7 +229,7 @@ class Splats2D(nn.Module):
         return rasterise_2d(self.means, covs, colours, opacities, self.depth, image_size)
 ```
 
-`log_scale`、`opacity_logit`、`colour_logits` 都是沒有約束的參數，渲染時再映過對的活化函數。這是每個 3DGS 實作的標準模式。
+`log_scale`、`opacity_logit`、`colour_logits` 都是沒有約束的參數，渲染時再套上對的活化函數（activation function）。這是每個 3DGS 實作的標準模式。
 
 ### 步驟 4：把 2D 高斯擬合到一張目標影像
 
@@ -261,23 +261,23 @@ for step in range(200):
         print(f"step {step:3d}  mse {loss.item():.4f}")
 ```
 
-200 步裡，64 個高斯會落到這兩個形狀上。整個想法就是這樣：對顯式的幾何基元做梯度下降法。
+200 步裡，64 個高斯落進那兩個形狀。整個想法就是這樣：對顯式的幾何基元做梯度下降法。
 
 ### 步驟 5：從 2D 到 3D
 
-3D 擴充保持同一個迴圈。多出來的是：
+3D 延伸留著同一個迴圈。多出來的是：
 
 1. 每個高斯的旋轉是四元數，不是單一角度。
-2. 共變異是 `R S S^T R^T`。`R` 由四元數做出來，`S = diag(exp(log_scale))`。
-3. 投影 `(mu, Sigma) -> (mu', Sigma')` 用相機外參，以及透視投影在 `mu` 處的 Jacobian。
-4. 顏色變成球諧展開。在觀看方向上求值。
-5. 深度排序用真正的相機空間 z，不是學來的純量。
+2. 共變異數是 `R S S^T R^T`。`R` 由四元數做出來，`S = diag(exp(log_scale))`。
+3. 投影 `(mu, Sigma) -> (mu', Sigma')` 用相機外參，以及透視投影在 `mu` 的雅可比（Jacobian）。
+4. 顏色變成球諧展開，在觀看方向上求值。
+5. 深度排序用的是相機空間真正的 z，不是學來的純量。
 
-每個正式環境的實作（`gsplat`、`inria/gaussian-splatting`、`nerfstudio`）都在 GPU 上用小塊 CUDA 核做這件事。
+每個正式環境的實作（`gsplat`、`inria/gaussian-splatting`、`nerfstudio`）都在 GPU 上、用以小塊為單位的 CUDA 核做這件事。
 
 ### 步驟 6：球諧求值
 
-到次數 3 的球諧基底，每個通道 16 項。求值：
+3 階以內的球諧基底，每個通道 16 項。求值是：
 
 ```python
 def eval_sh_degree_3(sh_coeffs, dirs):
@@ -310,11 +310,11 @@ def eval_sh_degree_3(sh_coeffs, dirs):
     return result
 ```
 
-學來的 `sh_coeffs` 存的是那個高斯「每個方向的顏色」。渲染時對目前的觀看方向求值，得到一個 3 維的 RGB。
+學來的 `sh_coeffs` 存的是那個高斯「每個方向的顏色」。渲染時對目前的觀看方向求值，得到一個三維的 RGB。
 
 ## Use It｜實際應用
 
-真正的 3DGS 工作用 `gsplat`（Meta）或 `nerfstudio`：
+真正要做 3DGS，用 `gsplat`（Meta）或 `nerfstudio`：
 
 ```bash
 pip install nerfstudio gsplat
@@ -322,48 +322,48 @@ ns-download-data example
 ns-train splatfacto --data path/to/data
 ```
 
-`splatfacto` 是 nerfstudio 的 3DGS 訓練器。典型場景在 RTX 4090 上要 10 到 30 分鐘。
+`splatfacto` 是 nerfstudio 的 3DGS 訓練器。一般場景在 RTX 4090 上要 10 到 30 分鐘。
 
 2026 年要緊的匯出選項：
 
-- `.ply`。原始高斯雲。可攜，檔案最大。
+- `.ply`。原始的高斯雲。可攜，檔案最大。
 - `.splat`。PlayCanvas / SuperSplat 的量化格式。
-- glTF `KHR_gaussian_splatting`。Khronos 標準，各檢視器之間可攜（2026 年 2 月的 RC）。
-- OpenUSD `UsdVolParticleField3DGaussianSplat`。USD 原生，給 NVIDIA Omniverse 和 Vision Pro 的管線（pipeline）用。
+- glTF `KHR_gaussian_splatting`。Khronos 標準，各種檢視器之間可攜（2026 年 2 月的 RC）。
+- OpenUSD `UsdVolParticleField3DGaussianSplat`。USD 原生，給 NVIDIA Omniverse 和 Vision Pro 的管線（pipeline）。
 
-4D 或動態場景，`4DGS` 和 `Deformable-3DGS` 用隨時間變的中心和不透明度，擴充同一套機制。
+4D 或動態場景，`4DGS` 和 `Deformable-3DGS` 用隨時間變的中心和不透明度，延伸同一套機制。
 
 ## Ship It｜交付成果
 
 本課會產出：
 
-- `outputs/prompt-3dgs-capture-planner.md`：一份 prompt，依場景類型規劃拍攝（照片張數、相機路徑、光線）
-- `outputs/skill-3dgs-export-router.md`：一項技能，依下游檢視器或引擎，挑對的匯出格式（`.ply` / `.splat` / glTF / USD）
+- `outputs/prompt-3dgs-capture-planner.md`：一份 prompt，依場景類型規劃拍攝：照片張數、相機路徑、光線
+- `outputs/skill-3dgs-export-router.md`：一項技能，依下游的檢視器或引擎，挑對的匯出格式（`.ply` / `.splat` / glTF / USD）
 
 ## Exercises｜練習
 
-1. **（簡單）** 用上面的 2D splat 訓練器跑另一張合成影像。`num_splats` 取 `[16, 64, 256]`，各畫一張 MSE 對步數的圖。找出報酬開始遞減的那個點。
-2. **（中等）** 把 2D 光柵化器擴充成：每個高斯的 RGB 顏色依一個純量「視角」，走 2 次諧波。在一對目標影像上訓練，確認模型兩邊都重建得出來。
-3. **（困難）** 複製 `nerfstudio`，在你有的任何場景（桌子、植物、臉、房間）的 20 張照片上訓練 `splatfacto`。匯出成 glTF `KHR_gaussian_splatting`，用檢視器打開（Three.js 的 `GaussianSplats3D`、SuperSplat、Babylon.js V9）。回報訓練時間、高斯數量和渲染的每秒影格數。
+1. **（簡單）** 用上面的 2D splat 訓練器跑另一張合成影像。`num_splats` 取 `[16, 64, 256]`，各自畫 MSE 對步數。找出報酬開始遞減的那個點。
+2. **（中等）** 把 2D 光柵器擴充成：每個高斯的 RGB 顏色，經由 2 階諧波依賴一個純量「視角」。用一對目標影像訓練，確認模型兩個都重建得回來。
+3. **（困難）** 複製 `nerfstudio`，在你有的任何場景（桌子、植物、臉、房間）的 20 張照片上訓練 `splatfacto`。匯出成 glTF `KHR_gaussian_splatting`，用檢視器打開（Three.js 的 `GaussianSplats3D`、SuperSplat、Babylon.js V9）。回報訓練時間、高斯數量，以及渲染的每秒影格數。
 
 ## Key Terms｜關鍵術語
 
 | 術語 | 常見說法 | 實際意義 |
 |------|----------------|----------------------|
 | 3DGS | 「高斯 splat」 | 顯式的場景表示：幾百萬個 3D 高斯，每個有位置、旋轉、尺度、不透明度、球諧顏色 |
-| 共變異 | 「高斯的形狀」 | `Sigma = R S S^T R^T`。一個高斯的朝向和非等向尺度 |
-| alpha 合成 | 「由後到前混合」 | 和 NeRF 體積渲染同一個式子，現在改在顯式的稀疏集合上 |
-| 增密 | 「複製再分裂」 | 重建擬合不足的地方，適應性地加上新高斯 |
-| 剪枝 | 「刪掉低不透明度」 | 拿掉訓練中不透明度塌到接近 0 的高斯 |
-| 球諧 | 「隨視角的顏色」 | 球上的傅立葉基底。把顏色存成觀看方向的函數 |
+| 共變異數 | 「高斯的形狀」 | `Sigma = R S S^T R^T`。一個高斯的方向和各向異性尺度 |
+| alpha 合成 | 「由後往前混」 | 和 NeRF 體積渲染同一個式子，現在積在顯式的稀疏集合上 |
+| 緻密化 | 「複製再切開」 | 重建擬合不足的地方，適應地加入新高斯 |
+| 剪枝 | 「刪掉低不透明度的」 | 拿掉訓練中不透明度塌到接近 0 的高斯 |
+| 球諧 | 「依視角的顏色」 | 球面上的傅立葉基底。把顏色存成觀看方向的函數 |
 | Splatfacto | 「nerfstudio 的 3DGS」 | 2026 年訓練 3DGS 最容易的路 |
 | `KHR_gaussian_splatting` | 「glTF 標準」 | Khronos 2026 的擴充，讓 3DGS 在檢視器和引擎之間可攜 |
 
 ## Further Reading｜延伸閱讀
 
 - [3D Gaussian Splatting for Real-Time Radiance Field Rendering (Kerbl et al., SIGGRAPH 2023)](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/) ——原始論文
-- [gsplat (Meta/nerfstudio)](https://github.com/nerfstudio-project/gsplat) ——正式環境品質的 CUDA 光柵化器
+- [gsplat (Meta/nerfstudio)](https://github.com/nerfstudio-project/gsplat) ——正式環境等級的 CUDA 光柵器
 - [nerfstudio Splatfacto](https://docs.nerf.studio/nerfology/methods/splat.html) ——參考訓練配方
 - [Khronos KHR_gaussian_splatting extension](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_gaussian_splatting/README.md) ——2026 年的可攜格式
-- [OpenUSD 26.03 release notes](https://openusd.org/release/) ——`UsdVolParticleField3DGaussianSplat` 結構描述
+- [OpenUSD 26.03 release notes](https://openusd.org/release/) ——`UsdVolParticleField3DGaussianSplat` schema
 - [THE FUTURE 3D State of Gaussian Splatting 2026](https://www.thefuture3d.com/blog-0/2026/4/4/state-of-gaussian-splatting-2026) ——產業總覽
