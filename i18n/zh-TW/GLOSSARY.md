@@ -351,6 +351,8 @@
 | prediction | 預測 | 否 |  |  |
 | dataset | 資料集 | 否 |  |  |
 | tokenization | tokenization | 是 |  | 文字處理步驟；保留 token 的英文用法。 |
+| stemming | 詞幹提取 | 否 |  | 用規則砍詞尾。結果不一定是真的詞。 |
+| lemmatization | 詞形還原 | 否 |  | 收回字典形式。需要詞性等文法脈絡。 |
 | language modeling | 語言建模 | 否 |  |  |
 | question answering | 問答 | 否 |  |  |
 | text classification | 文字分類 | 否 |  |  |
