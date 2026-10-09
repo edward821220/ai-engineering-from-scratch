@@ -1105,6 +1105,9 @@
 | epsilon-insensitive loss | ε 不敏感損失 | 否 |  | SVR 語境。 |
 | one-class SVM | 單類別 SVM | 否 |  | 異常偵測方法。 |
 | gamma parameter | gamma 參數 | 否 |  | RBF 核語境。 |
+| epsilon parameter | ε 參數 | 否 |  | SVR 語境。 |
+| logistic loss | 邏輯斯損失 | 否 |  | 與 logistic regression 的分類損失。 |
+| scalability | 可擴充性 | 否 |  |  |
 | feature mapping | 特徵映射 | 否 |  | 核方法語境；將輸入映射到特徵空間。 |
 | K-nearest neighbors | k 最近鄰法 | 否 |  | 可保留 KNN 縮寫。 |
 | anomaly detection | 異常偵測 | 否 |  |  |
