@@ -4,5 +4,6 @@
   "phases/04-computer-vision/03-cnns-lenet-to-resnet/docs/en.md": "d0481e111f38c7b8dc4af048a84d75fe8d9043a5431b90c9b06675e66925d27a",
   "phases/04-computer-vision/04-image-classification/docs/en.md": "1e1ade21c3e7dfe6025da6200e8d510bc64459c00714762c853d87923579eed0",
   "phases/04-computer-vision/05-transfer-learning/docs/en.md": "670f74b6d6cc2d6d61d56c868c50c482b9cd77fd3580dc427902dee9666c60a5",
-  "phases/04-computer-vision/06-object-detection-yolo/docs/en.md": "2274e5867a4df25fb17a700b8ad129fa6a45b6eb1aebf0673af7a2bc95bb2a79"
+  "phases/04-computer-vision/06-object-detection-yolo/docs/en.md": "2274e5867a4df25fb17a700b8ad129fa6a45b6eb1aebf0673af7a2bc95bb2a79",
+  "phases/04-computer-vision/07-semantic-segmentation-unet/docs/en.md": "7c1b00723a204bfc263ea5c3c3219b04b1549a7d2fc7e3297a4a6611609e54f1"
 }
