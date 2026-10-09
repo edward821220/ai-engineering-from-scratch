@@ -996,6 +996,14 @@
 | gradient clipping | 梯度裁剪 | 否 |  |  |
 | activation function | 活化函數 | 否 | 激活函數 |  |
 | ReLU | ReLU | 是 |  | 函數名稱保留。 |
+| tanh | tanh | 是 |  | 函數名稱保留。 |
+| GELU | GELU | 是 |  | Gaussian Error Linear Unit，函數名稱保留。 |
+| Leaky ReLU | Leaky ReLU | 是 |  | 負側保留小斜率。 |
+| Swish | Swish | 是 |  | x * sigmoid(x)。 |
+| SiLU | SiLU | 是 |  | Swish 的另一個名稱。 |
+| dead neuron | 死亡神經元 | 否 |  | ReLU 輸入恆為負，輸出與梯度皆為 0。 |
+| saturation | 飽和 | 否 |  | 活化函數導數接近 0 的區域。 |
+| nonlinearity | 非線性 | 否 |  |  |
 | softmax | softmax | 是 |  | 函數名稱保留。 |
 | softmax regression | softmax 迴歸 | 否 |  | 以 softmax 函數擴展至多類別分類的線性模型。 |
 | sigmoid function | sigmoid 函數 | 否 |  | 函數名稱常保留英文。 |
