@@ -1,4 +1,4 @@
-# 流匹配與整流流
+# 流匹配（flow matching）與整流流（rectified flow）
 
 > 擴散模型要走 20 到 50 個取樣步，因為它們從雜訊走到資料的路徑是彎的。流匹配（flow matching，Lipman et al.，2023）和整流流（rectified flow，Liu et al.，2022）訓練模型學得直線路徑。路徑越直，步數越少，推論（inference）越快。Stable Diffusion 3、Flux.1、AudioCraft 2 都在 2024 改成流匹配。
 
@@ -9,7 +9,7 @@
 
 ## The Problem｜問題
 
-DDPM 的反向過程，是從 `N(0, I)` 走回資料分布（distribution）的 1000 步隨機遊走。DDIM 把它縮成 20 到 50 個確定性步驟。你想要更少步——理想是一步。卡住的地方是：解反向過程的 ODE 是剛性的（stiff）；路徑是彎的。
+DDPM 的反向過程（reverse process），是從 `N(0, I)` 走回資料分布（distribution）的 1000 步隨機遊走（random walk）。DDIM 把它縮成 20 到 50 個確定性步驟。你想要更少步——理想是一步。卡住的地方是：解反向過程的 ODE 是剛性的（stiff）；路徑是彎的。
 
 若能把模型訓練成從雜訊到資料的路徑是一條*直線*，從 `t=1` 到 `t=0` 做一次歐拉步（Euler step）就夠了。流匹配直接造出這件事：定義從 `x_1 ∼ N(0, I)` 到 `x_0 ∼ data` 的直線內插（interpolant），訓練向量場（vector field）`v_θ(x, t)` 去對上它的時間導數（time derivative），推論時再積分。
 
@@ -60,7 +60,7 @@ x_{t-Δt} = x_t - Δt · v_θ(x_t, t)
 3. 用這些配對範例訓練 v_2。配對既然已經跟 ODE 對上，兩者之間的直線內插就真的更平。
 4. 重複。
 
-實務上 2 次 reflow 就接近線性，推論可以是 2 到 4 步。SDXL-Turbo、SD3-Turbo、LCM 都是從流匹配蒸餾出來的模型。
+實務上 2 次 reflow 就接近線性，推論可以是 2 到 4 步。SDXL-Turbo、SD3-Turbo、LCM 都是從流匹配蒸餾（distillation）出來的模型。
 
 ### 為什麼 2024 年它在影像上贏了
 
@@ -158,7 +158,7 @@ def sample(net, num_steps):
 
 ## 正式環境筆記：Flux.1-schnell 是流匹配最快的形態
 
-流匹配在正式環境打贏的，是 Flux.1-schnell——一個做過流匹配的 DiT，蒸餾到 1 到 4 步推論，同時保住 Flux-dev 等級的品質。Niels 的「用 8 GB 機器跑 Flux」notebook 是參考的部署配方：T5 加 CLIP 編碼，量化後的 MMDiT 去噪（schnell 4 步，dev 50 步），再 VAE 解碼。成本這樣算：
+流匹配在正式環境打贏的，是 Flux.1-schnell——一個做過流匹配的 DiT，蒸餾到 1 到 4 步推論，同時保住 Flux-dev 等級的品質。Niels 的「用 8 GB 機器跑 Flux」notebook 是參考的部署配方（deployment recipe）：T5 加 CLIP 編碼，量化後的 MMDiT 去噪（schnell 4 步，dev 50 步），再 VAE 解碼。成本這樣算：
 
 | 變體 | 步數 | 在 L4 上、1024² 的延遲 | 總 FLOPs（相對） |
 |------|------|------------------------|------------------|
