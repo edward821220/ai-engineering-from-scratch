@@ -13,7 +13,7 @@
 
 在 `d=8192, L=8192, B=1` 下，BF16 精度每層就需要 800 MB。一個 64 層的模型光是活化值就佔據 51 GB——這還是在乘上微批次大小之前、還沒算上注意力 softmax 中間值（每頭 `L^2`），以及還沒計入張量平行的局部複本之前。
 
-這是一張雙重帳單：BF16 權重加上最佳化器狀態或許能勉強塞進 80GB，但活化值會徹底將你推入活化值會使記憶體需求超出上限。梯度檢查點（Gradient checkpointing，亦稱活化值重算，activation recomputation）是標準解法。丟棄絕大多數活化值；在反向傳播期間重新執行前向傳遞以將它們即時算回。代價：額外的運算量（FLOPs）。收益：記憶體佔用依檢查點分段與總層數的比例大幅暴跌。
+這是一張雙重帳單：BF16 權重加上最佳化器狀態或許能勉強塞進 80GB，但活化值會把你推過這個上限。梯度檢查點（Gradient checkpointing，亦稱活化值重算，activation recomputation）是標準解法。丟棄絕大多數活化值；在反向傳播期間重新執行前向傳遞以將它們即時算回。代價：額外的運算量（FLOPs）。收益：記憶體佔用依檢查點分段與總層數的比例下降。
 
 天真的檢查點做法每步會多耗費約 33% 的前向運算量。而精巧的做法——依據 Korthikanti 等人的「智慧選擇性檢查點」——能以低於 5% 的額外運算開銷換取 5 倍的記憶體節省。在 FP8 矩陣乘法、FSDP 卸載與專家平行 MoE 的時代，這至關重要：你既承擔不起記憶體爆炸，也承擔不起浪費運算資源。
 
@@ -41,7 +41,7 @@
 
 ### 選擇性檢查點（Korthikanti，2022 年）
 
-並非所有活化值的儲存成本都相同。注意力 softmax 輸出大小為 `B*L*L*heads`，隨序列長度呈**二次方**暴增；而 FFN 隱藏活化值大小為 `B*L*4d`，僅隨長度呈線性增長。對於長序列，絕對。
+並非所有活化值的儲存成本都相同。注意力 softmax 輸出大小為 `B*L*L*heads`，隨序列長度呈**二次方**暴增；而 FFN 隱藏活化值大小為 `B*L*4d`，僅隨長度呈線性增長。對於長序列，softmax 主導了記憶體佔用。
 
 選擇性檢查點保留儲存代價低廉的活化值（線性投影、殘差），僅針對代價高昂的活化值（注意力機制）進行重算。你只需支付極微小的額外運算量來重算，卻能省去 O(L^2) 的龐大記憶體。
 
@@ -88,7 +88,7 @@ overhead_selective = (3 + 0.15) / 3 - 1 = 0.05 = 5%
 
 ### 何時不應設置檢查點
 
-- 管線平行階段中管線階段中已在執行的最內層（這些運算本來就得完成）。
+- 管線階段中已在執行的最內層（這些運算本來就得完成）。
 - 第一層與最後一層（若它們佔據該階段的主導運算，在 Transformer 中較為少見）。
 - 已經採用 FlashAttention 的注意力核心——FlashAttention 本身就以極快速度重算了 softmax，外層再包一層檢查點帶來的增益微乎其微。
 
@@ -258,9 +258,9 @@ def should_recompute(layer_type, activation_bytes, recompute_flops_ratio):
 
 ## Use It｜實際應用
 
-- **torch.utils.checkpoint**：`from torch.utils.checkpoint import checkpoint`——PyTorch 中的PyTorch 的標準包裝器。包裝一個函數；僅儲存輸入，在反向傳播時自動重算。
+- **torch.utils.checkpoint**：`from torch.utils.checkpoint import checkpoint`——PyTorch 的標準包裝器。包裝一個函數；僅儲存輸入，在反向傳播時自動重算。
 - **Megatron-Core 活化值重算**：支援 `selective`、`full` 與 `block` 模式。2024 年後尖端訓練的標配。
-- **FSDP2 卸載**：FSDP2 具備 `module.to_empty(device="cpu")` 與 `offload_policy`，分片 而非重算。
+- **FSDP2 卸載**：FSDP2 具備 `module.to_empty(device="cpu")` 與 `offload_policy`，將活化值卸載至 CPU 而非重算。
 - **DeepSpeed ZeRO-Offload**：為最佳化器狀態與活化值提供 CPU 卸載，與檢查點互為補充。
 
 ## Ship It｜交付成果
