@@ -84,7 +84,7 @@ D[i][j] = 0    for i != j
 
 以三角形為例：D = diag(2, 2, 2)，因為每個節點都連到另外兩個節點。
 
-度數能反映節點的重要性。度數高的節點是樞紐節點（hub node）。網路的度分布（degree distribution）（degree distribution）會揭示其結構。社群網路的度分布（degree distribution）常符合冪律（power law）：少數樞紐節點（hub nodes）連結很多節點，多數葉節點（leaf nodes）連結很少。隨機圖（random graph）的度數則呈卜瓦松分布（Poisson distribution）。
+度數能反映節點的重要性。度數高的節點是樞紐節點（hub node）。網路的度分布（degree distribution）會揭示其結構。社群網路的度分布（degree distribution）常符合冪律（power law）：少數樞紐節點（hub nodes）連結很多節點，多數葉節點（leaf nodes）連結很少。隨機圖（random graph）的度數則呈卜瓦松分布（Poisson distribution）。
 
 ### BFS 與 DFS
 
@@ -235,9 +235,9 @@ graph LR
 | 相鄰矩陣（adjacency matrix） | GNN 輸入表示法 |
 | 拉普拉斯矩陣（Laplacian） | 譜分群、社群偵測（community detection） |
 | BFS／DFS | 知識圖譜走訪、尋找路徑 |
-| 度分布（degree distribution）（degree distribution） | 節點重要性、特徵工程（feature engineering） |
+| 度分布（degree distribution） | 節點重要性、特徵工程（feature engineering） |
 | 訊息傳遞（message passing） | GNN 層（圖卷積網路（Graph Convolutional Network，GCN）、圖注意力網路（Graph Attention Network，GAT）、GraphSAGE） |
-| L 的特徵值 | 社群偵測（community detection）、圖分割（graph partitioning）（graph partitioning） |
+| L 的特徵值 | 社群偵測（community detection）、圖分割（graph partitioning） |
 | 譜分群（spectral clustering） | 非監督式（unsupervised）節點分群 |
 | PageRank | 節點重要性、網頁搜尋 |
 
