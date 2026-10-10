@@ -32,7 +32,7 @@
 
 **詞層級（Word-level）tokenization** 依空格與標點符號進行切分。「The cat sat」會變成 ["The", "cat", "sat"]。很直覺。但遇到「tokenization」呢？或者「GPT-4o」？又或是像德語的複合詞「Geschwindigkeitsbegrenzung」呢？詞層級需要龐大無比的詞彙表，才能涵蓋每一種語言中的每一個字詞。只要漏掉一個詞，就會出現令人頭痛的 `[UNK]` token——這是模型在表示「我完全不知道這是什麼」。光是英語就有超過一百萬種詞形變化。再加上程式碼、URL、科學記號與其他 100 種語言，你就需要一個無窮大的詞彙表。
 
-**字元層級（Character-level）tokenization** 走向另一個極端。「hello」會變成 ["h", "e", "l", "l", "o"]。詞彙表非常小（只有幾百個字元）。永遠不會有未知的 token。但序列會變得極長。原本在詞層級只需 10 個 token 的句子，在字元層級會變成 50 個 token。模型必須自行學會「t」、「h」、「e」連在一起代表「the」——把注意力容量浪費在人類三歲就能掌握的事情上。
+**字元層級（Character-level）tokenization** 走向另一個極端。「hello」會變成 ["h", "e", "l", "l", "o"]。詞彙表非常小（只有幾百個字元）。永遠不會有未知的 token。但序列會變得極長。原本在詞層級只需 10 個 token 的句子，在字元層級會變成 50 個 token。模型必須自行學會「t」、「h」、「e」連在一起代表「the」——把注意力（attention）容量浪費在人類三歲就能掌握的事情上。
 
 **子詞（Subword）tokenization** 找到了甜蜜點。常見字詞保持完整：「the」是一個 token。罕見字詞則拆解為有意義的片段：「unhappiness」變成 ["un", "happi", "ness"]。詞彙表維持在可控的規模（3 萬到 12.8 萬個 token）。序列保持精簡。未知的 token 基本上完全消失，因為任何字詞都能由子詞片段組合而成。
 
@@ -52,7 +52,7 @@ graph TD
 
 ### BPE：Byte Pair Encoding
 
-BPE 是一種貪婪壓縮演算法，後來後來改用於 tokenization。其核心概念簡單到能寫在一張索引卡上：
+BPE 是一種貪婪壓縮演算法，後來改用於 tokenization。其核心概念簡單到能寫在一張索引卡上：
 
 從個別字元開始。統計訓練語料庫（training corpus）中每一對相鄰的配對。將出現頻率最高的那一對合併為一個新的 token。重複這個步驟，直到達到你的目標詞彙表大小為止。
 
@@ -317,7 +317,7 @@ for sentence in test_sentences:
     print(f"  Roundtrip: {'PASS' if decoded == sentence else 'FAIL'}")
 ```
 
-壓縮比告訴你 tokenizer 的效能如何。0.50 的壓縮比意味著 tokenizer 將文字壓縮為原始位元組數量一半的 token。數值越低越好。在訓練語料庫（training corpus）上，壓縮比會相當不錯。但在分布外（out-of-distribution）的文字上，例如「unhappiness」（並未出現在語料庫中），壓縮比會變差——tokenizer 會退回使用字元層級來編碼未曾見過的模式。
+壓縮率（compression ratio）告訴你 tokenizer 的效能如何。0.50 的壓縮率意味著 tokenizer 將文字壓縮為原始位元組數量一半的 token。數值越低越好。在訓練語料庫（training corpus）上，壓縮率會相當不錯。但在分布外（out-of-distribution）的文字上，例如「unhappiness」（並未出現在語料庫中），壓縮率會變差——tokenizer 會退回使用字元層級來編碼未曾見過的模式。
 
 ### 步驟 4：與 tiktoken 進行比較
 
@@ -453,7 +453,7 @@ Llama 3 的 12.8 萬詞彙表壓縮非英語文字的效果明顯優於 GPT-2 �
 
 4. 建立一個多語言 tokenizer 效率基準測試。選取 10 個分別以英文、西班牙文、中文、韓文與阿拉伯文撰寫的句子。使用 tiktoken（cl100k_base）對每一組進行 tokenization，並測量每個字元的平均 token 數。量化每種語言的「多語言稅」。
 
-5. 在更大的語料庫（下載一篇維基百科條目）上訓練你的 BPE tokenizer。調整合併次數，使其在同一份文字上的壓縮比達到 tiktoken 的 10% 差距以內。這能迫使你理解語料庫大小、合併次數與壓縮品質之間的關聯。
+5. 在更大的語料庫（下載一篇維基百科條目）上訓練你的 BPE tokenizer。調整合併次數，使其在同一份文字上的壓縮率達到 tiktoken 的 10% 差距以內。這能迫使你理解語料庫大小、合併次數與壓縮品質之間的關聯。
 
 ## Key Terms｜關鍵術語
 
@@ -464,11 +464,11 @@ Llama 3 的 12.8 萬詞彙表壓縮非英語文字的效果明顯優於 GPT-2 �
 | WordPiece | 「BERT 的 tokenizer」 | 類似 BPE，但合併是以最大化概似比 count(AB)/(count(A)*count(B)) 為依歸，而非單純的出現頻率 |
 | SentencePiece | 「一個 tokenizer 函式庫」 | 一款與語言無關的 tokenizer，直接在原始 Unicode 上操作而無需預先切分，支援 BPE 與 Unigram 演算法 |
 | 詞彙表大小 | 「它認識多少個詞」 | 獨立 token 的總數：GPT-2 有 50,257 個，BERT 有 30,522 個，Llama 3 有 128,256 個 |
-| 產詞率（Fertility） | 「不是 tokenizer 的術語」 | 每個字詞的平均 token 數——衡量不同語言間的 tokenizer 效率（1.0 是完美，3.0 意味著模型的運算負擔是三倍） |
+| Fertility | 「不是 tokenizer 的術語」 | 每個字詞的平均 token 數——衡量不同語言間的 tokenizer 效率（1.0 是完美，3.0 意味著模型的運算負擔是三倍） |
 | 位元組層級 BPE | 「GPT 的 tokenizer」 | 在原始位元組（0-255）而非 Unicode 字元上操作的 BPE，確保對任何輸入都不會產生未知 token |
 | 合併表 | 「tokenizer 的檔案」 | 訓練過程中學習到的配對合併有序清單——這就是 tokenizer 本身，且順序至關重要 |
 | 預先 tokenization | 「依空格切分」 | 在子詞 tokenization 之前套用的規則：依空白切分、數字分離、標點符號處理 |
-| 壓縮比 | 「tokenizer 有多高效率」 | 產生的 token 數除以輸入位元組數——數值越低代表壓縮率越好，推論（inference）速度越快 |
+| 壓縮率 | 「tokenizer 有多高效率」 | 產生的 token 數除以輸入位元組數——數值越低代表壓縮率越好，推論（inference）速度越快 |
 
 ## Further Reading｜延伸閱讀
 
