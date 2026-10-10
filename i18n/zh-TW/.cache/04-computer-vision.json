@@ -17,5 +17,6 @@
   "phases/04-computer-vision/16-vision-pipeline-capstone/docs/en.md": "8f658578957bb2c27e48dd1926960ebc448d5030d5c21e3dd8398443689f9b73",
   "phases/04-computer-vision/17-self-supervised-vision/docs/en.md": "66a6b4b1a00ffd0c876bd52e43da023d00d1a9fa138f169d34442481ad8d82b9",
   "phases/04-computer-vision/18-open-vocab-clip/docs/en.md": "7c62736dc19a39acdbec6499254e943c83a8c14023a1ed0979462fc8a3fbebe1",
-  "phases/04-computer-vision/19-ocr-document-understanding/docs/en.md": "7d3780797a294b83dc498521397a2dba8c180ef07541faaa5092d6ad655e714e"
+  "phases/04-computer-vision/19-ocr-document-understanding/docs/en.md": "7d3780797a294b83dc498521397a2dba8c180ef07541faaa5092d6ad655e714e",
+  "phases/04-computer-vision/20-image-retrieval-metric/docs/en.md": "242ab4be9b9dc567f743984958434792bb3642856d2d776d079d27b6bc1060e5"
 }
