@@ -24,7 +24,7 @@
 
 ### 為什麼集成有效
 
-假設你有 N 個各自獨立的分類器（classifier）（classifier），每個的準確率都是 p > 0.5。多數決的準確率是：
+假設你有 N 個各自獨立的分類器（classifier），每個的準確率都是 p > 0.5。多數決的準確率是：
 
 ```
 P(majority correct) = sum over k > N/2 of C(N,k) * p^k * (1-p)^(N-k)
@@ -82,10 +82,10 @@ flowchart LR
     M2 --> E2[找出錯誤]
     E2 --> W2[提高錯誤樣本的權重]
     W2 --> M3[模型（model） 3]
-    M3 --> F[所有模型（model）的加權總和（weighted sum）（weighted sum）]
+    M3 --> F[所有模型（model）的加權總和（weighted sum）]
 ```
 
-Boosting 降低偏差：每個新模型（model）都在修正目前為止的目前集成的系統性誤差。最終預測是所有模型（model）的加權總和（weighted sum），表現較好的模型（model）權重較高。
+Boosting 降低偏差：每個新模型（model）都在修正目前為止集成的系統性誤差。最終預測是所有模型（model）的加權總和（weighted sum），表現較好的模型（model）權重較高。
 
 代價是：boosting 跑太多輪會過度擬合，因為它會一直去擬合愈來愈難的樣本，其中有些可能只是雜訊。
 
@@ -151,7 +151,7 @@ XGBoost（eXtreme Gradient Boosting）是 gradient boosting 加上一系列工�
 
 ### Stacking（元學習）
 
-Stacking 把多個基模型（model）（base model）的預測當成元學習器（meta-learner）的特徵。
+Stacking 把多個基模型（base model）的預測當成元學習器（meta-learner）的特徵。
 
 ```mermaid
 flowchart TD
@@ -170,7 +170,7 @@ flowchart TD
     META --> F[最終預測]
 ```
 
-元學習器會學到：在哪種輸入上該信任哪個基模型（model）。如果隨機森林在某些區域比較強、SVM 在另一些區域比較強，元學習器就會學會學會依輸入選擇合適的模型（model）。
+元學習器會學到：在哪種輸入上該信任哪個基模型（model）。如果隨機森林在某些區域比較強、SVM 在另一些區域比較強，元學習器就會學會依輸入選擇合適的模型（model）。
 
 為了避免資料洩漏（data leakage），基模型（model）的預測必須在訓練（training）集（training set）上以交叉驗證（cross-validation）產生。絕不能在訓練（training）基模型（model）的同一份資料上產生元特徵（meta-feature）。
 
