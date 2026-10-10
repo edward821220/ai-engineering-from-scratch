@@ -1,6 +1,6 @@
 # Whisper：架構與 fine-tuning
 
-> Whisper 是 30 秒視窗的 transformer 編碼器–解碼器，在 68 萬小時的多語、弱監督音訊和文字配對上訓練。一個架構、多個任務、99 種語言都穩。2026 年的 ASR 參考。
+> Whisper 是 30 秒視窗（window）的 transformer 編碼器–解碼器，在 68 萬小時的多語、弱監督（weakly supervised）音訊和文字配對上訓練。一個架構、多個任務、99 種語言都穩。2026 年的 ASR 參考。
 
 **Type:** Build
 **Languages:** Python
@@ -11,7 +11,7 @@
 
 Whisper 由 OpenAI 在 2022 年 9 月發布，是第一個能像一般商品般使用的 ASR 模型：貼上音訊就拿到文字，99 種語言，對雜訊穩，筆電跑得動。到 2024 年，OpenAI 已經交付 Large-v3 和 Turbo。到 2026 年，從 podcast 轉錄到語音助理到 YouTube 字幕，Whisper 是預設基準模型（baseline）。
 
-但 Whisper 不能永遠當黑盒。領域偏移會把它打垮：技術行話、說話人口音、專有名詞、短片段、靜音。你需要知道：
+但 Whisper 不能永遠當黑盒。領域偏移（domain shift）會使它的表現大幅下降：技術行話、說話人口音、專有名詞、短片段、靜音。你需要知道：
 
 1. 它裡面實際是什麼。
 2. 怎麼正確餵切塊、串流或長音訊。
@@ -23,7 +23,7 @@ Whisper 由 OpenAI 在 2022 年 9 月發布，是第一個能像一般商品般�
 
 **架構。** 標準的 transformer 編碼器–解碼器。
 
-- 輸入：30 秒的對數 mel 頻譜圖，80 個 mel，10 毫秒 hop，得到 3000 框。較短的片段補零，較長的切塊。
+- 輸入：30 秒的對數梅爾頻譜圖（log-mel spectrogram），80 個梅爾，10 毫秒跳躍長度（hop size），得到 3000 框。較短的片段補零，較長的切塊。
 - 編碼器：卷積降採樣（步幅 2）加 `N` 個 transformer 區塊。Large-v3 是 32 層、1280 維、20 頭。
 - 解碼器：`N` 個 transformer 區塊，帶因果自注意力，以及對編碼器輸出的交叉注意力。大小和編碼器相同。
 - 輸出：51,865 個 token 詞彙上的 BPE token。
@@ -38,13 +38,13 @@ Large-v3 有 15.5 億參數（parameter）。Turbo 的解碼器從 32 層改成 
 
 - `<|en|>`。語言標籤。決定是翻譯還是逐字轉錄。
 - `<|transcribe|>` 或 `<|translate|>`。把任何語言的輸入翻成英文輸出，或逐字轉錄。
-- `<|notimestamps|>`。跳過詞級時間戳（更快）。
+- `<|notimestamps|>`。跳過詞級時間戳（timestamp），速度較快。
 
 一個模型能做很多任務，靠的就是這個 prompt。把 `<|en|>` 改成 `<|fr|>`，它就轉錄法文。
 
-**30 秒視窗。** 輸入長度固定為 30 秒。較長的片段要切塊。較短的要填充。視窗原生不能串流。這就是 WhisperX、Whisper-Streaming、faster-whisper 存在的原因。
+**30 秒視窗。** 輸入長度固定為 30 秒。較長的片段要切塊。較短的要填充（padding）。視窗原生不能串流。這就是 WhisperX、Whisper-Streaming、faster-whisper 存在的原因。
 
-**對數 mel 正規化。** `(log_mel - mean) / std`，統計量來自 Whisper 自己的訓練語料。你一定要用 Whisper 的前處理（`whisper.audio.log_mel_spectrogram`），不要用 `librosa.feature.melspectrogram`。
+**對數梅爾正規化。** `(log_mel - mean) / std`，統計量來自 Whisper 自己的訓練語料。你一定要用 Whisper 的前處理（`whisper.audio.log_mel_spectrogram`），不要用 `librosa.feature.melspectrogram`。
 
 ### 2026 年的變體
 
@@ -155,9 +155,9 @@ with torch.inference_mode():
 
 ## 2026 年仍然會交付出去的坑
 
-- **靜音上的幻覺文字。** Whisper 在字幕上訓練，裡面有「Thanks for watching!」、「Subscribe!」、歌詞。呼叫之前一定用 VAD 當閘。
+- **靜音上的幻覺文字。** Whisper 在字幕上訓練，裡面有「Thanks for watching!」、「Subscribe!」、歌詞。呼叫之前一律先用 VAD 篩掉靜音。
 - **`condition_on_previous_text` 的連鎖。** 一次幻覺會污染後面的視窗。除非你需要跨塊的流暢，否則設 `False`。
-- **短片段填充。** 2 秒的片段填到 30 秒，尾端靜音可能幻覺。用 `pad=False`，或用 VAD 當閘。
+- **短片段填充。** 2 秒的片段填到 30 秒，尾端靜音可能幻覺。用 `pad=False`，或先用 VAD 篩掉靜音。
 - **錯的 mel 統計量。** 用 librosa 的 mel 而不是 Whisper 的，輸出幾乎是亂的。用 `whisper.audio.log_mel_spectrogram`。
 
 ## Ship It｜交付成果
@@ -179,8 +179,8 @@ with torch.inference_mode():
 | 時間戳 token | 時間對齊 | 每 0.02 秒的偏移是 5.1 萬詞彙裡的一個特殊 token。 |
 | Turbo | 快的變體 | 4 層解碼器，快 8 倍，WER 退步不到 1%。 |
 | WhisperX | 長音訊的包裝 | VAD 加 Whisper 加 wav2vec 對齊加說話人分離。 |
-| LoRA fine-tune | 高效率調校 | 在注意力上加低秩適配器。大約訓練 0.3% 的參數。 |
-| 幻覺 | 安靜的失敗 | Whisper 從雜訊或靜音產出流利英文。 |
+| LoRA fine-tune | 高效率調校 | 在注意力上加低秩適配器（low-rank adapter）。大約訓練 0.3% 的參數。 |
+| 幻覺 | 靜默的失敗 | Whisper 從雜訊或靜音產出流利英文。 |
 
 ## Further Reading｜延伸閱讀
 
