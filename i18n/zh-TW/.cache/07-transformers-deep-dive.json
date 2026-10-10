@@ -9,5 +9,6 @@
   "phases/07-transformers-deep-dive/08-t5-bart-encoder-decoder/docs/en.md": "26b9204335f4793b7910e02a3a03820cd0ea0c7d47a2aa9c37580dcac67baeb1",
   "phases/07-transformers-deep-dive/09-vision-transformers/docs/en.md": "6ac276b0bbfd15180e9e8850a8a7577f0ff18fa090f4ab545b8a3ad6906b2288",
   "phases/07-transformers-deep-dive/10-audio-transformers-whisper/docs/en.md": "f996b553ee4abba0d68ac4368a41ffecdffc5c91639060ffe99fa83fd84d80eb",
-  "phases/07-transformers-deep-dive/11-mixture-of-experts/docs/en.md": "9cad0d164da113440d4ed64d0ac4c32d79af89a2a6ffd5126fe28a24f538700c"
+  "phases/07-transformers-deep-dive/11-mixture-of-experts/docs/en.md": "9cad0d164da113440d4ed64d0ac4c32d79af89a2a6ffd5126fe28a24f538700c",
+  "phases/07-transformers-deep-dive/12-kv-cache-flash-attention/docs/en.md": "b93352bcfa28b0ae8b1a60fe52a6078d37066e2df8b291c428fa3422a4ab79dc"
 }
