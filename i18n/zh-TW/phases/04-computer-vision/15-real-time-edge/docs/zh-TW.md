@@ -9,7 +9,7 @@
 
 ## Learning Objectives｜學習目標
 
-- 量任何 PyTorch 模型的推論延遲、峰值記憶體和吞吐量，並讀懂 FLOPs、參數、延遲之間怎麼換
+- 量任何 PyTorch 模型的推論延遲（inference latency）、峰值記憶體（peak memory）和吞吐量（throughput），並讀懂 FLOPs、參數與延遲之間的取捨
 - 用 PyTorch 的訓練後量化（quantisation），把視覺模型量化成 INT8，並確認準確率（accuracy）掉不到 1%
 - 匯出成 ONNX，再用 ONNX Runtime 或 TensorRT 編譯。說出三種最常見的匯出失敗，以及怎麼修
 - 說明在邊緣限制下，什麼時候選 MobileNetV3、EfficientNet-Lite、ConvNeXt-Tiny 或 MobileViT
@@ -57,7 +57,7 @@ flowchart LR
 
 ### 用 FLOPs 當代理
 
-FLOPs（每次推論的浮點運算數）是便宜、跟裝置無關的是粗略的延遲代理指標；適合比較架構，但不能當成實際執行時間。FLOPs 多 10% 的模型，實務上可以快 2 倍，因為它用的是硬體友善的運算（深度卷積（depthwise convolution）編譯得很好，大的 7x7 卷積則否）。
+FLOPs（每次推論的浮點運算數）是便宜、與裝置無關的延遲代理指標；適合比較架構，但拿來當實際執行時間會誤導。FLOPs 多 10% 的模型，實務上可以快 2 倍，因為它用的是硬體友善的運算（深度卷積（depthwise convolution）編譯得很好，大的 7x7 卷積則否）。
 
 規則：找架構用 FLOPs，部署的決定用裝置上的延遲。
 
@@ -238,7 +238,7 @@ def compare_regimes():
 - **NVIDIA 邊緣（Jetson、GPU 伺服器）**。PyTorch 到 ONNX，再到 TensorRT。延遲最好，工程量也最大。
 - **行動裝置**。PyTorch 到 ONNX，再到 Core ML（iOS）或 TFLite（Android）。匯出前先量化。
 
-測量可以用 `torch-tb-profiler`、`nvprof` 或 `nsys`，macOS 上用 Instruments，一層一層拆開。`benchmark_app`（OpenVINO）和 `trtexec`（TensorRT）給獨立的命令列數字。
+測量可以用 `torch-tb-profiler`、`nvprof` 或 `nsys`，macOS 上用 Instruments，一層一層拆開。`benchmark_app`（OpenVINO）和 `trtexec`（TensorRT）可直接從命令列取得獨立的基準數字。
 
 ## Ship It｜交付成果
 
@@ -264,7 +264,7 @@ def compare_regimes():
 | QAT | 「量化感知訓練」 | 訓練時模擬量化。準確率最好，需要有標籤的資料 |
 | ONNX | 「中立格式」 | 主流推論執行環境（inference runtime）都支援的模型交換格式 |
 | TensorRT | 「NVIDIA 的編譯器」 | 把 ONNX 編成給 NVIDIA GPU 用的引擎 |
-| 知識蒸餾（knowledge distillation） | 「老師到學生」 | 訓練小模型去模仿大模型的 logit。掉掉的準確率大部分補得回來 |
+| 知識蒸餾（knowledge distillation） | 「老師到學生」 | 訓練小模型去模仿大模型的 logit。模型縮小後損失的準確率大部分補得回來 |
 
 ## Further Reading｜延伸閱讀
 
