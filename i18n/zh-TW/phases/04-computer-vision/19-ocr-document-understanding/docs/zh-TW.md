@@ -10,7 +10,7 @@
 ## Learning Objectives｜學習目標
 
 - 把傳統 OCR 管線走一遍（偵測、辨識、版面），以及現代的端到端替代（Donut、Qwen-VL-OCR）
-- 實作 CTC（連結主義時序分類（Connectionist Temporal Classification，CTC），Connectionist Temporal Classification）損失（loss），用來訓練序列到序列的 OCR
+- 實作連結主義時序分類（Connectionist Temporal Classification，CTC）損失（loss），用來訓練序列到序列的 OCR
 - 用 PaddleOCR 或 EasyOCR 做正式環境的文件解析，不用自己訓練
 - 分辨 OCR、版面解析、文件理解，並依任務挑對的工具
 
@@ -24,11 +24,11 @@
 2. **版面解析**。把 OCR 輸出分成區域：標題、正文、表格、頁首。
 3. **文件理解**。從版面抽出結構化欄位，例如「發票總額 = 42.50 美元」。
 
-每一層都有古典做法和現代做法。「我想從影像拿文字」和「我要這張收據的總金額」之間的差距，比大多數團隊以為的大。
+每一層都有傳統做法和現代做法。「我想從影像拿文字」和「我要這張收據的總金額」之間的差距，比大多數團隊以為的大。
 
 ## The Concept｜核心概念
 
-### 古典管線
+### 傳統管線
 
 ```mermaid
 flowchart LR
@@ -51,7 +51,7 @@ flowchart LR
 
 ### 一段話講完 CTC
 
-OCR 辨識要從固定長度的特徵圖（feature map）產出長度會變的序列。CTC（Graves 等人，2006）讓你不用字元級對齊就能訓練。模型在每個時間步輸出（詞彙加空白）上的分布。CTC 損失把所有「合併重複、拿掉空白之後會變成目標文字」的對齊加總。
+OCR 辨識要從固定長度的特徵圖（feature map）產出長度會變的序列。CTC（Graves 等人，2006）讓你不用字元級對齊就能訓練。模型在每個時間步輸出（詞彙加空白）上的分布。CTC 損失把所有「合併重複、拿掉空白之後會變成目標文字」的對齊機率加總，也就是邊緣化（marginalization）。
 
 ```
 raw output: "h h h _ _ e e l l _ l l o _ _"
@@ -65,7 +65,7 @@ CTC 是 CRNN 在 2015 年訓得動的原因，也是 2026 年大多數正式環�
 - **Donut**（Kim 等人，2022）。ViT 編碼器（encoder）加文字解碼器。讀一張影像，直接吐出 JSON。沒有文字偵測器，也沒有版面模組。
 - **TrOCR**。ViT 加 transformer 解碼器，做行級 OCR。
 - **Qwen-VL-OCR / InternVL**。完整的視覺語言模型，為 OCR 任務做過 fine-tuning。2026 年複雜文件上準確率（accuracy）最好。
-- **PaddleOCR**。古典的 DB 加 CRNN 管線，包成成熟的正式環境套件。仍是開放原始碼的主力。
+- **PaddleOCR**。傳統的 DB 加 CRNN 管線，包成成熟的正式環境套件。仍是開放原始碼的主力。
 
 端到端模型要更多資料和計算，但跳過多階段管線把誤差一層層疊上去的問題。
 
@@ -73,14 +73,14 @@ CTC 是 CRNN 在 2015 年訓得動的原因，也是 2026 年大多數正式環�
 
 結構化文件先跑版面偵測器（LayoutLMv3、DocLayNet），把每個區域標成標題、段落、圖、表格、註腳。閱讀順序就變成：依版面順序走完各區域，再接起來。
 
-表單用**鍵值抽取**模型。視覺很豐富的文件用 Donut，普通掃描用 LayoutLMv3。它們吃影像、偵測到的文字和位置，預測結構化的鍵值對。
+表單用**鍵值抽取（key-value extraction）**模型。視覺很豐富的文件用 Donut，普通掃描用 LayoutLMv3。它們吃影像、偵測到的文字和位置，預測結構化的鍵值對。
 
 ### 評估指標（metric）
 
-- **字元錯誤率，CER**。Levenshtein 距離除以參考長度。越低越好。正式環境的目標：乾淨掃描低於 2%。
-- **詞錯誤率，WER**。計算方式相同，但以詞為單位。
+- **字元錯誤率（character error rate，CER）**。Levenshtein 距離除以參考長度。越低越好。正式環境的目標：乾淨掃描低於 2%。
+- **詞錯誤率（word error rate，WER）**。計算方式相同，但以詞為單位。
 - **結構化欄位的 F1**。給鍵值任務用。量 `{invoice_total: 42.50}` 有沒有正確出現。
-- **JSON 上的編輯距離**。給端到端文件解析用。Donut 論文提出正規化（normalization）後的樹編輯距離。
+- **JSON 上的編輯距離（edit distance）**。給端到端文件解析用。Donut 論文提出正規化（normalization）後的樹編輯距離。
 
 ```figure
 cv3-ctc-collapse
@@ -125,7 +125,7 @@ def greedy_ctc_decode(log_probs, blank=0):
     return out
 ```
 
-`F.ctc_loss` 有 CuDNN 時會用那個高效率實作。貪心解碼器比集束搜尋（beam search）（beam search）簡單，字元錯誤率通常差在 1% 以內。
+`F.ctc_loss` 有 CuDNN 時會用那個高效率實作。貪心解碼器比集束搜尋（beam search）簡單，字元錯誤率通常差在 1% 以內。
 
 ### 步驟 2：很小的 CRNN 辨識器
 
@@ -219,7 +219,7 @@ for step in range(200):
 
 - **PaddleOCR**。成熟、快、多語言。一行就用：`paddleocr.PaddleOCR(lang="en").ocr(image_path)`。
 - **EasyOCR**。原生 Python、多語言、PyTorch 骨幹（backbone）。
-- **Tesseract**。古典的。模型吃力的舊掃描文件仍有用。
+- **Tesseract**。傳統的。模型吃力的舊掃描文件仍有用。
 
 端到端的文件解析用 Donut 或視覺語言模型：
 
@@ -243,7 +243,7 @@ model = VisionEncoderDecoderModel.from_pretrained("naver-clova-ix/donut-base-fin
 
 1. **（簡單）** 用五位隨機數字字串把 TinyCRNN 訓練 500 步。在留出集合上回報字元錯誤率。
 2. **（中等）** 把貪心解碼換成集束搜尋（beam search），beam_width=5。回報字元錯誤率差多少。哪些輸入上集束搜尋（beam search）會贏？
-3. **（困難）** 用 PaddleOCR 跑 20 張收據，抽出明細列，對手標的標準結果計算 {item_name, price} 配對的 F1。
+3. **（困難）** 用 PaddleOCR 跑 20 張收據，抽出明細列，對手標的真實標籤計算 {item_name, price} 配對的 F1。
 
 ## Key Terms｜關鍵術語
 
