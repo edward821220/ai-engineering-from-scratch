@@ -28,7 +28,7 @@
 
 以上都建立在四個基礎概念上：
 1. 隨機漫步——最簡單的隨機過程
-2. 馬可夫鏈——具有轉移矩陣（transition matrix）（transition matrix）的結構化隨機性
+2. 馬可夫鏈——具有轉移矩陣（transition matrix）的結構化隨機性
 3. Langevin 動力學——加入雜訊的梯度下降法（gradient descent）
 4. Metropolis-Hastings——從任意分布抽樣
 
@@ -443,7 +443,7 @@ SGLD（Stochastic Gradient Langevin Dynamics，隨機梯度 Langevin 動力學�
 |------|----------------|----------------------|
 | 隨機漫步（random walk） | 「擲硬幣移動」 | 位置在每一步都會因隨機增量而改變的過程 |
 | 馬可夫性質（Markov property） | 「沒有記憶」 | 未來只取決於目前狀態，而不取決於過去歷史 |
-| 轉移矩陣（transition matrix）（transition matrix） | 「機率表」 | P[i][j] = 從狀態 i 移動到狀態 j 的機率 |
+| 轉移矩陣（transition matrix） | 「機率表」 | P[i][j] = 從狀態 i 移動到狀態 j 的機率 |
 | 平穩分布（stationary distribution） | 「長期平均」 | 滿足 pi*P = pi 的分布；也就是鏈的平衡分布 |
 | 布朗運動（Brownian motion） | 「隨機抖動」 | 隨機漫步在連續時間下的極限，B(t) ~ N(0, t) |
 | Langevin 動力學（Langevin dynamics） | 「加上雜訊的梯度下降法」 | 結合確定性梯度與隨機擾動的更新規則 |
