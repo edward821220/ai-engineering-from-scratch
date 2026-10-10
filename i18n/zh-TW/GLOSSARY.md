@@ -877,6 +877,10 @@
 | diagonal matrix | 對角矩陣 | 否 |  | 僅主對角線非零的矩陣。 |
 | commutative | 可交換 | 否 |  | 運算順序不影響結果的性質。 |
 | recurrent neural network | 循環神經網路 | 否 |  | 具有迴圈結構、處理序列的網路；RNN。 |
+| context vector | 脈絡向量 | 否 |  | 編碼器最後隱藏狀態；序列到序列的瓶頸。 |
+| teacher forcing | teacher forcing | 是 |  | 訓練時餵標準結果的前一個 token。 |
+| exposure bias | 暴露偏差 | 否 |  | 訓練用真 token、推論用自己的預測，造成的落差。 |
+| beam search | 集束搜尋 | 否 |  | 每一步保留前 k 條部分序列。 |
 | RNN | RNN | 是 |  | recurrent neural network 縮寫。 |
 | data augmentation | 資料增強 | 否 |  | 以變換擴增訓練資料。 |
 | dynamical system | 動態系統 | 否 |  | 狀態隨時間演化的系統。 |
