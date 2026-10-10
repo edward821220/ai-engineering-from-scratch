@@ -1,6 +1,6 @@
 # 語音辨識（ASR）：CTC、RNN-T、注意力
 
-> 語音辨識是每個時間步都在做音訊分類，再用一個懂英文、也懂靜音的再用了解英文與靜音的序列模型把它們串起來。CTC、RNN-T、注意力是三種做法。挑一個，並懂為什麼。
+> 語音辨識是每個時間步都在做音訊分類，再用一個了解英文與靜音的序列模型把它們串起來。CTC、RNN-T、注意力是三種做法。挑一個，並懂為什麼。
 
 **Type:** Build
 **Languages:** Python
@@ -9,13 +9,13 @@
 
 ## The Problem｜問題
 
-你有一段 10 秒、16 kHz 的片段。你要一個字串：「turn on the kitchen lights」。難在結構：音框和字元不是一對一。「okay」可能佔 200 毫秒，也可能佔 1200 毫秒。靜音把語句切開。有的音素比別的長。輸出 token 數事先不知道。
+你有一段 10 秒、16 kHz 的片段。你想得到一串文字：「turn on the kitchen lights」。難在結構：音框（frame）和字元不是一對一。「okay」可能佔 200 毫秒，也可能佔 1200 毫秒。靜音把語句切開。有的音素比別的長。輸出 token 數事先不知道。
 
-三種表述解這個：
+可用三種方式處理：
 
 1. **CTC（連線時序分類，Connectionist Temporal Classification）。** 每一框發出 token 機率，含一個特殊的*空白*。解碼時把重複和空白收掉。非自迴歸、快。wav2vec 2.0、MMS 用這個。
 2. **RNN-T（遞迴神經網路轉導器，Recurrent Neural Network Transducer）。** 聯合網路依編碼器音框和先前 token 預測下一個 token。可串流。Google 的裝置上 ASR、NVIDIA Parakeet 用這個。
-3. **注意力編碼器–解碼器。** 編碼器把音訊壓成隱藏狀態，解碼器交叉注意力、自迴歸生成 token。Whisper、SeamlessM4T 用這個。
+3. **注意力編碼器–解碼器（attention encoder–decoder）。** 編碼器把音訊壓成隱藏狀態，解碼器交叉注意力、自迴歸生成 token。Whisper、SeamlessM4T 用這個。
 
 2026 年，LibriSpeech test-clean 上目前最好的 WER 是 1.4%（Parakeet-TDT-1.1B，NVIDIA）和 1.58%（Whisper-Large-v3-turbo）。數字差很少。部署上的差別很大。
 
@@ -25,7 +25,7 @@
 
 **CTC 的直覺。** 讓編碼器輸出 `T` 個音框級分布，在 `V+1` 個 token 上（V 個字元加空白）。目標字串 `y` 的長度是 `U < T`。任何合併之後等於 `y` 的音框對齊都算。CTC 損失把所有這種對齊加起來。推論：每一框取 argmax，收掉重複，拿掉空白。
 
-優點：非自迴歸、可串流、不用往前看。缺點：*條件獨立假設*。每一框的預測和其他框獨立，所以沒有內部語言模型。用集束搜尋或淺層融合接外部語言模型來補。
+優點：非自迴歸、可串流、不用往前看。缺點：*條件獨立假設（conditional independence assumption）*。每一框的預測和其他框獨立，所以沒有內部語言模型。用集束搜尋（beam search）或淺層融合接外部語言模型來補。
 
 **RNN-T 的直覺。** 加上一個*預測器*網路，把 token 歷史嵌進去，以及一個*接合器*，把預測器狀態和編碼器音框合成 `V+1` 上的聯合分布（這個 `+1` 是空／不輸出）。CTC 忽略的條件相依，這裡明確建了模型。可串流，因為每一步只條件在過去的音框和過去的 token 上。
 
@@ -149,8 +149,8 @@ for chunk in streaming_audio():
 
 ## 2026 年仍然會交付出去的坑
 
-- **沒有 VAD。** 讓 Whisper 處理靜音會產生幻覺（「Thanks for watching!」）。一定要用 VAD 當閘。
-- **字元、詞、子詞的 WER。** 正規化之後（小寫、去掉標點）再報詞級 WER。
+- **沒有 VAD。** 讓 Whisper 處理靜音會產生幻覺（「Thanks for watching!」）。一律先用 VAD 篩掉靜音。
+- **字元、詞、子詞（subword）的 WER。** 正規化之後（小寫、去掉標點）再報詞級 WER。
 - **語言辨識漂掉。** Whisper 的自動語言辨識會把吵的片段送去日文或威爾斯文。你知道語言時強制 `language="en"`。
 - **長片段沒有切塊。** Whisper 的視窗是 30 秒。更長的用 `chunk_length_s=30, stride=5`。
 
@@ -168,7 +168,7 @@ for chunk in streaming_audio():
 
 | 術語 | 常見說法 | 實際意義 |
 |------|-----------------|-----------------------|
-| CTC | 空白 token 的損失 | 對所有音框到 token 的對齊做邊際。非自迴歸。 |
+| CTC | 空白 token 的損失 | 對所有音框到 token 的對齊做邊際化。非自迴歸。 |
 | RNN-T | 串流的損失 | CTC 加下一個 token 的預測器。處理詞序。 |
 | 注意力編碼–解碼 | Whisper 風格 | 編碼器加交叉注意力解碼器。離線品質最好。 |
 | WER | 你要回報的那個數字 | 詞級的 `(S+D+I)/N`。 |
