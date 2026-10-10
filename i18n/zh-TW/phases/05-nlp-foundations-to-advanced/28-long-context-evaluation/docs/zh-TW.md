@@ -1,6 +1,6 @@
 # long-context evaluation——NIAH、RULER、LongBench、MRCR
 
-> Gemini 3 Pro 廣告 1000 萬個 token 的脈絡。到 100 萬 token 時，8 針的 MRCR 掉到 26.3%。廣告上的 ≠ 用得上的。long-context evaluation告訴你，你要交付的那個模型，實際容量是多少。
+> Gemini 3 Pro 宣稱支援 1000 萬個 token 的脈絡。到 100 萬 token 時，8 針的 MRCR 掉到 26.3%。宣稱的容量 ≠ 用得上的容量。長脈絡評估（long-context evaluation）告訴你，你要交付的那個模型，實際容量是多少。
 
 **Type:** Learn
 **Languages:** Python
@@ -13,11 +13,11 @@
 
 這是 2026 年的脈絡容量落差。規格表寫 100 萬或 1000 萬。現實是其中 60% 到 70% 用得上，而且「用得上」看任務。
 
-- **檢索（乾草堆裡一根針）：** 前沿模型到廣告上限都接近完美。
+- **檢索（乾草堆裡一根針）：** 前沿模型到宣稱上限都接近完美。
 - **多跳／聚合：** 大多數模型過了約 12.8 萬就陡降。
 - **對散落事實做推理：** 第一個失敗的任務。
 
-long-context evaluation量這些軸。這一課點名評測、各自實際量什麼，以及怎麼為你的領域做自訂的針測試。
+長脈絡評估量這些軸。這一課點名評測、各自實際量什麼，以及怎麼為你的領域做自訂的針測試。
 
 ## The Concept｜核心概念
 
@@ -39,12 +39,12 @@ long-context evaluation量這些軸。這一課點名評測、各自實際量什
 
 ### 實際要報告什麼
 
-- **廣告上的脈絡視窗（context window）。** 規格表上的數字。
+- **宣稱的脈絡視窗（context window）。** 規格表上的數字。
 - **有效檢索長度。** NIAH 在某個閾值（threshold）通過（例如 90%）。
 - **有效推理長度。** 多跳或聚合在那個閾值通過。
 - **退化曲線。** 按任務類型繪製準確率隨脈絡長度變化的曲線。
 
-規格表上的兩個數字：檢索有效、推理有效。推理有效通常是廣告視窗的 25% 到 50%。
+規格表上的兩個數字：檢索有效、推理有效。推理有效通常是宣稱視窗的 25% 到 50%。
 
 ```figure
 gx-niah-decay
@@ -198,7 +198,7 @@ Refuse to trust a context window from the model card alone. Refuse NIAH-only eva
 
 - [Kamradt (2023). Needle in a Haystack analysis](https://github.com/gkamradt/LLMTest_NeedleInAHaystack) ——最早的 NIAH 倉庫。
 - [Hsieh et al. (2024). RULER: What's the Real Context Size of Your Long-Context LMs?](https://arxiv.org/abs/2404.06654) ——多任務評測。
-- [Bai et al. (2024). LongBench v2](https://arxiv.org/abs/2412.15204) ——真實世界的long-context evaluation。
+- [Bai et al. (2024). LongBench v2](https://arxiv.org/abs/2412.15204) ——真實世界的長脈絡評估。
 - [Modarressi et al. (2024). NoLiMa: Non-lexical needles](https://arxiv.org/abs/2404.06666) ——更難的針。
 - [Kuratov et al. (2024). BABILong](https://arxiv.org/abs/2406.10149) ——乾草堆裡的推理。
 - [Liu et al. (2024). Lost in the Middle: How Language Models Use Long Contexts](https://arxiv.org/abs/2307.03172) ——深度偏差的論文。
