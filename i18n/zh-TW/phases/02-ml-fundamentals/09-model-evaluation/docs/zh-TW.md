@@ -10,7 +10,7 @@
 ## Learning Objectives｜學習目標
 
 - 從頭實作 K 折（K-fold）與分層 K 折（stratified K-fold）交叉驗證（cross-validation），並說明分層對類別不平衡（class imbalance）資料為何重要
-- 從頭計算精確率（precision）、召回率（recall）、F1 分數（F1 score）、AUC-ROC 與迴歸指標（regression metric）（MSE、RMSE、MAE、R 平方（R-squared））
+- 從頭計算精確率（precision）、召回率（recall）、F1 分數（F1 score）、AUC-ROC 與迴歸指標（regression metrics，MSE、RMSE、MAE、R 平方（R-squared））
 - 解讀學習曲線（learning curve），診斷模型是高偏差（high bias）還是高變異（high variance）
 - 辨識常見的評估錯誤：資料洩漏（data leakage）、選錯指標（metric），以及測試集（test set）污染
 
@@ -95,8 +95,8 @@ K=5 或 K=10 是標準選擇。每個資料點（data point）恰好被拿來驗
 
 |  | 預測為正類 | 預測為負類 |
 |--|---|---|
-| 實際為正類 | 真陽性（TP） | 偽陰性（FN） |
-| 實際為負類 | 偽陽性（FP） | 真陰性（TN） |
+| 實際為正類 | 真陽性（true positive，TP） | 偽陰性（false negative，FN） |
+| 實際為負類 | 偽陽性（false positive，FP） | 真陰性（true negative，TN） |
 
 其他所有指標都從這張矩陣推導出來：
 
@@ -104,7 +104,7 @@ K=5 或 K=10 是標準選擇。每個資料點（data point）恰好被拿來驗
 - **精確率** = TP / (TP + FP)。所有預測為正類的樣本中，實際真的是正類的有多少？當偽陽性代價高時用它（例如垃圾郵件篩選器把正常郵件誤判為垃圾郵件）。
 - **召回率**（亦稱敏感度（sensitivity）） = TP / (TP + FN)。所有實際為正類的樣本中，我們抓到了多少？當偽陰性代價高時用它（例如癌症篩檢漏掉腫瘤）。
 - **F1 分數** = 2 * precision * recall / (precision + recall)。精確率與召回率的調和平均數（harmonic mean）。兩者都重要、沒有誰明顯優先時用它來平衡。
-- **AUC-ROC**：ROC 曲線（Receiver Operating Characteristic curve）下的面積。ROC 曲線描繪不同分類閾值（threshold）下，真陽性率對偽陽性率的變化。AUC = 0.5 代表隨機亂猜，AUC = 1.0 代表完美分離。它與閾值無關——不管你選什麼切點，它衡量的是模型把正類排在負類前面的能力。
+- **AUC-ROC**：ROC 曲線（Receiver Operating Characteristic curve）下的面積。ROC 曲線描繪不同分類閾值（threshold）下，真陽性率（true positive rate）對偽陽性率（false positive rate）的變化。AUC = 0.5 代表隨機亂猜，AUC = 1.0 代表完美分離。它與閾值無關——不管你選什麼切點，它衡量的是模型把正類排在負類前面的能力。
 
 ### 迴歸指標
 
@@ -134,7 +134,7 @@ K=5 或 K=10 是標準選擇。每個資料點（data point）恰好被拿來驗
 
 **資料洩漏**：測試集的資訊滲進訓練。例子：切分前就在完整資料集上擬合縮放器（scaler）、在時間序列（time series）預測裡混入未來資料、使用從目標衍生出來的特徵（feature）。永遠先切分，再前處理（preprocessing）。
 
-**類別不平衡（class imbalance）（class imbalance）**：99% 的交易是正常交易，1% 是詐欺。一個永遠預測「正常」的模型能拿到 99% 的準確率。改用精確率、召回率、F1 或 AUC-ROC。
+**類別不平衡（class imbalance）**：99% 的交易是正常交易，1% 是詐欺。一個永遠預測「正常」的模型能拿到 99% 的準確率。改用精確率、召回率、F1 或 AUC-ROC。
 
 **選錯指標**：該最佳化（optimization）召回率時卻在最佳化準確率（醫療診斷）；資料裡有極端離群值時卻在最佳化 RMSE（這種情況改用 MAE）。
 
