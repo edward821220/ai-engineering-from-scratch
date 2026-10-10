@@ -1,6 +1,6 @@
 # Agent 狀態機——圖、節點與檢查點（Agent State Machines — Graphs, Nodes, Checkpoints）
 
-> 純手寫的 ReAct 迴圈本質上就是一個 `while True`。而將同一個迴圈以顯式的圖（Graph）形式表達，它就進化成了可設定檢查點（checkpoint）、隨時中斷、支援多路分岔與時光旅行的本課採用的心智模型，直接取自官方文件。Agent 的核心能力並未改變，改變的是包覆在它外層的調度框架。
+> 純手寫的 ReAct 迴圈本質上就是一個 `while True`。而將同一個迴圈以顯式的圖（Graph）形式表達，它就進化成了可設定檢查點（checkpoint）、隨時中斷（interrupt）、支援多路分岔與時光旅行的本課採用的心智模型，直接取自官方文件。Agent 的核心能力並未改變，改變的是包覆在它外層的調度框架。
 
 **Type:** Build
 **Languages:** Python
@@ -22,10 +22,10 @@
 一個 `StateGraph` 由三大核心要素構成：
 
 1. **狀態（State）**：在圖中流轉的型別化字典（TypedDict 或 Pydantic 模型）。每個節點接收全量狀態並回傳局部增量更新，LangGraph 依據各欄位設定的**歸約器（Reducer）**進行合併——例如針對需要累積保留的訊息清單使用 `operator.add`，其餘欄位預設為覆寫。
-2. **節點（Nodes）**：函式簽章為 `state -> partial_state` 的 Python 函式。每個節點代表一個離散的執行步驟：「呼叫模型」、「執行工具」、「產生摘要」。
-3. **邊（Edges）**：節點之間的流轉轉移。靜態邊直接指向固定目標；條件邊則接受一個路由函式 `state -> next_node_name`，使計算圖能根據模型的輸出動態分岔。
+2. **節點（Nodes）**：函式簽章（function signature）為 `state -> partial_state` 的 Python 函式。每個節點代表一個離散的執行步驟：「呼叫模型」、「執行工具」、「產生摘要」。
+3. **邊（Edges）**：節點之間的流轉轉移。靜態邊直接指向固定目標；條件邊（conditional edge）則接受一個路由函式 `state -> next_node_name`，使計算圖能根據模型的輸出動態分岔。
 
-你編譯該計算圖。Compile 動作鎖定圖的拓撲結構、掛載檢查點儲存器（Checkpointer，對正式環境至關重要），並回傳一個可執行的 Runnable 實體。你在呼叫時傳入初始狀態與一個專屬的 `thread_id`。執行的每一個步驟，皆會自動持久化儲存一筆以 `(thread_id, checkpoint_id)` 為鍵值的檢查點快照。
+你編譯該計算圖。Compile 動作鎖定圖的拓撲結構、掛載檢查點儲存器（Checkpointer，對正式環境至關重要），並回傳一個可執行的 Runnable 實體。你在呼叫時傳入初始狀態與一個專屬的 `thread_id`。執行的每一個步驟，皆會自動持久化儲存一筆以 `(thread_id, checkpoint_id)` 為鍵值的檢查點快照（snapshot）。
 
 ### 四大超能力
 
@@ -33,7 +33,7 @@
 
 **中斷機制（Interrupts）**：為節點標註 `interrupt_before=["human_review"]`，執行流程便會在該節點執行前安全暫停，當前狀態完整持久化。你的 API 能從容回傳給使用者「等待人工審核中」；後續請求帶著相同的 `thread_id` 並附帶 `Command(resume=...)`，即可無縫恢復執行。
 
-**串流分發（Streaming）**：`graph.stream(state, mode="updates")` 能在狀態增量發生的瞬間即時產出事件；`mode="messages"` 能逐字串流模型節點內部的 LLM token；`mode="values"` 則在每一步產出完整的狀態快照。你能依據前端 UI 的需求自由挑選。
+**串流分發（Streaming）**：`graph.stream(state, mode="updates")` 能在狀態增量（state delta）發生的瞬間即時產出事件；`mode="messages"` 能逐字串流模型節點內部的 LLM token；`mode="values"` 則在每一步產出完整的狀態快照。你能依據前端 UI 的需求自由挑選。
 
 **時光旅行（Time-travel）**：`graph.get_state_history(thread_id)` 能回傳完整的檢查點歷史日誌。將任何過往的 `checkpoint_id` 傳入 `graph.invoke`，即可從該歷史節點直接分岔出全新執行線。這在除錯（「如果模型當時選了工具 B 會怎樣？」）以及重放線上日誌的回歸測試中極為強大。
 
@@ -54,7 +54,7 @@
 
 ### StateGraph vs Send（扇出 fanout）
 
-`Send(node_name, state)` 允許節點平行分發多個子圖任務。例如：agent 決定同時向三個檢索器發起查詢。每一次 `Send` 皆會針對目標節點啟動一個獨立的平行執行個體，各路輸出最後透過狀態歸約器安全合流。這正是 LangGraph 在不需手寫複雜多執行緒原語的前提下，優雅表達編排器—工作者（Orchestrator-Workers）模式的秘訣。
+`Send(node_name, state)` 允許節點平行分發多個子圖（subgraph）任務。例如：agent 決定同時向三個檢索器發起查詢。每一次 `Send` 皆會針對目標節點啟動一個獨立的平行執行個體，各路輸出最後透過狀態歸約器安全合流。這正是 LangGraph 在不需手寫複雜多執行緒原語的前提下，優雅表達編排器—工作者（Orchestrator-Workers）模式的秘訣。
 
 ### 子圖
 
@@ -149,7 +149,7 @@ for event in app.stream(None, target, stream_mode="values"):
     pass  # replay from that point forward
 ```
 
-傳入 `None` 作為輸入會精準從給定的歷史檢查點重放；傳入一個值則會在該檢查點狀態上附加增量後再接續重跑。這讓你能極速重現某次糟糕的 Agent 執行歷程，而完全無需重新執行整場完整對話。
+傳入 `None` 作為輸入會精準從給定的歷史檢查點重放；傳入一個值則會在該檢查點狀態上附加增量後再接續重跑。這讓你能重現某次糟糕的 Agent 執行歷程，而無需重新執行整場完整對話。
 
 ### 步驟 5：在正式環境中替換檢查點儲存庫
 
@@ -170,7 +170,7 @@ with PostgresSaver.from_conn_string("postgresql://...") as checkpointer:
 在動手編寫 LangGraph 之前，請先進行 60 秒的架構設計：
 
 1. **命名所有節點**。每一個獨立的決策或具備副作用的操作皆應獨立成節點。「Agent 思考」、「工具執行」、「審核員審批」、「串流回應」。若無法具體列舉，代表任務尚未被拆解為適合 Agent 的形態。
-2. **宣告明確的狀態模型**。定義精簡的 TypedDict，並為每個清單欄位指派專屬歸約器。不要把所有東西全硬塞進 `messages`；將任務專屬的欄位（如當前執行的 `plan`、`budget` 計數器、`retrieved_docs` 檢索文件清單）提升至最外層獨立存放。
+2. **宣告明確的狀態模型**。定義精簡的 TypedDict，並為每個清單欄位指派專屬歸約器。不要把所有內容塞進 `messages`；將任務專屬的欄位（如當前執行的 `plan`、`budget` 計數器、`retrieved_docs` 檢索文件清單）提升至最外層獨立存放。
 3. **繪製連接邊**。預設皆為靜態邊，除非下一步的走向依賴於模型輸出的內容。每一條條件邊都必須綁定具備具名分岔目標的路由函式。
 4. **預先決定檢查點儲存方案**。本機單元測試用 `MemorySaver`，其餘情境一律採用 Postgres/Redis/SQLite。絕不發布沒有檢查點的系統——沒有檢查點意味著失去接續執行、人工介入與時間旅行的能力。
 5. **在工具執行前設定中斷，而非在執行後**。審批攔截必須設在通往副作用節點的邊上，以便在危害發生前取消操作；資料校驗則設在模型輸出的邊上，以便能以最低成本攔截錯誤呼叫。
