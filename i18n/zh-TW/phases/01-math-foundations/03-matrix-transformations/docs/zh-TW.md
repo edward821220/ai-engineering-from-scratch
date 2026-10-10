@@ -11,14 +11,14 @@
 
 - 建立旋轉、縮放、推移（shearing）和反射（reflection）矩陣，並套用到 2D 與 3D 的點
 - 用矩陣乘法組合多個變換，並驗證順序確實影響結果
-- 用特徵方程式（characteristic equation）計算 2x2 矩陣的特徵值與特徵向量
+- 用特徵方程式（characteristic equation）計算 2x2 矩陣的特徵值（eigenvalue）與特徵向量（eigenvector）
 - 說明為什麼特徵值決定了主成分分析（PCA）方向、RNN 穩定性和譜分群（spectral clustering）的行為
 
 ## The Problem｜問題
 
 讀 PCA 的資料時會看到「求共變異數矩陣（covariance matrix）的特徵向量」；讀模型（model）穩定性的資料時會看到「檢查所有特徵值的絕對值是否都小於 1」；讀資料增強（data augmentation）時會看到「套用隨機旋轉」。在理解矩陣對空間做了什麼之前，這些全都說不通。
 
-矩陣不只是數字網格，它們是空間機器：旋轉矩陣轉動點、縮放矩陣拉伸點、推移矩陣會使點的位置傾斜。神經網路對資料做的每個變換，都是這些運算之一，或它們的組合。本課把這些運算變得具體。
+矩陣不只是數字網格，它們是空間機器：旋轉矩陣轉動點、縮放矩陣拉伸點、推移矩陣會使點的位置傾斜。神經網路（neural network）對資料做的每個變換，都是這些運算之一，或它們的組合。本課把這些運算變得具體。
 
 ## The Concept｜核心概念
 
@@ -210,7 +210,7 @@ This says: rotate into eigenvector coordinates, scale along each axis, rotate ba
 
 ### 為什麼特徵值重要
 
-**PCA。** 共變異數矩陣的特徵向量就是主成分（principal component），特徵值告訴你每個成分捕捉到多少變異數。依特徵值排序、取前 k 個，就完成降維。
+**PCA。** 共變異數矩陣的特徵向量就是主成分（principal component），特徵值告訴你每個成分捕捉到多少變異數（variance）。依特徵值排序、取前 k 個，就完成降維（dimensionality reduction）。
 
 **穩定性。** 在循環神經網路（RNN）和動態系統中，絕對值大於 1 的特徵值會讓輸出爆炸，小於 1 則讓輸出消失。這就是用一句話說完的梯度消失／爆炸問題。
 
@@ -433,7 +433,7 @@ print(f"Rotate 90 around x: {np.round(rotated_x, 4)}")
 
 ## Ship It｜交付成果
 
-本課為 PCA（第 2 階段）和神經網路權重分析打下幾何基礎。這裡寫的特徵值／特徵向量程式，和實務上的 ML 系統中驅動降維、譜分群與穩定性分析的是同一套演算法。
+本課為 PCA（第 2 階段）和神經網路權重（weight）分析打下幾何基礎。這裡寫的特徵值／特徵向量程式，和實務上的 ML 系統中驅動降維、譜分群與穩定性分析的是同一套演算法。
 
 ## Exercises｜練習
 
