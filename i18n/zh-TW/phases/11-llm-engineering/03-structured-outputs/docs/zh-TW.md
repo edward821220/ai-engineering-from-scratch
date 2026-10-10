@@ -1,6 +1,6 @@
-# 結構化輸出：JSON、Schema 驗證與受限解碼
+# 結構化輸出：JSON、Schema 驗證與受限解碼（constrained decoding）
 
-> 你的 LLM 回傳了一個字串。但你的應用程式需要 JSON。這道鴻溝所造成的正式環境故障，比任何模型幻覺都要多。結構化輸出是自然語言與型別化資料之間的橋樑。做好它，你的 LLM 就會成為可靠的 API；做錯它，你將在凌晨三點用正規表達式狼狽地解析自由文字。
+> 你的 LLM 回傳了一個字串。但你的應用程式需要 JSON。這道鴻溝所造成的正式環境故障，比任何模型幻覺（hallucination）都要多。結構化輸出是自然語言與型別化資料（typed data）之間的橋樑。做好它，你的 LLM 就會成為可靠的 API；做錯則，你將在凌晨三點用正規表達式狼狽地解析自由文字。
 
 **Type:** Build
 **Languages:** Python
@@ -13,7 +13,7 @@
 - 使用 OpenAI 與 Anthropic API 參數實作 JSON 模式與 Schema 約束輸出
 - 建構 Pydantic 驗證層，拒絕格式錯誤的 LLM 輸出並透過錯誤反饋進行重試
 - 解釋受限解碼如何在 token 層級強制生成合法 JSON，而無需任何後處理
-- 設計穩健的擷取 Prompt，可靠地將非結構化文字轉化為型別化資料結構
+- 設計穩健的擷取（extraction） Prompt，可靠地將非結構化文字轉化為型別化資料結構
 
 ## The Problem｜問題
 
@@ -23,9 +23,9 @@
 The product is the Sony WH-1000XM5 headphones, which cost $348.00 and are currently in stock.
 ```
 
-這是一個完全正確的回答。但對於你的應用程式來說，它完全毫無用處。你的庫存系統需要的是 `{"product": "Sony WH-1000XM5", "price": 348.00, "in_stock": true}`。你需要一個具有特定鍵值、特定型別與特定數值約束的 JSON 物件，而不是一句通順的話。
+這是一個完全正確的回答。但對於你的應用程式來說，它對應用程式毫無用處。你的庫存系統需要的是 `{"product": "Sony WH-1000XM5", "price": 348.00, "in_stock": true}`。你需要一個具有特定鍵值、特定型別與數值限制條件的 JSON 物件，而不是一句通順的話。
 
-直覺的解法是在 Prompt 中加入「請以 JSON 回應」。這在 90% 的情況下有效。另外的 10%，模型會將 JSON 包裹在 Markdown 程式碼區塊中，或者加上「這是您的 JSON：」等開場贅字，又或者因為提早閉合括號而產生語法錯誤的 JSON。你的 JSON 解析器崩潰，整個資料管線中斷。你加入了 try/except 與重試迴圈。重試有時又會產出不同的資料。現在，除了解析問題之外，你還得面對資料一致性問題。
+直覺的解法是在 Prompt 中加入「請以 JSON 回應」。這在 90% 的情況下有效。另外的 10%，模型會將 JSON 包裹在 Markdown 程式碼區塊中，或者加上「這是您的 JSON：」等開場贅字，又或者因為提早閉合括號而產生語法錯誤的 JSON。你的 JSON 解析器崩潰，整個資料管線失效。你加入了 try/except 與重試迴圈。重試有時又會產出不同的資料。現在，除了解析問題之外，你還得面對資料一致性問題。
 
 這不是 Prompt 工程問題，這是解碼問題。模型由左至右生成 token。在每個位置上，它從包含 10 萬個以上選項的詞彙庫中挑選最可能的下一個 token。在任何特定位置上，絕大多數選項都會導致無效的 JSON。如果模型剛輸出了 `{"price":`，下一個 token 必須是數字、引號（若為字串）、`null`、`true`、`false` 或負號。其他任何內容都會產生無效的 JSON。缺乏約束時，模型很可能會挑選出一個語意合理但語法上徹底崩潰的英文字詞。
 
@@ -54,9 +54,9 @@ graph LR
 
 **JSON 模式（JSON mode）**：API 保證輸出為合法的 JSON。OpenAI 的 `response_format: { type: "json_object" }` 即啟用了此功能。輸出解析時絕不會報錯，但它可能不符合你預期的 Schema——可能出現多餘的鍵、型別錯誤或缺失欄位。
 
-**Schema 模式（Schema mode）**：API 接收一個 JSON Schema，並保證輸出嚴格符合該規範。在 2026 年，所有主流提供者皆原生支援此功能：OpenAI 的 `response_format: { type: "json_schema", json_schema: {...} }`（亦可透過 `tool_choice="required"` 達成）、Anthropic 帶有 `input_schema` 的工具呼叫，以及 Gemini 的 `response_schema` 搭配 `response_mime_type: "application/json"`。輸出將嚴格具備你指定的鍵值、型別與約束條件。
+**Schema 模式（Schema mode）**：API 接收一個 JSON Schema，並保證輸出符合該規範。在 2026 年，所有主流服務供應商（provider）皆原生支援此功能：OpenAI 的 `response_format: { type: "json_schema", json_schema: {...} }`（亦可透過 `tool_choice="required"` 達成）、Anthropic 帶有 `input_schema` 的工具呼叫（tool calling），以及 Gemini 的 `response_schema` 搭配 `response_mime_type: "application/json"`。輸出將嚴格具備你指定的鍵值、型別與約束條件。
 
-**受限解碼（Constrained decoding）**：在生成過程中的每個 token 位置，解碼器會遮除所有會導致非法輸出的候選 token。若 Schema 要求輸入數字，而模型正打算產出字母，該字母 token 的機率會被直接強制設為零。模型只能產出導向合法結構的 token。這正是 OpenAI 結構化輸出模式以及 Outlines、Guidance 等開源函式庫底層的具體實作。
+**受限解碼（Constrained decoding）**：在生成過程中的每個 token 位置，解碼器（decoder）會遮除所有會導致非法輸出的候選 token。若 Schema 要求輸入數字，而模型正打算產出字母，該字母 token 的機率會被直接強制設為零。模型只能產出導向合法結構的 token。這正是 OpenAI 結構化輸出模式以及 Outlines、Guidance 等開源函式庫的底層機制。
 
 ### JSON Schema：合約語言
 
@@ -80,11 +80,11 @@ JSON Schema 是你向模型（或驗證層）描述輸出結構型態的合約�
 
 這份 Schema 宣告：輸出必須是一個物件，包含字串型別的 `product`、非負數的 `price`、布林值的 `in_stock`，以及可選的字串陣列 `categories`。任何不符合此規範的輸出都會遭到拒絕。
 
-Schema 能處理複雜的邊界情況：巢狀物件、具備型別化項目的陣列、列舉（enum，將字串限制在特定候選值內）、模式匹配（字串的正規表達式），以及組合器（oneOf、anyOf、allOf 用於多型輸出）。
+Schema 能處理複雜的邊界情況：巢狀物件、具有型別的陣列項目、列舉（enum，將字串限制在特定候選值內）、模式匹配（字串的正規表達式），以及組合器（oneOf、anyOf、allOf 用於多型輸出）。
 
 ### Pydantic 模式
 
-在 Python 中，你通常不需要手寫 JSON Schema。你只需定義一個 Pydantic 模型，它會自動為你產生對應的 Schema。
+在 Python 中，通常無須手寫 JSON Schema。你只需定義一個 Pydantic 模型，它會自動為你產生對應 Schema。
 
 ```python
 from pydantic import BaseModel
@@ -96,11 +96,11 @@ class Product(BaseModel):
     categories: list[str] = []
 ```
 
-這會產生與上述完全相同的 JSON Schema。Instructor 函式庫（以及 OpenAI SDK）直接接受 Pydantic 模型：傳入模型類別，即可取回型別驗證通過的實例。若 LLM 輸出不符合規格，Instructor 會自動處理重試。
+這會產生與上述完全相同的 JSON Schema。Instructor 函式庫（以及 OpenAI SDK）直接接受 Pydantic 模型：傳入模型類別，即可取回經驗證的實例。若 LLM 輸出不符合規格，Instructor 會自動處理重試。
 
 ### 函式呼叫／工具呼叫（Function Calling / Tool Use）
 
-解決相同問題的另一種介面形態。與其要求模型直接產出 JSON，不如定義帶有具型別參數的「工具」（函式）。模型會輸出帶有結構化引數的函式呼叫。OpenAI 稱其為「函式呼叫（function calling）」，Anthropic 稱其為「工具呼叫（tool use）」。產出的結果是一樣的：型別化的結構化資料。
+解決相同問題的另一種介面形態。與其要求模型直接產出 JSON，不如定義帶有型別的參數的「工具」（函式）。模型會輸出帶有結構化引數的函式呼叫。OpenAI 稱其為「函式呼叫（function calling）」，Anthropic 稱其為「工具呼叫（tool use）」。產出的結果是一樣的：型別化的結構化資料。
 
 ```mermaid
 graph TD
@@ -127,9 +127,9 @@ graph TD
 
 **列舉值混淆**：你將某個欄位限制在 `["in_stock", "out_of_stock", "preorder"]`。模型輸出了 `"available"`——語意上完全通順，但不在允許的候選集合內。優良的受限解碼能從源頭杜絕此問題，而純 Prompt 方法則無法保證。
 
-**巢狀物件過深**：深層巢狀 Schema（4 層以上）會引發更多錯誤。每一層巢狀結構都是模型容易失去結構追蹤能力的潛在斷點。
+**巢狀物件過深**：深層巢狀 Schema（4 層以上）會引發更多錯誤。每一層巢狀結構都是模型可能導致模型無法維持結構。
 
-**陣列長度偏差**：模型在陣列中產出的項目數量可能過多或過少。Schema 支援 `minItems` 與 `maxItems`，但並非所有提供者都在解碼層級嚴格強制執行此項限制。
+**陣列長度偏差**：模型在陣列中產出的項目數量可能過多或過少。Schema 支援 `minItems` 與 `maxItems`，但並非所有服務供應商都在解碼層級嚴格執行這項限制。
 
 **遺漏可選欄位**：模型經常省略在技術上定義為可選、但對你的業務邏輯至關重要的欄位。即使資料偶爾缺失，也請在 Schema 中將其設為必填——迫使模型明確輸出 `null`。
 
@@ -267,7 +267,7 @@ def model_to_schema(name, fields):
 
 ### 步驟 3：受限 Token 過濾器
 
-模擬受限解碼。給定部分的 JSON 字串與目標 Schema，推斷出在當前位置上哪些 token 類別屬於合法字元。
+模擬受限解碼。給定部分的 JSON 字串與目標 Schema，推斷出在當前位置上哪些 token 類別在目前位置有效。
 
 ```python
 def next_valid_tokens(partial_json, schema):
@@ -328,7 +328,7 @@ def demonstrate_constrained_decoding():
 
 ### 步驟 4：擷取管線
 
-將所有模組整合為擷取管線：定義 Schema、模擬 LLM 產出結構化輸出、驗證輸出並處理失敗重試。
+將所有模組整合為擷取管線：定義 Schema、模擬 LLM 產出結構化輸出、驗證輸出並處理重試。
 
 ```python
 def simulate_llm_extraction(text, schema, attempt=0):
@@ -451,7 +451,7 @@ def run_demo():
 # print(product.product, product.price, product.in_stock)
 ```
 
-OpenAI 的結構化輸出模式在內部採用了受限解碼。模型生成的每一個 token 都保證產出符合 Pydantic Schema 的規格。無需重試，無需額外驗證，約束條件直接熔鑄於解碼過程中。
+OpenAI 的結構化輸出模式在內部採用了受限解碼。模型生成的每一個 token 都保證產出符合 Pydantic Schema 的規格。無需重試，無需額外驗證，約束條件直接整合進解碼過程。
 
 ### Anthropic 工具呼叫
 
@@ -480,7 +480,7 @@ OpenAI 的結構化輸出模式在內部採用了受限解碼。模型生成的�
 # )
 ```
 
-Anthropic 透過工具呼叫實現結構化輸出。模型發出一個工具呼叫，其結構化引數嚴格符合宣告的 input_schema。相同的成果，不同的 API 介面表現形式。
+Anthropic 透過工具呼叫實現結構化輸出。模型發出一個工具呼叫，其結構化引數嚴格符合宣告的 input_schema。相同的成果，不同的 不同的 API 介面。
 
 ### Instructor 函式庫
 
@@ -504,25 +504,25 @@ Anthropic 透過工具呼叫實現結構化輸出。模型發出一個工具呼�
 # )
 ```
 
-Instructor 封裝了各大 LLM 用戶端，並自動加入驗證與重試機制。若首次嘗試未能通過驗證，它會將具體錯誤訊息作為脈絡傳回給模型並要求修正輸出。這在任何提供者上皆能平穩執行，不僅限於 OpenAI。
+Instructor 封裝了任何 LLM 用戶端，並自動加入驗證與重試機制。若首次嘗試未能通過驗證，它會將具體錯誤訊息作為脈絡傳回給模型並要求修正輸出。這在任何服務供應商上皆能平穩執行，不僅限於 OpenAI。
 
 ## Ship It｜交付成果
 
-本課產出 `outputs/prompt-structured-extractor.md`——一個可重複使用的 Prompt 範本，能在給定 Schema 定義下從任何文字中精準擷取結構化資料。輸入 JSON Schema 與非結構化文字，即可獲得驗證通過的 JSON。
+本課產出 `outputs/prompt-structured-extractor.md`——一個可重複使用的 Prompt 範本，能在給定 Schema 定義下從任何文字中擷取結構化資料。輸入 JSON Schema 與非結構化文字，即可獲得驗證通過的 JSON。
 
-此外還包含 `outputs/skill-structured-outputs.md`——一套依據提供者、可靠度要求與 Schema 複雜度，挑選最適結構化輸出策略的決策框架。
+此外還包含 `outputs/skill-structured-outputs.md`——一套依據服務供應商、可靠度要求與 Schema 複雜度，挑選最適結構化輸出策略的決策框架。
 
 ## Exercises｜練習
 
-1. 擴充 Schema 驗證器以支援 `oneOf`（資料必須嚴格匹配多個候選 Schema 中的恰好一個）。這能妥善處理多型輸出——例如某欄位既可能是 `Product` 物件，也可能是具有不同欄位結構的 `Service` 物件。
+1. 擴充 Schema 驗證器以支援 `oneOf`（資料必須嚴格匹配多個 Schema 中恰好符合其中一個）。這能妥善處理多型輸出——例如某欄位既可能是 `Product` 物件，也可能是具有不同欄位結構的 `Service` 物件。
 
 2. 打造一套「Schema 差異分析（schema diff）」工具，用以比對兩份 Schema 並識別出破壞性變更（刪除必填欄位、變更型別）與非破壞性變更（新增可選欄位、放寬約束）。這是在正式環境中對擷取 Schema 進行版本管理的核心工具。
 
-3. 實作更逼真的受限解碼模擬器。給定一個 JSON Schema 與包含 100 個 token 的詞彙表（字母、數字、標點符號、關鍵字），逐步走訪生成流程，並在每個位置上遮除非法 token。測量在每一步驟中詞彙表保持合法的百分比。
+3. 實作更逼真的受限解碼模擬器。給定一個 JSON Schema 與包含 100 個 token 的詞彙表（vocabulary，字母、數字、標點符號、關鍵字），逐步走訪生成流程，並在每個位置上遮除非法 token。測量在每一步驟中詞彙表保持合法的百分比。
 
-4. 建構一套擷取評估套件。建立 50 份帶有人工標註標準 JSON 輸出的產品描述。在全部 50 份資料上執行你的擷取管線，測量完全匹配率、欄位級準確率與型別合規度。找出哪些欄位最難被正確擷取。
+4. 建構一套擷取評估套件。建立 50 份帶有人工標註標準 JSON 輸出的產品描述。在全部 50 份資料上執行你的擷取管線，測量完全匹配率、欄位級準確率與型別合規（type compliance）度。找出哪些欄位最難被正確擷取。
 
-5. 為你的擷取管線加入「信心分數」。對每個擷取出的欄位估算模型的置信度（基於 token 機率，或透過重複執行 3 次並測量一致性）。將低信心度欄位標記出來以供人工審核。
+5. 為你的擷取管線加入「信心分數」（confidence score）。對每個擷取出的欄位估算模型的置信度（基於 token 機率，或透過重複執行 3 次並測量一致性）。將低信心度欄位標記出來以供人工審核。
 
 ## Key Terms｜關鍵術語
 
@@ -536,7 +536,7 @@ Instructor 封裝了各大 LLM 用戶端，並自動加入驗證與重試機制�
 | 函式呼叫（Function calling） | 「工具呼叫」 | LLM 輸出結構化的函式呼叫請求（名稱 + 具型別引數）而非自由文字——OpenAI 與 Anthropic 皆原生支援 |
 | Instructor | 「LLM 的 Pydantic」 | 封裝 LLM 用戶端以回傳通過驗證的 Pydantic 實例的 Python 函式庫，並在驗證失敗時自動重試 |
 | Token 遮罩（Token masking） | 「過濾詞彙表」 | 在生成期間將特定 token 的機率強制設為零，使模型完全無法產出這些 token |
-| Schema 合規（Schema compliance） | 「符合結構外觀」 | 輸出具備所有必填欄位、型別完全正確、數值在合理約束內，且無多餘不允許的欄位 |
+| Schema 合規（Schema compliance） | 「符合結構外觀」 | 輸出具備所有必填欄位、型別完全正確、數值符合限制條件，且無多餘不允許的欄位 |
 | 重試迴圈（Retry loop） | 「重試直到成功」 | 將驗證錯誤回傳給模型並要求其修復輸出——Instructor 能在可設定的上限內自動執行此流程 |
 
 ## Further Reading｜延伸閱讀
