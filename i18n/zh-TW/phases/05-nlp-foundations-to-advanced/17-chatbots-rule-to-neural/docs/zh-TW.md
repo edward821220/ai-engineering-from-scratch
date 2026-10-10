@@ -25,7 +25,7 @@
 
 **1950。** Turing 繞開「機器會思考嗎？」，提出一個可操作的替代：若詢問者透過電傳打字分不出機器和人，那個哲學問題就不再有意義。對話在這個領域有名字之前，就成了它的評測。
 
-**1956。** 人工智慧一詞由達特茅斯夏季研討會提出；提案預期兩個月內能取得重大進展——達特茅斯的夏季工作坊造出「人工智慧（artificial intelligence）」，猜想是智力的每個特徵「原則上可以被描述得夠精確，讓機器能夠模擬它」。那份提案為實質進展編了兩個月。
+**1956。** 人工智慧一詞由達特茅斯夏季研討會提出；提案預期兩個月內能取得重大進展——達特茅斯的夏季工作坊造出「人工智慧（artificial intelligence）」，猜想是智力的每個特徵「原則上可以被描述得夠精確，讓機器能夠模擬它」。
 
 **1966。** ELIZA 交付了你在步驟 1 會做的反射技巧：分解規則從輸入抽出片段，重組規則把它們回聲成問題。總共大約 200 個模式，零狀態、零理解——使用者還是對它傾訴。Weizenbaum 餘生都對「只靠這麼少的機制就能做到」感到警惕。
 
@@ -47,9 +47,9 @@ chatbot-lineage
 
 **神經（seq2seq）。** 在對話紀錄上訓練的編碼器–解碼器。從零生成回應。流暢，但容易給出泛泛的輸出（「I don't know」）和事實漂移。也無法穩定切合主題。這是 Google、Facebook、Microsoft 在 2016 到 2019 年的聊天機器人都令人失望的原因。
 
-**agent（agent）。** 包在迴圈裡的語言模型，會規劃、呼叫工具、驗證結果。不是一條很長 prompt 的聊天機器人。是LLM agent：規劃 → 呼叫工具 → 觀察結果 → 決定下一步。先檢索再接地（RAG）讓它不幻覺。工具呼叫讓它真的做事。這是 2026 年的架構。
+**LLM agent。** 包在迴圈裡的語言模型，會規劃、呼叫工具、驗證結果。不是一條很長 prompt 的聊天機器人。是 LLM agent：規劃 → 呼叫工具 → 觀察結果 → 決定下一步。先檢索、再以檢索到的文件作為依據（grounding，即 RAG）讓它不幻覺。工具呼叫讓它真的做事。這是 2026 年的架構。
 
-這四種典範不是依序取代。2026 年正式環境的聊天機器人四條都走：規則處理驗證和破壞性動作，檢索處理 FAQ，神經生成處理自然說法，agent處理含糊的開放查詢。
+這四種典範不是依序取代。2026 年正式環境的聊天機器人四條都走：規則處理驗證和破壞性動作，檢索處理 FAQ，神經生成處理自然說法，agent 處理含糊的開放查詢。
 
 ## Build It｜動手實作
 
@@ -128,7 +128,7 @@ response = chatbot("Respond politely to: Hi there!", max_new_tokens=40)
 print(response[0]["generated_text"])
 ```
 
-### 步驟 4：agent迴圈
+### 步驟 4：agent 迴圈
 
 2026 年正式環境的形狀：
 
@@ -160,7 +160,7 @@ def agent_loop(user_message, tools, llm, max_steps=5):
 
 三件事要點名。工具是大型語言模型可以呼叫的函式。迴圈在模型回最終答案、而不是工具呼叫時結束。步數預算防止含糊任務上的無限迴圈。
 
-正式環境還會加：每次呼叫模型前先注入相關文件的檢索接地、護欄（破壞性動作沒確認就拒絕）、可觀測性（每一步都記下來）、評估（自動檢查代理行為有沒有偏離規格）。
+正式環境還會加：每次呼叫模型前先注入相關文件，以檢索到的文件作為依據（grounding）、護欄（破壞性動作沒確認就拒絕）、可觀測性（每一步都記下來）、評估（自動檢查 agent 行為有沒有偏離規格）。
 
 ### 步驟 5：混合路由
 
@@ -199,16 +199,16 @@ def is_destructive_action(text):
 
 ## 仍會交付出去的失敗模式
 
-- **自信的捏造。** agent宣稱完成了它沒做的動作。緩解：驗證結果、記錄工具呼叫、沒有成功的工具回傳就不讓模型宣稱做過。
-- **prompt 注入（prompt injection）。** 使用者插入文字，蓋過 system prompt。在 OWASP Top 10 for LLM Applications 2025 裡列為 LLM01。兩種：直接注入（貼進對話）和間接注入（藏在代理會讀的文件、電子郵件或工具輸出裡）。
+- **自信的捏造。** agent 宣稱完成了它沒做的動作。緩解：驗證結果、記錄工具呼叫、沒有成功的工具回傳就不讓模型宣稱做過。
+- **prompt 注入（prompt injection）。** 使用者插入文字，蓋過 system prompt。在 OWASP Top 10 for LLM Applications 2025 裡列為 LLM01。兩種：直接注入（貼進對話）和間接注入（藏在 agent 會讀的文件、電子郵件或工具輸出裡）。
 
-  攻擊成功率隨情境而變。在一般工具使用和程式評測上，前沿模型測到的成功率大約 0.5% 到 8.5%。特定高風險設定（對 AI agent loop的適應性攻擊、脆弱的編排）達到約 84%。正式環境的 CVE 包括 EchoLeak（CVE-2025-32711，CVSS 9.3）——Microsoft 365 Copilot 裡由攻擊者控制的電子郵件觸發的零點選（zero-click）資料外洩缺陷。
+  攻擊成功率隨情境而變。在一般工具使用和程式評測上，前沿模型測到的成功率大約 0.5% 到 8.5%。特定高風險設定（對 AI agent loop 的適應性攻擊、脆弱的編排）達到約 84%。正式環境的 CVE 包括 EchoLeak（CVE-2025-32711，CVSS 9.3）——Microsoft 365 Copilot 裡由攻擊者控制的電子郵件觸發的零點選（zero-click）資料外洩缺陷。
 
-  緩解：在整個迴圈裡把使用者輸入當成不可信；工具呼叫前先清理；把工具輸出和主 prompt 隔離；用規劃–驗證–執行（Plan-Verify-Execute，PVE），代理先規劃，再對照計畫驗證每個動作才執行（這能阻止工具結果注入新的、計畫外的動作）；破壞性動作要使用者確認；工具範圍用最小權限。
+  緩解：在整個迴圈裡把使用者輸入當成不可信；工具呼叫前先清理；把工具輸出和主 prompt 隔離；用規劃–驗證–執行（Plan-Verify-Execute，PVE），agent 先規劃，再對照計畫驗證每個動作才執行（這能阻止工具結果注入新的、計畫外的動作）；破壞性動作要使用者確認；工具範圍用最小權限。
 
   再多的 prompt 工程也不能完全消掉這個風險。需要外部的執行期防禦層（LLM Guard、允許清單驗證、語意異常偵測）。
-- **任務範圍失控。** 工具呼叫回了沾邊的資訊，代理就離題。緩解：收窄工具契約；system prompt 保持聚焦；為離題比率加評估。
-- **無限迴圈。** 代理一直呼叫同一個工具。緩解：步數預算、工具呼叫去重、用 LLM 評審「我們有沒有在前進」。
+- **任務範圍失控。** 工具呼叫回了沾邊的資訊，agent 就離題。緩解：收窄工具契約；system prompt 保持聚焦；為離題比率加評估。
+- **無限迴圈。** agent 一直呼叫同一個工具。緩解：步數預算、工具呼叫去重、用 LLM 評審「我們有沒有在前進」。
 - **脈絡視窗耗盡。** 長對話把最早的輪次推出脈絡。緩解：摘要較舊的輪次、按相似度檢索相關的過去輪次，或用長脈絡模型。
 
 ## Ship It｜交付成果
@@ -239,7 +239,7 @@ Refuse to recommend a pure-LLM agent for any destructive action (payments, accou
 
 1. **簡單。** 用上面的規則式回應，為咖啡店點餐機器人做 10 個模式。測邊界：重複點餐、修改、取消、意圖不清。
 2. **中等。** 做混合的 FAQ 加 LLM 後援。一個 SaaS 產品的 50 則制式 FAQ，LLM 後援在文件站上檢索。在 100 則真實客服問題上量拒答率和準確率（accuracy）。
-3. **困難。** 用三個工具（搜尋、讀使用者資料、寄信）實作上面的LLM agent。用 50 個測試情境跑評估，其中包含 prompt 注入嘗試。報告離題比率、失敗任務比率、以及任何注入成功。
+3. **困難。** 用三個工具（搜尋、讀使用者資料、寄信）實作上面的 LLM agent。用 50 個測試情境跑評估，其中包含 prompt 注入嘗試。報告離題比率、失敗任務比率、以及任何注入成功。
 
 ## Key Terms｜關鍵術語
 
@@ -257,10 +257,10 @@ Refuse to recommend a pure-LLM agent for any destructive action (payments, accou
 - [Turing (1950). Computing Machinery and Intelligence](https://academic.oup.com/mind/article/LIX/236/433/986238) ——把對話變成這個領域評測的論文。
 - [Weizenbaum (1966). ELIZA — A Computer Program For the Study of Natural Language Communication](https://web.stanford.edu/class/cs124/p36-weizenabaum.pdf) ——原始的規則式聊天機器人論文。
 - [Colby, Weber, Hilf (1971). Artificial Paranoia](https://doi.org/10.1016/0004-3702(71)90002-6) ——PARRY 的情緒變數架構，第一個有狀態的聊天機器人。
-- [Thoppilan et al. (2022). LaMDA: Language Models for Dialog Applications](https://arxiv.org/abs/2201.08239) ——Google 晚期的神經聊天機器人論文，就在 agent接手之前。
-- [Yao et al. (2022). ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629) ——為LLM agent模式命名的論文。
+- [Thoppilan et al. (2022). LaMDA: Language Models for Dialog Applications](https://arxiv.org/abs/2201.08239) ——Google 晚期的神經聊天機器人論文，就在 agent 接手之前。
+- [Yao et al. (2022). ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629) ——為 LLM agent 模式命名的論文。
 - [Anthropic's guide on building effective agents](https://www.anthropic.com/research/building-effective-agents) ——2024 年的正式環境指引，2026 年仍然成立。
 - [Greshake et al. (2023). Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection](https://arxiv.org/abs/2302.12173) ——prompt 注入的論文。
 - [OWASP Top 10 for LLM Applications 2025 — LLM01 Prompt Injection](https://genai.owasp.org/llmrisk/llm01-prompt-injection/) ——把 prompt 注入列成首要安全疑慮的排名。
 - [AWS — Securing Amazon Bedrock Agents against Indirect Prompt Injections](https://aws.amazon.com/blogs/machine-learning/securing-amazon-bedrock-agents-a-guide-to-safeguarding-against-indirect-prompt-injections/) ——編排層的實務防禦，包括規劃–驗證–執行和使用者確認流程。
-- [EchoLeak (CVE-2025-32711)](https://www.vectra.ai/topics/prompt-injection) ——間接 prompt 注入造成的標準的零點選資料外洩 CVE。說明為什麼有寫入權限的代理需要執行期防禦。
+- [EchoLeak (CVE-2025-32711)](https://www.vectra.ai/topics/prompt-injection) ——間接 prompt 注入造成的標準的零點選資料外洩 CVE。說明為什麼有寫入權限的 agent 需要執行期防禦。
