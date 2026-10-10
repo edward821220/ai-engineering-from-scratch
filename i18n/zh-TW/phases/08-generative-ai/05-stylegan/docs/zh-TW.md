@@ -9,9 +9,9 @@
 
 ## The Problem｜問題
 
-DCGAN 用一疊轉置卷積把 `z` 映成影像。問題是 `z` 什麼都控——姿勢、光線、身份、背景——纏在一起。沿著 `z` 的一個軸走，四種屬性同時改變。你不能叫模型「同一個人、不同姿勢」，因為表示沒有這樣分解。
+DCGAN 用一疊轉置卷積（transposed convolution）把 `z` 映成影像。問題是 `z` 什麼都控——姿勢、光線、身份、背景——纏在一起。沿著 `z` 的一個軸走，四種屬性同時改變。你不能叫模型「同一個人、不同姿勢」，因為表示沒有這樣分解。
 
-Karras 等人（2019，NVIDIA）提議：不要把 `z` 直接送進卷積層。網路（network）輸入改餵一個常數張量 `4×4×512`。學一個 8 層 MLP，做 `z ∈ Z → w ∈ W` 這段映射。每個解析度用*自適應實例正規化（adaptive instance normalization）*，也就是 AdaIN，注入 `w`：先正規化每個卷積特徵圖（feature map），再依 `w` 的仿射投影縮放並平移。每一層加噪聲，做隨機細節，皮膚毛孔、頭髮絲。
+Karras 等人（2019，NVIDIA）提議：不要把 `z` 直接送進卷積層。網路（network）輸入改餵一個常數張量 `4×4×512`。學一個 8 層 MLP，做 `z ∈ Z → w ∈ W` 這段映射。每個解析度用*自適應實例正規化（adaptive instance normalization）*，也就是 AdaIN，注入 `w`：先正規化每個卷積特徵圖（feature map），再依 `w` 的仿射投影（affine projection）縮放並平移。每一層加雜訊，做隨機細節，皮膚毛孔、頭髮絲。
 
 結果：`W` 大致有正交的軸，一邊是「高層風格」，姿勢、身份，一邊是「細風格」，光線、顏色。你可以交換兩張影像的風格：低解析度用影像 A 的 `w`，高解析度用影像 B 的 `w`。這打開了編輯、跨領域風格化，和整條 StyleGAN 反演（inversion）研究線。
 
@@ -19,7 +19,7 @@ Karras 等人（2019，NVIDIA）提議：不要把 `z` 直接送進卷積層。�
 
 ![StyleGAN: mapping network + AdaIN + per-layer noise](../assets/stylegan.svg)
 
-**映射網路。** `f: Z → W`，一個 8 層 MLP。`Z = N(0, I)^512`。`W` 不被逼成高斯——它學一個配合資料的形狀。
+**映射網路（mapping network）。** `f: Z → W`，一個 8 層 MLP。`Z = N(0, I)^512`。`W` 不被逼成高斯——它學一個配合資料的形狀。
 
 **合成網路。** 從學來的常數 `4×4×512` 開始。每個解析度區塊是 `upsample → conv → AdaIN(w_i) → noise → conv → AdaIN(w_i) → noise`。解析度加倍：4、8、16、32、64、128、256、512、1024。
 
@@ -31,7 +31,7 @@ AdaIN(x, y) = y_scale · (x - mean(x)) / std(x) + y_bias
 
 其中 `y_scale` 和 `y_bias` 來自 `w` 的仿射投影。按特徵圖正規化，再交換風格。「風格」在這裡是特徵圖的一階和二階統計。
 
-**逐層噪聲。** 每個特徵圖加上單通道高斯噪聲，再乘一個學來的逐通道係數。控制隨機細節，不動全域結構。
+**逐層雜訊。** 每個特徵圖加上單通道高斯雜訊，再乘一個學來的逐通道係數。控制隨機細節，不動全域結構。
 
 **截斷手法（truncation trick）。** 推論（inference）時抽 `z`，算 `w = mapping(z)`，然後 `w' = ŵ + ψ·(w - ŵ)`，其中 `ŵ` 是很多樣本上 `w` 的平均。`ψ < 1` 以多樣性換取品質。幾乎每個 StyleGAN 展示都用 `ψ ≈ 0.7`。
 
@@ -39,13 +39,13 @@ AdaIN(x, y) = y_scale · (x - mean(x)) / std(x) + y_bias
 
 | 版本 | 年份 | 創新 |
 |---------|------|------------|
-| StyleGAN | 2019 | 映射網路加 AdaIN、噪聲、漸進式增長（progressive growing）。 |
+| StyleGAN | 2019 | 映射網路加 AdaIN、雜訊、漸進式增長（progressive growing）。 |
 | StyleGAN2 | 2020 | 權重解調（weight demodulation）換掉 AdaIN，修好水滴狀瑕疵；跳躍／殘差架構；路徑長度正則（path-length regularization）。 |
 | StyleGAN3 | 2021 | 無混疊（alias-free）卷積加等變核（kernel）；紋理不再黏在像素格子上。 |
 | StyleGAN-XL | 2022 | 類別條件、1024²、ImageNet。 |
 | R3GAN | 2024 | 用更強的正則以更強的正則化重新設計；在 FFHQ-1024 上縮小和擴散的差距，參數（parameter）少到 20 分之一。 |
 
-2026 年 StyleGAN3 仍是這些的預設：(a) 高畫面更新率（FPS）的窄領域照片級寫實，(b) 少樣本（few-shot）領域調適，用 100 張影像訓練新的資料集（dataset），映射網路凍住，(c) 以反演為基礎的編輯，找出能重建一張真實照片的 `w`，再編那個 `w`。開放領域的文字生影像，不該用它——擴散才是。
+2026 年 StyleGAN3 仍是這些的預設：(a) 高畫面更新率（FPS）的窄領域照片級寫實，(b) 少樣本（few-shot）領域調適（domain adaptation），用 100 張影像訓練新的資料集（dataset），映射網路凍住，(c) 以反演為基礎的編輯，找出能重建一張真實照片的 `w`，再編那個 `w`。開放領域的文字生影像，不該用它——擴散才是。
 
 ```figure
 gx-stylegan-mapping
@@ -53,7 +53,7 @@ gx-stylegan-mapping
 
 ## Build It｜動手實作
 
-`code/main.py` 實作一維的玩具「精簡 style-GAN」：一個映射 MLP，一個合成函數，吃學來的常數向量，用從 `w` 來的縮放和偏置去調它，再加上逐層噪聲。它顯示：透過仿射調變注入 `w`，比得上或贏過把 `z` 串進產生器輸入。
+`code/main.py` 實作一維的玩具「精簡 style-GAN」：一個映射 MLP，一個合成函數，吃學來的常數向量，用從 `w` 來的縮放和偏置去調它，再加上逐層雜訊。它顯示：透過仿射調變注入 `w`，比得上或贏過把 `z` 串進產生器輸入。
 
 ### 步驟 1：映射網路
 
@@ -77,7 +77,7 @@ def adain(x, w_scale, w_bias):
 
 每個特徵圖的縮放和偏置，來自 `w` 的線性投影。
 
-### 步驟 3：逐層噪聲
+### 步驟 3：逐層雜訊
 
 ```python
 def add_noise(x, sigma, rng):
