@@ -1,6 +1,6 @@
 # 開放詞彙視覺（open-vocabulary vision）：CLIP
 
-> 把影像編碼器（encoder）和文字編碼器一起訓練，讓讓相符的影像與說明文字配對，在共享空間中落在同一點。訣竅就在於此。
+> 把影像編碼器（image encoder）和文字編碼器（text encoder）一起訓練，讓相符的影像與說明文字配對，在共享空間中落在同一點。訣竅就在於此。
 
 **Type:** Build + Use
 **Languages:** Python
@@ -9,9 +9,9 @@
 
 ## Learning Objectives｜學習目標
 
-- 說明 CLIP 的雙塔架構，以及對比訓練的目標
-- 用預訓練的 CLIP（或 SigLIP）做零樣本分類，不用任何針對任務的訓練
-- 從零實作零樣本分類：把類別 prompt 編碼、算餘弦相似度、取 argmax
+- 說明 CLIP 的雙塔（two-tower）架構，以及對比訓練（contrastive training）的目標
+- 用預訓練的 CLIP（或 SigLIP）做零樣本（zero-shot）分類，不用任何針對任務的訓練
+- 從零實作零樣本分類：把類別 prompt 編碼、算餘弦相似度（cosine similarity）、取 argmax
 - 分辨 CLIP、SigLIP、OpenCLIP，以及 LLaVA／LLaMA-vision 模型。2026 年各自拿來做什麼
 
 ## The Problem｜問題
@@ -214,7 +214,7 @@ SigLIP 較新，小規模訓得更好，新工作偏好它：`google/siglip-base
 | 零樣本 | 「沒有針對任務的訓練」 | 推論時只靠文字描述的類別來分類。不需使用標籤 |
 | 溫度／logit_scale | 「tau」 | 學來的純量，在 softmax 之前把相似度矩陣放大 |
 | prompt 模板 | 「A photo of a {}」 | 包在類別名稱外面的自然語言。把很多模板平均，零樣本準確率會上升 |
-| CLIP | 「影像加文字的模型」 | 2021 年 OpenAI 的模型。到 2026 年仍是這個領域的到 2026 年仍是此領域的代表性模型 |
+| CLIP | 「影像加文字的模型」 | 2021 年 OpenAI 的模型。到 2026 年仍是此領域的代表性模型 |
 | SigLIP | 「sigmoid 版 CLIP」 | 把 softmax 換成一對一對的 sigmoid。小批次訓得更好 |
 | OpenCLIP | 「開放的重現」 | 社群在 LAION 上訓練的 CLIP 變體。開放原始碼管線（pipeline）在正式環境的預設 |
 | VLM | 「視覺語言模型」 | CLIP 家族的編碼器加上一個 LLM，訓練來回答關於影像的問題 |
