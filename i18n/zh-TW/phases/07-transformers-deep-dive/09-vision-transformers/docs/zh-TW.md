@@ -1,6 +1,6 @@
 # 視覺 Transformer（Vision Transformer，ViT）
 
-> 一張影像是一格一格的圖塊。一句話是一格一格的 token。同一個 transformer 兩邊都吃。
+> 一張影像是一格一格的圖塊（patch）。一句話是一格一格的 token。同一個 transformer 兩者都能處理。
 
 **Type:** Build
 **Languages:** Python
@@ -9,9 +9,9 @@
 
 ## The Problem｜問題
 
-2020 年以前，電腦電腦視覺主要依賴卷積（convolution）。ImageNet、COCO、偵測評測上的每一個最前沿，都用 CNN 當骨幹。Transformer 是給語言用的。
+2020 年以前，電腦視覺主要依賴卷積（convolution）。ImageNet、COCO、偵測評測上的每一個最前沿，都用 CNN 當骨幹。Transformer 是給語言用的。
 
-Dosovitskiy et al.（2020）——「An Image is Worth 16x16 Words」——顯示你可以把卷積整個丟掉。把影像切成固定大小的圖塊（patch），每個圖塊線性投影成一個 embedding，再把這條序列送進原味的 transformer 編碼器。規模夠大時（ImageNet-21k 預訓練或更大），ViT 打平或打贏以 ResNet 為底的模型。
+Dosovitskiy et al.（2020）——「An Image is Worth 16x16 Words」——顯示你可以把卷積整個丟掉。把影像切成固定大小的圖塊（patch），每個圖塊線性投影（linear projection）成一個 embedding，再把這條序列送進標準的 transformer 編碼器。規模夠大時（ImageNet-21k 預訓練或更大），ViT 打平或打贏以 ResNet 為底的模型。
 
 ViT 開了一個 2026 年更廣的模式：一種架構，很多模態。Whisper 把音訊切成 token。ViT 把影像切成 token。機器人用動作 token。影片用像素 token。Transformer 不在乎——餵它一條序列，它就學。
 
@@ -56,7 +56,7 @@ image (224, 224, 3) → 14 × 14 grid of 16x16x3 patches → 196 vectors of leng
 | ViT | 2020 | 原始的。固定圖塊大小，完整的全域注意力。 |
 | DeiT | 2021 | 蒸餾；只在 ImageNet-1k 上就能訓練。 |
 | Swin | 2021 | 階層式，帶位移視窗。次二次方的成本是固定的。 |
-| DINOv2 | 2023 | 自監督（沒有標籤）。最好的通用視覺特徵（feature）。 |
+| DINOv2 | 2023 | 自監督（self-supervised，沒有標籤）。最好的通用視覺特徵（feature）。 |
 | ViT-22B | 2023 | 220 億參數；縮放規律適用。 |
 | SigLIP | 2023 | ViT 加語言配對，sigmoid 對比損失。 |
 | SAM 3 | 2025 | 分割任何東西；ViT-Large 加可用 prompt 的遮罩解碼器。 |
