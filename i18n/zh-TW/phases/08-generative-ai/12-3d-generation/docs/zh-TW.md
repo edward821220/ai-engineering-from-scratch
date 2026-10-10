@@ -43,7 +43,7 @@
 |------|------|------|------|
 | DreamFusion (2022) | 文字 | 經由 SDS（score distillation sampling）的 NeRF | 每個資產約 1 小時 |
 | Magic3D | 文字 | 網格 + 貼圖 | 約 40 分鐘 |
-| Shap-E (OpenAI, 2023) | 文字 | 隱式 3D | 約 1 分鐘 |
+| Shap-E (OpenAI, 2023) | 文字 | 隱式（implicit）3D | 約 1 分鐘 |
 | SJC / ProlificDreamer | 文字 | NeRF／網格 | 約 30 分鐘 |
 | LRM (Meta, 2023) | 影像 | triplane | 約 5 秒 |
 | InstantMesh (2024) | 影像 | 網格 | 約 10 秒 |
