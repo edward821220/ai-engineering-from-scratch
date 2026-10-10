@@ -10,7 +10,7 @@
 
 ## Learning Objectives｜學習目標
 
-- 使用 API 提供者與開源模型生成文字 embedding，並計算兩者之間的餘弦相似度
+- 使用 API 服務供應商與開源模型生成文字 embedding，並計算兩者之間的餘弦相似度（cosine similarity）
 - 解釋為何 embedding 能解決關鍵字搜尋無法應對的詞彙不匹配問題
 - 建構一套依據語意而非字面關鍵字精確比對來檢索文件的語意搜尋索引
 - 使用檢索基準測試（precision@k、recall）評估 embedding 品質，並為你的任務挑選合適的 embedding 模型
@@ -35,7 +35,7 @@ Embedding 是一個由浮點數構成的密集向量（dense vector），用以�
 
 ### Word2Vec 的重大突破
 
-2013 年，Tomas Mikolov 與 Google 的研究同仁發表了 Word2Vec。其核心洞見在於：訓練一個神經網路從上下文預測中心字詞（或由中心字詞預測上下文），該網路隱藏層的權重便會成為具語意資訊的向量表示的向量表示法。
+2013 年，Tomas Mikolov 與 Google 的研究同仁發表了 Word2Vec。其核心洞見在於：訓練一個神經網路從上下文預測中心字詞（或由中心字詞預測上下文），該網路隱藏層（hidden layer）的權重便會成為具語意資訊的向量表示法。
 
 其最著名的經典成果：
 
@@ -51,7 +51,7 @@ Word2Vec 產生的是 300 維的向量。每個字詞無論在何種語境中都
 
 word embedding 僅代表單一 token。正式環境系統則需要對整個句子、段落或完整文件建立 embedding。歷史上發展出四種主要方法：
 
-**平均法（Averaging）**：取句子中所有詞向量的平均值。計算成本極低、帶有資訊損失，但對簡短文字效果出奇不錯。致命缺點在於徹底丟失了詞序——「dog bites man」（狗咬人）與「man bites dog」（人咬狗）會得到完全相同的 embedding。
+**平均法（Averaging）**：取句子中所有詞向量的平均值。計算成本極低、帶有資訊損失，但對簡短文字效果出奇不錯。主要缺點是完全丟失了詞序——「dog bites man」（狗咬人）與「man bites dog」（人咬狗）會得到完全相同的 embedding。
 
 **CLS token**：Transformer 模型（BERT, 2018）輸出一個特殊的 [CLS] token embedding，用以代表整個輸入序列。雖優於簡單平均，但 [CLS] token 的訓練目標是預測下一句，而非衡量語意相似度。
 
@@ -81,7 +81,7 @@ graph LR
 
 當前市場已收斂至少數幾個適用於正式環境的熱門選項（MTEB 分數基準為 2026 年初，MTEB v2）：
 
-| 模型 | 提供者 | 維度 | MTEB | 脈絡長度 | 成本 / 1M tokens |
+| 模型 | 服務供應商 | 維度 | MTEB | 脈絡長度 | 成本 / 1M tokens |
 |-------|----------|-----------|------|---------|------------------|
 | Gemini Embedding 2 | Google | 3072（Matryoshka） | 67.7（檢索） | 8192 | $0.15 |
 | embed-v4 | Cohere | 1024（Matryoshka） | 65.2 | 128K | $0.12 |
@@ -92,7 +92,7 @@ graph LR
 | Qwen3-Embedding | 阿里巴巴 | 4096（Matryoshka） | 66.9 | 32K | 開源權重 |
 | Nomic-embed-v2 | Nomic | 768（Matryoshka） | 63.1 | 8192 | 開源權重 |
 
-MTEB（海量文字 Embedding 基準測試，Massive Text Embedding Benchmark）v2 涵蓋了跨檢索、分類、群集、重新排序與摘要的 100 多項評測任務。分數越高越好。至 2026 年，開源權重模型（Qwen3-Embedding、BGE-M3）在多數維度上已追平甚至超越封閉式代管模型。Gemini Embedding 2 在純檢索在該指標領先；Voyage/Cohere 在金融、法律與程式碼等特定垂直領域拔得頭籌。在正式導入前，務必先在你自己的真實查詢資料集上進行基準評測。
+MTEB（海量文字 Embedding 基準測試，Massive Text Embedding Benchmark）v2 涵蓋了跨檢索、分類、群集（clustering）、重新排序與摘要的 100 多項評測任務。分數越高越好。至 2026 年，開源權重模型（Qwen3-Embedding、BGE-M3）在多數維度上已追平甚至超越封閉式代管模型。Gemini Embedding 2 在純檢索在該指標領先；Voyage/Cohere 在金融、法律與程式碼等特定垂直領域拔得頭籌。在正式導入前，務必先在你自己的真實查詢資料集上進行基準評測。
 
 ### 相似度度量指標
 
@@ -104,7 +104,7 @@ MTEB（海量文字 Embedding 基準測試，Massive Text Embedding Benchmark）
 cosine_sim(a, b) = dot(a, b) / (||a|| * ||b||)
 ```
 
-**點積（Dot product）**：兩向量的原始內積。當向量已經過正規化（長度為 1 的單位向量）時，點積與餘弦相似度在數值上完全等價，且計算速度更快。OpenAI 的 embedding 皆已預先正規化，因此點積與餘弦相似度產生的排序結果完全相同。
+**點積（Dot product）**：兩向量的原始內積（inner product）。當向量已經過正規化（長度為 1 的單位向量）時，點積與餘弦相似度在數值上完全等價，且計算速度更快。OpenAI 的 embedding 皆已預先正規化，因此點積與餘弦相似度產生的排序結果完全相同。
 
 ```
 dot(a, b) = sum(a_i * b_i)
@@ -128,7 +128,7 @@ L2(a, b) = sqrt(sum((a_i - b_i)^2))
 
 暴力搜尋（Brute-force similarity search）是將查詢向量與儲存庫中的每一個向量逐一比對。在包含 100 萬個 1536 維向量的資料庫中，單次查詢就需要 15 億次乘加運算，延遲難以承受。
 
-向量資料庫透過近似最近鄰（Approximate Nearest Neighbor, ANN）演算法破解了這個瓶頸。當前目前最常用的演算法的演算法是 HNSW（分層導航小世界，Hierarchical Navigable Small World）：
+向量資料庫透過近似最近鄰（Approximate Nearest Neighbor, ANN）演算法破解了這個瓶頸。目前最常用的演算法是 HNSW（分層導航小世界，Hierarchical Navigable Small World）：
 
 1. 建立向量的多層次圖結構
 2. 頂層極為稀疏——在遙遠群集間建立長距離跳轉連接
@@ -136,7 +136,7 @@ L2(a, b) = sqrt(sum((a_i - b_i)^2))
 4. 搜尋由頂層切入，逐層向下搜尋並縮小範圍
 5. 以 O(log n) 的時間複雜度取代 O(n)，快速回傳近似 top-k 結果
 
-HNSW 犧牲了極微小的精度損失（召回率通常落在 95% 到 99%），換取了大幅提升速度。在 1000 萬個向量的規模下，暴力搜尋需要數秒，而 HNSW 僅需數毫秒。
+HNSW 犧牲了極微小的精度損失（召回率（recall）通常落在 95% 到 99%），換取了大幅提升速度。在 1000 萬個向量的規模下，暴力搜尋需要數秒，而 HNSW 僅需數毫秒。
 
 ```mermaid
 graph TD
@@ -160,7 +160,7 @@ graph TD
 | pgvector | Postgres 擴充套件 | 原本已重度依賴 Postgres | 1000 萬級 |
 | FAISS | 函式庫 | 行程內高效運算、學術研究 | 10 億以上 |
 
-### 分塊策略
+### 分塊（chunking）策略
 
 長篇文件無法作為單一向量直接建立 embedding。一份 50 頁的 PDF 涵蓋數十個子主題——其整體 embedding 會淪為所有主題的平庸平均，與任何具體細節都不足夠相似。你必須將文件切分為多個區塊（chunk），並為每個區塊分別建立 embedding。
 
@@ -170,7 +170,7 @@ graph TD
 
 **遞迴分塊（Recursive chunking）**：優先嘗試在最大邊界處切分（如章節標題）。若區塊依然過大，再嘗試段落邊界，接著是句子標點，最後才退回字元限制。這正是 LangChain 的 `RecursiveCharacterTextSplitter` 機制，極適合格式雜亂的混合文件。
 
-**語意分塊（Semantic chunking）**：先為每個句子生成 embedding，接著計算相鄰句子間的語意相似度。當相似度跌破相似度低於閾值時時，便另起新區塊。雖然成本高昂（需為每句話單獨呼叫 embedding），但能產出語意凝聚度最高的優質區塊。
+**語意分塊（Semantic chunking）**：先為每個句子生成 embedding，接著計算相鄰句子間的語意相似度。當相似度跌破閾值（threshold）時，便另起新區塊。雖然成本高昂（需為每句話單獨呼叫 embedding），但能產出語意凝聚度最高的優質區塊。
 
 | 策略 | 複雜度 | 品質 | 最佳場景 |
 |----------|-----------|---------|----------|
@@ -181,7 +181,7 @@ graph TD
 
 絕大多數系統的常見的折衷點：256 到 512 個 token 的區塊大小，搭配 50 個 token 的重疊。
 
-### 雙編碼器 vs 交叉編碼器
+### 雙編碼器（bi-encoder） vs 交叉編碼器（cross-encoder）
 
 雙編碼器（Bi-encoder）將查詢與文件各自獨立編碼為向量，隨後僅比對向量。速度極快——查詢只需編碼一次，即可與預先算好的長篇文件向量庫快速比對。這是大規模檢索的主要選擇。
 
@@ -213,7 +213,7 @@ OpenAI 的 text-embedding-3-small 與 text-embedding-3-large 透過 `dimensions`
 
 二值量化（Binary quantization）將每個浮點數壓縮為單個位元：正數轉為 1，負數轉為 0。儲存容量瞬間從 6,144 位元組降至至 192 位元組——達成高達 32 倍的驚人壓縮。相似度計算改採漢明距離（Hamming distance，計算相異位元數），現代 CPU 可以在單一指令週期內完成該計算。
 
-其對檢索召回率的衝擊通常約在 5% 到 10% 之間。業界常見的標準架構：先用二值量化在數百萬向量向量庫中進行超高速初篩，篩選出前 1,000 個候選，再用完整浮點精度的向量進行精準重評分。這讓你能在享有 32 倍儲存空間節省的同時，保有 95% 以上的原生精度。
+其對檢索召回率的衝擊通常約在 5% 到 10% 之間。業界常見的標準架構：先用二值量化在數百萬個向量中進行超高速初篩，篩選出前 1,000 個候選，再用完整浮點精度的向量進行精準重評分。這讓你能在享有 32 倍儲存空間節省的同時，保有 95% 以上的原生精度。
 
 ```figure
 cosine-similarity
@@ -319,7 +319,7 @@ def euclidean_distance(a, b):
     return float(np.linalg.norm(a - b))
 ```
 
-### 步驟 4：暴力搜尋向量索引
+### 步驟 4：暴力搜尋向量索引（vector index）
 
 ```python
 class VectorIndex:
@@ -490,7 +490,7 @@ embeddings = model.encode(["semantic search query", "another document"])
 |------|----------------|----------------------|
 | Embedding | 「文字轉數字」 | 一個幾何鄰近性精確編碼語意相似度的密集向量 |
 | Word2Vec | 「始祖級 embedding」 | 2013 年透過預測上下文學習詞向量的模型；首次證明向量運算能編碼抽象語意 |
-| 餘弦相似度（Cosine similarity） | 「兩向量有多相似」 | 兩向量夾角的餘弦值；1 = 方向完全相同，0 = 正交無關，-1 = 方向完全相反 |
+| 餘弦相似度（Cosine similarity） | 「兩向量有多相似」 | 兩向量夾角的餘弦值；1 = 方向完全相同，0 = 正交（orthogonal）無關，-1 = 方向完全相反 |
 | HNSW | 「高速向量搜尋」 | 分層導航小世界圖結構——透過多層圖拓撲實現 O(log n) 的近似最近鄰搜尋 |
 | 雙編碼器（Bi-encoder） | 「各自編碼，高速比對」 | 將查詢與文件分別獨立編碼為向量；支援預先計算與超大規模高速檢索 |
 | 交叉編碼器（Cross-encoder） | 「慢速但極精確的重排器」 | 將查詢—文件對合併輸入整個模型進行聯合推論；精度更高，但無法預先計算向量 |
