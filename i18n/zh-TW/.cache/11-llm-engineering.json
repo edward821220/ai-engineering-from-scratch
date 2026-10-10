@@ -5,5 +5,6 @@
   "phases/11-llm-engineering/04-embeddings/docs/en.md": "9c3115093f152ce871351f278f9e08a2322849bfaa9af54bb5339b5874f2b401",
   "phases/11-llm-engineering/05-context-engineering/docs/en.md": "778ebedaa18baad1af5409b500b174f1809d215fcc20a48960e8ad6324eb50a6",
   "phases/11-llm-engineering/06-rag/docs/en.md": "03116a37ce0e9ea3f59d086a0c2cf40c621f16fd1b23351e74042d6329096419",
-  "phases/11-llm-engineering/07-advanced-rag/docs/en.md": "e0f7bf9bf7a1fa40baf3017291881cf3eb995b93696db33178c424566bbfe801"
+  "phases/11-llm-engineering/07-advanced-rag/docs/en.md": "e0f7bf9bf7a1fa40baf3017291881cf3eb995b93696db33178c424566bbfe801",
+  "phases/11-llm-engineering/08-fine-tuning-lora/docs/en.md": "6e6752387e06906ae70b2300d8bf5f2457b2a4f25c85895b10c724db9bee083a"
 }
