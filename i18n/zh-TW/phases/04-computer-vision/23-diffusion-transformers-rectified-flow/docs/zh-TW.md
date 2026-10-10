@@ -1,6 +1,6 @@
 # 擴散 transformer（Diffusion Transformer）與整流流（rectified flow）
 
-> U-Net 不是擴散的秘訣。把它換成 transformer，把雜訊排程換成一條直線的流，你就有了 SD3、FLUX，以及 2026 年每一個文字到影像的模型。
+> U-Net 不是擴散的秘訣。把它換成 transformer，把雜訊排程（noise schedule）換成一條直線的流，你就有了 SD3、FLUX，以及 2026 年每一個文字到影像的模型。
 
 **Type:** Learn + Build
 **Languages:** Python
@@ -63,7 +63,7 @@ DDPM 把前向過程定義成雜訊逐漸增強的 SDE，`x_t` 被破壞得愈�
 x_t = (1 - t) * x_0 + t * epsilon,     t in [0, 1]
 ```
 
-訓練網路去預測速度 `v_theta(x_t, t) = epsilon - x_0`。那是沿直線、從乾淨資料走向雜訊的前向方向（`dx_t/dt`）。取樣時把這個速度倒著積分，從雜訊走向資料。得出的 ODE 更接近直線，所以取樣需要的積分步數少很多。
+訓練網路去預測速度（velocity） `v_theta(x_t, t) = epsilon - x_0`。那是沿直線、從乾淨資料走向雜訊的前向方向（`dx_t/dt`）。取樣時把這個速度倒著積分，從雜訊走向資料。得出的 ODE 更接近直線，所以取樣需要的積分步數少很多。
 
 SD3 把這叫做 **Rectified Flow Matching**。FLUX、Z-Image，以及大多數 2026 年的模型用同一個目標。典型推論：20 到 30 步 Euler（確定性），對上舊 DDPM 體制的 50 步以上 DDIM。蒸餾、turbo、schnell、LCM 這些變體把它收到 1 到 4 步。
 
@@ -86,7 +86,7 @@ SD3 和 FLUX 對 prompt 的推理比 SD1.5 好那麼多，文字編碼器是很�
 
 ### 無分類器引導仍然成立
 
-整流流改的是取樣器，不是條件。無分類器引導（訓練時以 10% 的機率丟掉文字，推論時把有條件和無條件的預測混在一起）在整流流上一樣。大多數 2026 年的模型用引導尺度 3.5 到 5。比 SD1.5 的 7.5 低，因為整流流模型預設就預設就更能遵循 prompt。
+整流流改的是取樣器，不是條件。無分類器引導（訓練時以 10% 的機率丟掉文字，推論時把有條件和無條件的預測混在一起）在整流流上一樣。大多數 2026 年的模型用引導尺度 3.5 到 5。比 SD1.5 的 7.5 低，因為整流流模型預設就更能遵循 prompt。
 
 ### Consistency、Turbo、Schnell、LCM
 
@@ -112,7 +112,7 @@ SD3 和 FLUX 對 prompt 的推理比 SD1.5 好那麼多，文字編碼器是很�
 | Hunyuan-Image-3.0 | 約 800 億 | DiT | 研究用 |
 | SD4 Turbo | 30 億 | DiT 加蒸餾 | SAI 商業 |
 
-2026 年開放原始碼的預設是 FLUX.1-schnell。效率領先的是 Z-Image。目前品質表現領先的是 FLUX.2 和 SD4 FLUX.2 和 SD4。
+2026 年開放原始碼的預設是 FLUX.1-schnell。效率領先的是 Z-Image。目前品質表現領先的是 FLUX.2 和 SD4。
 
 ### 為什麼這次轉向要緊
 
@@ -282,7 +282,7 @@ def synthetic_blobs(num=200, size=16, seed=0):
     return torch.from_numpy(out)
 ```
 
-用整流流在這上面訓練一個 `TinyDiT`。500 步之後，抽出來的輸出應該像淡淡的色塊。
+用整流流在這上面訓練一個 `TinyDiT`。500 步之後，取樣出來的輸出應該像淡淡的色塊。
 
 ## Use It｜實際應用
 
@@ -327,9 +327,9 @@ out = pipe(prompt, guidance_scale=3.5, num_inference_steps=28).images[0]
 
 ## Exercises｜練習
 
-1. **（簡單）** 在上面的合成色塊資料集（dataset）上，把 TinyDiT 訓練 500 步。比較 10、20、50 步 Euler 抽出的樣本。
+1. **（簡單）** 在上面的合成色塊資料集（dataset）上，把 TinyDiT 訓練 500 步。比較 10、20、50 步 Euler 取樣得到的樣本。
 2. **（中等）** 加上文字條件：把一個學來的類別 embedding 接到時間 embedding 上（依顏色分 10 個色塊「類別」）。用類別 0、5、9 取樣，確認顏色對得上。
-3. **（困難）** 算 Fréchet 距離（FID 的代理）。同一大小的網路、同一份資料、同樣的步數，比較整流流版本和 DDPM 版本抽出的樣本。回報哪一個收斂更快。
+3. **（困難）** 算 Fréchet 距離（FID 的代理）。同一大小的網路、同一份資料、同樣的步數，比較整流流版本和 DDPM 版本取樣得到的樣本。回報哪一個收斂更快。
 
 ## Key Terms｜關鍵術語
 
