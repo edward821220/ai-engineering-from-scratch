@@ -29,7 +29,7 @@
 
 **LLM 當評審。** 用一個 LLM 換掉靜態指標：給它評分準則，它為輸出打分。給定 `(query, context, answer)`，prompt 評審 LLM：「在忠實度上打 0 到 1 分。」回傳分數。
 
-為什麼行得通：LLM 以成本的一小部分逼近人的判斷。GPT-4o-mini `$0.003 per scored case enables 1000-sample regression eval runs for under $`5，也就是每個案例約 0.003 美元、1000 個樣本不到 5 美元。
+為什麼行得通：LLM 以成本的一小部分逼近人的判斷。GPT-4o-mini $0.003 per scored case enables 1000-sample regression eval runs for under $5，也就是每個案例約 0.003 美元、1000 個樣本不到 5 美元。
 
 為什麼它會悄悄失敗：
 
