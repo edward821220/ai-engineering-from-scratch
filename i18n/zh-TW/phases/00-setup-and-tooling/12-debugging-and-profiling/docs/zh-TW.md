@@ -18,7 +18,7 @@
 
 AI 程式出錯的方式和一般程式不同。網頁應用程式（web app）壞掉時會丟出堆疊追蹤（stack trace）；設定錯誤的訓練迴圈會跑上 8 小時、燒掉 200 美元的 GPU 時間，然後產出一個對任何輸入都只預測平均數的模型。程式從頭到尾沒有報錯——問題可能出在張量放錯裝置、一個忘記寫的 `.detach()`，或是標籤洩漏進了特徵裡。
 
-你需要能在這些在這些靜默失敗耗掉時間和運算資源前就將它們找出來的除錯工具（debugging tools）。
+你需要能在這些靜默失敗耗掉時間和運算資源前就將它們找出來的除錯工具（debugging tools）。
 
 ## The Concept｜核心概念
 
@@ -54,7 +54,7 @@ def debug_print(name, tensor):
 
 在每個可疑的操作後面呼叫它。找到 bug 後就把 print 移除。就是這麼簡單。
 
-### 第 2 部分：Python 除錯器（debugger）（pdb 與 breakpoint）
+### 第 2 部分：Python 除錯器（debugger，pdb 與 breakpoint）
 
 內建除錯器（debugger）在 AI 工作中被低估了。把 `breakpoint()` 放進訓練迴圈，就能互動式檢查張量。
 
@@ -376,7 +376,7 @@ tensorboard --logdir=runs
 2. **前 10 步**：對 loss、輸出和梯度用 `debug_print`，確認沒有 NaN、數值都在合理範圍內。
 3. **訓練中**：記錄 loss、學習率和梯度範數，並用 TensorBoard 視覺化。
 4. **出錯時**：在故障點放 `breakpoint()`，互動式檢查張量。
-5. **效能問題**：分別測量資料載入、前向傳遞和反向傳遞的時間；快 OOM 時做記憶體分析（memory profiling）。
+5. **效能問題**：分別測量資料載入、前向傳遞（forward pass）和反向傳遞（backward pass）的時間；快 OOM 時做記憶體分析（memory profiling）。
 
 ## Ship It｜交付成果
 
