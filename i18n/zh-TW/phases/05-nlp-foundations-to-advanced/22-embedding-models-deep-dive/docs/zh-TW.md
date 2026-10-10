@@ -37,7 +37,7 @@
 
 ### MTEB 排行榜只說了一部分
 
-大規模文本 embedding 評測——推出時（2022）8 類任務共 56 個，MTEB v2 擴到 100 個以上。2026 年初，Gemini Embedding 2 在檢索居前（MTEB-R 67.71）。Cohere embed-v4 在一般任務領先（MTEB 65.2）。BGE-M3 在開放權重多語領先（63.0）。排行榜必要，但不充分——永遠在你的領域上評測。
+大規模文本 embedding 評測（Massive Text Embedding Benchmark，MTEB）——推出時（2022）8 類任務共 56 個，MTEB v2 擴到 100 個以上。2026 年初，Gemini Embedding 2 在檢索居前（MTEB-R 67.71）。Cohere embed-v4 在一般任務領先（MTEB 65.2）。BGE-M3 在開放權重多語領先（63.0）。排行榜必要，但不充分——永遠在你的領域上評測。
 
 ### 三層模式
 
