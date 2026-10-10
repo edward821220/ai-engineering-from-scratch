@@ -1,6 +1,6 @@
 # 關鍵點偵測（keypoint detection）與姿態估計（pose estimation）
 
-> 一個姿態是一組有順序的關鍵點（keypoint）。關鍵點偵測器是一個熱圖（heatmap）迴歸器。其餘都是資料整理。
+> 一個姿態是一組有順序的關鍵點（keypoint）。關鍵點偵測器是一個熱圖迴歸器（heatmap regressor）。其餘都是資料整理。
 
 **Type:** Build
 **Languages:** Python
@@ -9,7 +9,7 @@
 
 ## Learning Objectives｜學習目標
 
-- 分辨由上而下和由下而上的姿態估計，並說出各自什麼時候用
+- 分辨由上而下（top-down）和由下而上（bottom-up）的姿態估計，並說出各自什麼時候用
 - 用每個關鍵點一個高斯（Gaussian）的目標，迴歸 K 個關鍵點的熱圖，並在推論（inference）時取出座標
 - 說明部位親和場（Part Affinity Fields，PAF），以及由下而上的管線（pipeline）怎麼把關鍵點配成實例
 - 用 MediaPipe Pose 或 MMPose 做正式環境的關鍵點估計，並看懂它們的輸出格式
@@ -58,7 +58,7 @@ target[k, y, x] = exp(-((x - cx_k)^2 + (y - cy_k)^2) / (2 sigma^2))
 
 熱圖比直接迴歸好的原因：網路的空間結構，也就是卷積特徵圖（feature map），和空間輸出自然對齊。高斯目標也有正則化（regularise）的效果。定位誤差小，損失（loss）就小，不是零。
 
-### 次像素定位
+### 次像素定位（sub-pixel localization）
 
 argmax 給的是整數座標。要次像素精度，在 argmax 和鄰居上擬合一條拋物線，或用這個常見的偏移：`(dx, dy) = 0.25 * (heatmap[y, x+1] - heatmap[y, x-1], ...)` 那個方向。
 
@@ -73,11 +73,11 @@ For each connection (limb):
   Higher integral = stronger match
 ```
 
-方法簡潔，而且可擴展到任意人數到任意人數，不用依人裁切。
+方法簡潔，而且可擴展到任意人數，不用依人裁切。
 
 ### COCO 關鍵點
 
-標準的身體姿態資料集（dataset）：每人 17 個關鍵點。指標（metric）是 PCK（正確關鍵點百分比）和 OKS（物件關鍵點相似度）。OKS 是關鍵點版的 IoU，COCO 的 mAP@OKS 報的就是它。
+標準的身體姿態資料集（dataset）：每人 17 個關鍵點。指標（metric）是正確關鍵點百分比（Percentage of Correct Keypoints，PCK）和物件關鍵點相似度（Object Keypoint Similarity，OKS）。OKS 是關鍵點版的交並比（IoU），COCO 的 mAP@OKS 報的就是它。
 
 ### 2D 對 3D
 
