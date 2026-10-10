@@ -10,14 +10,14 @@
 ## The Problem｜問題
 
 你的 RAG 系統回答：「June 29th, 2007.」。
-黃金參考是：「June 29, 2007.」。
+標準參考答案（gold reference）是：「June 29, 2007.」。
 完全相符（Exact Match）是 0。F1 大約 75%。人會打 100%。
 
 再乘上 1 萬個測試案例。每次檢索器、切塊、prompt 或模型一改，再乘一次。你需要一個懂意思、大規模跑起來便宜、不會把退步說成沒事、而且把對的失敗模式露出來的評估器。
 
 2026 年有三個框架在處理這件事。
 
-- **RAGAS。** Retrieval-Augmented Generation ASsessment。四個 RAG 指標：忠實度（faithfulness）、答案相關性、脈絡精確率（precision）、脈絡召回率（recall）。後端是 NLI 加 LLM 評審。有研究支持，且輕量。
+- **RAGAS。** Retrieval-Augmented Generation ASsessment。四個 RAG 指標：忠實度（faithfulness）、答案相關性（answer relevance）、脈絡精確率（context precision）、脈絡召回率（context recall）。後端是 NLI 加 LLM 評審。有研究支持，且輕量。
 - **DeepEval。** 給 LLM 用的 Pytest。G-Eval、任務完成、幻覺（hallucination）、偏差（bias）指標。原生就進 CI/CD。
 - **G-Eval。** 一個方法（也是 DeepEval 的一個指標）：LLM-as-judge（LLM 當評審），帶逐步推理（chain-of-thought）、自訂準則、0 到 1 的分數。
 
@@ -29,7 +29,7 @@
 
 **LLM-as-judge（LLM 當評審）。** 用一個 LLM 換掉靜態指標：給它評分準則，它為輸出打分。給定 `(query, context, answer)`，prompt 評審 LLM：「在忠實度上打 0 到 1 分。」回傳分數。
 
-為什麼行得通：LLM 以成本的一小部分逼近人的判斷。GPT-4o-mini $0.003 per scored case enables 1000-sample regression eval runs for under $5，也就是每個案例約 0.003 美元、1000 個樣本不到 5 美元。
+為什麼行得通：LLM 以成本的一小部分逼近人的判斷。GPT-4o-mini 每個已評分案例約 0.003 美元，1000 個樣本的回歸評測不到 5 美元。
 
 為什麼它會悄悄失敗：
 
@@ -42,13 +42,13 @@
 | 指標 | 問題 | 後端 |
 |--------|----------|---------|
 | 忠實度 | 答案裡的每個主張都來自檢索到的脈絡嗎？ | 基於 NLI 的蘊涵（entailment） |
-| 答案相關性 | 答案有沒有回應問題？ | 從答案生成假設問題，再和真問題比 |
-| 脈絡精確率 | 檢索到的區塊裡，相關的佔多少？ | LLM 評審 |
-| 脈絡召回率 | 檢索有沒有把需要的都找回來？ | 對上黃金答案的 LLM 評審 |
+| 答案相關性（answer relevance） | 答案有沒有回應問題？ | 從答案生成假設問題，再和真問題比 |
+| 脈絡精確率（context precision） | 檢索到的區塊裡，相關的佔多少？ | LLM 評審 |
+| 脈絡召回率（context recall） | 檢索有沒有把需要的都找回來？ | 對照標準答案的 LLM 評審 |
 
 **G-Eval。** 定義一個自訂準則：「答案有沒有引用正確的來源？」框架自動展開成逐步推理的評估步驟，再打 0 到 1 分。適合 RAGAS 沒蓋到的、領域專用的品質維度（dimension）。
 
-**校準。** 在對上人類標籤（label）有相關之前，不要信原始的評審分數。跑 100 個手標的例子。先確認評審分數與人工標註結果的相關性；繪製評審與人工分數的比較圖。算 Spearman rho。若 rho 低於 0.7，評審的評分準則需要再修。
+**校準。** 在評審分數與人工標籤（label）有相關性之前，不要信原始的評審分數。跑 100 個手標的例子。先確認評審分數與人工標註結果的相關性；繪製評審與人工分數的比較圖。算 Spearman rho。若 rho 低於 0.7，評審的評分準則需要再修。
 
 ```figure
 n5-judge-gauge
@@ -220,7 +220,7 @@ Refuse to rely on a judge untested against ≥50 human-labeled examples. Refuse 
 
 1. **簡單。** 在 10 個已知有幻覺的 RAG 例子上用 RAGAS。確認忠實度指標每個都抓到。
 2. **中等。** 為 50 個問答的答案手標 0 到 1 的正確性。用 G-Eval 打分。量評審和人之間的 Spearman rho。
-3. **困難。** 用 DeepEval 做 pytest 的 CI 閘門。故意讓檢索器退步。確認閘門失敗。用最低 10% 的閾值檢查，加上最底下分位數的警報。
+3. **困難。** 用 DeepEval 做 pytest 的 CI 閘門。故意讓檢索器退步。確認閘門失敗。用最低 10% 的閾值檢查，加上最低分位數的警報。
 
 ## Key Terms｜關鍵術語
 
@@ -230,7 +230,7 @@ Refuse to rely on a judge untested against ≥50 human-labeled examples. Refuse 
 | RAGAS | RAG 的指標函式庫 | 開放原始碼的評估框架，有 4 個不需參考的 RAG 指標。 |
 | 忠實度 | 答案有沒有依據？ | 答案主張裡，被檢索脈絡蘊涵的比例。 |
 | 脈絡精確率 | 檢索到的區塊相關嗎？ | 前 K 個區塊裡，真正要緊的比例。 |
-| 脈絡召回率 | 檢索找齊了嗎？ | 黃金答案的主張裡，被檢索區塊支持的比例。 |
+| 脈絡召回率 | 檢索找齊了嗎？ | 標準答案的主張裡，被檢索區塊支持的比例。 |
 | G-Eval | 自訂的 LLM 評審 | 評分準則加逐步推理的評估步驟，再加 0 到 1 的分數。 |
 | 校準 | 信，但要查 | 評審分數和人類分數的 Spearman 相關。 |
 
