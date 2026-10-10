@@ -16,7 +16,7 @@
 
 ## The Problem｜問題
 
-你讀一篇傅立葉轉換（Fourier transform）的論文，裡面到處都是 `i`。你看 transformer 的位置編碼（positional encoding），會看到不同頻率下的 `sin` 和 `cos`；它們是複指數函數的實部（real part）和虛部（imaginary part）。你讀量子計算（quantum computing）相關內容，發現所有東西都以複數向量空間（complex vector space）（complex vector spaces）表示。
+你讀一篇傅立葉轉換（Fourier transform）的論文，裡面到處都是 `i`。你看 transformer 的位置編碼（positional encoding），會看到不同頻率下的 `sin` 和 `cos`；它們是複指數函數的實部（real part）和虛部（imaginary part）。你讀量子計算（quantum computing）相關內容，發現所有東西都以複數向量空間（complex vector spaces）表示。
 
 複數（complex numbers）看起來很抽象。以 -1 的平方根為基礎建立數系，感覺像是數學上的取巧。但它並非取巧，而是描述旋轉和振盪的自然語言。任何會旋轉、振動或振盪的現象，都適合用複數處理。
 
@@ -382,7 +382,7 @@ def roots_of_unity(N):
 - 每個單位根的模都恰好是 1。
 - 所有 N 個單位根的總和為零（它們會因對稱性而互相抵消）。
 
-這些性質讓 DFT 可逆。單位根構成頻域（frequency domain）的一組正交基底。
+這些性質讓 DFT 可逆。單位根構成頻域（frequency domain）的一組正交基底（orthogonal basis）。
 
 ## Use It｜實際應用
 
