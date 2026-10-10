@@ -18,7 +18,7 @@
 
 你知道怎麼在 PyTorch 裡建神經網路。你定義一個 `nn.Module`，呼叫 `.backward()`，再讓最佳化器（optimizer）走一步。它能動。好幾百萬人在用。
 
-但 PyTorch 的骨子裡有一個限制：它在 Python 裡立即執行（eager execution）地、一次一個地追蹤運算。每一次 `tensor + tensor` 都是一次獨立的GPU kernel 啟動。每一步訓練都把同一段 Python 重新解讀一次。這在你要跨 2,048 個 TPU 訓練一個 5400 億參數（parameter）的模型（model）之前都還好。到了那個規模，額外開銷會把你拖垮。
+但 PyTorch 的骨子裡有一個限制：它以立即執行（eager execution）的方式，在 Python 裡一次一個地追蹤運算。每一次 `tensor + tensor` 都是一次獨立的 GPU kernel 啟動。每一步訓練都把同一段 Python 重新解讀一次。這在你要跨 2,048 個 TPU 訓練一個 5400 億參數（parameter）的模型（model）之前都還好。到了那個規模，額外開銷會把你拖垮。
 
 Google DeepMind 用 JAX 訓練 Gemini。Anthropic 用 JAX 訓練 Claude。這不是小規模的運算。它們是地球上最大規模的神經網路訓練。他們選 JAX，是因為它把訓練迴圈當成一個可以編譯的程式，而不是一連串 Python 呼叫。
 
@@ -215,7 +215,7 @@ optimizer = optax.chain(
 
 | 因素 | JAX | PyTorch |
 |--------|-----|---------|
-| TPU 支援 | 一等支援，Google 兩邊都是自己做的 | 社群維護，torch_xla |
+| TPU 支援 | 官方一級支援，Google 兩邊都是自己做的 | 社群維護，torch_xla |
 | GPU 支援 | 好，經由 XLA 用 CUDA | 最好，原生 CUDA |
 | 除錯 | 難，追蹤加編譯 | 容易，立即執行，一行一行看 |
 | 生態系 | 偏研究，Flax、Equinox | 非常大，HuggingFace、torchvision 等 |
@@ -489,7 +489,7 @@ restored = checkpointer.restore('/tmp/model')
 |------|----------------|----------------------|
 | XLA | 「讓 JAX 變快的那個東西」 | Accelerated Linear Algebra。一個編譯器，把運算融合，並從計算圖產生最佳化過的 GPU/TPU 核心 |
 | JIT | 「即時編譯」 | JAX 在第一次呼叫時追蹤函式、編譯成 XLA，之後的呼叫跑編譯好的版本 |
-| 純函式 | 「沒有副作用」 | 輸出只取決於輸入的函式。沒有全域狀態，沒有就地修改，沒有未明示 key 的隨機 |
+| 純函式 | 「沒有副作用」 | 輸出只取決於輸入的函式。沒有全域狀態，沒有就地修改，沒有明確的 key 就不產生隨機數 |
 | vmap | 「自動分批」 | 把處理一個例子的函式，變成處理一個批次的函式，不用重寫 |
 | pmap | 「自動平行化」 | 把函式複製到多個裝置，並把輸入批次切開 |
 | pytree | 「巢狀的陣列 dict」 | 任何由清單、tuple、dict 和陣列組成的巢狀結構，JAX 可以走訪並變換 |
