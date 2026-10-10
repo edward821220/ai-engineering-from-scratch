@@ -149,8 +149,8 @@ class TranslationDocumentTest(unittest.TestCase):
         self.assert_has_finding(check_document(SOURCE, altered), "figure")
 
     def test_fixed_heading_requires_original_english_prefix_and_chinese_label(self) -> None:
-        valid = TRANSLATION.replace("## Build It｜動手實作", "## Build It｜實作")
-        self.assertEqual([], check_document(SOURCE, valid))
+        wrong_label = TRANSLATION.replace("## Build It｜動手實作", "## Build It｜實作")
+        self.assert_has_finding(check_document(SOURCE, wrong_label), "heading")
         invalid = TRANSLATION.replace("## Build It｜動手實作", "## 動手實作")
         self.assert_has_finding(check_document(SOURCE, invalid), "heading")
         empty = TRANSLATION.replace("## Build It｜動手實作", "## Build It｜")
