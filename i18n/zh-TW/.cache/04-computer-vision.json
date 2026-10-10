@@ -19,5 +19,6 @@
   "phases/04-computer-vision/18-open-vocab-clip/docs/en.md": "7c62736dc19a39acdbec6499254e943c83a8c14023a1ed0979462fc8a3fbebe1",
   "phases/04-computer-vision/19-ocr-document-understanding/docs/en.md": "7d3780797a294b83dc498521397a2dba8c180ef07541faaa5092d6ad655e714e",
   "phases/04-computer-vision/20-image-retrieval-metric/docs/en.md": "242ab4be9b9dc567f743984958434792bb3642856d2d776d079d27b6bc1060e5",
-  "phases/04-computer-vision/21-keypoint-pose/docs/en.md": "88644bb7be201d54db0db32f6923a932673219bc5bef4664afa604be5c8a663d"
+  "phases/04-computer-vision/21-keypoint-pose/docs/en.md": "88644bb7be201d54db0db32f6923a932673219bc5bef4664afa604be5c8a663d",
+  "phases/04-computer-vision/22-3d-gaussian-splatting/docs/en.md": "0ede4133b98620602cbe40bc4ff92f43246dbe70e7575466b38207c470c0d55a"
 }
