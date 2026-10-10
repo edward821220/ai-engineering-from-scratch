@@ -132,7 +132,7 @@ def preprocess(text, pos_tagger=None):
     return {"tokens": tokens, "stems": stems, "lemmas": lemmas}
 ```
 
-缺的那一塊是詞性標註器。第 5 階段第 07 課（詞性標記）會做一個。現在先全部預設成 `NOUN`，並承認這個限制。
+缺的那一塊是詞性標註器（POS tagger）。第 5 階段第 07 課（詞性標記）會做一個。現在先全部預設成 `NOUN`，並承認這個限制。
 
 ## Use It｜實際應用
 
@@ -247,7 +247,7 @@ Refuse to recommend stemming for user-visible text. Refuse to recommend lemmatiz
 | token | 一個詞 | 模型吃進去的單位。可以是詞、子詞（subword）、字元或位元組。 |
 | 詞幹 | 一個詞的根 | 用規則剝掉詞尾的結果。不一定是真的詞。 |
 | 詞條 | 字典形式 | 你會去查的那個形式。要算對，需要文法脈絡。 |
-| 詞性標記 | 詞類 | NOUN、VERB、ADJ 這類類別。要準確做詞形還原就需要它。 |
+| 詞性標記 | 詞類 | NOUN、VERB、ADJ 這類標記。要準確做詞形還原就需要它。 |
 | 構詞 | 詞形規則 | 詞怎麼因時態、數量、格而變形。詞形還原靠它。 |
 
 ## Further Reading｜延伸閱讀
