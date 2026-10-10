@@ -100,7 +100,7 @@ graph LR
     mul --> |"grad"| w
 ```
 
-和你的框架關鍵的差別是：PyTorch 用的是以運算記錄帶為基礎的自動微分。前向傳遞時，每個運算都附加到一條「運算記錄帶」上。呼叫 `.backward()` 會把運算記錄帶倒著重播。
+和你的框架關鍵的差別是：PyTorch 用的是以運算記錄帶（tape）為基礎的自動微分。前向傳遞時，每個運算都附加到一條「運算記錄帶」上。呼叫 `.backward()` 會把運算記錄帶倒著重播。
 
 ```python
 x = torch.randn(3, requires_grad=True)
