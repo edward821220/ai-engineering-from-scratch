@@ -8,5 +8,6 @@
   "phases/11-llm-engineering/07-advanced-rag/docs/en.md": "e0f7bf9bf7a1fa40baf3017291881cf3eb995b93696db33178c424566bbfe801",
   "phases/11-llm-engineering/08-fine-tuning-lora/docs/en.md": "6e6752387e06906ae70b2300d8bf5f2457b2a4f25c85895b10c724db9bee083a",
   "phases/11-llm-engineering/09-function-calling/docs/en.md": "30695ec65c0ada92bac742cb5a287603a340c26ed7b1674767d886f54f591b29",
-  "phases/11-llm-engineering/10-evaluation/docs/en.md": "6d034f8ea8714a1effae7a38bb3078d65d54389eacb1ea3336b273dac57980f1"
+  "phases/11-llm-engineering/10-evaluation/docs/en.md": "6d034f8ea8714a1effae7a38bb3078d65d54389eacb1ea3336b273dac57980f1",
+  "phases/11-llm-engineering/11-caching-cost/docs/en.md": "bec924754c74950f7a7f6e975846b477cb63cc8aec4e8942cffdb4bbbd076bd3"
 }
