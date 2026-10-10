@@ -23,7 +23,7 @@
 
 **抽取式。** 把文章當成圖：節點是句子，邊是相似度。在圖上跑 PageRank（或類似的東西），依句子和其餘一切有多連通來打分。分數最高的句子就是摘要。標準實作是 **TextRank**（Mihalcea 和 Tarau，2004）。
 
-**抽象式。** 在文件－摘要配對上 fine-tune 一個 transformer 編碼器－解碼器（encoder-decoder）（BART、T5、Pegasus）。推論（inference）時，模型讀文件，經由交叉注意力（cross-attention）一個 token 一個 token 生成摘要。Pegasus 特別用空句預訓練目標，所以不用太多 fine-tune 就很會做摘要。
+**抽象式。** 在文件－摘要配對上 fine-tune 一個 transformer 編碼器－解碼器（encoder-decoder）（BART、T5、Pegasus）。推論（inference）時，模型讀文件，經由交叉注意力（cross-attention）一個 token 一個 token 生成摘要。Pegasus 特別用缺句生成預訓練目標（gap-sentence generation objective），所以不用太多 fine-tune 就很會做摘要。
 
 用 **ROUGE**（Recall-Oriented Understudy for Gisting Evaluation）評估。ROUGE-1 和 ROUGE-2 給一元和二元 n-gram 的重疊打分。ROUGE-L 給最長共同子序列打分。越高越好，但 40 的 ROUGE-L 是「好」，50 是「非常出色」。每篇論文三個都報。用 `rouge-score` 套件。
 
@@ -204,6 +204,6 @@ Refuse abstractive summarization for medical, legal, financial, or regulated con
 
 - [Mihalcea and Tarau (2004). TextRank: Bringing Order into Texts](https://aclanthology.org/W04-3252/) ——抽取式的標準論文。
 - [Lewis et al. (2019). BART: Denoising Sequence-to-Sequence Pre-training](https://arxiv.org/abs/1910.13461) ——BART 論文。
-- [Zhang et al. (2019). PEGASUS: Pre-training with Extracted Gap-sentences](https://arxiv.org/abs/1912.08777) ——Pegasus 和空句目標。
+- [Zhang et al. (2019). PEGASUS: Pre-training with Extracted Gap-sentences](https://arxiv.org/abs/1912.08777) ——Pegasus 和缺句生成目標。
 - [Lin (2004). ROUGE: A Package for Automatic Evaluation of Summaries](https://aclanthology.org/W04-1013/) ——ROUGE 論文。
 - [Maynez et al. (2020). On Faithfulness and Factuality in Abstractive Summarization](https://arxiv.org/abs/2005.00661) ——把事實性問題攤開的那篇論文。

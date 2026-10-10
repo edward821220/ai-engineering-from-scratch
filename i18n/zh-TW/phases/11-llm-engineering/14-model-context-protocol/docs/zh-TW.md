@@ -10,7 +10,7 @@
 ## Learning Objectives｜學習目標
 
 - 辨析 MCP 宿主（Host）、用戶端（Client）、伺服器（Server）、傳輸層（Transport）與伺服器原語（Server Primitives）的職責分工
-- 建構符合 MCP 2026-07-28 規範所需詮釋資料的標準 JSON-RPC 請求
+- 建構符合 MCP 2026-07-28 規範所需中繼資料（metadata）的標準 JSON-RPC 請求
 - 使用 `server/discover` 端點探測支援版本、伺服器識別資訊與能力宣告
 - 從工具、資源與 Prompt 回傳具備型別化且相容快取機制的執行結果
 - 闡述現代無狀態 MCP 如何與早期依賴交握機制的伺服器實現雙向相容互通
@@ -22,7 +22,7 @@
 
 MCP 大幅收斂了龐雜的整合矩陣。伺服器對外發布標準的 JSON-RPC 介面；任何相容的用戶端皆能探索該介面、將其呈現給模型或終端使用者、執行呼叫並解析回傳結果，完全無需為個別伺服器撰寫特定廠商的專屬轉接器。
 
-但請務必認清關鍵邊界：MCP 僅僅將通訊協定標準化。它絕不代替模型決定何時呼叫工具、絕不保證不可信外部內容的安全性，也絕不將無狀態的請求自動轉換為持久化的應用層狀態。你的宿主程式與伺服器端依舊必須全權承擔這些架構決策。
+但請務必認清關鍵邊界：MCP 僅僅將通訊協定標準化。它不會決定模型應呼叫哪個工具、絕不保證不可信外部內容的安全性，也絕不將無狀態的請求自動轉換為持久化的應用層狀態。你的宿主程式與伺服器端依舊必須全權承擔這些架構決策。
 
 ## The Concept｜核心概念
 
@@ -156,7 +156,7 @@ def add(a: int, b: int) -> dict:
 
 收錄於 `code/main.py` 的實作亦註冊了資源與 Prompt。該實作刻意採用 Python 標準函式庫完成，讓你能直接透視每一層封裝信封，而非將通訊協定全數託管給第三方 SDK。
 
-### 步驟 2：為每個請求附加詮釋資料
+### 步驟 2：為每個請求附加中繼資料
 
 ```python
 def request(method, params=None):
@@ -177,7 +177,7 @@ def request(method, params=None):
     }
 ```
 
-切勿僅將這份詮釋資料快取於連線物件中，因為伺服器會在每一次收到的獨立請求上嚴格重新校驗。
+切勿僅將這份中繼資料快取於連線物件中，因為伺服器會在每一次收到的獨立請求上嚴格重新校驗。
 
 ### 步驟 3：在列出工具前可選進行服務探索
 
@@ -219,17 +219,17 @@ cd code
 python3 -m unittest discover tests -v
 ```
 
-首行輸出應正確回報探測到執行於 `2026-07-28` 協定下的 `demo-server`。接著檢視 `MCPClient.request`：確認其為每一次呼叫皆動態組裝 `_meta`。試著從某次請求中移除該詮釋資料，觀察伺服器如何堅決拒絕該請求。
+首行輸出應正確回報探測到執行於 `2026-07-28` 協定下的 `demo-server`。接著檢視 `MCPClient.request`：確認其為每一次呼叫皆動態組裝 `_meta`。試著從某次請求中移除該中繼資料，觀察伺服器如何堅決拒絕該請求。
 
 ## Ship It｜交付成果
 
-`outputs/skill-mcp-server-designer.md` 能將特定業務領域轉化為無狀態 MCP 架構設計。其驗收門檻嚴格涵蓋：探索結果宣告、單請求詮釋資料政策、確定性具快取感知的清單排序、顯式狀態代號、傳輸標頭規範、授權驗證與危險操作核准規則。
+`outputs/skill-mcp-server-designer.md` 能將特定業務領域轉化為無狀態 MCP 架構設計。其驗收門檻嚴格涵蓋：探索結果宣告、單請求中繼資料政策、確定性具快取感知的清單排序、顯式狀態代號、傳輸標頭規範、授權驗證與危險操作核准規則。
 
 ## Continue the MCP Deep Dive｜深入探索 MCP 系列
 
 本課為你建立了核心協定架構。Phase 13 進一步將四個生產級系統邊界拆解為獨立的實作與驗證課程：
 
-1. [MCP Tool Contracts and Content](../../../13-tools-and-protocols/28-mcp-tool-contracts-and-content/docs/en.md) 深入封閉式輸入 Schema、結構化內容、路由詮釋資料、不透明分頁、自動補全授權，以及協定層與工具業務層錯誤的本質差異。
+1. [MCP Tool Contracts and Content](../../../13-tools-and-protocols/28-mcp-tool-contracts-and-content/docs/en.md) 深入封閉式輸入 Schema、結構化內容、路由中繼資料、不透明分頁、自動補全授權，以及協定層與工具業務層錯誤的本質差異。
 2. [MCP Reliability, Cancellation, and Flow Control](../../../13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control/docs/en.md) 涵蓋請求取消、長效任務終止、超時限制、等冪性保護、背壓反壓控制、代理緩衝與斷線重連行為。
 3. [MCP Registry Supply Chain, Admission, Drift, and Rollback](../../../13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift/docs/en.md) 探討命名空間所有權證明、產物溯源驗證、不可變版本釘選、即時漂移偵測、註冊中心審查證據與版本回滾機制。
 4. [MCP Conformance Engineering](../../../13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/docs/en.md) 涵蓋標準與負向網路傳輸日誌錄製、嚴格版本劃分、SDK 實作差異對比、代理審計證據、敏感資料遮除、健康閘門與發布回滾。

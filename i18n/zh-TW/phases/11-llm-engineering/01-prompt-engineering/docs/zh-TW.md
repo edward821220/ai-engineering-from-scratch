@@ -631,7 +631,7 @@ def run_prompt_test(prompt, models=None):
 
 ### 步驟 4：Prompt 評分與對比
 
-對跨模型輸出進行打分與比對。測量長度規範、格式遵循度以及關鍵字覆蓋率。
+對跨模型輸出進行評分與比對。測量輸出長度、格式遵循度與結構相似度。
 
 ```python
 def score_response(response_text, criteria):

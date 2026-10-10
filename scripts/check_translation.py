@@ -237,10 +237,19 @@ def _mermaid_syntax(raw: str) -> str:
     return "\n".join(line.rstrip() for line in body.splitlines() if line.strip())
 
 
+CURRENCY = re.compile(r"(?<!\\)\$\d[\d,]*(?:\.\d+)?(?!\$)")
+
+
 def _protected_spans(text: str) -> Counter[tuple[str, str]]:
     spans: list[tuple[int, int, str, str]] = []
-    for kind, pattern in (("image", IMAGE), ("inline code", INLINE_CODE), ("math", INLINE_MATH)):
-        spans.extend((match.start(), match.end(), kind, match.group(0)) for match in pattern.finditer(text))
+    # Mask pure currency amounts so they are not falsely treated as math delimiters
+    math_text = CURRENCY.sub(lambda m: " " * len(m.group(0)), text)
+    for kind, pattern, source_t in (
+        ("image", IMAGE, text),
+        ("inline code", INLINE_CODE, text),
+        ("math", INLINE_MATH, math_text),
+    ):
+        spans.extend((match.start(), match.end(), kind, match.group(0)) for match in pattern.finditer(source_t))
 
     occupied = [(start, end) for start, end, _, _ in spans]
     for match in LINK_TARGET_RE.finditer(text):

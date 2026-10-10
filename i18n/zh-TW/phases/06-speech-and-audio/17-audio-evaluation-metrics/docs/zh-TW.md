@@ -89,7 +89,7 @@
 
 **LongAudioBench。** 好幾分鐘的片段，加上語意查詢。Audio Flamingo Next 贏過 Gemini 2.5 Pro。
 
-**AudioCaps／Clotho。** 字幕基準。指標是 SPICE、CIDEr、FENSE。
+**AudioCaps／Clotho。** 音訊描述基準。指標是 SPICE、CIDEr、FENSE。
 
 ### 串流語音到語音
 

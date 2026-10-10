@@ -51,7 +51,7 @@
 | Cobra VAD（Picovoice） | 98.9% | 約 1 毫秒 | 商業 |
 | pyannote 切段 | 95% | 約 10 毫秒 | 大致 MIT |
 
-預設該用 Silero。要合規或更高準度就升級到 Cobra。2026 年正式環境沒有只用能量的 VAD 的位置。
+預設該用 Silero。要合規或更高準確率就升級到 Cobra。2026 年正式環境沒有只用能量的 VAD 的位置。
 
 ```figure
 sp-vad-cascade
@@ -170,7 +170,7 @@ def flush_on_end(stt_client, audio_buffer):
 ## Further Reading｜延伸閱讀
 
 - [Silero VAD](https://github.com/snakers4/silero-vad) ——開放 VAD 的參考。
-- [Picovoice Cobra VAD](https://picovoice.ai/products/voice/voice-activity-detection/) ——商業準度的領先者。
+- [Picovoice Cobra VAD](https://picovoice.ai/products/voice/voice-activity-detection/) ——商業準確率的領先者。
 - [Kyutai — Unmute + flush trick](https://kyutai.org/stt) ——低於 200 毫秒的工程手法。
 - [LiveKit — turn detection](https://docs.livekit.io/agents/logic/turns/) ——正式環境裡的語意結束點。
 - [WebRTC VAD](https://webrtc.googlesource.com/src/) ——舊的基準模型。

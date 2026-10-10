@@ -9,7 +9,7 @@
 
 ## The Problem｜問題
 
-一個程式碼 agent 在一場對話的每一輪都向 Claude 發送相同的 15,000 token 系統提示。在 20 輪對話中，單是系統提示本身，twenty turns at $3/M input tokens is $0.90 in input cost alone — before any of the user's actual messages. Multiply by 10,000 daily conversations and the bill hits $9,000/day（每百萬輸入 token 3 美元下僅輸入成本就達 0.90 美元；乘以每日 10,000 場對話，每天僅為了發送完全不變的文字，帳單就高達 9,000 美元）。
+一個寫程式的 agent 在一場對話的每一輪都向 Claude 發送相同的 15,000 token 系統提示。在 20 輪對話中，若每百萬輸入 token 為 3 美元，單是系統提示本身就耗費 0.90 美元輸入成本——這還沒算進使用者的任何實際訊息。若乘以每日 10,000 場對話，每天光是傳送完全不變的文字，帳單就高達 9,000 美元。
 
 你不能刪減 prompt，因為這會直接損害輸出品質；你也不能不傳它，因為模型在每一輪對話中都需要依賴它。唯一的解法，就是停止為提供者早已看過並運算過的前綴支付全額費用。
 

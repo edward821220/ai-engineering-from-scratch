@@ -305,9 +305,9 @@ def simulate_tensor_parallelism(input_data, weight_matrix, num_gpus):
     return full_output, error
 ```
 
-誤差應嚴格為零（或機器精度等級）。張量平行在數學上是完全等價的——它產生的結果與在單張 GPU 上計算完整矩陣乘法完全相同。拆分是沿著輸出維度進行的，因此每張 GPU 產生不同區塊的行，串接即可還原完整結果。
+誤差應嚴格為零（或機器精度等級）。張量平行在數學上是完全等價的——它產生的結果與在單張 GPU 上計算完整矩陣乘法完全相同。拆分是沿著輸出維度進行的，因此每張 GPU 產生不同區塊的欄，串接即可還原完整結果。
 
-對於行平行（column-parallel）線性層（拆分輸出維度），使用串接。對於列平行（row-parallel，拆分輸入維度），則使用加總。在 transformer FFN 中，第一個線性層（擴展）使用行平行，第二個線性層（收縮）使用列平行。這避免了在兩層之間進行 all-reduce。
+對於欄平行（column-parallel）線性層（拆分輸出維度），使用串接。對於列平行（row-parallel，拆分輸入維度），則使用加總。在 transformer FFN 中，第一個線性層（擴展）使用欄平行，第二個線性層（收縮）使用列平行。這避免了在兩層之間進行 all-reduce。
 
 ### 步驟 3：模擬管線平行
 
