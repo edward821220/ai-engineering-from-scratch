@@ -1,6 +1,6 @@
 # 推測解碼與 EAGLE
 
-> 頂尖 LLM 每生成一個 token，都需要在數百億參數上執行完整的前向傳遞。這種前向傳遞在硬體配置上是嚴重過剩的：多數情況下，小得多的模型就能正確猜出接下來的 3 到 5 個 token，而大模型只需負責「驗證」這個猜測。當猜測正確時，你相當於用 1 個 token 的成本換取了 5 個 token。推測解碼（Leviathan 等人，2023 年）在數學上精確保證了這點，而 EAGLE-3（2025 年）則將每次驗證的接受率推升至約 4.5 個 token——在完全維持原輸出分布的前提下實現了 4 到 5 倍的加速。
+> 頂尖 LLM 每生成一個 token，都需要在數百億參數上執行完整的前向傳遞。這種前向傳遞在硬體配置上是嚴重過剩的：多數情況下，小得多的模型就能正確猜出接下來的 3 到 5 個 token，而大模型只需負責「驗證」這個猜測。當猜測正確時，你相當於用 1 個 token 的成本換取了 5 個 token。推測解碼（speculative decoding，Leviathan 等人，2023 年）在數學上精確保證了這點，而 EAGLE-3（2025 年）則將每次驗證的接受率推升至約 4.5 個 token——在完全維持原輸出分布的前提下實現了 4 到 5 倍的加速。
 
 **Type:** Build
 **Languages:** Python (with numpy)
@@ -26,8 +26,8 @@ Leviathan、Kalai 與 Matias（2023 年，《Fast Inference from Transformers vi
 
 1. 草稿模型自回歸提出 `K` 個候選 token：`x_1, x_2, ..., x_K ~ q`。
 2. 目標模型在所有 `K+1` 個位置上平行執行「單次」前向傳遞，為每個候選 token 產出 `p(x_k)`。
-3. 由左至右依據下述修正後的拒絕抽樣法則接受／拒絕每個 token，接受最長匹配的前綴。
-4. 若任一 token 被拒絕，從修正後的殘差分布中抽樣替代 token 並立即停止；若全部接受，則從 `p(· | x_1...x_K)` 中免費抽樣一個額外贈送 token。
+3. 由左至右依據下述修正後的拒絕取樣法則（rejection sampling）接受／拒絕每個 token，接受最長匹配的前綴。
+4. 若任一 token 被拒絕，從修正後的殘差分布（residual distribution）中抽樣替代 token 並立即停止；若全部接受，則從 `p(· | x_1...x_K)` 中免費抽樣一個額外贈送 token。
 
 若草稿與目標模型完全吻合，每次目標模型前向傳遞可獲得 K+1 個 token；若草稿在位置 1 猜錯，你依然能獲得 1 個 token。
 
@@ -61,7 +61,7 @@ E[tokens] = (1 - α^{K+1}) / (1 - α)        # K = draft length, α in [0, 1]
 
 唯一的實質關鍵參數就是 `α`，它完全取決於草稿與目標之間的對齊程度。優質的草稿模型決定了一切。
 
-### 訓練草稿模型：知識蒸餾
+### 訓練草稿模型：知識蒸餾（knowledge distillation）
 
 隨便找一個小模型當草稿往往效果欠佳。業界標準配方是從目標模型進行知識蒸餾：
 
@@ -104,7 +104,7 @@ EAGLE-3（Li 等人，2025 年，《EAGLE-3: Scaling up Inference Acceleration o
 ### 何時勝出，何時無效
 
 **勝出場景：**
-- 文字可預測性高的對話／程式碼生成／結構化輸出（JSON、SQL）。`α` 處於高位。
+- 文字可預測性高的對話／程式碼生成／結構化輸出。`α` 處於高位。
 - 在 decode 期間 GPU 算力處於閒置狀態的場景（記憶體頻寬受限階段）。樹狀推測充分榨乾了閒置的 FLOPS。
 
 **無效／落敗場景：**
@@ -197,12 +197,12 @@ def speculative_step(p_target, q_draft, K, temperature=1.0):
 | 樹狀注意力遮罩 | 「拓撲遮罩」 | 編碼樹結構的因果遮罩，確保每個節點僅能關注其祖先節點 |
 | Medusa 輸出頭 | 「平行預測頭」 | 掛載在目標模型本身的 K 個額外預測頭；無需維護獨立草稿模型 |
 | EAGLE 特徵複用 | 「隱藏狀態草稿」 | 草稿模型以目標模型最終隱藏狀態為輸入而非原始 token，大幅縮小草稿體積 |
-| 測試期模擬損失 | 「EAGLE-3 訓練法」 | 訓練草稿模型去匹配目標模型測試期分布而非教師強制，消除誤差累積 |
+| 測試期模擬損失 | 「EAGLE-3 訓練法」 | 訓練草稿模型去匹配目標模型測試期分布而非教師強制 |
 
 ## Further Reading｜延伸閱讀
 
 - [Leviathan, Kalai, Matias, 2023 — "Fast Inference from Transformers via Speculative Decoding"](https://arxiv.org/abs/2211.17192) ——推測解碼精確拒絕法則與理論加速比分析的開創性經典論文
-- [Chen, Borgeaud, Irving et al., 2023 — "Accelerating Large Language Model Decoding with Speculative Sampling"](https://arxiv.org/abs/2302.01318) ——DeepMind 同期獨立發布、包含優雅證明的推測抽樣論文
+- [Chen, Borgeaud, Irving et al., 2023 — "Accelerating Large Language Model Decoding with Speculative Sampling"](https://arxiv.org/abs/2302.01318) ——DeepMind 同期獨立發布的推測抽樣論文
 - [Cai, Li, Geng, Wang, Wang, Zhu, Dao, 2024 — "Medusa: Simple LLM Inference Acceleration Framework with Multiple Decoding Heads"](https://arxiv.org/abs/2401.10774) ——無需獨立草稿模型的平行頭解碼替代方案
 - [Li, Wei, Zhang, Zhang, 2024 — "EAGLE: Speculative Sampling Requires Rethinking Feature Uncertainty"](https://arxiv.org/abs/2401.15077) ——特徵複用與樹狀推測突破
 - [Li et al., 2024 — "EAGLE-2: Faster Inference of Language Models with Dynamic Draft Trees"](https://arxiv.org/abs/2406.16858) ——動態樹拓撲自適應結構
