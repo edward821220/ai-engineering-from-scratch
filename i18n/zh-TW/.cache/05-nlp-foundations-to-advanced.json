@@ -10,5 +10,6 @@
   "phases/05-nlp-foundations-to-advanced/09-sequence-to-sequence/docs/en.md": "83d570d30ef505439edbbe90a16c984e6c5e552468ed53a54919b36d2dd43d49",
   "phases/05-nlp-foundations-to-advanced/10-attention-mechanism/docs/en.md": "f31dde76b3cd616e1c7d242a9d36fc4f5dd2c4a8514bd026da2d4b9e652ae49b",
   "phases/05-nlp-foundations-to-advanced/11-machine-translation/docs/en.md": "956eeb576fdea61cef4a66b8f4c6b1b1caa47eea8e7488aace436c9c177b09ca",
-  "phases/05-nlp-foundations-to-advanced/12-text-summarization/docs/en.md": "d856ec071b1b46533679495c2c23bf7bfb8796e664589771f1dad37a30bf4623"
+  "phases/05-nlp-foundations-to-advanced/12-text-summarization/docs/en.md": "d856ec071b1b46533679495c2c23bf7bfb8796e664589771f1dad37a30bf4623",
+  "phases/05-nlp-foundations-to-advanced/13-question-answering/docs/en.md": "0fcd3cb8c48f9b9f0a1597958ed41da266022394329bd44bf1c29eae8453d7f9"
 }
