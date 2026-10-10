@@ -9,10 +9,10 @@
 
 ## Learning Objectives｜學習目標
 
-- 從零實作 標準梯度下降法、帶動量的 SGD，以及 Adam
+- 從零實作標準梯度下降法（vanilla gradient descent）、帶動量的 SGD，以及 Adam
 - 在 Rosenbrock 函數上比較各最佳化器的收斂情形，並說明 Adam 為何能為每個權重自適應調整學習率
-- 分辨凸與非凸損失地景，並解釋鞍點在高維空間中的角色
-- 設定學習率排程（步進衰減、餘弦退火、預熱）讓訓練保持穩定
+- 分辨凸與非凸損失地景（loss landscape），並解釋鞍點在高維空間中的角色
+- 設定學習率排程（learning rate schedule，步進衰減、餘弦退火、預熱）讓訓練保持穩定
 
 ## The Problem｜問題
 
@@ -124,8 +124,8 @@ graph TD
 
 Adam（Adaptive Moment Estimation）對每個權重追蹤兩件事：
 
-1. 一階動差（m）：梯度的移動平均數（類似動量）
-2. 二階動差（v）：梯度平方的移動平均數（梯度大小）
+1. 一階矩（first moment，m）：梯度的移動平均數（類似動量）
+2. 二階矩（second moment，v）：梯度平方的移動平均數（梯度大小）
 
 ```
 m = beta1 * m + (1 - beta1) * gradient
@@ -365,7 +365,7 @@ scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(adam, T_max=100)
 | SGD | 「隨機取樣」 | 隨機梯度下降法。用隨機子集而非整個資料集算梯度。實務上幾乎都指小批次 SGD。 |
 | 小批次（mini-batch） | 「一塊資料」 | 用來估計梯度的一小批訓練資料（32-256 個樣本）。平衡速度與梯度準確度。 |
 | Adam | 「預設的最佳化器」 | Adaptive Moment Estimation。追蹤每個權重的梯度與梯度平方移動平均，給每個權重自己的學習率。 |
-| 偏差校正（bias correction） | 「修掉冷啟動」 | Adam 的一階與二階動差初始化為零。偏差校正除以 (1 - beta^t)，補償早期步驟。 |
+| 偏差校正（bias correction） | 「修掉冷啟動」 | Adam 的一階與二階矩初始化為零。偏差校正除以 (1 - beta^t)，補償早期步驟。 |
 | 學習率排程（learning rate schedule） | 「隨時間改 lr」 | 在訓練中調整學習率的函數。早期大步，後期小步。 |
 | 凸函數（convex function） | 「一個山谷」 | 任何局部最小值都是全域最小值的函數。梯度下降法保證找到。神經網路損失不是凸的。 |
 | 鞍點（saddle point） | 「平但不是最小值」 | 梯度為零、但在某些方向是最小值、另一些方向是最大值的點。高維中很常見。 |
