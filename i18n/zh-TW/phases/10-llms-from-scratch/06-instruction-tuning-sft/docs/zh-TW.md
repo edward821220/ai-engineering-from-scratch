@@ -9,7 +9,7 @@
 
 ## Learning Objectives｜學習目標
 
-- 實作監督式 fine-tuning（Supervised Fine-Tuning）（SFT），將基底語言模型轉化為遵循指令的助理
+- 實作監督式 fine-tuning（Supervised Fine-Tuning）（SFT），將基語言模型轉化為遵循指令的助理
 - 使用包含系統、使用者與助理角色的聊天範本格式化訓練資料，並對非助理 token 進行損失遮罩
 - 解釋為何 SFT 是必要的：基模型只會接續文字，而非回答問題
 - 透過在保留指令集上比對基模型與 fine-tuning 後模型的回應，評估 SFT 的品質
@@ -22,7 +22,7 @@
 
 這就是 GPT-3（基模型，2020 年 6 月發布）與 ChatGPT（經過指令調校的模型，2022 年 11 月發布）之間的鴻溝。兩者擁有相同的架構、相同的預訓練。差別在於 2 萬到 10 萬組精心打造的（指令，回應）配對，教會了模型遵循對話模式。
 
-史丹佛的 Alpaca 證明了你不需要數百萬個範例。2023 年 3 月，他們僅使用由 GPT-3.5 生成的 52,000 組指令－回應配對，就對 Llama 7B 進行了 fine-tuning。Total cost: $600. The result was a chatbot that could follow instructions, answer questions, and hold conversations. Not as good as ChatGPT, but shockingly close for $600 and a few hours of training（總成本僅 600 美元，訓練數小時即產出能遵循指令的助理）。
+史丹佛的 Alpaca 證明了你不需要數百萬個範例。2023 年 3 月，他們僅使用由 GPT-3.5 生成的 52,000 組指令－回應配對，就對 Llama 7B 進行了 fine-tuning。總成本僅 600 美元，訓練數小時即產出能遵循指令、回答問題並進行對話的聊天機器人，雖不及 ChatGPT，但已相當接近。
 
 Meta 的 Llama 2 Chat 在最初的 SFT 階段僅使用了約 27,000 個高品質範例。核心洞見在於：品質遠比數量重要。由專業標註人員撰寫的 27,000 個範例，擊敗了從網路爬取、充斥雜訊的 100 萬個範例。
 
@@ -30,7 +30,7 @@ Meta 的 Llama 2 Chat 在最初的 SFT 階段僅使用了約 27,000 個高品質
 
 ### SFT 實際上在做什麼
 
-監督式 fine-tuning（Supervised Fine-Tuning）（Supervised Fine-Tuning）沿用了預訓練中相同的訓練迴圈——前向傳遞、計算損失、反向傳播、更新權重——但採用了不同類型的資料。你不是在原始文字上訓練，而是在結構化對話上訓練：
+監督式 fine-tuning（Supervised Fine-Tuning）沿用了預訓練中相同的訓練迴圈——前向傳遞、計算損失、反向傳遞、更新權重——但採用了不同類型的資料。你不是在原始文字上訓練，而是在結構化對話上訓練：
 
 ```json
 {
@@ -129,7 +129,7 @@ SFT 所使用的超參數與預訓練截然不同。你不是從零開始訓練�
 | 權重衰減 | 0.1 | 0.0-0.1 |
 | 資料規模 | 2 兆 token | 27,000 個範例 |
 
-SFT 的學習率低了 15 倍。這一點至關重要。fine-tuning 期間如果使用高學習率，會摧毀預訓練學到的知識。模型會「遺忘」它所學過的內容，並在小規模資料集上產生過度擬合。這就是災難性遺忘（catastrophic forgetting）。
+SFT 的學習率是預訓練的 15 分之一。這一點至關重要。fine-tuning 期間如果使用高學習率，會摧毀預訓練學到的知識。模型會「遺忘」它所學過的內容，並在小規模資料集上產生過度擬合。這就是災難性遺忘（catastrophic forgetting）。
 
 兩個 epoch 意味著模型能將每個訓練範例看過兩次。在小型資料集上超過 3 個 epoch 容易導致死記硬背——模型開始逐字背誦訓練範例，而不是學會泛化。
 
@@ -388,7 +388,7 @@ def sft_train(model, dataset, num_epochs=2, lr=2e-5, seq_len=64):
     return model, losses
 ```
 
-學習率為 2e-5，與 Llama 2 Chat 相符。相較於預訓練中使用的 3e-4，整整小了 15 倍。梯度經過遮罩：指令 token 產生零梯度，只有回應 token 能推動權重更新。
+學習率為 2e-5，與 Llama 2 Chat 相符。相較於預訓練中使用的 3e-4，這是其 15 分之一。梯度經過遮罩：指令 token 產生零梯度，只有回應 token 能推動權重更新。
 
 ### 步驟 5：比較基模型與 SFT 模型
 
@@ -586,7 +586,7 @@ The model learns to predict the next token given all previous tokens."""
 
 | 術語 | 常見說法 | 實際意義 |
 |------|----------------|----------------------|
-| SFT | 「在對話上 fine-tune」 | 監督式 fine-tuning（Supervised Fine-Tuning）（Supervised Fine-Tuning）：在（指令，回應）配對上接續訓練，僅在回應 token 上計算損失 |
+| SFT | 「在對話上 fine-tune」 | 監督式 fine-tuning（Supervised Fine-Tuning）：在（指令，回應）配對上接續訓練，僅在回應 token 上計算損失 |
 | 指令調校（Instruction tuning） | 「教會模型遵循指令」 | 在明確的指令－回應配對上訓練，讓基模型學會對話模式，而非學習新知識 |
 | 損失遮罩（Loss masking） | 「忽略 prompt」 | 將指令 token 的損失設為零，使梯度僅由回應 token 的預測流出 |
 | ChatML | 「Chat Markup Language」 | 一種使用 `<\|im_start\|>` 與 `<\|im_end\|>` 分隔符號來標記對話中說話者角色的 token 格式 |
