@@ -7,5 +7,6 @@
   "phases/08-generative-ai/06-diffusion-ddpm-from-scratch/docs/en.md": "f62dd0eaa055920ebe0ae369fd734c5b0e6ab90ce3f31f485487d7d4cd7a86f8",
   "phases/08-generative-ai/07-latent-diffusion-stable-diffusion/docs/en.md": "31a712aa953cffde8d835b2d6776923c98ca0946f06adb2c53f2694863ba6941",
   "phases/08-generative-ai/08-controlnet-lora-conditioning/docs/en.md": "cc1f1598103a54fe7dda2459c8e0c172c22109098a64f730ac2dbb9d251e83b2",
-  "phases/08-generative-ai/09-inpainting-outpainting-editing/docs/en.md": "a0a39b1a67b7b04440df938be761512cc0fc841d15d2ca492e7d7cdbad0cdbc2"
+  "phases/08-generative-ai/09-inpainting-outpainting-editing/docs/en.md": "a0a39b1a67b7b04440df938be761512cc0fc841d15d2ca492e7d7cdbad0cdbc2",
+  "phases/08-generative-ai/10-video-generation/docs/en.md": "5e91c7daf3c94dce2a239e36f6cf07314359b21629aac1e2f47910d9212c53d1"
 }
