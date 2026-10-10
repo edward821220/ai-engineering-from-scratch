@@ -15,7 +15,7 @@
 
 2026 年 2 月的評測給出人意料的結果：
 
-- Vectara 2026 年的研究：遞迴的 512 token 切塊，以 69% 對 54% 的準確率（accuracy）贏過語意切塊。
+- Vectara 2026 年的研究：遞迴（recursive）的 512 token 切塊，以 69% 對 54% 的準確率（accuracy）贏過語意切塊（semantic chunking）。
 - SPLADE 加 Mistral-8B 在 Natural Questions 上：重疊量不出好處。
 - 脈絡斷崖：脈絡大約到 2,500 個 token，回應品質就陡降。
 
@@ -25,19 +25,19 @@
 
 ![Six chunking strategies visualized on one passage](../assets/chunking.svg)
 
-**固定切塊。** 每 N 個字元或 token 切一次。最簡單的基準模型（baseline）。會從句子中間切開。壓縮好，連貫差。
+**固定切塊（fixed chunking）。** 每 N 個字元或 token 切一次。最簡單的基準模型（baseline）。會從句子中間切開。壓縮好，連貫差。
 
-**遞迴。** LangChain 的 `RecursiveCharacterTextSplitter`。先試 `\n\n`，再 `\n`，再 `.`，再空白。可順利退回較低層級的分隔符。2026 年的預設。
+**遞迴（recursive chunking）。** LangChain 的 `RecursiveCharacterTextSplitter`。先試 `\n\n`，再 `\n`，再 `.`，再空白。可順利退回較低層級的分隔符。2026 年的預設。
 
-**語意。** 把每個句子做成 embedding。算相鄰句子的餘弦（cosine）相似度。相似度掉到閾值（threshold）以下就切開。保住主題連貫。較慢；有時產出小到 40 個 token 的碎片，傷檢索。
+**語意（semantic chunking）。** 把每個句子做成 embedding。算相鄰句子的餘弦（cosine）相似度。相似度掉到閾值（threshold）以下就切開。保住主題連貫。較慢；有時產出小到 40 個 token 的碎片，傷檢索。
 
-**句子。** 在句子邊界切開。一個區塊一句，或 N 句的視窗。到大約 5000 個 token 為止，和語意切塊不相上下，成本只是一小部分。
+**句子（sentence chunking）。** 在句子邊界切開。一個區塊一句，或 N 句的視窗。到大約 5000 個 token 為止，和語意切塊不相上下，成本只是一小部分。
 
-**父文件。** 檢索用小的子區塊，脈絡用較大的父區塊，兩者都存。用子區塊檢索，回傳父區塊。退化得很溫和：子區塊再差，回傳的父區塊仍然合理。
+**父文件（parent-document）。** 檢索用小的子區塊，脈絡用較大的父區塊，兩者都存。用子區塊檢索，回傳父區塊。退化得很溫和：子區塊再差，回傳的父區塊仍然合理。
 
-**後置切塊（2024）。** 先在 token 層級把整份文件做成 embedding，再把 token embedding 聚成區塊 embedding。保住跨區塊的脈絡。搭配長脈絡 embedding 模型（BGE-M3、Jina v3）能用。計算量更高。
+**後置切塊（late chunking，2024）。** 先在 token 層級把整份文件做成 embedding，再把 token embedding 聚成區塊 embedding。保住跨區塊的脈絡。搭配長脈絡 embedding 模型（BGE-M3、Jina v3）能用。計算量更高。
 
-**脈絡化檢索（Anthropic，2024）。** 在每個區塊前面加上 LLM 生成的、說明它在文件裡位置的摘要（「這個區塊是終止條款第 3.2 節……」）。在 Anthropic 自己的評測裡，檢索改善 35% 到 50%。建索引很貴。
+**脈絡化檢索（contextual retrieval，Anthropic，2024）。** 在每個區塊前面加上 LLM 生成的、說明它在文件裡位置的摘要（「這個區塊是終止條款第 3.2 節……」）。在 Anthropic 自己的評測裡，檢索改善 35% 到 50%。建索引很貴。
 
 ### 贏過每個預設的那條規則
 
@@ -49,7 +49,7 @@
 | 分析／多跳 | 512 到 1024 個 token |
 | 整節理解 | 1024 到 2048 個 token |
 
-NVIDIA 2026 年的評測。區塊要大到裝得下答案加上附近脈絡，小到檢索器的top-K 結果集中在答案上，而不是脈絡雜訊。
+NVIDIA 2026 年的評測。區塊要大到裝得下答案加上附近脈絡，小到檢索器的 top-K 結果集中在答案上，而不是脈絡雜訊。
 
 ```figure
 n5-chunk-cuts
@@ -204,7 +204,7 @@ def recall_at_k(queries, corpus_chunks, encoder, k=5):
 | 對話語料庫 | 以輪次為區塊，加上說話者後設資料（metadata） |
 | 短話語（推文、評論） | 一份文件就是一個區塊 |
 
-從遞迴 512 開始。在 50 個查詢的評估集上量recall@5（前 5 名召回率）（recall）。再從那裡調。
+從遞迴 512 開始。在 50 個查詢的評估集上量 recall@5（前 5 名召回率）。再從那裡調。
 
 ## Ship It｜交付成果
 
