@@ -119,7 +119,7 @@ where the weights are the proportions of samples in each child.
 
 預剪枝較簡單、速度也較快。後剪枝通常能產生更好的樹，因為它不會過早停止樹的生長，讓可能再形成有用分割的路徑得以延伸。
 
-### 迴歸樹（regression tree）（regression）
+### 迴歸樹（regression tree）
 
 在迴歸問題中，葉節點會輸出該節點中目標值的平均數。分割準則也會改變：
 
@@ -444,7 +444,7 @@ print(f"Feature importances: {rf.feature_importances_}")
 
 1. 在含有 3 個類別的二維資料集上訓練單一決策樹。手動追蹤分割過程，並畫出矩形決策邊界（decision boundaries）。比較 max_depth=2 與 max_depth=10 時的邊界。
 
-2. 為迴歸樹實作變異數減少分割。產生 200 個 y = sin(x) + noise 資料點（data point），並訓練迴歸樹。將樹的分段常數預測畫在真實曲線上比較。
+2. 為迴歸樹實作變異數減少分割。產生 200 個 y = sin(x) + noise 資料點（data point），並訓練迴歸樹。將樹的分段常數（piecewise-constant）預測畫在真實曲線上比較。
 
 3. 使用 1、5、10、50 和 200 棵樹建立隨機森林。繪製訓練準確率和測試準確率隨樹數量變化的圖。觀察測試準確率會達到平台期，但不會下降（隨機森林能抵抗過度擬合）。
 
