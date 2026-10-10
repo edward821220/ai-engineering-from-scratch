@@ -94,7 +94,7 @@ PC4          0.89          0.089              0.925
 
 t-SNE（t-Distributed Stochastic Neighbor Embedding，t 分布隨機鄰域 embedding）是為視覺化設計的。它把高維資料映射到 2D（或 3D），同時保留哪些點彼此靠近。
 
-直覺：在原始空間中，依點與點之間的距離，計算每一對點的機率分布（probability distribution）。近的點機率高，遠的點機率低。然後找出一個 2D 排列，使相同的機率分布（probability distribution）成立。在 784 維中是鄰居的點，在 2D 中仍然是鄰居。
+直覺：在原始空間中，依點與點之間的距離，計算每一對點的機率分布（probability distribution）。近的點機率高，遠的點機率低。然後找出一個 2D 配置，使其點對的機率分布與原空間一致。在 784 維中是鄰居的點，在 2D 中仍然是鄰居。
 
 t-SNE 的關鍵性質：
 - 非線性。它能攤開 PCA 攤不開的複雜流形（manifold）。
