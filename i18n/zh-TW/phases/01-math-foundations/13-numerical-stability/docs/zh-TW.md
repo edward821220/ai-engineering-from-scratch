@@ -1,6 +1,6 @@
 # 數值穩定性
 
-> 浮點數是一種浮點數是一種有漏洞的抽象。訓練時它會反咬你一口，而你不會預先察覺。
+> 浮點數是一種有漏洞的抽象。訓練時它會反咬你一口，而你不會預先察覺。
 
 **Type:** Build
 **Language:** Python
@@ -18,7 +18,7 @@
 
 模型訓練了三小時，接著損失變成 NaN。你加了一行印出數值的程式碼：第 9,000 步的 logits 還正常；第 9,001 步就變成 `inf`；到了第 9,002 步，每個梯度都是 `nan`，訓練也停擺了。
 
-或者，模型順利訓練完成，但準確率比論文低了 2%。你逐一檢查，架構、超參數和資料都一致。問題在於論文用 float32，而你用 float16，卻沒有正確縮放。32 位元浮點運算中累積的捨入雜訊，悄悄拉低了準確率，悄悄吃掉了你的準確率。
+或者，模型順利訓練完成，但準確率比論文低了 2%。你逐一檢查，架構、超參數和資料都一致。問題在於論文用 float32，而你用 float16，卻沒有正確縮放。32 位元浮點運算中累積的捨入誤差（rounding error），悄悄吃掉了你的準確率。
 
 或者，你從零實作交叉熵損失（cross-entropy loss）。logits 不大時都正常，但超過 100 就回傳 `inf`。softmax 發生溢位，因為 `exp(100)` 大到超出 float32 的表示範圍。每個 ML 框架都用一個兩行的小技巧處理這件事，但你不知道它存在。
 
@@ -279,7 +279,7 @@ relative_error = |grad_analytical - grad_numerical| / max(|grad_analytical|, |gr
 
 只用 float16 訓練的問題是：梯度通常很小（1e-8 或更小）。float16 中低於約 6e-8 的數值會因下溢位而成為零。所有梯度更新都變成零，模型就不再學習。
 
-解法是損失縮放（loss scaling）（loss scaling）：
+解法是損失縮放（loss scaling）：
 
 ```
 1. Multiply loss by a large scale factor (e.g., 1024)
@@ -591,7 +591,7 @@ check_tensor("ugly", [1.0, float('inf'), 3.0])
 | 穩定 softmax（stable softmax） | 「不會爆掉的 softmax」 | 取指數前先減去 max(logits)。結果在數學上相同，且不會溢位。 |
 | 梯度檢查（gradient checking） | 「驗證反向傳播」 | 比較反向傳播得到的解析梯度和有限差分算出的數值梯度，找出實作錯誤。 |
 | 混合精度（mixed precision） | 「float16 前向、float32 反向」 | 對速度關鍵運算使用低精度浮點數，對數值敏感運算使用高精度浮點數。通常可加速 2 到 3 倍。 |
-| 損失縮放（loss scaling）（loss scaling） | 「避免梯度下溢位」 | 反向傳播前先乘上較大的常數，讓梯度維持在 float16 可表示範圍內；更新權重前再除以相同常數。 |
+| 損失縮放（loss scaling） | 「避免梯度下溢位」 | 反向傳播前先乘上較大的常數，讓梯度維持在 float16 可表示範圍內；更新權重前再除以相同常數。 |
 | bfloat16 | 「Brain floating point」 | Google 的 16 位元格式，有 8 位元指數（範圍與 float32 相同）和 7 位元尾數（精度比 float16 低），較適合訓練。 |
 | 梯度裁剪（gradient clipping） | 「限制梯度範數」 | 縮放梯度向量，使其範數不超過閾值，避免梯度爆炸破壞權重。 |
 | NaN | 「Not a Number」 | 由未定義運算（0/0、inf-inf、sqrt(-1)）產生的特殊浮點值，會傳播到後續算術運算。 |
