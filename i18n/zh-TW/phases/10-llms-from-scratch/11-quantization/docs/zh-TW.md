@@ -1,6 +1,6 @@
 # 量化：讓模型裝得下
 
-> FP16 精度的 70B 模型需要 140GB。光是放model weights就需要兩張 A100。量化至 FP8：單張 80GB GPU 搞定。INT4：一台 MacBook 就能跑。
+> FP16 精度的 70B 模型需要 140GB。光是放模型權重（model weights）就需要兩張 A100。量化至 FP8：單張 80GB GPU 搞定。INT4：一台 MacBook 就能跑。
 
 **Type:** Build
 **Languages:** Python (with numpy)
@@ -16,9 +16,9 @@
 
 ## The Problem｜問題
 
-Llama 3 70B 擁有 700 億個參數。每個參數都是一個 16 位元浮點數。那是 1,400 億個位元組，也就是 140GB。一張單獨的 A100 只有 80GB 的 VRAM。在單張 GPU 上你連model weights都載入不了，更遑論執行推論。你至少需要兩張 A100（每張每小時約 2 美元）才能提供單一模型的服務。
+Llama 3 70B 擁有 700 億個參數。每個參數都是一個 16 位元浮點數。那是 1,400 億個位元組，也就是 140GB。一張單獨的 A100 只有 80GB 的 VRAM。在單張 GPU 上你連模型權重都載入不了，更遑論執行推論。你至少需要兩張 A100（每張每小時約 2 美元）才能提供單一模型的服務。
 
-但每個參數使用 16 位元其實極其浪費。神經網路中的絕大多數model weights都聚集在零附近。FP16 的完整動態範圍（從 0.000000059 到 65,504）幾乎完全處於閒置狀態。如果你實際測量 Llama 3 70B 的model weights分布，會發現 95% 的數值都落在 -0.1 到 +0.1 之間。你耗費了 16 個位元，去表示只需 4 個位元就能裝得下的數值。
+但每個參數使用 16 位元其實極其浪費。神經網路中的絕大多數模型權重都聚集在零附近。FP16 的完整動態範圍（從 0.000000059 到 65,504）幾乎完全處於閒置狀態。如果你實際測量 Llama 3 70B 的模型權重分布，會發現 95% 的數值都落在 -0.1 到 +0.1 之間。你耗費了 16 個位元，去表示只需 4 個位元就能裝得下的數值。
 
 量化（Quantization）以低精度數值取代高精度數值。從 FP16 轉為 FP8 能讓記憶體直接減半。從 FP16 轉為 INT4 則將其縮減為四分之一。那個 140GB 的龐然大物縮減為 35GB，剛好能裝進單張消費級 GPU。若進一步推向 2 位元量化（極端且具損耗性，但在部分任務中堪用），同一個模型甚至能在 16GB 的筆記型電腦上執行。
 
@@ -44,15 +44,15 @@ INT4:  [1 sign] [3 value]                   = 4  bits (16 levels total)
 
 **FP32** 是全精度。23 個尾數位元提供約 7 位十進位有效數字。數值範圍：約 1.2 x 10^-38 到 3.4 x 10^38。過去的模型訓練完全在 FP32 下進行。如今在矩陣乘法的累加計算中依然採用 FP32。
 
-**FP16** 將位元數減半。10 個尾數位元提供約 3.3 位十進位有效數字。指數縮減至 5 個位元，大幅縮小了數值範圍（最大值約為 65,504）。這對集中在零附近的model weights來說沒有問題，但對訓練期間可能劇烈暴增的活化值與梯度極具危險性。FP16 訓練需要損失縮放以防止數值下溢。
+**FP16** 將位元數減半。10 個尾數位元提供約 3.3 位十進位有效數字。指數縮減至 5 個位元，大幅縮小了數值範圍（最大值約為 65,504）。這對集中在零附近的模型權重來說沒有問題，但對訓練期間可能劇烈暴增的活化值與梯度極具危險性。FP16 訓練需要損失縮放以防止數值下溢。
 
-**BF16**（Brain Float 16）保留了 FP32 的 8 位元指數，但將尾數縮減至 7 個位元。具備與 FP32 相同的數值範圍，但精度低於 FP16。Google 專為深度學習設計了此格式。其核心直覺在於：對神經網路而言，數值範圍的重要性遠勝於單純的精度。在 FP16 中下溢為零的 10^-20 梯度能在 BF16 中存活。一個原本為 0.07342 的model weights在 BF16 中四捨五入為 0.0734，對模型表現而言已經足夠接近。現代訓練無一例外皆採用 BF16 或 BF16/FP32 混合模式。
+**BF16**（Brain Float 16）保留了 FP32 的 8 位元指數，但將尾數縮減至 7 個位元。具備與 FP32 相同的數值範圍，但精度低於 FP16。Google 專為深度學習設計了此格式。其核心直覺在於：對神經網路而言，數值範圍的重要性遠勝於單純的精度。在 FP16 中下溢為零的 10^-20 梯度能在 BF16 中存活。一個原本為 0.07342 的模型權重在 BF16 中四捨五入為 0.0734，對模型表現而言已經足夠接近。現代訓練無一例外皆採用 BF16 或 BF16/FP32 混合模式。
 
-**FP8** 有兩種常見格式。E4M3（4 個指數位元、3 個尾數位元）在推論期間用於model weights與活化值。E5M2（5 個指數位元、2 個尾數位元）則用於訓練期間的梯度，此時數值範圍重於精度。在 H100 GPU 上執行 FP8 推論，相較於 FP16 能帶來 30% 到 50% 的速度提升，且品質損失微乎其微。
+**FP8** 有兩種常見格式。E4M3（4 個指數位元、3 個尾數位元）在推論期間用於模型權重與活化值。E5M2（5 個指數位元、2 個尾數位元）則用於訓練期間的梯度，此時數值範圍重於精度。在 H100 GPU 上執行 FP8 推論，相較於 FP16 能帶來 30% 到 50% 的速度提升，且品質損失微乎其微。
 
-**INT8** 是整數格式。沒有指數，沒有尾數。只有從 -128 到 127 的 256 個等距數值。你需要一個縮放因子（scale factor）將浮點數model weights映射進這個範圍。優勢在於：整數運算比浮點數運算更快速且更省電。A100 上的 INT8 矩陣乘法運算能力達 624 TOPS，而 FP16 僅為 312 TFLOPS。
+**INT8** 是整數格式。沒有指數，沒有尾數。只有從 -128 到 127 的 256 個等距數值。你需要一個縮放因子（scale factor）將浮點數模型權重映射進這個範圍。優勢在於：整數運算比浮點數運算更快速且更省電。A100 上的 INT8 矩陣乘法運算能力達 624 TOPS，而 FP16 僅為 312 TFLOPS。
 
-**INT4** 則更進一步。總共只有 16 個可能的數值。縮放因子承擔了極其關鍵的任務。品質好壞完全取決於你如何挑選縮放因子以及選擇量化哪些model weights。頂尖的 INT4 方法（GPTQ、AWQ）能保留原始模型 95% 以上的品質。
+**INT4** 則更進一步。總共只有 16 個可能的數值。縮放因子承擔了極其關鍵的任務。品質好壞完全取決於你如何挑選縮放因子以及選擇量化哪些模型權重。頂尖的 INT4 方法（GPTQ、AWQ）能保留原始模型 95% 以上的品質。
 
 ```mermaid
 graph LR
@@ -101,9 +101,9 @@ scale = max(abs(tensor)) / 127
 quantized = clamp(round(tensor / scale), -128, 127)
 ```
 
-誤差即為捨入誤差。每個數值的誤差最大不超過 `scale / 2`。整層的總誤差取決於你有多少個model weights，以及模型對這些model weights擾動的敏感程度。
+誤差即為捨入誤差。每個數值的誤差最大不超過 `scale / 2`。整層的總誤差取決於你有多少個模型權重，以及模型對這些模型權重擾動的敏感程度。
 
-**逐張量（Per-tensor）vs 逐通道（Per-channel）量化。** 逐張量量化為整個model weights矩陣使用單一縮放因子。實作簡單但損耗較大：如果一欄／另一欄，較小數值的列就會失去大部分精度。逐通道量化為每個輸出通道（model weights矩陣的每一列或每一行）使用獨立的縮放因子。雖然增加了少量額外開銷（必須儲存 N 個縮放因子而非 1 個），但品質有著飛躍性的提升。所有正式環境的量化方法皆採用逐通道或更細粒度的縮放。
+**逐張量（Per-tensor）vs 逐通道（Per-channel）量化。** 逐張量量化為整個模型權重矩陣使用單一縮放因子。實作簡單但損耗較大：如果一欄的數值較大、另一欄的數值較小，數值較小的那一欄就會失去大部分精度。逐通道量化為每個輸出通道（模型權重矩陣的每一列或每一行）使用獨立的縮放因子。雖然增加了少量額外開銷（必須儲存 N 個縮放因子而非 1 個），但品質有著飛躍性的提升。所有正式環境的量化方法皆採用逐通道或更細粒度的縮放。
 
 **非對稱量化（Asymmetric quantization）** 加入了零點（zero-point）偏移：`quantized = round(tensor / scale) + zero_point`。這能妥善處理未以零為中心的分布。例如 ReLU 活化值永遠為非負數。對稱量化會將整整一半的整數範圍浪費在永遠不會出現的負數上。非對稱量化則將實際的 [min, max] 區間完整映射到整個整數範圍。
 
@@ -111,9 +111,9 @@ quantized = clamp(round(tensor / scale), -128, 127)
 
 模型內部各個元件對量化的容忍度截然不同。存在一個清晰的敏感度階層。
 
-**model weights（最穩健）。** 模型model weights在訓練期間變化平緩，且遵循以零為中心的大致高斯分布。它們非常適合量化。帶有逐通道縮放的 INT8 model weights幾乎能達到無損效果。INT4 雖然需要更精密的方法，但同樣具備高度可行性。
+**模型權重（最穩健）。** 模型權重在訓練期間變化平緩，且遵循以零為中心的大致高斯分布。它們非常適合量化。帶有逐通道縮放的 INT8 模型權重幾乎能達到無損效果。INT4 雖然需要更精密的方法，但同樣具備高度可行性。
 
-**活化值（中等敏感）。** 活化值是推論期間流經網路的中間數值。它們的動態範圍比model weights更廣，且包含極端離群值（outliers）。單一注意力頭產生的活化值可能比平均值大上 100 倍。這些離群值對模型品質至關重要，天真地對其進行量化會嚴重破壞資訊。解決方案：將離群特徵保留在高精度（LLM.int8()），或採用逐 token / 逐通道的活化值縮放。
+**活化值（中等敏感）。** 活化值是推論期間流經網路的中間數值。它們的動態範圍比模型權重更廣，且包含極端離群值（outliers）。單一注意力頭產生的活化值可能比平均值大上 100 倍。這些離群值對模型品質至關重要，天真地對其進行量化會嚴重破壞資訊。解決方案：將離群特徵保留在高精度（LLM.int8()），或採用逐 token / 逐通道的活化值縮放。
 
 **KV 快取（高度敏感）。** 鍵值快取（KV cache）儲存了所有先前 token 的注意力狀態。在長脈絡長度下，KV 快取會霸佔大部分記憶體。對於處於 32K 脈絡下的 70B 模型，光是 FP16 的 KV 快取就高達 40GB。將 KV 快取量化至 FP8 或 INT8 能節省巨量記憶體，但任何誤差都會在所有後續的注意力計算中層層疊加。品質影響會隨序列長度增加而加重。
 
@@ -141,9 +141,9 @@ graph TD
 
 ### PTQ vs QAT
 
-**訓練後量化（PTQ）** 對已經訓練好的模型進行量化，無需重新訓練。你取得 FP16 model weights，計算縮放因子，進行四捨五入，然後上線。速度極快（數分鐘至數小時）且成本低廉。在 INT8 與 FP8 下表現極佳。在 INT4 下，天真的 PTQ 往往會因為捨入誤差疊加而嚴重失敗。進階的 PTQ 方法（GPTQ、AWQ）使用校準資料來最小化量化誤差。
+**訓練後量化（PTQ）** 對已經訓練好的模型進行量化，無需重新訓練。你取得 FP16 模型權重，計算縮放因子，進行四捨五入，然後上線。速度極快（數分鐘至數小時）且成本低廉。在 INT8 與 FP8 下表現極佳。在 INT4 下，天真的 PTQ 往往會因為捨入誤差疊加而嚴重失敗。進階的 PTQ 方法（GPTQ、AWQ）使用校準資料來最小化量化誤差。
 
-**量化感知訓練（QAT）** 在訓練期間的前向傳遞中插入偽量化（fake quantization）操作。模型學會將model weights置於捨入誤差較小的位置。梯度透過直通估計器（Straight-Through Estimator，STE）穿透偽量化操作：假裝四捨五入操作的梯度為 1。QAT 在 INT4 與 INT2 下產生的模型優於 PTQ，但需要完整的訓練執行作業。Google 在 Gemini 的高效服務中採用了 QAT，Meta 也在部分 Llama 部署目標中採用了 QAT。
+**量化感知訓練（QAT）** 在訓練期間的前向傳遞中插入偽量化（fake quantization）操作。模型學會將模型權重置於捨入誤差較小的位置。梯度透過直通估計器（Straight-Through Estimator，STE）穿透偽量化操作：假裝四捨五入操作的梯度為 1。QAT 在 INT4 與 INT2 下產生的模型優於 PTQ，但需要完整的訓練執行作業。Google 在 Gemini 的高效服務中採用了 QAT，Meta 也在部分 Llama 部署目標中採用了 QAT。
 
 | 面向 | PTQ | QAT |
 |--------|-----|-----|
@@ -156,11 +156,11 @@ graph TD
 
 ### GPTQ、AWQ、GGUF
 
-**GPTQ（GPT Quantization）** 是一種單次（one-shot）PTQ 方法。它逐層量化model weights，使用小型校準資料集（通常為 128 個範例）來測量 Hessian 矩陣（二階曲率資訊，反映輸出對每個model weights的敏感程度）。Hessian 判定為重要的model weights會被更謹慎地量化。GPTQ 是第一個讓 LLM 的 INT4 量化具備實用可行性的演算法。Hugging Face 上的 TheBloke 透過發布數百個模型的 GPTQ 版本將其發揚光大。
+**GPTQ（GPT Quantization）** 是一種單次（one-shot）PTQ 方法。它逐層量化模型權重，使用小型校準資料集（通常為 128 個範例）來測量 Hessian 矩陣（二階曲率資訊，反映輸出對每個模型權重的敏感程度）。Hessian 判定為重要的模型權重會被更謹慎地量化。GPTQ 是第一個讓 LLM 的 INT4 量化具備實用可行性的演算法。Hugging Face 上的 TheBloke 透過發布數百個模型的 GPTQ 版本將其發揚光大。
 
-**AWQ（Activation-Aware Weight Quantization）** 觀察到極少數model weights（約 1%）因與龐大的活化值相乘而顯得格外重要。AWQ 利用校準資料辨識出這些顯著model weights（salient weights），並在量化前將其放大（同時等比縮小相應的活化值）。這將重要model weights保護在 INT4 能準確量化的數值範圍內。AWQ 的品質通常打平或略勝 GPTQ，且執行速度快 1.5 到 2 倍。
+**AWQ（Activation-Aware Weight Quantization）** 觀察到極少數模型權重（約 1%）因與龐大的活化值相乘而顯得格外重要。AWQ 利用校準資料辨識出這些顯著模型權重（salient weights），並在量化前將其放大（同時等比縮小相應的活化值）。這將重要模型權重保護在 INT4 能準確量化的數值範圍內。AWQ 的品質通常打平或略勝 GPTQ，且執行速度快 1.5 到 2 倍。
 
-**GGUF（GPT-Generated Unified Format）** 是 llama.cpp 生態系統所使用的檔案格式。它支援混合量化：不同層級採用不同位元寬度。第一層與最後一層（embedding 與輸出頭）通常保留在較高精度，中間層則採用 INT4 或 INT3。GGUF 檔案完全自給自足：model weights、tokenizer、詮釋資料全包在單一檔案內。該格式專為 CPU 與 Apple Silicon 推論設計，將整個模型載入記憶體並在 CPU 或 Metal GPU 上執行矩陣乘法是其標準路徑。Q4_K_M 是最受歡迎的 GGUF 量化變體，在品質與檔案大小之間取得平衡。
+**GGUF（GPT-Generated Unified Format）** 是 llama.cpp 生態系統所使用的檔案格式。它支援混合量化：不同層級採用不同位元寬度。第一層與最後一層（embedding 與輸出頭）通常保留在較高精度，中間層則採用 INT4 或 INT3。GGUF 檔案完全自給自足：模型權重、tokenizer、詮釋資料全包在單一檔案內。該格式專為 CPU 與 Apple Silicon 推論設計，將整個模型載入記憶體並在 CPU 或 Metal GPU 上執行矩陣乘法是其標準路徑。Q4_K_M 是最受歡迎的 GGUF 量化變體，在品質與檔案大小之間取得平衡。
 
 ```mermaid
 graph TD
@@ -446,7 +446,7 @@ def bit_width_sweep(tensor):
 
 ### 步驟 5：敏感度實驗
 
-模擬量化 transformer 的不同部分，測量哪些元件最為敏感。這展示了敏感度階層：model weights < 活化值 < KV 快取 < 注意力。
+模擬量化 transformer 的不同部分，測量哪些元件最為敏感。這展示了敏感度階層：模型權重 < 活化值 < KV 快取 < 注意力。
 
 ```python
 def simulate_transformer_layer(input_data, weights, kv_scale=1.0):
@@ -526,7 +526,7 @@ def sensitivity_experiment(batch_size=2, seq_len=16, d_model=64, num_bits=8):
 
 ### 步驟 6：模擬 GPTQ
 
-GPTQ 一次量化一個列，利用 Hessian 矩陣決定如何分散捨入誤差。這是捕捉其核心思想的簡化版本：使用校準資料衡量model weights重要性，隨後更積極地量化次要model weights。
+GPTQ 一次量化一欄，利用 Hessian 矩陣決定如何分散捨入誤差。這是捕捉其核心思想的簡化版本：使用校準資料衡量模型權重重要性，隨後更積極地量化次要模型權重。
 
 ```python
 def simulated_gptq(weight_matrix, calibration_inputs, num_bits=4):
@@ -586,7 +586,7 @@ def dequantize_gptq(quantized, scales):
 
 ### 步驟 7：AWQ 模擬
 
-AWQ 辨識顯著model weights（與大型活化值相乘的model weights），並在量化前透過縮放加以保護。
+AWQ 辨識顯著模型權重（與大型活化值相乘的模型權重），並在量化前透過縮放加以保護。
 
 ```python
 def simulated_awq(weight_matrix, calibration_inputs, num_bits=4, salient_fraction=0.01):
@@ -628,7 +628,7 @@ def simulated_awq(weight_matrix, calibration_inputs, num_bits=4, salient_fractio
 
 ### 步驟 8：完整管線
 
-將所有環節串聯。在同一個model weights矩陣上比較天真量化、逐通道量化、GPTQ 與 AWQ。
+將所有環節串聯。在同一個模型權重矩陣上比較天真量化、逐通道量化、GPTQ 與 AWQ。
 
 ```python
 def full_quantization_comparison(d_in=256, d_out=512, num_bits=4, n_calibration=32):
@@ -839,7 +839,7 @@ AutoGPTQ 與 AutoAWQ 作為這兩種方法的原始工具已被歸檔封存。GP
 # vllm serve llama-8b-awq-int4 --max-model-len 8192
 ```
 
-vLLM 原生支援 AWQ 與 GPTQ 模型，並從 checkpoint 的 config 自動讀取量化方法，因此不需要額外帶 `--quantization` 旗標。它會在矩陣乘法期間自動處理反量化，並為 KV 快取採用分頁注意力（paged attention）。若要在 H100 上使用 FP8，只需加上 `--quantization fp8_per_tensor`，即可在載入時量化 16 位元 checkpoint 的model weights。
+vLLM 原生支援 AWQ 與 GPTQ 模型，並從 checkpoint 的 config 自動讀取量化方法，因此不需要額外帶 `--quantization` 旗標。它會在矩陣乘法期間自動處理反量化，並為 KV 快取採用分頁注意力（paged attention）。若要在 H100 上使用 FP8，只需加上 `--quantization fp8_per_tensor`，即可在載入時量化 16 位元 checkpoint 的模型權重。
 
 ## Ship It｜交付成果
 
@@ -847,7 +847,7 @@ vLLM 原生支援 AWQ 與 GPTQ 模型，並從 checkpoint 的 config 自動讀�
 
 ## Exercises｜練習
 
-1. 實作群組量化（group quantization）。在單一通道內，不再為整個通道使用單一縮放，而是每 128 個model weights組成一個群組使用獨立縮放。這正是 GPTQ 與 AWQ 實際採用的方式。在相同的model weights矩陣上比較群組大小為 32、64、128 與 256 的表現。較小的群組帶來更佳品質，但需要更多儲存空間來放置縮放因子。
+1. 實作群組量化（group quantization）。在單一通道內，不再為整個通道使用單一縮放，而是每 128 個模型權重組成一個群組使用獨立縮放。這正是 GPTQ 與 AWQ 實際採用的方式。在相同的模型權重矩陣上比較群組大小為 32、64、128 與 256 的表現。較小的群組帶來更佳品質，但需要更多儲存空間來放置縮放因子。
 
 2. 打造混合精度量化器。將多層網路的第一層與最後一層量化為 INT8，同時將中間層量化為 INT4。將端到端輸出品質與全 INT4 及全 INT8 進行比較，並測量相對於全 INT8 節省的記憶體。
 
@@ -855,7 +855,7 @@ vLLM 原生支援 AWQ 與 GPTQ 模型，並從 checkpoint 的 config 自動讀�
 
 4. 打造受 LLM.int8() 啟發的離群值感知量化器。偵測活化值幅度超過平均值 6 倍的通道。將這些通道保留在 FP16，並將其他所有通道量化為 INT8。在第 5 步的 transformer 層上，使用不同的離群值閾值（3x、6x、10x）測量端到端品質。
 
-5. 實作量化品質儀表板。給定model weights矩陣，計算並顯示：model weights分布長條圖、量化誤差分布、逐通道縮放因子、量化最差的通道（重建誤差最高者），以及跨 100 個隨機輸入時原始與量化輸出之間的餘弦相似度。識別哪些通道應保留在較高精度。
+5. 實作量化品質儀表板。給定模型權重矩陣，計算並顯示：模型權重分布長條圖、量化誤差分布、逐通道縮放因子、量化最差的通道（重建誤差最高者），以及跨 100 個隨機輸入時原始與量化輸出之間的餘弦相似度。識別哪些通道應保留在較高精度。
 
 ## Key Terms｜關鍵術語
 
@@ -868,9 +868,9 @@ vLLM 原生支援 AWQ 與 GPTQ 模型，並從 checkpoint 的 config 自動讀�
 | INT4 | 「四位元整數」 | 總共 16 個離散等級，需要精密方法（GPTQ、AWQ）來維持模型品質 |
 | 逐通道量化（Per-channel quantization） | 「每列一個縮放因子」 | 為每個輸出通道使用獨立的縮放因子，而非整個張量共用一個，大幅降低誤差 |
 | GPTQ | 「Hessian 方法」 | 逐層使用二階曲率資訊最小化輸出誤差的訓練後量化方法 |
-| AWQ | 「活化值感知」 | 在量化前放大顯著model weights（與大型活化值相乘者）以保護它們不受損 |
+| AWQ | 「活化值感知」 | 在量化前放大顯著模型權重（與大型活化值相乘者）以保護它們不受損 |
 | GGUF | 「llama.cpp 格式」 | 自給自足的模型檔案，具備混合精度層，專為 CPU 與 Apple Silicon 推論最佳化 |
-| PTQ | 「訓練後量化」 | 在不重新訓練的情況下將訓練好的模型model weights轉換為較低精度，速度快但在極端壓縮下受限 |
+| PTQ | 「訓練後量化」 | 在不重新訓練的情況下將訓練好的模型權重轉換為較低精度，速度快但在極端壓縮下受限 |
 | QAT | 「量化感知訓練」 | 在前向傳遞中插入偽量化，使模型學會容忍捨入誤差，在 INT4/INT2 下品質更佳 |
 | 校準資料（Calibration data） | 「那 128 個範例」 | 傳入模型用以計算活化值統計量以設定縮放因子的小型資料集 |
 | 縮放因子（Scale factor） | 「乘數」 | 在浮點數範圍與整數範圍之間進行轉換：`float_val = int_val * scale` |
@@ -878,8 +878,8 @@ vLLM 原生支援 AWQ 與 GPTQ 模型，並從 checkpoint 的 config 自動讀�
 
 ## Further Reading｜延伸閱讀
 
-- [Frantar et al., 2022 -- "GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers"](https://arxiv.org/abs/2210.17323) ——利用 Hessian 引導model weights四捨五入讓 LLM 的 INT4 量化具備實用可行性的論文
-- [Lin et al., 2023 -- "AWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration"](https://arxiv.org/abs/2306.00978) ——在量化前透過縮放保護顯著model weights，打平或超越 GPTQ 的經典方法
+- [Frantar et al., 2022 -- "GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers"](https://arxiv.org/abs/2210.17323) ——利用 Hessian 引導模型權重四捨五入讓 LLM 的 INT4 量化具備實用可行性的論文
+- [Lin et al., 2023 -- "AWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration"](https://arxiv.org/abs/2306.00978) ——在量化前透過縮放保護顯著模型權重，打平或超越 GPTQ 的經典方法
 - [Dettmers et al., 2022 -- "LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale"](https://arxiv.org/abs/2208.07339) ——將離群特徵保留在 FP16 的混合精度 INT8，實現無損 INT8 推論
-- [Xiao et al., 2023 -- "SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models"](https://arxiv.org/abs/2211.10438) ——將量化難度從活化值遷移至model weights以實現 W8A8 部署
+- [Xiao et al., 2023 -- "SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models"](https://arxiv.org/abs/2211.10438) ——將量化難度從活化值遷移至模型權重以實現 W8A8 部署
 - [Micikevicius et al., 2022 -- "FP8 Formats for Deep Learning"](https://arxiv.org/abs/2209.05433) ——由 NVIDIA、ARM 與 Intel 聯合發表、定義 H100 原生 E4M3 與 E5M2 格式的論文
