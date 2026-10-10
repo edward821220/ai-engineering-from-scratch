@@ -84,7 +84,7 @@ def predict_mft(tokens, word_best, default_tag):
 P(tags, words) = prod P(tag_i | tag_{i-1}) * P(word_i | tag_i)
 ```
 
-兩張表：轉移機率（給定前一個標記的標記），發射機率（給定標記的詞）。用拉普拉斯平滑（Laplace smoothing）從次數估計兩者。用維特比解碼，也就是在標記格子上做動態規劃（dynamic programming）。
+兩張表：轉移機率（transition probability，給定前一個標記的標記），發射機率（emission probability，給定標記的詞）。用拉普拉斯平滑（Laplace smoothing）從次數估計兩者。用維特比解碼（Viterbi decoding），也就是在標記格子上做動態規劃（dynamic programming）。
 
 ```python
 import math
