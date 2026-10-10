@@ -21,5 +21,6 @@
   "phases/05-nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding/docs/en.md": "be2656f8a0ad2ca753a9ec60fd3b43bb1aa6a7fc0623f179c4a124cb93160ee3",
   "phases/05-nlp-foundations-to-advanced/21-nli-textual-entailment/docs/en.md": "ff81c43d767535518d1d724e57b8c0958a0bd8aabd8d16f64880347772ff0ed8",
   "phases/05-nlp-foundations-to-advanced/22-embedding-models-deep-dive/docs/en.md": "bfb5483ccac7e580a5256434b2a7e4ea749c30999fabc4aead4a95189e8c96b0",
-  "phases/05-nlp-foundations-to-advanced/23-chunking-strategies-rag/docs/en.md": "b8b7d9323c9387e7f6b96b5590b767631de766b169b081a128bc70c9648b7372"
+  "phases/05-nlp-foundations-to-advanced/23-chunking-strategies-rag/docs/en.md": "b8b7d9323c9387e7f6b96b5590b767631de766b169b081a128bc70c9648b7372",
+  "phases/05-nlp-foundations-to-advanced/24-coreference-resolution/docs/en.md": "5737352d097d9de94f3107cee673829c3dd42daf2b0229f0771e0f78489ccabe"
 }
