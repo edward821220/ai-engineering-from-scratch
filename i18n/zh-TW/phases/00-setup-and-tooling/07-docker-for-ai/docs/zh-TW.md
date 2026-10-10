@@ -9,14 +9,14 @@
 
 ## Learning Objectives｜學習目標
 
-- 使用 Dockerfile 建置支援 GPU 的 Docker 映像（image），內含 CUDA、PyTorch 和 AI 函式庫
-- 將主機（host）目錄掛載為磁碟區（volume），讓模型、資料集和程式碼（code）在容器重建後仍能保留
+- 使用 Dockerfile 建置（build）支援 GPU 的 Docker 映像（image），內含 CUDA、PyTorch 和 AI 函式庫
+- 將主機（host）目錄掛載（mount）為磁碟區（volume），讓模型（model）、資料集和程式碼（code）在容器重建後仍能保留
 - 設定 NVIDIA Container Toolkit，讓容器內可使用 GPU
-- 使用 Docker Compose 編排（orchestrate）多服務 AI 應用程式，例如推論伺服器（inference server）和向量資料庫（vector database）
+- 使用 Docker Compose 編排（orchestrate）多服務（multi-service）AI 應用程式，例如推論伺服器（inference server）和向量資料庫（vector database）
 
 ## The Problem｜問題
 
-你在筆電上使用 PyTorch 2.3、CUDA 12.4 和 Python 3.12 訓練模型；同事的環境則是 PyTorch 2.1、CUDA 11.8 和 Python 3.10，結果你的模型在他的電腦上崩潰。你的 Dockerfile 在兩台機器上都能正常運作。
+你在筆電上使用 PyTorch 2.3、CUDA 12.4 和 Python 3.12 訓練模型；同事的環境則是 PyTorch 2.1、CUDA 11.8 和 Python 3.10，結果你的模型在同事的電腦上崩潰。你的 Dockerfile 在兩台機器上都能正常運作。
 
 AI 專案常有棘手的相依套件（dependency）問題。常見的技術堆疊（stack）包含 Python、PyTorch、CUDA 驅動程式（driver）、cuDNN、系統層級的 C 函式庫（C libraries），以及 flash-attn 等需要精確編譯器（compiler）版本的專用套件。Docker 會把這些內容封裝成單一映像，讓它在各處都能以相同方式執行。
 
@@ -372,7 +372,7 @@ docker logs -f <container_id>
 
 1. 建置 Dockerfile，並在容器內執行 `python -c "import torch; print(torch.__version__)"`
 2. 啟動 docker-compose 堆疊，確認 AI 容器可透過 `http://qdrant:6333/collections` 存取 Qdrant
-3. 在 Dockerfile 加入 `flask`，重新建置，並在通訊埠（port）5000 啟動簡單的 API 伺服器（API server）（API server）；使用 `-p 5000:5000` 對應通訊埠
+3. 在 Dockerfile 加入 `flask`，重新建置，並在通訊埠（port）5000 啟動簡單的 API 伺服器（API server）；使用 `-p 5000:5000` 對應通訊埠
 4. 使用 `docker images` 測量映像大小。試著將基礎映像由 `devel` 改成 `runtime`，再比較大小
 
 ## Key Terms｜關鍵術語
@@ -380,7 +380,7 @@ docker logs -f <container_id>
 | 術語 | 常見說法 | 實際含義 |
 |------|----------------|----------------------|
 | 容器 | 「輕量虛擬機」 | 使用主機核心、擁有獨立檔案系統和網路的隔離行程 |
-| 映像層（image layer）（image layer） | 「快取步驟」 | Dockerfile 的每個指令都會建立一層；未變動的層會被快取，讓重建速度更快 |
+| 映像層（image layer） | 「快取步驟」 | Dockerfile 的每個指令都會建立一層；未變動的層會被快取，讓重建速度更快 |
 | NVIDIA Container Toolkit | 「Docker 裡的 GPU」 | 透過 `--gpus` 旗標將主機 GPU 提供給容器的執行階段擴充元件 |
 | 磁碟區掛載 | 「共用資料夾」 | 將主機上的目錄掛載到容器內；容器停止後，變更仍會保留 |
 | 基礎映像 | 「起始點」 | Dockerfile 以 `FROM` 指定的映像，決定預先安裝哪些內容 |
