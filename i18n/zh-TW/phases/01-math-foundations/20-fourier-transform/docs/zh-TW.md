@@ -52,7 +52,7 @@ X[0] = sum_{n=0}^{N-1} x[n] * e^0 = sum of all samples
 
 **X[N/2]：奈奎斯特頻率（Nyquist frequency）。** 使用 N 個樣本能表示的最高頻率。超過此頻率就會產生混疊（aliasing）——高頻看起來會像低頻。
 
-**X[k]，其中 N/2 < k < N：負頻率。** 對實值訊號而言（real-valued signals），X[N-k] = conj(X[k])，形成共軛對稱（conjugate symmetry）（conjugate symmetry）。負頻率與正頻率互為對稱。因此，有用的資訊只在前 N/2 + 1 個係數中。
+**X[k]，其中 N/2 < k < N：負頻率。** 對實值訊號而言（real-valued signals），X[N-k] = conj(X[k])，形成共軛對稱（conjugate symmetry）。負頻率與正頻率互為對稱。因此，有用的資訊只在前 N/2 + 1 個係數中。
 
 ### 反離散傅立葉轉換
 
@@ -66,7 +66,7 @@ for n = 0, 1, ..., N-1
 
 它與正向 DFT 只有兩處不同：指數中的負號改為正號，並多了 1/N 正規化因子。
 
-IDFT 能完美重建原始資料，不會遺失資訊。你可以在時域和頻域之間來回轉換，不會產生誤差。DFT 是基底變換（change of basis）——它只是用另一種座標系統重新表示相同的資訊。
+IDFT 能完美重建原始資料，不會遺失資訊。你可以在時域和頻域之間來回轉換，不會產生誤差。DFT 是基底變換（change of basis）——它只是用另一種座標系統（coordinate system）重新表示相同的資訊。
 
 ### FFT：加快計算
 
@@ -438,7 +438,7 @@ spectrogram = np.abs(Zxx) ** 2
 
 | 術語 | 定義 |
 |------|---------------|
-| DFT（Discrete Fourier Transform） | 將 N 個時域樣本轉換成 N 個頻域係數。每個係數都是訊號與該頻率複數正弦訊號（complex sinusoid）（complex sinusoid）的相關值。 |
+| DFT（Discrete Fourier Transform） | 將 N 個時域樣本轉換成 N 個頻域係數。每個係數都是訊號與該頻率複數正弦訊號（complex sinusoid）的相關值。 |
 | FFT（Fast Fourier Transform） | 以 O(N log N) 計算 DFT 的演算法。Cooley-Tukey 演算法會遞迴拆分偶數與奇數索引。 |
 | 反離散傅立葉轉換（Inverse DFT） | 從頻率係數重建時域訊號。公式與 DFT 相同，但指數符號相反，並乘上 1/N。 |
 | 頻率槽（frequency bin） | DFT 輸出中的每個索引 k 都代表頻率 k*fs/N Hz；「槽」是離散的頻率位置。 |
