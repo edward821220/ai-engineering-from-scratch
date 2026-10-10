@@ -97,7 +97,7 @@ dL/dw = (1/n) * sum((p - y) * x)
 dL/db = (1/n) * sum(p - y)
 ```
 
-這些梯度與線性迴歸的梯度形式相同。差別在於 p = sigmoid(wx + b)，而非 p = wx + b。sigmoid 引入了非線性，但梯度更新規則仍相同。
+這些梯度與線性迴歸的梯度形式相同。差別在於 p = sigmoid(wx + b)，而非 p = wx + b。sigmoid 引入了非線性（nonlinearity），但梯度更新規則仍相同。
 
 ```mermaid
 flowchart TD
@@ -505,9 +505,7 @@ print(f"\nClassification Report:\n{classification_report(y_te, y_pred)}")
 ## Exercises｜練習
 
 1. 產生一個完全無法線性可分（linearly separable）的資料集，例如由兩個同心圓（concentric circles）形成的資料。訓練邏輯斯迴歸並觀察它如何失效。接著加入多項式特徵（x1^2, x2^2, x1*x2），再重新訓練。展示準確率有所提升。
-
 2. 為三類別 softmax 模型實作多類別混淆矩陣（multi-class confusion matrix）。計算每個類別的精確率與召回率。哪個類別最難分類？
-
 3. 從頭實作 ROC 曲線（ROC curve）。對 0 到 1 之間的 100 個閾值，計算真陽性率（true positive rate）與偽陽性率（false positive rate）。再用梯形法則（trapezoidal rule）計算曲線下面積（area under the curve，AUC）。
 
 ## Key Terms｜關鍵術語
