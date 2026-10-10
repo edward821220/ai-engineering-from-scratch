@@ -84,7 +84,7 @@ For each training example (x, y_true):
 
 ### XOR 問題
 
-問題出在這裡。看看這些邏輯閘（logic gate）（logic gate）：
+問題出在這裡。看看這些邏輯閘（logic gate）：
 
 ```
 AND gate:           OR gate:            XOR gate:
@@ -149,7 +149,7 @@ class Perceptron:
         print(f"Did not converge after {epochs} epochs")
 ```
 
-### 步驟 2：用邏輯閘（logic gate）（logic gate）訓練
+### 步驟 2：用邏輯閘（logic gate）訓練
 
 ```python
 and_data = [
