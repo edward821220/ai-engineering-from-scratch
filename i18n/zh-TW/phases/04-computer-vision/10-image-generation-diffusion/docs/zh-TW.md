@@ -10,15 +10,15 @@
 ## Learning Objectives｜學習目標
 
 - 推導前向加雜訊過程 `x_0 -> x_1 -> ... -> x_T`，並說明為什麼閉式（closed form）的 `q(x_t | x_0)` 對任何 t 都成立
-- 實作 DDPM 風格的訓練目標：迴歸每一步加進去的雜訊，以及一個從純雜訊走回影像的抽樣器（sampler）
+- 實作 DDPM 風格的訓練目標：迴歸每一步加進去的雜訊，以及一個從純雜訊走回影像的取樣器（sampler）
 - 做一個時間條件的 U-Net，小到能在 CPU 上訓練，對任何時間步預測雜訊
-- 說明 DDPM 和 DDIM 抽樣的差別，以及各自適合的時候（第 23 課會深入流匹配（flow matching）和整流流（rectified flow））
+- 說明 DDPM 和 DDIM 取樣的差別，以及各自適合的時候（第 23 課會深入流匹配（flow matching）和整流流（rectified flow））
 
 ## The Problem｜問題
 
 GAN 一次生成：雜訊進去，影像出來，一次前向傳遞（forward pass）。它們快，但難訓練。擴散模型是反覆生成：從純雜訊開始，一小步一小步去雜訊，影像慢慢浮出來。它們慢，但好訓練。過去五年，後者這個性質壓過了前者。任何小團隊都能訓練一個擴散模型，拿到還可以的樣本。GAN 訓練是要花很多年失敗才學會的手藝。
 
-除了訓練穩，擴散的反覆結構才是現代影像生成能做那麼多事的原因：文字條件、局部修補（inpainting）、影像編輯、超解析度（super-resolution）、可控的風格。抽樣迴圈的每一步，都是塞進新約束的地方。Stable Diffusion、Imagen、DALL-E 3、Midjourney，以及你會用到的每個可控影像模型都走擴散，就是因為有這個接點。
+除了訓練穩，擴散的反覆結構才是現代影像生成能做那麼多事的原因：文字條件、局部修補（inpainting）、影像編輯、超解析度（super-resolution）、可控的風格。取樣迴圈的每一步，都是塞進新約束的地方。Stable Diffusion、Imagen、DALL-E 3、Midjourney，以及你會用到的每個可控影像模型都走擴散，就是因為有這個接點。
 
 本課做最小的 DDPM：前向加雜訊、反向去雜訊、訓練迴圈。下一課（Stable Diffusion）把它接到一套正式環境的系統：VAE、文字編碼器（encoder），以及無分類器引導（classifier-free guidance）。
 
@@ -36,7 +36,7 @@ q(x_t | x_{t-1}) = N(x_t; sqrt(1 - beta_t) * x_{t-1},  beta_t * I)
 
 ### 閉式解的一步更新
 
-一步一步加雜訊是一條馬可夫鏈（Markov chain），但式子可以折成一步：你可以一步就從 `x_0` 抽出 `x_t`。
+一步一步加雜訊是一條馬可夫鏈（Markov chain），但式子可以折成一步：你可以一步就從 `x_0` 取樣出 `x_t`。
 
 ```
 Define alpha_t = 1 - beta_t
@@ -50,7 +50,7 @@ Equivalently:
   where epsilon ~ N(0, I)
 ```
 
-這一個式子，就是擴散做得起來的全部理由。訓練時你隨機挑一個 `t`，直接從 `x_0` 抽出 `x_t`，一步就訓練完。不用把整條馬可夫鏈模擬出來。
+這一個式子，就是擴散做得起來的全部理由。訓練時你隨機挑一個 `t`，直接從 `x_0` 取樣出 `x_t`，一步就訓練完。不用把整條馬可夫鏈模擬出來。
 
 ### 反向過程
 
@@ -66,7 +66,7 @@ flowchart LR
 
     XT -.->|sampling| STEP["p(x_{t-1}|x_t)"]
     STEP -.-> XT1["x_{t-1}"]
-    XT1 -.->|repeat 1000x| X0S["x_0（抽樣得到）"]
+    XT1 -.->|repeat 1000x| X0S["x_0（取樣得到）"]
 
     style X0 fill:#dcfce7,stroke:#16a34a
     style MODEL fill:#fef3c7,stroke:#d97706
@@ -87,7 +87,7 @@ flowchart LR
 
 就是這樣。神經網路學會在任何時間步預測雜訊。損失（loss）是 MSE。沒有對抗賽局，沒有崩塌，沒有振盪。
 
-### 抽樣器（DDPM）
+### 取樣器（DDPM）
 
 要生成時，從 `x_T ~ N(0, I)` 開始，一次往回走一步。
 
@@ -103,11 +103,11 @@ return x_0
 
 ### 為什麼是 1000 步
 
-前向雜訊排程選成每一步只加剛好夠的雜訊，讓反向那一步幾乎是高斯。步數太少，反向那一步離高斯太遠，網路模型不好。步數太多，抽樣變貴，增益卻遞減。T=1000 配線性排程，是 DDPM 的預設。
+前向雜訊排程選成每一步只加剛好夠的雜訊，讓反向那一步幾乎是高斯。步數太少，反向那一步離高斯太遠，網路模型不好。步數太多，取樣變貴，增益卻遞減。T=1000 配線性排程，是 DDPM 的預設。
 
-### DDIM：抽樣快約 20 倍
+### DDIM：取樣快約 20 倍
 
-訓練相同。抽樣改變。DDIM（Song 等人，2020）定義一個確定性的反向過程，可以跳過時間步，不用重新訓練。用 DDIM 抽 50 步，品質接近 1000 步的 DDPM。每個正式環境的系統都用 DDIM，或更快的變體，例如 DPM-Solver、Euler ancestral（祖先抽樣）。
+訓練相同。取樣改變。DDIM（Song 等人，2020）定義一個確定性的反向過程，可以跳過時間步，不用重新訓練。用 DDIM 取樣 50 步，品質接近 1000 步的 DDPM。每個正式環境的系統都用 DDIM，或更快的變體，例如 DPM-Solver、Euler ancestral（祖先取樣）。
 
 ### 時間條件
 
@@ -150,7 +150,7 @@ def precompute_schedule(betas):
 schedule = precompute_schedule(linear_beta_schedule(T=1000))
 ```
 
-先算一次，訓練和抽樣時再依索引取出。
+先算一次，訓練和取樣時再依索引取出。
 
 ### 步驟 2：前向擴散（q_sample）
 
@@ -229,7 +229,7 @@ def train_step(model, x0, schedule, optimizer, device, T=1000):
 
 這就是整個訓練迴圈。沒有 GAN 的賽局，沒有特製的損失，一次 MSE。
 
-### 步驟 5：抽樣器（DDPM）
+### 步驟 5：取樣器（DDPM）
 
 ```python
 @torch.no_grad()
@@ -252,9 +252,9 @@ def sample(model, schedule, shape, T=1000, device="cpu"):
     return x
 ```
 
-要產出一批樣本，得做 1000 次前向傳遞。實際程式會把這段換成 DDIM 的 50 步抽樣器。
+要產出一批樣本，得做 1000 次前向傳遞。實際程式會把這段換成 DDIM 的 50 步取樣器。
 
-### 步驟 6：DDIM 抽樣器（確定性，大約快 20 倍）
+### 步驟 6：DDIM 取樣器（確定性，大約快 20 倍）
 
 ```python
 @torch.no_grad()
@@ -294,7 +294,7 @@ scheduler = DDPMScheduler(num_train_timesteps=1000)
 
 這個函式庫（library）提供現成的排程器（DDPM、DDIM、DPM-Solver、Euler、Heun）、可設定的 U-Net、文字到影像和影像到影像的管線（pipeline），以及 LoRA fine-tuning 的輔助程式。
 
-做研究的話，`k-diffusion`（Katherine Crowson）有最忠於原文的參考實作，抽樣變體也最好。
+做研究的話，`k-diffusion`（Katherine Crowson）有最忠於原文的參考實作，取樣變體也最好。
 
 ## Ship It｜交付成果
 
@@ -306,7 +306,7 @@ scheduler = DDPMScheduler(num_train_timesteps=1000)
 ## Exercises｜練習
 
 1. **（簡單）** 把前向過程畫出來：拿一張影像，在 `t in [0, 100, 250, 500, 750, 1000]` 畫出 `x_t`。確認 `x_1000` 看起來像純高斯雜訊。
-2. **（中等）** 在合成圓形資料集上把 TinyUNet 訓練 20 個 epoch（訓練週期），抽出 16 個圓。比較 DDPM（1000 步）和 DDIM（50 步）。同一顆雜訊種子，它們產出的影像像不像？
+2. **（中等）** 在合成圓形資料集上把 TinyUNet 訓練 20 個 epoch（訓練週期），取樣出 16 個圓。比較 DDPM（1000 步）和 DDIM（50 步）。同一顆雜訊種子，它們產出的影像像不像？
 3. **（困難）** 實作餘弦雜訊排程（Nichol 與 Dhariwal，2021）：`alpha_bar_t = cos^2((t/T + s) / (1 + s) * pi / 2)`。同一模型用線性和餘弦排程各訓練一次，顯示步數少的時候餘弦的樣本更好。
 
 ## Key Terms｜關鍵術語
@@ -318,13 +318,13 @@ scheduler = DDPMScheduler(num_train_timesteps=1000)
 | epsilon 預測 | 「預測雜訊」 | 訓練目標：`epsilon_theta(x_t, t)` 預測第 t 步加進去的雜訊 |
 | beta 排程 | 「雜訊的量」 | 長度 T 的一串小變異數，定義每一步灌進多少雜訊 |
 | alpha_bar_t | 「累積保留係數」 | 到時間 t 為止，(1 - beta_s) 的乘積。t 越大，剩下的訊號越少 |
-| DDPM 抽樣器 | 「祖先抽樣，隨機」 | 從條件高斯抽出每個 x_{t-1}。1000 步 |
-| DDIM 抽樣器 | 「確定、很快」 | 把抽樣改寫成確定性 ODE。20 到 100 步，品質接近 |
+| DDPM 取樣器 | 「祖先取樣，隨機」 | 從條件高斯取樣出每個 x_{t-1}。1000 步 |
+| DDIM 取樣器 | 「確定、很快」 | 把取樣改寫成確定性 ODE。20 到 100 步，品質接近 |
 | 時間條件 | 「告訴模型現在是哪個 t」 | 把 t 的正弦 embedding 灌進 U-Net，讓它知道雜訊有多大 |
 
 ## Further Reading｜延伸閱讀
 
 - [Denoising Diffusion Probabilistic Models (Ho et al., 2020)](https://arxiv.org/abs/2006.11239) ——把擴散做得實用、並在 FID 上贏過 GAN 的那篇
 - [Improved DDPM (Nichol & Dhariwal, 2021)](https://arxiv.org/abs/2102.09672) ——餘弦排程和 v-parameterisation
-- [DDIM (Song, Meng, Ermon, 2020)](https://arxiv.org/abs/2010.02502) ——讓即時推論（inference）變得可能的確定性抽樣器
+- [DDIM (Song, Meng, Ermon, 2020)](https://arxiv.org/abs/2010.02502) ——讓即時推論（inference）變得可能的確定性取樣器
 - [Elucidating the Design Space of Diffusion (Karras et al., 2022)](https://arxiv.org/abs/2206.00364) ——把每個擴散設計選擇整理成一個統一觀點。目前最好的參考
