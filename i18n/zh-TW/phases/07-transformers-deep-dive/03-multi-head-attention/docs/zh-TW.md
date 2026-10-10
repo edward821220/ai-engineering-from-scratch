@@ -1,6 +1,6 @@
 # 多頭注意力（multi-head attention）
 
-> 一個注意力頭一次學一種關係。八個頭學八種。頭是免費的。多拿幾個。
+> 一個注意力頭（attention head）一次學一種關係。八個頭學八種。頭不花額外成本。多開幾個。
 
 **Type:** Build
 **Languages:** Python
@@ -11,9 +11,9 @@
 
 單一的自注意力（self-attention）頭算出一張注意力矩陣。那張矩陣抓住一種關係——通常是把損失（loss）在訓練訊號上壓到最低的那一種。如果你的資料裡主詞動詞一致、共指（coreference）、長程篇章、句法切塊全纏在一起，單一的頭會混在同一個 softmax 分布（distribution），丟掉一半的訊號。
 
-2017 年 Vaswani 論文的修法：平行跑好幾個注意力函式，各自有自己的 Q、K、V 投影，再把輸出串接起來。每個頭在較小的子空間裡運作，維度（dimension）是 `d_model / n_heads`。參數（parameter）總數不變。表達力上升。
+2017 年 Vaswani 論文的修法：平行跑好幾個注意力函式，各自有自己的 Q、K、V 投影（projection），再把輸出串接起來。每個頭在較小的子空間（subspace）裡運作，維度（dimension）是 `d_model / n_heads`。參數（parameter）總數不變。表達力上升。
 
-多頭注意力是 2026 年每個交付出去的 transformer 的預設。唯一還在爭的是頭要*幾個*，以及鍵和值要不要共用投影（分組查詢注意力 Grouped-Query Attention、多查詢注意力 Multi-Query Attention、多頭潛在注意力 Multi-head Latent Attention）。
+多頭注意力是 2026 年所有 transformer 的預設架構。唯一還在爭的是頭要*幾個*，以及鍵（key）和值要不要共用投影（分組查詢注意力 Grouped-Query Attention、多查詢注意力 Multi-Query Attention、多頭潛在注意力 Multi-head Latent Attention）。
 
 ## The Concept｜核心概念
 
@@ -36,7 +36,7 @@
 | 分組查詢（GQA） | N | G（例如 N/8） | Llama 2 70B、Llama 3+、Qwen 2+、Mistral |
 | 多頭潛在（MLA） | N | 壓成低秩 | DeepSeek-V2、V3 |
 
-GQA 是現代的預設，因為它把 KV 快取的記憶體（memory）砍到 `N/G` 分之一，品質幾乎留滿。MLA 更進一步，把 K／V 壓進潛在空間，計算時再投影回來——多花 FLOPs，記憶體省得更多。
+GQA 是現代的預設，因為它能把 KV 快取的記憶體（memory）降到 `N/G` 分之一，同時品質幾乎維持不變。MLA 更進一步，把 K／V 壓進潛在空間（latent space），計算時再投影回來——多花 FLOPs，記憶體省得更多。
 
 ```figure
 multihead-split
