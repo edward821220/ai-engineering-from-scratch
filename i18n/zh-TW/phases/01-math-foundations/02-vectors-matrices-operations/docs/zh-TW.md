@@ -16,7 +16,7 @@
 
 ## The Problem｜問題
 
-你想打造一個神經網路。讀程式碼時看到這行：
+你想打造一個神經網路。讀程式碼（code）時看到這行：
 
 ```
 output = activation(weights @ input + bias)
@@ -32,7 +32,7 @@ output = activation(weights @ input + bias)
 
 ### 向量：有序的數字列表
 
-向量是有方向和大小的數字列表。在 AI 中，向量用來表示資料點、特徵（feature）或參數（parameter）。
+向量是有方向和大小的數字列表。在 AI 中，向量用來表示資料點（data point）、特徵（feature）或參數（parameter）。
 
 ```
 v = [3, 4]        -- a 2D vector

@@ -16,7 +16,7 @@
 
 ## The Problem｜問題
 
-你在終端機裡花的時間會比在任何編輯器裡都多。訓練作業（training run）、GPU 監控、追蹤日誌、遠端 SSH 工作階段、環境管理——每個 AI 工作流程都離不開 shell。你在這裡慢，到處都慢。
+你在終端機裡花的時間會比在任何編輯器（editor）裡都多。訓練作業（training run）、GPU 監控、追蹤日誌、遠端 SSH 工作階段、環境管理——每個 AI 工作流程都離不開 shell。你在這裡慢，到處都慢。
 
 本課只講 AI 工作真正用得上的終端機技能。不講 Unix 歷史，不深究 Bash 程式，只講你需要的東西。
 
@@ -217,7 +217,7 @@ nvidia-smi --query-compute-apps=pid,name,used_memory --format=csv
 ```
 
 你會用到的 `htop` 按鍵：
-- `F6` 或 `>` 依欄位排序（依記憶體排序可找出記憶體洩漏）
+- `F6` 或 `>` 依欄位排序（依記憶體（memory）排序可找出記憶體（memory）洩漏）
 - `F5` 切換樹狀檢視（查看子行程）
 - `F9` 終止行程
 - `/` 搜尋行程名稱
@@ -334,7 +334,7 @@ env | grep -i torch
 1. 安裝 tmux，建立一個含三個窗格的工作階段：一個跑 `htop`、一個跑 `watch -n1 date`、一個跑 Python 程式檔案。分離後再重新連接。
 2. 把 `code/shell_aliases.sh` 裡的別名加進你的 shell 設定檔，並用 `source ~/.zshrc`（或 `~/.bashrc`）重新載入。
 3. 用 `for i in $(seq 1 100); do echo "epoch $i loss: $(echo "scale=4; 1/$i" | bc)"; sleep 0.1; done > fake_train.log` 建立一份假訓練（training）日誌，再用 `grep`、`tail` 和 `awk` 只擷取 loss 值。
-4. 為一台你有權限存取的伺服器設定一個 SSH config 項目（或用 `localhost` 練習語法）。
+4. 為一台你有權限存取的伺服器（server）設定一個 SSH config 項目（或用 `localhost` 練習語法）。
 
 ## Key Terms｜關鍵術語
 
@@ -345,4 +345,4 @@ env | grep -i torch
 | 管線（pipe） | 「那根直的線」 | `\|` 運算子，把一個指令的輸出送到另一個指令當輸入 |
 | PID | 「Process ID」 | 指派給每個執行中行程的唯一編號，用於監控或終止行程 |
 | nohup | 「No hangup」 | 讓指令不受掛斷訊號（hangup signal）影響，關閉終端機也不會終止它 |
-| SSH | 「連到伺服器」 | Secure Shell，用於在遠端機器上執行指令的加密協定 |
+| SSH | 「連到伺服器（server）」 | Secure Shell，用於在遠端機器上執行指令的加密協定 |

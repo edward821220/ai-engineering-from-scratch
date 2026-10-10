@@ -21,11 +21,11 @@
 這就是相依地獄。在 AI/ML 工作中，這種情況很常見，原因包括：
 
 - PyTorch、JAX 和 TensorFlow 各自附帶 CUDA 繫結（CUDA bindings）
-- 模型函式庫（libraries）會固定使用特定的框架（framework）版本
+- 模型（model）函式庫（libraries）會固定使用特定的框架（framework）版本
 - 全域執行 `pip install` 會覆寫先前安裝的內容
 - CUDA 11.8 組建無法搭配 CUDA 12.x 驅動程式（driver），反之亦然
 
-解決方法是：每個專案都有自己的隔離環境，並在其中安裝自己的套件（package）。
+解決方法是：每個專案都有自己的隔離環境，並在其中安裝自己的套件（package）（package）。
 
 ## The Concept｜核心概念
 

@@ -18,7 +18,7 @@
 
 模型訓練了三小時，接著損失變成 NaN。你加了一行印出數值的程式碼：第 9,000 步的 logits 還正常；第 9,001 步就變成 `inf`；到了第 9,002 步，每個梯度都是 `nan`，訓練也停擺了。
 
-或者，模型順利訓練完成，但準確率比論文低了 2%。你逐一檢查，架構、超參數和資料都一致。問題在於論文用 float32，而你用 float16，卻沒有正確縮放。32 位元浮點運算中累積的捨入誤差，悄悄拉低了準確率，悄悄吃掉了你的準確率。
+或者，模型順利訓練完成，但準確率比論文低了 2%。你逐一檢查，架構、超參數和資料都一致。問題在於論文用 float32，而你用 float16，卻沒有正確縮放。32 位元浮點運算中累積的捨入雜訊，悄悄拉低了準確率，悄悄吃掉了你的準確率。
 
 或者，你從零實作交叉熵損失（cross-entropy loss）。logits 不大時都正常，但超過 100 就回傳 `inf`。softmax 發生溢位，因為 `exp(100)` 大到超出 float32 的表示範圍。每個 ML 框架都用一個兩行的小技巧處理這件事，但你不知道它存在。
 
@@ -47,7 +47,7 @@ float16    16     5         10        ~3-4            +/- 65,504
 bfloat16   16     8         7         ~2-3            +/- 3.4e38
 ```
 
-float32 約有 7 位十進位精度。它能分辨 1.0000001 和 1.0000002，卻分不出 1.00000001 和 1.00000002。超過 7 位的部分都會受捨入誤差影響。
+float32 約有 7 位十進位精度。它能分辨 1.0000001 和 1.0000002，卻分不出 1.00000001 和 1.00000002。超過 7 位的部分都會受捨入雜訊影響。
 
 float16 約有 3 位精度，能表示的最大值是 65,504。這個範圍小得令人不安，因為 ML 的 logits、梯度和活化值常常會超過它。
 
@@ -82,7 +82,7 @@ False
 
 ### 災難性消去
 
-當你相減兩個非常接近的浮點數時，有效數字會互相抵消，原本微不足道的捨入誤差反而成為主要數值。
+當你相減兩個非常接近的浮點數時，有效數字會互相抵消，原本微不足道的捨入雜訊反而成為主要數值。
 
 ```
 a = 1.0000001    (stored as 1.00000011920929 in float32)
@@ -584,7 +584,7 @@ check_tensor("ugly", [1.0, float('inf'), 3.0])
 |------|----------------|----------------------|
 | IEEE 754 | 「浮點數標準」 | 定義二進位浮點格式、捨入規則和特殊值（inf、nan）的國際標準。現代 CPU 和 GPU 都有實作。 |
 | 機器精度（machine epsilon） | 「精度極限」 | 對某種浮點格式而言，使 1.0 + e != 1.0 成立的最小值。float32 約為 1.19e-7。 |
-| 災難性消去（catastrophic cancellation） | 「減法造成的精度損失」 | 相減非常接近的浮點數時，有效數字互相抵消，捨入誤差因而主導結果。 |
+| 災難性消去（catastrophic cancellation） | 「減法造成的精度損失」 | 相減非常接近的浮點數時，有效數字互相抵消，捨入雜訊因而主導結果。 |
 | 溢位（overflow） | 「數值太大」 | 結果超過最大可表示值，變成 inf。exp(89) 會讓 float32 溢位。 |
 | 下溢位（underflow） | 「數值太小」 | 結果比最小可表示正數更接近零，變成 0.0。exp(-104) 會讓 float32 下溢位。 |
 | log-sum-exp 技巧（log-sum-exp trick） | 「先減去最大值」 | 將 exp(max(x)) 提出後計算 log(sum(exp(x)))，避免溢位和下溢位。用於 softmax、交叉熵和對數機率運算。 |
@@ -604,4 +604,4 @@ check_tensor("ugly", [1.0, float('inf'), 3.0])
 - [Mixed Precision Training (Micikevicius et al., 2018)](https://arxiv.org/abs/1710.03740) -- NVIDIA 提出 float16 訓練損失縮放（loss scaling）的論文
 - [AMP: Automatic Mixed Precision (PyTorch docs)](https://pytorch.org/docs/stable/amp.html) -- PyTorch 混合精度實務指南
 - [bfloat16 format (Google Cloud TPU docs)](https://cloud.google.com/tpu/docs/bfloat16) -- Google 為 TPU 選擇此格式的原因
-- [Kahan Summation (Wikipedia)](https://en.wikipedia.org/wiki/Kahan_summation_algorithm) -- 降低浮點數加總捨入誤差的演算法
+- [Kahan Summation (Wikipedia)](https://en.wikipedia.org/wiki/Kahan_summation_algorithm) -- 降低浮點數加總捨入雜訊的演算法

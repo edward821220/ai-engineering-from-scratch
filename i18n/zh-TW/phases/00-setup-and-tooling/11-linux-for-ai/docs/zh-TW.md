@@ -16,7 +16,7 @@
 
 ## The Problem｜問題
 
-你在 macOS 或 Windows 上開發。但只要用 SSH 連上雲端 GPU 機器、租用 Lambda 執行個體，或開一台 EC2 機器，你就會進入 Ubuntu 環境。終端機是你唯一的介面——沒有 Finder、沒有檔案總管、沒有 GUI。如果你不會在命令列上瀏覽檔案系統、安裝套件、管理行程（process），就只能一邊支付 GPU 閒置期間的費用，一邊搜尋「Linux 怎麼解壓縮檔案」。
+你在 macOS 或 Windows 上開發。但只要用 SSH 連上雲端 GPU（cloud GPU） 機器、租用 Lambda 執行個體，或開一台 EC2 機器，你就會進入 Ubuntu 環境。終端機是你唯一的介面（interface）——沒有 Finder、沒有檔案總管、沒有 GUI。如果你不會在命令列上瀏覽檔案系統、安裝套件、管理行程（process），就只能一邊支付 GPU 閒置期間的費用，一邊搜尋「Linux 怎麼解壓縮檔案」。
 
 這是一份生存指南，只講在遠端 Linux 機器上做 AI 工作需要的東西，不多不少。
 
@@ -117,7 +117,7 @@ chown user:group file.txt   # Change who owns a file (needs sudo)
 
 ## 套件管理（apt）
 
-Ubuntu 使用 `apt`，用來安裝系統層級的軟體。
+Ubuntu 使用 `apt`，用來安裝系統層級的軟體（software）。
 
 ```bash
 sudo apt update             # Refresh the package list (always do this first)
@@ -153,7 +153,7 @@ sudo command                # Run a single command as root
 sudo su                     # Become root (exit to go back, use sparingly)
 ```
 
-在雲端 GPU 執行個體上，你通常是唯一的使用者，而且已經有 sudo 權限。不要什麼都用 root 跑，需要時才用 sudo。
+在雲端 GPU（cloud GPU） 執行個體上，你通常是唯一的使用者，而且已經有 sudo 權限。不要什麼都用 root 跑，需要時才用 sudo。
 
 ## 行程與 systemd
 
@@ -301,7 +301,7 @@ s0-process-fork
 ## Exercises｜練習
 
 1. SSH 進任一台 Linux 機器（或打開 WSL2），切換到你的家目錄。建立一個專案（project）資料夾，在裡面用 `touch` 建三個空檔案，再用 `ls -la` 列出來。
-2. 用 apt 安裝 `htop`，執行它，找出哪個行程用了最多記憶體。
+2. 用 apt 安裝 `htop`，執行它，找出哪個行程用了最多記憶體（memory）。
 3. 開一個 tmux 工作階段，在裡面執行 `sleep 300`，然後分離、列出工作階段、再重新連接。
 4. 用 `df -h` 查看可用磁碟空間，再用 `du -sh ~/.cache/*` 找出快取（cache）裡什麼東西在佔空間。
 5. 用 `scp` 把一個檔案從本機傳到遠端機器，再用 `rsync` 做同樣的傳輸，比較兩者的體驗。

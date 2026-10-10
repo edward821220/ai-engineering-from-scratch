@@ -1,6 +1,6 @@
 # 連鎖律與自動微分
 
-> 連鎖律（chain rule）是每個會學習的神經網路背後的引擎。
+> 連鎖律（chain rule）是每個會學習的神經網路（neural network）背後的引擎。
 
 **Type:** Build
 **Language:** Python
@@ -16,7 +16,7 @@
 
 ## The Problem｜問題
 
-你已經會對簡單函數算導數。但神經網路不是簡單函數，它是由數百個函數組合而成：矩陣乘法（matrix multiply）、加偏置、套用活化函數、再做矩陣乘法（matrix multiply）、softmax、交叉熵損失。輸出是層層函數組合的結果。
+你已經會對簡單函數算導數。但神經網路（neural network）不是簡單函數，它是由數百個函數組合而成：矩陣乘法（matrix multiply）、加偏置、套用活化函數、再做矩陣乘法（matrix multiply）、softmax、交叉熵損失。輸出是層層函數組合的結果。
 
 要訓練網路，你得拿到損失對每一個權重的梯度。對數百萬個參數來說，手算不可能，用數值方法（有限差分）又太慢。
 
@@ -53,7 +53,7 @@ y = f(g(h(x)))
 dy/dx = f'(g(h(x))) * g'(h(x)) * h'(x)
 ```
 
-神經網路的每一層都是這條鏈上的一環。
+神經網路（neural network）的每一層都是這條鏈上的一環。
 
 ### 計算圖
 
@@ -108,12 +108,12 @@ Reverse mode: seed dy/dy = 1, propagate backward
   x = 2       (dy/dx = dy/da * da/dx = -0.654 * 4 = -2.615)
 ```
 
-神經網路有數百萬個輸入（權重）和一個輸出（損失）。反向模式用一次反向傳遞就算出所有梯度——這就是反向傳播（backpropagation）採用反向模式的原因。
+神經網路（neural network）有數百萬個輸入（權重）和一個輸出（損失）。反向模式用一次反向傳遞就算出所有梯度——這就是反向傳播（backpropagation）採用反向模式的原因。
 
 | 模式 | 種子 | 方向 | 最適合 |
 |------|------|-----------|-----------|
 | 正向 | `dx_i/dx_i = 1` | 輸入到輸出 | 輸入少、輸出多 |
-| 反向 | `dy/dy = 1` | 輸出到輸入 | 輸入多、輸出少（神經網路） |
+| 反向 | `dy/dy = 1` | 輸出到輸入 | 輸入多、輸出少（神經網路（neural network）） |
 
 ### 用對偶數做正向模式
 
@@ -240,7 +240,7 @@ class Value:
 
 ### 步驟 4：補齊完整引擎的運算
 
-基本的 Value 類別只能處理加法、乘法和 relu。真正的 autograd 引擎需要更多運算，以下是建神經網路需要的：
+基本的 Value 類別只能處理加法、乘法和 relu。真正的 autograd 引擎需要更多運算，以下是建神經網路（neural network）需要的：
 
 ```python
     def __neg__(self):
@@ -310,7 +310,7 @@ class Value:
 
 ### 步驟 5：從零建迷你 MLP
 
-有了完整的 Value 類別，你就可以建神經網路了。不用 PyTorch、不用 NumPy，只有 Value 和連鎖律。
+有了完整的 Value 類別，你就可以建神經網路（neural network）了。不用 PyTorch、不用 NumPy，只有 Value 和連鎖律。
 
 ```python
 import random
@@ -381,7 +381,7 @@ for x, y in zip(xs, ys):
     print(f"  input={x}  target={y:2d}  pred={model(x).data:6.3f}")
 ```
 
-這就是 micrograd：一個用純 Python 加自動微分寫成的完整神經網路訓練迴圈。所有商業深度學習框架做的都是同一件事，只是規模巨大。
+這就是 micrograd：一個用純 Python 加自動微分寫成的完整神經網路（neural network）訓練迴圈。所有商業深度學習框架做的都是同一件事，只是規模巨大。
 
 ### 步驟 6：梯度檢查
 
@@ -485,7 +485,7 @@ print(f"df/dc = {c.grad}")  #  1.0
 - `outputs/skill-autodiff.md` — 一份建構與除錯自動微分系統的技能
 - `code/autodiff.py` — 一個可延伸的最小 autograd 引擎
 
-這裡打造的 Value 類別，是第 3 階段神經網路訓練迴圈的基礎。
+這裡打造的 Value 類別，是第 3 階段神經網路（neural network）訓練迴圈的基礎。
 
 ## Exercises｜練習
 
@@ -511,11 +511,11 @@ print(f"df/dc = {c.grad}")  #  1.0
 | 梯度累積（gradient accumulation） | 「加，不要覆蓋」 | 當一個值餵給多個運算時，它的梯度是所有傳入梯度貢獻的總和 |
 | 動態圖（dynamic graph） | 「define-by-run」 | 每次前向傳遞都重建的計算圖，讓模型內可以使用 Python 控制流（PyTorch 風格） |
 | 梯度檢查（gradient checking） | 「數值驗證」 | 拿自動微分梯度與數值有限差分梯度互相比較以驗證正確性。除錯時不可或缺。 |
-| MLP | 「多層感知器」 | 有一或多個隱藏層神經元的神經網路。每個神經元計算加權總和加偏置，再套用活化函數。 |
+| MLP | 「多層感知器」 | 有一或多個隱藏層神經元的神經網路（neural network）。每個神經元計算加權總和加偏置，再套用活化函數。 |
 | 神經元（neuron） | 「加權總和 + 活化函數」 | 基本單元：output = activation(w1*x1 + w2*x2 + ... + b)。權重和偏置是可學習的參數。 |
 
 ## Further Reading｜延伸閱讀
 
-- [3Blue1Brown: Backpropagation calculus](https://www.youtube.com/watch?v=tIeHLnjs5U8) — 神經網路中連鎖律的視覺化解說
+- [3Blue1Brown: Backpropagation calculus](https://www.youtube.com/watch?v=tIeHLnjs5U8) — 神經網路（neural network）中連鎖律的視覺化解說
 - [PyTorch Autograd mechanics](https://pytorch.org/docs/stable/notes/autograd.html) — 真實系統的運作方式
 - [Baydin et al., Automatic Differentiation in Machine Learning: a Survey](https://arxiv.org/abs/1502.05767) — 全面的參考文獻

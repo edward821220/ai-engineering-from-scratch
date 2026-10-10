@@ -45,7 +45,7 @@ graph TD
 
 2. **模型權重（model weights）體積很大。** 一個有 7B 個參數（parameters）的模型，使用 fp16 時需要 14 GB。每次重建都重新下載模型並不實際。Docker 磁碟區可讓你掛載主機上的模型目錄。
 
-3. **多服務架構很常見。** 真正的 AI 應用程式不只是一支 Python 程式：它可能包含推論伺服器、供 RAG 使用的向量資料庫，也可能還有網頁前端。Docker Compose 能用一個指令編排這些服務。
+3. **多服務架構很常見。** 真正的 AI 應用程式不只是一支 Python 程式：它可能包含推論伺服器、供 RAG 使用的向量資料庫，也可能還有網頁前端。Docker Compose 能用一個指令（command）編排這些服務。
 
 ### 關鍵詞彙
 
@@ -126,7 +126,7 @@ docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi
 
 ### 步驟 3：了解基礎映像（base image）
 
-選對基礎映像能省下好幾個小時的除錯時間。
+選對基礎映像能省下好幾個小時的除錯（debugging）時間。
 
 ```
 nvidia/cuda:12.4.1-devel-ubuntu22.04
@@ -264,7 +264,7 @@ model = AutoModel.from_pretrained("/models/llama-7b")
 
 ### 步驟 6：用 Docker Compose 建立多服務 AI 應用程式
 
-真正的 RAG 應用程式需要推論伺服器和向量資料庫。Docker Compose 能用一個指令啟動兩者。
+真正的 RAG 應用程式需要推論伺服器和向量資料庫。Docker Compose 能用一個指令（command）啟動兩者。
 
 請參考 `code/docker-compose.yml`：
 
@@ -310,7 +310,7 @@ cd phases/00-setup-and-tooling/07-docker-for-ai/code
 docker compose up -d
 ```
 
-現在 AI 開發容器可以透過服務名稱 qdrant，連線到向量資料庫的 `http://qdrant:6333`。Docker Compose 會自動建立共用網路。
+現在 AI 開發容器可以透過服務名稱 qdrant，連線到向量資料庫的 `http://qdrant:6333`。Docker Compose 會自動建立共用網路（network）。
 
 從 AI 容器內測試連線：
 
@@ -372,7 +372,7 @@ docker logs -f <container_id>
 
 1. 建置 Dockerfile，並在容器內執行 `python -c "import torch; print(torch.__version__)"`
 2. 啟動 docker-compose 堆疊，確認 AI 容器可透過 `http://qdrant:6333/collections` 存取 Qdrant
-3. 在 Dockerfile 加入 `flask`，重新建置，並在通訊埠（port）5000 啟動簡單的 API 伺服器（API server）；使用 `-p 5000:5000` 對應通訊埠
+3. 在 Dockerfile 加入 `flask`，重新建置，並在通訊埠（port）5000 啟動簡單的 API 伺服器（API server）（API server）；使用 `-p 5000:5000` 對應通訊埠
 4. 使用 `docker images` 測量映像大小。試著將基礎映像由 `devel` 改成 `runtime`，再比較大小
 
 ## Key Terms｜關鍵術語

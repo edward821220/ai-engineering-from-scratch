@@ -432,7 +432,7 @@ print(f"d(dot)/dx = {x.grad}")
 | 內積 | transformer 的注意力分數、RAG 中的餘弦相似度（cosine similarity） |
 | 矩陣乘法 | 每一層神經網路、每一種線性變換（linear transformation） |
 | 線性獨立 | 特徵選擇（feature selection）、避免多重共線性 |
-| 秩 | 判斷系統是否可解、LoRA（low-rank adaptation，低秩適配） |
+| 秩 | 判斷系統是否可解、LoRA（low-rank adaptation，low-rank adaptation） |
 | 投影 | 線性迴歸（regression）（將資料投影到欄空間）、PCA |
 | Gram-Schmidt／QR | 數值求解器、特徵值計算 |
 | 標準正交基底（basis） | 穩定的數值計算、白化轉換（whitening transform） |
