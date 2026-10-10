@@ -1,6 +1,6 @@
 # 打造語音助理管線（voice assistant pipeline）：第 6 階段總整課
 
-> 第 01 到 11 課的東西整合前 01–11 課的內容。做一個會聽、會推理、會回嘴的語音助理。2026 年這是已解的工程問題，不是研究問題。能不能交付，看整合細節。
+> 把第 01 到 11 課的內容整合起來。做一個會聽、會推理、會回嘴的語音助理。2026 年這是已解的工程問題，不是研究問題。能不能交付，看整合細節。
 
 **Type:** Build
 **Languages:** Python
@@ -27,19 +27,19 @@
 
 ### 七個元件
 
-1. **音訊擷取。** 麥克風到 16 kHz 單聲道，再到 20 毫秒的塊。Python 通常用 `sounddevice`。正式環境用原生的 AudioUnit、ALSA、WASAPI。
+1. **音訊擷取（audio capture）。** 麥克風到 16 kHz 單聲道，再到 20 毫秒的塊。Python 通常用 `sounddevice`。正式環境用原生的 AudioUnit、ALSA、WASAPI。
 2. **VAD（第 11 課）。** Silero VAD，閾值 0.5，最短語音 250 毫秒，靜音拖尾 500 毫秒。發出「開始」和「結束」。
 3. **串流語音轉文字（第 4 到 5 課）。** Whisper-streaming、Parakeet-TDT，或 Deepgram Nova-3（API）。部分逐字稿加最終逐字稿。
 4. **帶工具呼叫的 LLM。** GPT-4o、Claude 3.5、Gemini 2.5 Flash。工具用 JSON schema。串流 token。
-5. **串流 TTS（第 7 課）。** Kokoro-82M（最快的開放模型）或 Cartesia Sonic（商業）。LLM 出 20 個 token 就開始 TTS。
+5. **串流 TTS（第 7 課）。** Kokoro-82M（最快的開放模型）或 Cartesia Sonic（商業）。LLM 產生 20 個 token 就開始 TTS。
 6. **播放。** 喇叭輸出。低頻寬網路用 Opus 編碼。
 7. **打斷處理器。** TTS 播放中 VAD 觸發，就停播放、取消 LLM、重新開始語音轉文字。
 
-### 你一定會撞上的三種失敗
+### 你一定會遇到的三種失敗模式
 
 1. **第一個字被切掉。** VAD 慢一拍才開始。使用者的「hey」不見了。開始閾值用 0.3，不要用 0.5。
 2. **回應中途打斷搞混。** 使用者打斷之後 LLM 還在生成，助理蓋過使用者。把 VAD 接到取消 LLM。
-3. **靜音幻覺。** Whisper 在暖機的靜音音框上輸出「Thanks for watching」。一定用 VAD 當閘。
+3. **靜音幻覺。** Whisper 在暖機的靜音音框上輸出「Thanks for watching」。一律先用 VAD 篩掉靜音。
 
 ### 2026 年正式環境的參考堆疊
 
@@ -71,7 +71,7 @@ def mic_stream(chunk_ms=20, sr=16000):
             yield q.get()
 ```
 
-### 步驟 2：VAD 閘住的輪次擷取
+### 步驟 2：VAD 閘控的輪次擷取
 
 ```python
 def capture_turn(stream, vad, pre_roll_ms=300, silence_ms=500):
@@ -143,12 +143,12 @@ while True:
 
 ## Pitfalls｜容易踩的坑
 
-- **永久記錄個人資料。** 整輪音訊在大多數法域都是個人資料。保留 30 天，靜態加密。
+- **永久記錄個人資料。** 整輪音訊在大多數法域都是個人資料。保留 30 天，並對儲存中的資料加密。
 - **沒有插話。** 使用者會打斷。助理必須停止說話。
 - **TTS 會堵住。** 同步 TTS 會堵住事件迴圈。用非同步，或另開執行緒。
 - **工具呼叫沒有錯誤處理。** 工具會失敗。LLM 必須拿回錯誤、重試一次，然後優雅降級。
 - **幻覺過濾太兇。** 濾太兇，助理會一直說「I can't help with that」。濾太鬆，它什麼都說。在留出集上調。
-- **沒有喚醒詞選項。** 一直聽是隱私負債。加一個喚醒詞閘（Porcupine 或 openWakeWord）。
+- **沒有喚醒詞選項。** 持續聆聽是隱私風險。加一個喚醒詞閘（Porcupine 或 openWakeWord）。
 
 ## Ship It｜交付成果
 
@@ -167,8 +167,8 @@ while True:
 | 輪次 | 使用者和助理一來回 | 一次由 VAD 框住的使用者語音，加一次 LLM 到 TTS 的回應。 |
 | 插話 | 打斷 | 助理還在說時使用者開口。助理停下。 |
 | 喚醒詞 | 「Hey assistant」 | 短的關鍵詞偵測器。Porcupine、Snowboy、openWakeWord。 |
-| 結束點 | 輪次結束 | VAD 加最短靜音，判定使用者說完了。 |
-| 預捲 | 語音前緩衝 | VAD 觸發前留 200 到 400 毫秒音訊，避免第一個字被切掉。 |
+| 結束點（endpoint） | 輪次結束 | VAD 加最短靜音，判定使用者說完了。 |
+| 預捲（pre-roll） | 語音前緩衝 | VAD 觸發前留 200 到 400 毫秒音訊，避免第一個字被切掉。 |
 | 工具呼叫 | 函式呼叫 | LLM 發出 JSON。執行環境分派。結果在迴圈裡送回去。 |
 
 ## Further Reading｜延伸閱讀
