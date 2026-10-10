@@ -1,6 +1,6 @@
 # 音訊生成
 
-> 音訊是 16 到 48 kHz 的一維訊號。5 秒片段有 8 萬到 24 萬個取樣點。transformer 不會直接對整段音訊序列計算注意力。2026 年每一個生產級音訊模型的解法都一樣：神經編解碼器（neural codec）——Encodec、SoundStream、DAC——把音訊壓成 50 到 75 Hz 的離散 token，再由 transformer 或擴散模型生成 token。
+> 音訊是 16 到 48 kHz 的一維訊號（1-D signal）。5 秒片段有 8 萬到 24 萬個取樣點。transformer 不會直接對整段音訊序列計算注意力。2026 年每一個生產級音訊模型的解法都一樣：神經編解碼器（neural codec）——Encodec、SoundStream、DAC——把音訊壓成 50 到 75 Hz 的離散 token，再由 transformer 或擴散模型生成 token。
 
 **Type:** Build
 **Languages:** Python
@@ -11,11 +11,11 @@
 
 三種音訊生成任務：
 
-1. **文字轉語音（text-to-speech）。** 給文字，產出語音。乾淨語音是窄頻（narrow-band），音素結構也很強——用 token 上的 transformer 解得很好。VALL-E（Microsoft）、NaturalSpeech 3、ElevenLabs、OpenAI TTS。
-2. **音樂生成。** 給一段 prompt（文字、旋律、和弦進行、曲風），產出音樂。分布（distribution）分布範圍廣得多。MusicGen（Meta）、Stable Audio 2.5、Suno v4、Udio、Riffusion。
-3. **音效／聲音設計。** 給一段 prompt，產出環境音或擬音（Foley）。AudioGen、AudioLDM 2、Stable Audio Open。
+1. **文字轉語音（text-to-speech）。** 給文字，產出語音。乾淨語音是窄頻（narrow-band），音素結構（phonetic structure）也很強——用 token 上的 transformer 解得很好。VALL-E（Microsoft）、NaturalSpeech 3、ElevenLabs、OpenAI TTS。
+2. **音樂生成。** 給一段 prompt（文字、旋律、和弦進行（chord progression）、曲風），產出音樂。分布（distribution）分布範圍廣得多。MusicGen（Meta）、Stable Audio 2.5、Suno v4、Udio、Riffusion。
+3. **音效／聲音設計（sound design）。** 給一段 prompt，產出環境音或擬音（Foley）。AudioGen、AudioLDM 2、Stable Audio Open。
 
-三者都跑在同一層基底上：神經音訊編解碼器，加上 token 自迴歸（token-AR）或擴散產生器。
+三者都跑在同一層基底上：神經音訊編解碼器（neural audio codec），加上 token 自迴歸（token-AR）或擴散產生器。
 
 ## The Concept｜核心概念
 
@@ -23,7 +23,7 @@
 
 ### 神經音訊編解碼器
 
-Encodec（Meta，2022）、SoundStream（Google，2021）、Descript Audio Codec（DAC，2023）。卷積編碼器（encoder）把波形（waveform）壓成每個時間步輸出一個向量；殘差向量量化（residual vector quantization，RVQ）把每個向量變成一連串 K 個碼本（codebook）索引。解碼器（decoder）把它還原。24 kHz、2 kbps、8 個 RVQ 碼本、75 Hz 的音訊，等於每秒 600 個 token。
+Encodec（Meta，2022）、SoundStream（Google，2021）、Descript Audio Codec（DAC，2023）。卷積編碼器（encoder）把波形（waveform）壓成每個時間步（timestep）輸出一個向量；殘差向量量化（residual vector quantization，RVQ）把每個向量變成一連串 K 個碼本（codebook）索引。解碼器（decoder）把它還原。24 kHz、2 kbps、8 個 RVQ 碼本、75 Hz 的音訊，等於每秒 600 個 token。
 
 ```
 waveform (16000 samples/sec)
@@ -36,7 +36,7 @@ waveform (16000 samples/sec)
 
 ### 上面的兩種生成範式
 
-**Token 自迴歸。** 將 RVQ token 攤平成一條序列一條序列，跑一個只有解碼器的 transformer。MusicGen 用「延遲平行（delayed parallel）」平行吐出 K 條碼本流，每條流各有偏移。VALL-E 用文字 prompt 加 3 秒聲音樣本，生成語音 token。
+**Token 自迴歸。** 將 RVQ token 攤平成一條序列，跑一個只有解碼器的 transformer。MusicGen 用「延遲平行（delayed parallel）」平行吐出 K 條碼本流，每條流各有偏移（offset）。VALL-E 用文字 prompt 加 3 秒聲音樣本，生成語音 token。
 
 **潛在空間擴散。** 把 codec token 包成連續潛在表示（latent），或用類別擴散（categorical diffusion）來建模。Stable Audio 2.5 在連續音訊潛在表示上用流匹配（flow matching）。AudioLDM 2 用文字到 mel 再到音訊的擴散。
 
@@ -129,7 +129,7 @@ def make_tokens(style, length, vocab_size, rng):
 
 ## 正式環境筆記：音訊是串流問題
 
-音訊是使用者期待*邊生成邊送到*的那種輸出模態，不是一次到齊。用正式環境的框法，這表示 TPOT 要緊（每個輸出 token 的時間，Time Per Output Token），因為目標吞吐量（throughput）是使用者的聆聽速度——不是閱讀速度。16 kHz 音訊若 tokenization 成約每秒 75 個 token（Encodec），伺服器必須為每位使用者伺服器必須為每位使用者每秒產生至少 75 個 token，播放才順。
+音訊是使用者期待*邊生成邊送到*的那種輸出模態，不是一次到齊。用正式環境的框法，這表示 TPOT 要緊（每個輸出 token 的時間，Time Per Output Token），因為目標吞吐量（throughput）是使用者的聆聽速度——不是閱讀速度。16 kHz 音訊若 tokenization 成約每秒 75 個 token（Encodec），伺服器必須為每位使用者每秒產生至少 75 個 token，播放才順。
 
 兩個架構上的後果：
 
