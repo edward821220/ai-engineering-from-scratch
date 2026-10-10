@@ -92,9 +92,9 @@ SAM 2 處理影片時，為每個實例留一份時空特徵的**記憶庫**。�
 
 ### 要知道的三個指標
 
-- **MOTA（多物件追蹤準度，Multi-Object Tracking Accuracy）**。1 - (FN + FP + ID switches) / GT。依錯誤類型加權。一個指標把偵測失敗和關聯失敗混在一起。
+- **MOTA（多物件追蹤準確率，Multi-Object Tracking Accuracy）**。1 - (FN + FP + ID switches) / GT。依錯誤類型加權。一個指標把偵測失敗和關聯失敗混在一起。
 - **IDF1（ID F1）**。ID 精確率和召回率的調和平均。專門看每條標準結果軌跡能不能一直保住自己的 ID。對 ID 切換敏感的任務，比 MOTA 好。
-- **HOTA（高階追蹤準度，Higher Order Tracking Accuracy）**。拆成偵測準度（DetA）和關聯準度（AssA）。2020 年起的社群標準。最完整。
+- **HOTA（高階追蹤準度，Higher Order Tracking Accuracy）**。拆成偵測準確率（DetA）和關聯準確率（AssA）。2020 年起的社群標準。最完整。
 
 監控（誰是誰）：回報 IDF1。運動分析（數傳球）：HOTA。一般學術比較：HOTA。
 
@@ -283,7 +283,7 @@ def count_id_switches(tracks_per_frame, gt_per_frame):
 | DeepSORT | 「SORT 加外觀」 | 加上 ReID 特徵做跨影格配對。ID 比較保得住 |
 | 記憶庫 | 「SAM 2 的手法」 | 跨影格存每個實例的時空特徵。交叉注意力取代明確的關聯 |
 | Object Multiplex | 「SAM 3.1 的共享記憶」 | 一個共享記憶，每個實例各自查詢，用來快速追很多物件 |
-| HOTA | 「現代追蹤指標」 | 拆成偵測準度和關聯準度。社群標準 |
+| HOTA | 「現代追蹤指標」 | 拆成偵測準確率和關聯準確率。社群標準 |
 
 ## Further Reading｜延伸閱讀
 

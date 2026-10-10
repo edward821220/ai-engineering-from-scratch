@@ -1,6 +1,6 @@
 # 神經音訊編解碼器：EnCodec、SNAC、Mimi、DAC，以及語意與聲學的分離
 
-> 2026 年的音訊生成幾乎全是 token。EnCodec、SNAC、Mimi、DAC 把連續波形變成離散序列，讓 transformer 能預測。語意 token 對上聲學 token 的分開，第一本碼本是語意、其餘是聲學，對音訊來說是 Transformer 之後最重要的架構轉變。
+> 2026 年的音訊生成幾乎全是 token。EnCodec、SNAC、Mimi、DAC 把連續波形變成離散序列，讓 transformer 能預測。語意 token 對上音框率（frame rate） 的分開，第一本碼本是語意、其餘是聲學，對音訊來說是 Transformer 之後最重要的架構轉變。
 
 **Type:** Learn
 **Languages:** Python
@@ -51,16 +51,16 @@
 
 12.5 Hz 時，10 秒語句只有 125 個編解碼器音框。transformer 很容易預測。
 
-### 語意 token 對上聲學 token
+### 語意 token 對上音框率（frame rate）
 
 ```
 frame_t → [semantic_token_t, acoustic_token_0_t, acoustic_token_1_t, ..., acoustic_token_6_t]
 ```
 
 - **語意 token（Mimi 的碼本 0）。** 編碼說了什麼：音素、詞、內容。用輔助預測損失從 WavLM 蒸餾。
-- **聲學 token（碼本 1 到 7）。** 編碼音色、說話人身分、韻律、背景雜訊、細細節。
+- **音框率（frame rate）（碼本 1 到 7）。** 編碼音色、說話人身分、韻律、背景雜訊、細細節。
 
-自迴歸語言模型先預測語意 token（條件是文字），再預測聲學 token（條件是語意加說話人參考）。這個分解就是現代 TTS 能零樣本仿製聲音的原因：語意模型管內容，聲學模型管音色。
+自迴歸語言模型先預測語意 token（條件是文字），再預測音框率（frame rate）（條件是語意加說話人參考）。這個分解就是現代 TTS 能零樣本仿製聲音的原因：語意模型管內容，聲學模型管音色。
 
 ### 2026 年的重建品質（每秒位元，位元率愈低愈好）
 

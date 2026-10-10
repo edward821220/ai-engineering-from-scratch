@@ -212,7 +212,7 @@ for epoch in range(num_epochs):
         optimizer.step()
 ```
 
-批次迴圈裡面是五行。訓練出 GPT-4、Stable Diffusion 和 LLaMA 的就是這五行。架構會變。資料會變。這五行不會。
+批次迴圈裡面是五行。訓練出 GPT-4、Stable Diffusion 和 LLaMA 的就是這五行。架構會變。資料會變。這五行不會變。
 
 ### Dataset 與 DataLoader
 

@@ -9,13 +9,13 @@
 
 ## The Problem｜問題
 
-2020 年以前，電腦視覺就是卷積（convolution）。ImageNet、COCO、偵測評測上的每一個最前沿，都用 CNN 當骨幹。Transformer 是給語言用的。
+2020 年以前，電腦電腦視覺主要依賴卷積（convolution）。ImageNet、COCO、偵測評測上的每一個最前沿，都用 CNN 當骨幹。Transformer 是給語言用的。
 
 Dosovitskiy et al.（2020）——「An Image is Worth 16x16 Words」——顯示你可以把卷積整個丟掉。把影像切成固定大小的圖塊（patch），每個圖塊線性投影成一個 embedding，再把這條序列送進原味的 transformer 編碼器。規模夠大時（ImageNet-21k 預訓練或更大），ViT 打平或打贏以 ResNet 為底的模型。
 
 ViT 開了一個 2026 年更廣的模式：一種架構，很多模態。Whisper 把音訊切成 token。ViT 把影像切成 token。機器人用動作 token。影片用像素 token。Transformer 不在乎——餵它一條序列，它就學。
 
-到 2026 年，ViT 和它的後代（DeiT、Swin、DINOv2、ViT-22B、SAM 3）佔了視覺的大部分。CNN 仍然在邊緣裝置（device）和對延遲（latency）敏感的任務上贏。其他地方的堆疊裡，某處都會有一個 ViT。
+到 2026 年，ViT 和它的後代（DeiT、Swin、DINOv2、ViT-22B、SAM 3）成為多數視覺任務的主流。CNN 仍然在邊緣裝置（device）和對延遲（latency）敏感的任務上贏。其他地方的堆疊裡，某處都會有一個 ViT。
 
 ## The Concept｜核心概念
 
@@ -33,7 +33,7 @@ image (224, 224, 3) → 14 × 14 grid of 16x16x3 patches → 196 vectors of leng
 
 ### 步驟 2——線性 embedding
 
-一個學來的矩陣把每個扁平圖塊投影到 `d_model`。等價於核（kernel）大小 `P`、步幅（stride）`P` 的卷積。在 PyTorch 裡這就是 `nn.Conv2d(C, d_model, kernel_size=P, stride=P)`——兩行的實作。
+一個學來的矩陣把每個扁平圖塊投影到 `d_model`。等價於核（kernel）大小 `P`、步幅（stride）`P` 的卷積。在 PyTorch 裡這就是 `nn.Conv2d(C, d_model, kernel_size=P, stride=P)`——只需兩行程式碼。
 
 ### 步驟 3——在前面加上 `[CLS]` token，再加位置 embedding
 
@@ -63,7 +63,7 @@ image (224, 224, 3) → 14 × 14 grid of 16x16x3 patches → 196 vectors of leng
 
 ### 為什麼花了一段時間
 
-ViT 要*很多*資料才打得平 CNN，因為它沒有 CNN 的歸納偏差（inductive bias）：平移不變、局部性。沒有超過 1 億張有標籤（label）的影像，或強力的自監督預訓練，在對得上的運算上 CNN 仍然贏。DeiT 在 2021 年用蒸餾手法補上；DINOv2 在 2023 年用自監督把它永久補上。
+ViT 要*很多*資料才打得平 CNN，因為它沒有 CNN 的歸納偏差（inductive bias）：平移不變、局部性。沒有超過 1 億張有標籤（label）的影像，或強力的自監督預訓練，在相同計算量下 CNN 仍然贏。DeiT 在 2021 年用蒸餾手法補上；DINOv2 在 2023 年用自監督把它永久補上。
 
 ```figure
 n5-patch-stream
@@ -71,7 +71,7 @@ n5-patch-stream
 
 ## Build It｜動手實作
 
-見 `code/main.py`。只有標準函式庫的切圖塊、線性 embedding、和健全檢查。沒有訓練——任何實際規模的 ViT 都需要 PyTorch 和數小時的 GPU 時間。
+見 `code/main.py`。僅用標準函式庫切分圖塊、線性 embedding、和健全檢查。沒有訓練——任何實際規模的 ViT 都需要 PyTorch 和數小時的 GPU 時間。
 
 ### 步驟 1：假影像
 
@@ -120,7 +120,7 @@ out = model(**inputs).last_hidden_state   # (1, 197, 768): [CLS] + 196 patches
 cls_emb = out[:, 0]                       # image representation
 ```
 
-**DINOv2 的 embedding 是 2026 年影像特徵的預設。** 把骨幹凍住，訓練一個小小的頭。分類、檢索、偵測、配字都行。Meta 的 DINOv2 checkpoint 在每一個非文字的視覺任務上打贏 CLIP。
+**DINOv2 的 embedding 是 2026 年影像特徵的預設。** 把骨幹凍住，訓練一個小小的頭。分類、檢索、偵測、配字都行。Meta 的 DINOv2 checkpoint 在每一個非文字的視覺任務上表現勝過 CLIP。
 
 **挑圖塊大小。** 小模型用 16×16（ViT-B/16）。稠密預測（分割）用 8×8 或 14×14（SAM、DINOv2）。非常大的模型用 14×14。
 
@@ -143,9 +143,9 @@ cls_emb = out[:, 0]                       # image representation
 | `[CLS]` token | 「影像的摘要」 | 加在前面的可學習 token；它最終的 embedding 就是影像表示。 |
 | 歸納偏差 | 「模型假設了什麼」 | ViT 的先驗比 CNN 少；要更多資料才補得上落差。 |
 | DINOv2 | 「自監督的 ViT」 | 不用標籤訓練，用影像增強加動量教師。2026 年最好的通用影像特徵。 |
-| SigLIP | 「CLIP 的後繼」 | ViT 加文字編碼器，用 sigmoid 對比損失訓練；在對得上的運算上比 CLIP 好。 |
+| SigLIP | 「CLIP 的後繼」 | ViT 加文字編碼器，用 sigmoid 對比損失訓練；在相同計算量下比 CLIP 好。 |
 | Swin | 「開了視窗的 ViT」 | 階層式 ViT，局部注意力加位移視窗；次二次方。 |
-| 暫存器 token | 「2023 年的手法」 | 幾個額外的可學習 token，把注意力匯吸收掉；改善 DINOv2 的特徵。 |
+| 暫存器 token | 「2023 年的手法」 | 幾個額外的可學習 token，把吸收多餘的注意力；改善 DINOv2 的特徵。 |
 
 ## Further Reading｜延伸閱讀
 

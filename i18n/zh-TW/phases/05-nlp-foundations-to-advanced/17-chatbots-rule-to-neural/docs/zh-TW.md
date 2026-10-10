@@ -1,4 +1,4 @@
-# 聊天機器人——從規則到神經到 LLM 代理
+# 聊天機器人——從規則到神經到 agent
 
 > ELIZA 用模式相符來回。DialogFlow 把意圖對上。GPT 從權重回答。Claude 跑工具並驗證。每個時代都解決了前一個時代最糟的失敗。
 
@@ -47,9 +47,9 @@ chatbot-lineage
 
 **神經（seq2seq）。** 在對話紀錄上訓練的編碼器–解碼器。從零生成回應。流暢，但容易給出泛泛的輸出（「I don't know」）和事實漂移。也無法穩定切合主題。這是 Google、Facebook、Microsoft 在 2016 到 2019 年的聊天機器人都令人失望的原因。
 
-**LLM 代理（agent）。** 包在迴圈裡的語言模型，會規劃、呼叫工具、驗證結果。不是一條很長 prompt 的聊天機器人。是代理迴圈：規劃 → 呼叫工具 → 觀察結果 → 決定下一步。先檢索再接地（RAG）讓它不幻覺。工具呼叫讓它真的做事。這是 2026 年的架構。
+**agent（agent）。** 包在迴圈裡的語言模型，會規劃、呼叫工具、驗證結果。不是一條很長 prompt 的聊天機器人。是LLM agent：規劃 → 呼叫工具 → 觀察結果 → 決定下一步。先檢索再接地（RAG）讓它不幻覺。工具呼叫讓它真的做事。這是 2026 年的架構。
 
-這四種典範不是依序取代。2026 年正式環境的聊天機器人四條都走：規則處理驗證和破壞性動作，檢索處理 FAQ，神經生成處理自然說法，LLM 代理處理含糊的開放查詢。
+這四種典範不是依序取代。2026 年正式環境的聊天機器人四條都走：規則處理驗證和破壞性動作，檢索處理 FAQ，神經生成處理自然說法，agent處理含糊的開放查詢。
 
 ## Build It｜動手實作
 
@@ -128,7 +128,7 @@ response = chatbot("Respond politely to: Hi there!", max_new_tokens=40)
 print(response[0]["generated_text"])
 ```
 
-### 步驟 4：LLM 代理迴圈
+### 步驟 4：agent迴圈
 
 2026 年正式環境的形狀：
 
@@ -181,7 +181,7 @@ def is_destructive_action(text):
     return any(w in text.lower() for w in danger_words)
 ```
 
-模式是：破壞性的事情用確定性規則，制式 FAQ 用檢索，其餘用 LLM 代理。2026 年的客服系統就是這樣交付的。
+模式是：破壞性的事情用確定性規則，制式 FAQ 用檢索，其餘用 agent。2026 年的客服系統就是這樣交付的。
 
 ## Use It｜實際應用
 
@@ -191,18 +191,18 @@ def is_destructive_action(text):
 |---------|---------------|
 | 訂位、付款、驗證 | 規則狀態機加槽位填充 |
 | 客服 FAQ | 在整理過的答案上檢索 |
-| 開放的求助對話 | 帶 RAG 和工具呼叫的 LLM 代理 |
-| 內部工具／IDE 助理 | 帶工具呼叫（搜尋、讀、寫）的 LLM 代理 |
+| 開放的求助對話 | 帶 RAG 和工具呼叫的 agent |
+| 內部工具／IDE 助理 | 帶工具呼叫（搜尋、讀、寫）的 agent |
 | 伴侶／角色聊天機器人 | 調校過的 LLM，加上人格 system prompt，知識用檢索 |
 
 正式環境永遠用混合路由。沒有單一架構能把每個請求都處理好。路由層本身通常是一個小的意圖分類器。
 
 ## 仍會交付出去的失敗模式
 
-- **自信的捏造。** LLM 代理宣稱完成了它沒做的動作。緩解：驗證結果、記錄工具呼叫、沒有成功的工具回傳就不讓模型宣稱做過。
+- **自信的捏造。** agent宣稱完成了它沒做的動作。緩解：驗證結果、記錄工具呼叫、沒有成功的工具回傳就不讓模型宣稱做過。
 - **prompt 注入（prompt injection）。** 使用者插入文字，蓋過 system prompt。在 OWASP Top 10 for LLM Applications 2025 裡列為 LLM01。兩種：直接注入（貼進對話）和間接注入（藏在代理會讀的文件、電子郵件或工具輸出裡）。
 
-  攻擊成功率隨情境而變。在一般工具使用和程式評測上，前沿模型測到的成功率大約 0.5% 到 8.5%。特定高風險設定（對 AI 程式代理的適應性攻擊、脆弱的編排）達到約 84%。正式環境的 CVE 包括 EchoLeak（CVE-2025-32711，CVSS 9.3）——Microsoft 365 Copilot 裡由攻擊者控制的電子郵件觸發的零點選（zero-click）資料外洩缺陷。
+  攻擊成功率隨情境而變。在一般工具使用和程式評測上，前沿模型測到的成功率大約 0.5% 到 8.5%。特定高風險設定（對 AI agent loop的適應性攻擊、脆弱的編排）達到約 84%。正式環境的 CVE 包括 EchoLeak（CVE-2025-32711，CVSS 9.3）——Microsoft 365 Copilot 裡由攻擊者控制的電子郵件觸發的零點選（zero-click）資料外洩缺陷。
 
   緩解：在整個迴圈裡把使用者輸入當成不可信；工具呼叫前先清理；把工具輸出和主 prompt 隔離；用規劃–驗證–執行（Plan-Verify-Execute，PVE），代理先規劃，再對照計畫驗證每個動作才執行（這能阻止工具結果注入新的、計畫外的動作）；破壞性動作要使用者確認；工具範圍用最小權限。
 
@@ -239,7 +239,7 @@ Refuse to recommend a pure-LLM agent for any destructive action (payments, accou
 
 1. **簡單。** 用上面的規則式回應，為咖啡店點餐機器人做 10 個模式。測邊界：重複點餐、修改、取消、意圖不清。
 2. **中等。** 做混合的 FAQ 加 LLM 後援。一個 SaaS 產品的 50 則制式 FAQ，LLM 後援在文件站上檢索。在 100 則真實客服問題上量拒答率和準確率（accuracy）。
-3. **困難。** 用三個工具（搜尋、讀使用者資料、寄信）實作上面的代理迴圈。用 50 個測試情境跑評估，其中包含 prompt 注入嘗試。報告離題比率、失敗任務比率、以及任何注入成功。
+3. **困難。** 用三個工具（搜尋、讀使用者資料、寄信）實作上面的LLM agent。用 50 個測試情境跑評估，其中包含 prompt 注入嘗試。報告離題比率、失敗任務比率、以及任何注入成功。
 
 ## Key Terms｜關鍵術語
 
@@ -249,7 +249,7 @@ Refuse to recommend a pure-LLM agent for any destructive action (payments, accou
 | 槽位 | 一塊資訊 | 機器人需要的參數（日期、目的地）。槽位填充是一連串的詢問。 |
 | RAG | 檢索加生成 | 檢索相關文件，再讓 LLM 的回應有依據。 |
 | 工具呼叫 | 函式呼叫 | LLM 發出帶名稱和引數的結構化呼叫。執行期執行，回傳結果。 |
-| 代理迴圈 | 規劃、行動、驗證 | 控制器把 LLM 呼叫和工具呼叫交錯跑，直到任務完成。 |
+| LLM agent | 規劃、行動、驗證 | 控制器把 LLM 呼叫和工具呼叫交錯跑，直到任務完成。 |
 | prompt 注入 | 使用者攻擊 prompt | 惡意輸入試圖蓋過 system prompt。 |
 
 ## Further Reading｜延伸閱讀
@@ -257,8 +257,8 @@ Refuse to recommend a pure-LLM agent for any destructive action (payments, accou
 - [Turing (1950). Computing Machinery and Intelligence](https://academic.oup.com/mind/article/LIX/236/433/986238) ——把對話變成這個領域評測的論文。
 - [Weizenbaum (1966). ELIZA — A Computer Program For the Study of Natural Language Communication](https://web.stanford.edu/class/cs124/p36-weizenabaum.pdf) ——原始的規則式聊天機器人論文。
 - [Colby, Weber, Hilf (1971). Artificial Paranoia](https://doi.org/10.1016/0004-3702(71)90002-6) ——PARRY 的情緒變數架構，第一個有狀態的聊天機器人。
-- [Thoppilan et al. (2022). LaMDA: Language Models for Dialog Applications](https://arxiv.org/abs/2201.08239) ——Google 晚期的神經聊天機器人論文，就在 LLM 代理接手之前。
-- [Yao et al. (2022). ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629) ——為代理迴圈模式命名的論文。
+- [Thoppilan et al. (2022). LaMDA: Language Models for Dialog Applications](https://arxiv.org/abs/2201.08239) ——Google 晚期的神經聊天機器人論文，就在 agent接手之前。
+- [Yao et al. (2022). ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629) ——為LLM agent模式命名的論文。
 - [Anthropic's guide on building effective agents](https://www.anthropic.com/research/building-effective-agents) ——2024 年的正式環境指引，2026 年仍然成立。
 - [Greshake et al. (2023). Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection](https://arxiv.org/abs/2302.12173) ——prompt 注入的論文。
 - [OWASP Top 10 for LLM Applications 2025 — LLM01 Prompt Injection](https://genai.owasp.org/llmrisk/llm01-prompt-injection/) ——把 prompt 注入列成首要安全疑慮的排名。

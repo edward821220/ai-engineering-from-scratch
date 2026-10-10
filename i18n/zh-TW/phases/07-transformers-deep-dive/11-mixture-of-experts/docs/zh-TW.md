@@ -72,7 +72,7 @@ DeepSeek-V2／V3 也把專家分成*共用*和*被路由*。每個 token 都經�
 | DeepSeek-V3 | 370 億 | 6710 億 |
 | Kimi K2（MoE） | 約 320 億 | 1 兆 |
 
-DeepSeek-V3 在幾乎每個評測上打贏稠密的 Llama 3 70B，而且每個 token 的活躍 FLOPs **更少**。參數更多 = 知識更多。活躍 FLOPs 更多 = 每個 token 的運算更多。MoE 把兩者拆開。
+DeepSeek-V3 在幾乎每個效能基準測試上打贏稠密的 Llama 3 70B，而且每個 token 的活躍 FLOPs **更少**。參數更多 = 知識更多。活躍 FLOPs 更多 = 每個 token 的運算更多。MoE 把兩者拆開。
 
 ### 代價：記憶體（memory）
 

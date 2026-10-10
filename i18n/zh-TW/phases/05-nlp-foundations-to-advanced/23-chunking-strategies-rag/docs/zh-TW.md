@@ -37,7 +37,7 @@
 
 **後置切塊（2024）。** 先在 token 層級把整份文件做成 embedding，再把 token embedding 聚成區塊 embedding。保住跨區塊的脈絡。搭配長脈絡 embedding 模型（BGE-M3、Jina v3）能用。計算量更高。
 
-**脈絡化檢索（Anthropic，2024）。** 在每個區塊前面加上 LLM 生成的、說明它在文件裡位置的摘要（「This chunk is section 3.2 of the termination clauses...」）。在 Anthropic 自己的評測裡，檢索改善 35% 到 50%。建索引很貴。
+**脈絡化檢索（Anthropic，2024）。** 在每個區塊前面加上 LLM 生成的、說明它在文件裡位置的摘要（「這個區塊是終止條款第 3.2 節……」）。在 Anthropic 自己的評測裡，檢索改善 35% 到 50%。建索引很貴。
 
 ### 贏過每個預設的那條規則
 
@@ -49,7 +49,7 @@
 | 分析／多跳 | 512 到 1024 個 token |
 | 整節理解 | 1024 到 2048 個 token |
 
-NVIDIA 2026 年的評測。區塊要大到裝得下答案加上附近脈絡，小到檢索器的前 K 筆集中在答案上，而不是脈絡雜訊。
+NVIDIA 2026 年的評測。區塊要大到裝得下答案加上附近脈絡，小到檢索器的top-K 結果集中在答案上，而不是脈絡雜訊。
 
 ```figure
 n5-chunk-cuts
@@ -204,7 +204,7 @@ def recall_at_k(queries, corpus_chunks, encoder, k=5):
 | 對話語料庫 | 以輪次為區塊，加上說話者後設資料（metadata） |
 | 短話語（推文、評論） | 一份文件就是一個區塊 |
 
-從遞迴 512 開始。在 50 個查詢的評估集上量前 5 的召回率（recall）。再從那裡調。
+從遞迴 512 開始。在 50 個查詢的評估集上量recall@5（前 5 名召回率）（recall）。再從那裡調。
 
 ## Ship It｜交付成果
 

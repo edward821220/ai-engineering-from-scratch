@@ -126,7 +126,7 @@ def dct_ii(x, n_coeffs):
 | 任務 | 特徵 |
 |------|----------|
 | ASR（Whisper、Parakeet、SeamlessM4T） | 80 個對數 mel，10 毫秒 hop，25 毫秒視窗 |
-| TTS 聲學模型（VITS、F5-TTS、Kokoro） | 80 個 mel，5 到 12 毫秒 hop，用來做細的時間控制 |
+| TTS 聲學模型（VITS、F5-TTS、Kokoro） | 80 個 mel，5 到 12 毫秒 hop，用來精細控制時間 |
 | 音訊分類（AST、PANNs、BEATs） | 128 個對數 mel，10 毫秒 hop |
 | 說話人 embedding（ECAPA-TDNN、WavLM） | 80 個對數 mel，或原始波形的自監督 |
 | 音樂（MusicGen、Stable Audio 2） | EnCodec 離散 token（不是 mel） |
@@ -136,7 +136,7 @@ def dct_ii(x, n_coeffs):
 
 ## 2026 年仍會隨產品上線的陷阱
 
-- **Mel 數量不合。** 訓練用 80 個 mel，推論用 128 個。安靜地失敗。兩邊都把特徵形狀記下來。
+- **數量不一致。** 訓練用 80 個 mel，推論用 128 個。安靜地失敗。兩邊都把特徵形狀記下來。
 - **上游取樣率不合。** 22.05 kHz 算出的 mel 和 16 kHz 看起來不一樣。做特徵*之前*先把取樣率修好。
 - **dB 對上對數。** Whisper 期望對數 mel，不是 dB mel。有些 Hugging Face 管線會自動偵測。你自己的程式不會。
 - **正規化漂掉。** 訓練時每一句正規化，推論時全域正規化。正式環境的 bug，WER 會變成兩倍。

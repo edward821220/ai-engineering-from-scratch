@@ -1,6 +1,6 @@
 # Jamba——混合 SSM-Transformer
 
-> 狀態空間模型（SSM）與 Transformer 各自追求不同的目標。Transformer 透過注意力機制換取高品質，但承受二次方運算代價；SSM 透過遞迴換取線性時間推論與常數記憶體佔用，但在品質上略遜一籌。AI21 的 Jamba（2024 年 3 月）與 Jamba 1.5（2024 年 8 月）將兩者融為一爐：每 7 個 Mamba 層搭配 1 個 Transformer 層，每隔一個區塊啟用 MoE，並在單張 80GB GPU 上實現了 256k 脈絡視窗。Mamba-3（ICLR 2026）則在純 SSM 端引入複數值狀態空間與 MIMO 投影。本課將深入剖析這兩種架構，解釋為何這套混合配方能歷經三年的規模擴展依然歷久彌新，而純 SSM 與純 Transformer 的長脈絡嘗試卻難以兼顧各方。
+> 狀態空間模型（SSM）與 Transformer 各自追求不同的目標。Transformer 透過注意力機制換取高品質，但承受二次方運算代價；SSM 透過遞迴換取線性時間推論與常數記憶體佔用，但在品質上略遜一籌。AI21 的 Jamba（2024 年 3 月）與 Jamba 1.5（2024 年 8 月）將兩者融為一爐：每 7 個 Mamba 層搭配 1 個 Transformer 層，每隔一個區塊啟用 MoE，並在單張 80GB GPU 上實現了 256k 脈絡視窗。Mamba-3（ICLR 2026）則在純 SSM 端引入複數值狀態空間與 MIMO 投影。本課將深入剖析這兩種架構，解釋為何這套混合配方能混合配方歷經三年擴展仍持續發展，而純 SSM 與純 Transformer 的長脈絡嘗試則未能延續。
 
 **Type:** Learn
 **Languages:** Python (stdlib, layer-mix calculator)
@@ -140,7 +140,7 @@ swiglu-ffn
 - Jamba 風格的 1:7 混合模型。
 - 純 SSM（完全沒有任何 KV 快取）。
 
-其數值直接取自 Jamba-1 與 Jamba-1.5 論文的公開數字，並對各類假設變體進行了嚴謹外推。
+其數值直接取自 Jamba-1 與 Jamba-1.5 論文的公開數字，並對各類假設變體進行了嚴謹。
 
 正式環境部署注意事項：
 

@@ -170,7 +170,7 @@ pc = depth_to_point_cloud(depth, intr)
 print(f"point cloud shape: {pc.shape}  (H, W, 3)")
 ```
 
-一個函式，每一個把東西抬到 3D 的應用。把點雲輸出成 `.ply`，用 MeshLab 或 CloudCompare 打開。
+一個函式，每一個把東西轉換為 3D 點雲 的應用。把點雲輸出成 `.ply`，用 MeshLab 或 CloudCompare 打開。
 
 ### 步驟 4：合成深度場景的冒煙測試
 
@@ -221,7 +221,7 @@ depth_np = np.array(out["depth"])
 1. RGB 影格進來。
 2. 深度模型產出深度圖。
 3. 偵測器產出框。
-4. 把框的中心經深度抬到 3D。有點雲就合併。
+4. 把框的中心經深度轉換為 3D 點雲。有點雲就合併。
 5. 下游：AR 遮擋、路徑規劃、物件尺寸估計、取代立體視覺。
 
 要即時，Depth Anything V2 Small（INT8 量化）在消費級 GPU、518x518，大約每秒 30 影格。

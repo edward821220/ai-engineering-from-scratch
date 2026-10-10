@@ -9,7 +9,7 @@
 
 ## Learning Objectives｜學習目標
 
-- 從零實作小塊 embedding、學來的位置 embedding、類別 token、以及 transformer 編碼器（encoder）區塊，組出一個最小的 ViT
+- 從零實作patch embedding（小塊 embedding）、學來的positional embedding（位置 embedding）、class token（類別 token）、以及 transformer 編碼器（encoder）區塊，組出一個最小的 ViT
 - 說明為什麼大家一度以為 ViT 需要海量預訓練資料，直到 DeiT 和 MAE 證明並非如此
 - 比較 ViT、Swin、ConvNeXt 的架構先驗：沒有、局部視窗注意力、卷積骨幹（backbone）
 - 用 `timm` 和標準的線性探測（linear probe）／fine-tuning 做法，在小資料集（dataset）上 fine-tune 一個預訓練的 ViT
@@ -28,10 +28,10 @@
 
 ```mermaid
 flowchart LR
-    IMG["影像<br/>(3, 224, 224)"] --> PATCH["小塊 embedding<br/>卷積 16x16 s=16<br/>-> (768, 14, 14)"]
+    IMG["影像<br/>(3, 224, 224)"] --> PATCH["patch embedding（小塊 embedding）<br/>卷積 16x16 s=16<br/>-> (768, 14, 14)"]
     PATCH --> FLAT["展平成<br/>(196, 768) 個 token"]
     FLAT --> CAT["前面接上<br/>[CLS] token"]
-    CAT --> POS["加上學來的<br/>位置 embedding"]
+    CAT --> POS["加上學來的<br/>positional embedding（位置 embedding）"]
     POS --> ENC["N 個 transformer<br/>編碼器區塊"]
     ENC --> CLS["取出 [CLS]<br/>token 的輸出"]
     CLS --> HEAD["MLP 分類器"]
@@ -43,7 +43,7 @@ flowchart LR
 
 七步。小塊變成 token，再做注意力，再進分類器。每個變體（DeiT、Swin、ConvNeXt、MAE 預訓練）只改這七步裡的一兩步，其餘不動。
 
-### 小塊 embedding
+### patch embedding（小塊 embedding）
 
 第一個卷積是關鍵。核大小 16、步幅 16，所以 224x224 的影像變成 14x14 格、每格 16x16 的小塊，再投影成 768 維的 embedding。這一個卷積同時把影像切成小塊，並做線性投影。
 
@@ -56,7 +56,7 @@ Flatten spatial: (196, 768)
 
 196 個小塊就是 196 個 token。每個 token 的特徵（feature）維度是 768（ViT-B）、1024（ViT-L）或 1280（ViT-H）。
 
-### 類別 token
+### class token（類別 token）
 
 序列前面接上一個學來的向量：
 
@@ -66,7 +66,7 @@ tokens = [CLS; patch_1; patch_2; ...; patch_196]   shape (197, 768)
 
 經過 N 個 transformer 區塊之後，`[CLS]` 的輸出就是整張影像的表示。分類頭只讀這一個向量。
 
-### 位置 embedding
+### positional embedding（位置 embedding）
 
 transformer 本身不知道空間位置。每個 token 加上一個學來的向量：
 
@@ -131,7 +131,7 @@ batchnorm-inference
 
 ## Build It｜動手實作
 
-### 步驟 1：小塊 embedding
+### 步驟 1：patch embedding（小塊 embedding）
 
 ```python
 import torch
@@ -246,7 +246,7 @@ model = timm.create_model("vit_base_patch16_224", pretrained=True, num_classes=1
 本課會產出：
 
 - `outputs/prompt-vit-vs-cnn-picker.md`：一份 prompt，依資料集大小、計算和推論堆疊，在 ViT、ConvNeXt、Swin 之間挑一個
-- `outputs/skill-vit-patch-and-pos-embed-inspector.md`：一項技能，檢查 ViT 的小塊 embedding 和位置 embedding 形狀是否對上模型預期的序列長度，抓出最常見的移植 bug
+- `outputs/skill-vit-patch-and-pos-embed-inspector.md`：一項技能，檢查 ViT 的patch embedding（小塊 embedding） 和positional embedding（位置 embedding） 形狀是否對上模型預期的序列長度，抓出最常見的移植 bug
 
 ## Exercises｜練習
 
@@ -258,9 +258,9 @@ model = timm.create_model("vit_base_patch16_224", pretrained=True, num_classes=1
 
 | 術語 | 常見說法 | 實際意義 |
 |------|----------------|----------------------|
-| 小塊 embedding | 「第一個卷積」 | 核大小等於步幅、也等於小塊大小的卷積。把影像變成一格格的 token embedding |
-| 類別 token | 「[CLS]」 | 接在 token 序列前面的學來向量。它最後的輸出就是整張影像的表示 |
-| 位置 embedding | 「學來的位置」 | 加到每個 token 上的學來向量，讓 transformer 知道每個小塊從哪來 |
+| patch embedding（小塊 embedding） | 「第一個卷積」 | 核大小等於步幅、也等於小塊大小的卷積。把影像變成一格格的 token embedding |
+| class token（類別 token） | 「[CLS]」 | 接在 token 序列前面的學來向量。它最後的輸出就是整張影像的表示 |
+| positional embedding（位置 embedding） | 「學來的位置」 | 加到每個 token 上的學來向量，讓 transformer 知道每個小塊從哪來 |
 | 前 LayerNorm | 「子層之前做 LayerNorm」 | 較穩的 transformer 變體：是 `x + sublayer(LN(x))`，不是 `LN(x + sublayer(x))` |
 | 多頭注意力 | 「平行的注意力」 | 標準 transformer 注意力拆成 num_heads 個獨立子空間，再接回來 |
 | ViT-B/16 | 「Base，小塊 16」 | 標準尺寸：dim=768、depth=12、heads=12、patch_size=16、影像 224。大約 8600 萬參數 |

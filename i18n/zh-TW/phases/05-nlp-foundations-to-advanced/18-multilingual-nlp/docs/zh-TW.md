@@ -1,6 +1,6 @@
 # 多語 NLP
 
-> 一個模型、100 種以上的語言，其中多數沒有訓練資料。跨語言遷移是 2020 年代實務上的奇蹟。
+> 一個模型、100 種以上的語言，其中多數沒有訓練資料。跨語言遷移（cross-lingual transfer）是 2020 年代實務上的奇蹟。
 
 **Type:** Learn
 **Languages:** Python
@@ -11,7 +11,7 @@
 
 英文有數十億筆有標籤（label）的例子。烏爾都語有幾千筆。邁蒂利語幾乎沒有。任何要服務全球受眾的實務 NLP 系統，都得在任務專用訓練資料不存在的語言長尾上運作。
 
-多語模型的解法是同時在很多語言上訓練一個模型。共享的表示讓模型把高資源語言學到的能力，遷移到低資源語言。在英文情感分析（sentiment analysis）上 fine-tune 這個模型，它開箱就能在烏爾都語上給出好得出人意料的情感預測。那就是零樣本（zero-shot）跨語言遷移，它改變了 NLP 推向全球使用者的方式。
+多語模型的解法是同時在很多語言上訓練一個模型。共享的表示讓模型把高資源語言學到的能力，遷移到低資源語言。在英文情感分析（sentiment analysis）上 fine-tune 這個模型，它開箱就能在烏爾都語上給出好得出人意料的情感預測。那就是零樣本（zero-shot）跨語言遷移（cross-lingual transfer），它改變了 NLP 推向全球使用者的方式。
 
 這一課點名取捨、標準模型，以及會絆倒剛做多語的團隊的那個決定：選哪個來源語言來遷移。
 
@@ -207,7 +207,7 @@ Refuse to ship a multilingual model without per-language evaluation — aggregat
 | 術語 | 常見說法 | 實際意義 |
 |------|-----------------|-----------------------|
 | 多語模型 | 一個模型，很多語言 | 跨語言共享詞彙表和參數。 |
-| 跨語言遷移 | 在一種語言上訓練，在另一種上跑 | 在來源上 fine-tune，在目標上評估，不用目標語言的標籤。 |
+| 跨語言遷移（cross-lingual transfer） | 在一種語言上訓練，在另一種上跑 | 在來源上 fine-tune，在目標上評估，不用目標語言的標籤。 |
 | 零樣本 | 沒有目標語言標籤 | 不在目標語言上 fine-tune 就遷移。 |
 | 少樣本 | 少量目標標籤 | 用 100 到 500 個目標語言例子做 fine-tune。 |
 | mBERT | 第一個多語語言模型 | 在 Wikipedia 上預訓練的 104 種語言 BERT。 |
@@ -217,7 +217,7 @@ Refuse to ship a multilingual model without per-language evaluation — aggregat
 ## Further Reading｜延伸閱讀
 
 - [Conneau et al. (2019). Unsupervised Cross-lingual Representation Learning at Scale](https://arxiv.org/abs/1911.02116) ——XLM-R 論文。
-- [Pires, Schlinger, Garrette (2019). How Multilingual is Multilingual BERT?](https://arxiv.org/abs/1906.01502) ——開啟跨語言遷移這條研究線的分析論文。
+- [Pires, Schlinger, Garrette (2019). How Multilingual is Multilingual BERT?](https://arxiv.org/abs/1906.01502) ——開啟跨語言遷移（cross-lingual transfer）這條研究線的分析論文。
 - [Costa-jussà et al. (2022). No Language Left Behind](https://arxiv.org/abs/2207.04672) ——NLLB-200 論文。
 - [Üstün et al. (2024). Aya Model: An Instruction Finetuned Open-Access Multilingual Language Model](https://arxiv.org/abs/2402.07827) ——Aya，Cohere 的多語 LLM。
 - [Language Similarity Predicts Cross-Lingual Transfer Learning Performance (2026)](https://www.mdpi.com/2504-4990/8/3/65) ——qWALS／LANGRANK 的來源語言論文。

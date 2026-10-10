@@ -167,7 +167,7 @@ def hybrid_search(query, bm25, encoder, dense_embeddings, corpus, top_k=5, pool_
 | 1000 到 10 萬份文件 | 記憶體（memory）內的 BM25 加 `all-MiniLM-L6-v2` embedding 加 RRF。不需要分開的資料庫。 |
 | 10 萬到 1000 萬份文件 | FAISS 或 pgvector 做稠密，Elasticsearch / OpenSearch 做 BM25。平行跑。 |
 | 1000 萬份以上 | Qdrant / Weaviate / Vespa / Milvus，支援混合。交叉編碼器重排前 30。 |
-| 品質前沿 | 三路（BM25 加稠密加 SPLADE）加 ColBERT 延遲互動重排 |
+| 品質前沿 | 三路（BM25 加稠密加 SPLADE）加 ColBERT late-interaction |
 
 無論選哪個，都要為評估留預算。先評測檢索召回率（recall），再評測端到端的 RAG 準確率。檢索器漏掉的，閱讀器補不回來。
 
@@ -231,4 +231,4 @@ Refuse to recommend dense-only for corpora with named entities, error codes, or 
 - [Karpukhin et al. (2020). Dense Passage Retrieval for Open-Domain QA](https://arxiv.org/abs/2004.04906) ——DPR，標準的雙編碼器。
 - [Formal et al. (2021). SPLADE: Sparse Lexical and Expansion Model](https://arxiv.org/abs/2107.05720) ——學出來的稀疏檢索器，補上和稠密的差距。
 - [Cormack, Clarke, Büttcher (2009). Reciprocal Rank Fusion outperforms Condorcet and individual Rank Learning Methods](https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf) ——RRF 論文。
-- [Khattab and Zaharia (2020). ColBERT: Efficient and Effective Passage Search](https://arxiv.org/abs/2004.12832) ——延遲互動檢索。
+- [Khattab and Zaharia (2020). ColBERT: Efficient and Effective Passage Search](https://arxiv.org/abs/2004.12832) ——晚期互動。

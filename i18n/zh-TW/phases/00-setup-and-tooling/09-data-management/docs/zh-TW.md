@@ -9,10 +9,10 @@
 
 ## Learning Objectives｜學習目標
 
-- 使用 Hugging Face 的 `datasets` 函式庫載入、串流（streaming）處理並快取（cache）資料集（dataset）
+- 使用 Hugging Face 的 `datasets` 函式庫（library）載入、串流（streaming）處理並快取（cache）資料集（dataset）
 - 在 CSV、JSON、Parquet 和 Arrow 格式間轉換，並說明各格式的取捨
 - 使用固定亂數種子（fixed random seed）建立可重現性（reproducibility）高的訓練／驗證／測試集切分（training/validation/test split）
-- 使用 `.gitignore`、Git LFS 或 DVC 管理大型模型與資料集檔案
+- 使用 `.gitignore`、Git LFS 或 DVC 管理大型模型（model）與資料集檔案
 
 ## The Problem｜問題
 
@@ -22,7 +22,7 @@
 
 ```mermaid
 graph TD
-    A["Hugging Face Hub"] --> B["datasets 函式庫"]
+    A["Hugging Face Hub"] --> B["datasets 函式庫（library）"]
     B --> C["載入／串流處理"]
     C --> D["本機快取<br/>~/.cache/huggingface/"]
     B --> E["格式轉換<br/>CSV、JSON、Parquet、Arrow"]
@@ -30,7 +30,7 @@ graph TD
     F --> G["你的訓練管線"]
 ```
 
-Hugging Face 的 `datasets` 函式庫是 AI 工作中載入資料的標準方式。它能直接處理下載、快取、格式轉換和串流。
+Hugging Face 的 `datasets` 函式庫（library）是 AI 工作中載入資料的標準方式。它能直接處理下載、快取、格式轉換和串流。
 
 ```figure
 s0-data-pipeline
@@ -38,7 +38,7 @@ s0-data-pipeline
 
 ## Build It｜動手實作
 
-### 步驟 1：安裝 datasets 函式庫
+### 步驟 1：安裝 datasets 函式庫（library）
 
 ```bash
 pip install datasets huggingface_hub
@@ -69,11 +69,11 @@ for i, example in enumerate(dataset):
         break
 ```
 
-串流會產生 `IterableDataset`。資料列一到就能立即處理；無論資料集多大，記憶體用量都維持不變。
+串流會產生 `IterableDataset`。資料列一到就能立即處理；無論資料集多大，記憶體（memory）用量都維持不變。
 
 ### 步驟 4：資料集格式
 
-`datasets` 函式庫底層使用 Apache Arrow。你可以依照管線需求轉換成其他格式。
+`datasets` 函式庫（library）底層使用 Apache Arrow。你可以依照管線需求轉換成其他格式。
 
 ```python
 dataset = load_dataset("stanfordnlp/imdb", split="train")
@@ -90,7 +90,7 @@ dataset.to_parquet("imdb_train.parquet")
 | CSV | 大 | 慢 | 方便閱讀、試算表 |
 | JSON | 大 | 慢 | API、巢狀資料 |
 | Parquet | 小 | 快 | 分析、欄式查詢 |
-| Arrow | 小 | 最快 | 記憶體內處理（in-memory processing；`datasets` 函式庫使用的格式） |
+| Arrow | 小 | 最快 | 記憶體內處理（in-memory processing；`datasets` 函式庫（library）使用的格式） |
 
 AI 工作最適合用 Parquet 作為儲存格式。Arrow 則是你在記憶體中處理資料時使用的格式。CSV 和 JSON 適合用來交換資料。
 
@@ -98,7 +98,7 @@ AI 工作最適合用 Parquet 作為儲存格式。Arrow 則是你在記憶體�
 
 每個機器學習專案都需要三種資料集切分：
 
-- **訓練集（train）**：模型從這份資料中學習（通常占 80%）
+- **訓練集（train）**：模型（model）從這份資料中學習（通常占 80%）
 - **驗證集（validation）**：訓練期間用來檢查進度（通常占 10%）
 - **測試集（test）**：訓練完成後用來做最終評估（通常占 10%）
 
@@ -119,9 +119,9 @@ print(f"Train: {len(train_ds)}, Val: {len(val_ds)}, Test: {len(test_ds)}")
 
 務必設定亂數種子，確保結果可重現。同一個種子每次都會產生相同的資料集切分。
 
-### 步驟 6：下載並快取模型
+### 步驟 6：下載並快取模型（model）
 
-模型是大型檔案。`huggingface_hub` 函式庫會負責下載並快取模型。
+模型（model）是大型檔案。`huggingface_hub` 函式庫（library）會負責下載並快取模型（model）。
 
 ```python
 from huggingface_hub import hf_hub_download, snapshot_download
@@ -136,11 +136,11 @@ model_dir = snapshot_download("sentence-transformers/all-MiniLM-L6-v2")
 print(f"Full model at: {model_dir}")
 ```
 
-模型會快取到 `~/.cache/huggingface/hub/`。下載一次後，之後再次執行就能立即載入。
+模型（model）會快取到 `~/.cache/huggingface/hub/`。下載一次後，之後再次執行就能立即載入。
 
 ### 步驟 7：處理大型檔案
 
-模型權重（model weights）和大型資料集不應放進 git。你有三種選擇：
+模型（model）權重（model weights）和大型資料集不應放進 git。你有三種選擇：
 
 **選項 A：.gitignore（最簡單）**
 
@@ -163,7 +163,7 @@ git lfs track "*.safetensors"
 git add .gitattributes
 ```
 
-Git LFS 會在儲存庫中存放指向實際檔案的參照，實際檔案則存放在另一台伺服器上。GitHub 提供 1 GB 免費空間。
+Git LFS 會在儲存庫中存放指向實際檔案的參照，實際檔案則存放在另一台伺服器（server）上。GitHub 提供 1 GB 免費空間。
 
 **選項 C：DVC（data version control，資料版本控制）**
 
@@ -180,7 +180,7 @@ DVC 會建立小型 `.dvc` 檔案，指向你的資料。資料本身則存放�
 | 方法 | 複雜度 | 適用情境 |
 |----------|-----------|----------|
 | .gitignore | 低 | 個人專案、可重新下載的資料 |
-| Git LFS | 中 | 透過 git 分享模型權重的團隊 |
+| Git LFS | 中 | 透過 git 分享模型（model）權重的團隊 |
 | DVC | 高 | 可重現的實驗、大型資料集、團隊協作 |
 
 本課程使用 `.gitignore` 就足夠。需要在不同電腦上重現完全相同的實驗時，再使用 DVC。
@@ -249,10 +249,10 @@ python code/data_utils.py
 
 | 術語 | 常見說法 | 實際意義 |
 |------|----------------|----------------------|
-| 資料集切分（dataset split） | 「訓練資料」 | 依機器學習生命週期的不同階段使用、具名子集（train／val／test） |
+| 資料集切分（dataset split） | 「訓練資料（training data）」 | 依機器學習生命週期的不同階段使用、具名子集（train／val／test） |
 | 串流（streaming） | 「延遲載入」 | 從遠端來源逐列處理資料，不必下載整份資料集 |
 | Parquet | 「壓縮過的 CSV」 | 針對分析查詢與儲存效率最佳化的欄式檔案格式（columnar file format） |
-| Arrow | 「快速的 DataFrame」 | datasets 函式庫在內部使用的記憶體內欄式格式，支援零複製讀取 |
+| Arrow | 「快速的 DataFrame」 | datasets 函式庫（library）在內部使用的記憶體內欄式格式，支援零複製讀取 |
 | Git LFS | 「大型檔案版 git」 | 一種擴充功能（extension），會將大型檔案存放在 git 儲存庫之外，同時在版本控制中保留檔案參照 |
-| DVC | 「資料版 git」 | 可與雲端儲存整合的資料集與模型版本控制系統 |
+| DVC | 「資料版 git」 | 可與雲端儲存整合的資料集與模型（model）版本控制系統 |
 | 快取（cache） | 「已經下載過」 | 先前取得資料的本機副本；預設（default）儲存在 ~/.cache/huggingface/ |

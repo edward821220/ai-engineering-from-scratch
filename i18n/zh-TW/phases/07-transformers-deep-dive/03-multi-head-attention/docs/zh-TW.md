@@ -9,7 +9,7 @@
 
 ## The Problem｜問題
 
-單一的自注意力（self-attention）頭算出一張注意力矩陣。那張矩陣抓住一種關係——通常是把損失（loss）在訓練訊號上壓到最低的那一種。如果你的資料裡主詞動詞一致、共指（coreference）、長程篇章、句法切塊全纏在一起，單一的頭會把它們糊進同一個 softmax 分布（distribution），丟掉一半的訊號。
+單一的自注意力（self-attention）頭算出一張注意力矩陣。那張矩陣抓住一種關係——通常是把損失（loss）在訓練訊號上壓到最低的那一種。如果你的資料裡主詞動詞一致、共指（coreference）、長程篇章、句法切塊全纏在一起，單一的頭會混在同一個 softmax 分布（distribution），丟掉一半的訊號。
 
 2017 年 Vaswani 論文的修法：平行跑好幾個注意力函式，各自有自己的 Q、K、V 投影，再把輸出串接起來。每個頭在較小的子空間裡運作，維度（dimension）是 `d_model / n_heads`。參數（parameter）總數不變。表達力上升。
 
@@ -21,11 +21,11 @@
 
 **拆開。** 取形狀 `(N, d_model)` 的 `X`。投影成 Q、K、V，各自形狀也是 `(N, d_model)`。重塑成 `(N, n_heads, d_head)`，其中 `d_head = d_model / n_heads`。轉置成 `(n_heads, N, d_head)`。
 
-**平行注意。** 在每個頭裡跑縮放點積注意力。每個頭產出 `(N, d_head)`。這些頭在 embedding 的不同子空間上運作，注意力計算本身期間互不交談。
+**平行注意。** 在每個頭裡跑縮放點積注意力。每個頭產出 `(N, d_head)`。這些頭在 embedding 的不同子空間上運作，進行注意力計算時彼此獨立。
 
 **串接再投影。** 把頭疊回 `(N, d_model)`，再乘上學來的輸出矩陣 `W_o`，形狀 `(d_model, d_model)`。頭要混合，就在 `W_o`。
 
-**為什麼行得通。** 每個頭可以專精，不用跟別的頭搶表示預算。2019 到 2024 的探查研究顯示頭的角色分明：位置頭、會注意前一個 token 的頭、複製頭、命名實體（named entity）頭、歸納頭（induction head）——它們是上下文學習（in-context learning）的底層。
+**為什麼行得通。** 每個頭可以專精，不用跟別的頭搶表示預算。2019 到 2024 的探查研究顯示頭的角色分明：位置頭、會注意前一個 token 的頭、複製頭、命名實體（named entity）頭、歸納頭（induction head）——它們是上下文學習（in-context learning）的基礎機制。
 
 **2026 年的變體譜系：**
 
@@ -59,7 +59,7 @@ def combine_heads(H):
     return H.transpose(1, 0, 2).reshape(n, h * d_head)
 ```
 
-一次 reshape、一次轉置。沒有迴圈。這正是 PyTorch 在 `nn.MultiheadAttention` 底下做的。
+一次重塑操作、一次轉置。沒有迴圈。這正是 PyTorch 在 `nn.MultiheadAttention` 底下做的。
 
 ### 步驟 2：每個頭跑縮放點積注意力
 

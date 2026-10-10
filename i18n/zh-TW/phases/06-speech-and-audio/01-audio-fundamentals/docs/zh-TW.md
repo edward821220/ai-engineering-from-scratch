@@ -44,7 +44,7 @@
 
 **FFT。** 快速傅立葉轉換：當 `N` 是 2 的冪，DFT 的 `O(N log N)` 演算法（algorithm）。每個音訊函式庫底下都用 FFT。16 kHz 的 1024 點 FFT 給出 512 個可用頻率槽，涵蓋 0 到 8 kHz，解析度 15.6 Hz。
 
-**切音框加視窗。** 我們不會對整段做 FFT。把它切成重疊的*音框*（frame），通常 25 毫秒、hop 10 毫秒。每一框乘上窗函數（window），Hann 或 Hamming，消掉邊緣不連續，再對每一框做 FFT。這就是短時傅立葉轉換（STFT）。第 02 課從這裡接下去。
+**切音框加視窗。** 我們不會對整段做 FFT。把它切成重疊的*音框*（frame），通常 25 毫秒、跳躍長度（hop size） 10 毫秒。每一框乘上窗函數（window），Hann 或 Hamming，消掉邊緣不連續，再對每一框做 FFT。這就是短時傅立葉轉換（STFT）。第 02 課從這裡接下去。
 
 ```figure
 mel-scale
@@ -54,7 +54,7 @@ mel-scale
 
 ### 步驟 1：讀一段片段，畫出波形
 
-`code/main.py` 只用標準函式庫的 `wave` 模組，示範沒有額外依賴。正式環境會用 `soundfile` 或 `torchaudio.load`（兩者都回 `(waveform, sr)` 元組）：
+`code/main.py` 只用標準函式庫的 `wave` 模組，示範不需安裝額外套件。正式環境會用 `soundfile` 或 `torchaudio.load`（兩者都回 `(waveform, sr)` 元組）：
 
 ```python
 import soundfile as sf
@@ -118,7 +118,7 @@ def dft(x):
 
 1. **簡單。** 在 16 kHz 合成 1 秒的 220 Hz 加 440 Hz 加 880 Hz。跑 DFT。確認預期的箱上有三個峰。
 2. **中等。** 用 48 kHz 錄 3 秒自己的聲音 WAV。用 `torchaudio.transforms.Resample`（帶抗混疊）降到 16 kHz，再用單純抽取（每三個樣本取一個）降到 16 kHz。兩邊都做 FFT。混疊出現在哪？
-3. **困難。** 只用 `math` 和第 3 步的 DFT，從零做 STFT。音框大小 400、hop 160、Hann 窗。用 `matplotlib.pyplot.imshow` 畫幅度。這就是第 02 課的頻譜圖。
+3. **困難。** 只用 `math` 和第 3 步的 DFT，從零做 STFT。音框大小 400、跳躍長度（hop size） 160、Hann 窗。用 `matplotlib.pyplot.imshow` 畫幅度。這就是第 02 課的頻譜圖。
 
 ## Key Terms｜關鍵術語
 

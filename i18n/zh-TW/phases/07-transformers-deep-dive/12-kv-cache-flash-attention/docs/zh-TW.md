@@ -11,14 +11,14 @@
 
 單純（naive）的自迴歸（autoregressive）解碼器，要生成 `N` 個 token 得做 `O(N²)` 的工作：每一步都對整個前綴重算注意力。4000 個 token 的回覆是 1600 萬次注意力運算，大多是多餘的。前綴 token 的每個隱藏狀態一旦算過就是確定的——你只需要拿新 token 的查詢，去對之前全部快取起來的鍵和值。
 
-除此之外，注意力本身搬很多資料。標準注意力會實體化出 N×N 的分數矩陣、N×d 的 softmax 輸出、N×d 的最終輸出——對 HBM 的讀寫太多。N 大於等於 2000 時，注意力先被記憶體卡住，才輪到被 FLOP 卡住。經典注意力核（kernel）把現代 GPU 的利用率壓低 4 到 10 倍。
+除此之外，注意力本身需要搬移大量資料。標準注意力會實體化出 N×N 的分數矩陣、N×d 的 softmax 輸出、N×d 的最終輸出——對 HBM 的讀寫太多。N 大於等於 2000 時，注意力先被記憶體卡住，才輪到被 FLOP 卡住。經典注意力核（kernel）把現代 GPU 的利用率壓低 4 到 10 倍。
 
 兩項調校都來自 Dao 等人，把前沿推論從「慢」推到「快」：
 
 1. **KV cache。** 存每個前綴 token 的 K 和 V 向量。每個新 token 的注意力，是一個查詢對上快取的鍵。推論從 `O(N²)` 降成每個生成步驟 `O(N)`。
 2. **Flash Attention。** 把注意力計算分塊，完整的 N×N 矩陣永遠不進 HBM。softmax 加矩陣乘法全在 SRAM 裡做。A100 上實際時間快 2 到 4 倍；H100 配 FP8 快 5 到 10 倍。
 
-到 2026 年兩者都是標配。每一套正式環境（production）推論堆疊（vLLM、TensorRT-LLM、SGLang、llama.cpp）都假設它們在。每個前沿模型出貨時都開著 Flash Attention。
+到 2026 年兩者都是標配。每一套正式環境（production）推論堆疊（vLLM、TensorRT-LLM、SGLang、llama.cpp）都都以這些技術為前提。每個前沿模型發布時都啟用 Flash Attention Flash Attention。
 
 ## The Concept｜核心概念
 
@@ -53,7 +53,7 @@ per 32K context = 10.4 GB
 
 **GQA 是 KV cache 的大勝利。** 64 個頭的 MHA 會是 32 GB。MLA 壓得更小。
 
-拖維度，看快取大小怎麼動。把序列長度或批次往上推，看它多快衝過單張 GPU：
+調整維度，看快取大小怎麼動。把序列長度或批次往上推，看它多快衝過單張 GPU：
 
 ```figure
 kv-cache-sizer
@@ -84,9 +84,9 @@ for each block of Q (tile size ~128 × 128):
     write O_tile to HBM
 ```
 
-每個區塊一次 HBM 來回。記憶體足跡從 `O(N²)` 降到 `O(N)`。反向傳播從前向重算一些值，而不是把它們存起來——又是一次記憶體上的勝利。
+每個區塊一次 HBM 來回。記憶體足跡從 `O(N²)` 降到 `O(N)`。反向傳播時重新計算部分前向值一些值，而不是把它們存起來——又是一次記憶體上的勝利。
 
-**數值手法。** 跑動中的 softmax 跨區塊維持 `(max, sum)`，所以最後的正規化（normalization）是精確的。不是近似——Flash Attention 算出來和標準注意力位元相同（除了 fp16 不可結合）。
+**數值手法。** 跑動中的 softmax 跨區塊維持 `(max, sum)`，所以最後的正規化（normalization）是精確的。不是近似——Flash Attention 算出來和標準注意力輸出與一次計算完全相同（除了 fp16 不可結合）。
 
 **版本演進：**
 
@@ -111,13 +111,13 @@ Flash 4 發布時只有前向。訓練仍用 Flash 3。Flash 4 的 GQA 和 varle
 
 ### 連續批次（continuous batching）
 
-經典的批次推論：等最慢的序列做完，再開始新的一批。短回覆提早結束時，GPU 在空等。
+經典的批次推論：等最慢的序列做完，再開始新的一批。短回覆提早結束時，GPU 閒置。
 
 連續批次（最先在 Orca 出貨，現在 vLLM、TensorRT-LLM、SGLang 都有）：舊的一做完就把新請求換進批次。典型聊天工作負載的吞吐量（throughput）多 5 到 10 倍。
 
 ### PagedAttention——把 KV cache 當虛擬記憶體
 
-vLLM 的招牌功能。KV cache 以 16 個 token 的區塊配置；頁表把邏輯位置對到實體區塊。讓你在平行樣本之間共用 KV（集束搜尋（beam search）、平行取樣），為 prompt 快取熱切換前綴，並重整記憶體碎片（fragmentation）。相對單純的連續配置，吞吐量多 4 倍。
+vLLM 的代表功能。KV cache 以 16 個 token 的區塊配置；頁表把邏輯位置對到實體區塊。讓你在平行樣本之間共用 KV（集束搜尋（beam search）、平行取樣），為 prompt 快取熱切換前綴，並重整記憶體碎片（fragmentation）。相對單純的連續配置，吞吐量多 4 倍。
 
 ```figure
 flash-attention-memory
@@ -171,7 +171,7 @@ def tiled_softmax_dot(q, K, V, tile=4):
     return [o / s for o in out]
 ```
 
-和一次算完的 `softmax(qK) V` 位元相同，但任何時刻的工作集是一個 `tile × d_head` 區塊，不是完整的 `N × d_head`。
+和一次算完的 `softmax(qK) V` 輸出與一次計算完全相同，但任何時刻的工作集是一個 `tile × d_head` 區塊，不是完整的 `N × d_head`。
 
 ### 步驟 3：在 100 個 token 的生成上比較單純解碼和有快取的解碼
 
@@ -209,7 +209,7 @@ vllm serve meta-llama/Llama-3.1-70B-Instruct \
 
 ## Exercises｜練習
 
-1. **簡單。** 跑 `code/main.py`。確認單純解碼器和有快取的解碼器輸出相同；注意運算次數的差。
+1. **簡單。** 跑 `code/main.py`。確認樸素解碼器和有快取的解碼器輸出相同；注意運算次數的差。
 2. **中等。** 實作前綴快取：給定 prompt P 和幾個補完，對 P 跑一次前向把 KV cache 填滿，再按每個補完分岔。量相對每次重新編碼 P 的加速。
 3. **困難。** 實作玩具 PagedAttention：KV cache 放在固定 16 個 token 的區塊，配空閒清單。序列結束就把區塊還回池子。模擬 1000 個長度不一的聊天補完。比記憶體碎片化和連續配置。
 

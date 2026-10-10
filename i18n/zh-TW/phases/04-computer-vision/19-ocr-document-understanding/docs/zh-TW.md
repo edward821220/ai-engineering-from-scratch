@@ -125,7 +125,7 @@ def greedy_ctc_decode(log_probs, blank=0):
     return out
 ```
 
-`F.ctc_loss` 有 CuDNN 時會用那個高效率實作。貪心解碼器比束搜尋（beam search）簡單，字元錯誤率通常差在 1% 以內。
+`F.ctc_loss` 有 CuDNN 時會用那個高效率實作。貪心解碼器比集束搜尋（beam search）（beam search）簡單，字元錯誤率通常差在 1% 以內。
 
 ### 步驟 2：很小的 CRNN 辨識器
 
@@ -237,12 +237,12 @@ model = VisionEncoderDecoderModel.from_pretrained("naver-clova-ix/donut-base-fin
 本課會產出：
 
 - `outputs/prompt-ocr-stack-picker.md`：一份 prompt，依文件類型、語言和結構，在 Tesseract、PaddleOCR、Donut、VLM-OCR 之間挑一個
-- `outputs/skill-ctc-decoder.md`：一項技能，從零寫出貪心和束搜尋的 CTC 解碼器，含長度正規化
+- `outputs/skill-ctc-decoder.md`：一項技能，從零寫出貪心和集束搜尋（beam search）的 CTC 解碼器，含長度正規化
 
 ## Exercises｜練習
 
 1. **（簡單）** 用五位隨機數字字串把 TinyCRNN 訓練 500 步。在留出集合上回報字元錯誤率。
-2. **（中等）** 把貪心解碼換成束搜尋，beam_width=5。回報字元錯誤率差多少。哪些輸入上束搜尋會贏？
+2. **（中等）** 把貪心解碼換成集束搜尋（beam search），beam_width=5。回報字元錯誤率差多少。哪些輸入上集束搜尋（beam search）會贏？
 3. **（困難）** 用 PaddleOCR 跑 20 張收據，抽出明細列，對手標的標準結果計算 {item_name, price} 配對的 F1。
 
 ## Key Terms｜關鍵術語

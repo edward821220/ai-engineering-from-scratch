@@ -11,7 +11,7 @@
 
 - 說明生成器（generator）和判別器（discriminator）之間的極小極大賽局，以及為什麼均衡對應到 p_model = p_data
 - 用 PyTorch 實作 DCGAN，在 60 行以內生成看得出結構的 32x32 合成影像
-- 用三個標準手法把 GAN 訓練穩住：非飽和損失、譜範數（spectral norm）、TTUR（兩時間尺度更新規則，two-timescale update rule）
+- 用三個標準手法把 GAN 訓練穩住：非飽和損失、譜正規化（spectral normalization）（spectral norm）、TTUR（兩時間尺度更新規則，two-timescale update rule）
 - 讀訓練曲線，分辨健康的收斂（convergence）、模式崩塌（mode collapse）、振盪，以及判別器完全贏
 
 ## The Problem｜問題
@@ -51,7 +51,7 @@ min_G max_D  E_x[log D(x)] + E_z[log(1 - D(G(z)))]
 
 從右邊往左讀。D 要把真影像上的準確率拉到最大，對應 `log D(real)`，也要把假影像上的準確率拉到最大，對應 `log (1 - D(fake))`。G 要把 D 對假影像的準確率壓到最小。它希望 `D(G(z))` 高。
 
-Goodfellow 證明這個極小極大有一個全域均衡：`p_G = p_data`，D 到處都輸出 0.5，生成分布和真實分布的 Jensen-Shannon 散度是 0。難的是走到那裡。
+Goodfellow 證明這個極小極大有一個全域均衡：`p_G = p_data`，D 到處都輸出 0.5，生成分布和真實分布的 Jensen-Shannon 散度是 0。要達到這點並不容易。
 
 ### 非飽和損失
 
@@ -89,7 +89,7 @@ flowchart LR
     style M3 fill:#fecaca,stroke:#dc2626
 ```
 
-- **模式崩塌**。G 找到一張能騙過 D 的影像，就只產那一張。修法：加上小批次判別、譜範數，或用標籤做條件。
+- **模式崩塌**。G 找到一張能騙過 D 的影像，就只產那一張。修法：加上小批次判別、譜正規化（spectral normalization），或用標籤做條件。
 - **判別器贏**。D 太快變得太強，G 的梯度消失。修法：把 D 做小、降低 D 的學習率，或對真實標籤做標籤平滑（label smoothing）。
 - **振盪**。兩個網路一直互有勝負，從未靠近均衡。修法：TTUR，讓 D 學得比 G 快 2 到 4 倍，或改用 Wasserstein 損失。
 
@@ -250,7 +250,7 @@ def sample(G, n=16, z_dim=64, device="cpu"):
 
 抽樣之前一定要切到 eval 模式。對 DCGAN 這要緊，因為這時用的是批次正規化累積下來的統計，不是這個批次自己的統計。
 
-### 步驟 6：譜範數
+### 步驟 6：譜正規化（spectral normalization）
 
 這可以直接換掉判別器裡的批次正規化，並保證網路是 1-Lipschitz。大多數「D 贏太兇」的失敗都能修。
 
@@ -269,7 +269,7 @@ def build_sn_discriminator(img_channels=3, feat=64):
     )
 ```
 
-把 `Discriminator` 換成 `build_sn_discriminator()`，常常就不需要 TTUR。譜範數是你能加上的、最容易的單一穩健性升級。
+把 `Discriminator` 換成 `build_sn_discriminator()`，常常就不需要 TTUR。譜正規化（spectral normalization）是你能加上的、最容易的單一穩健性升級。
 
 ## Use It｜實際應用
 
@@ -290,7 +290,7 @@ def build_sn_discriminator(img_channels=3, feat=64):
 ## Exercises｜練習
 
 1. **（簡單）** 在上面的合成圓形資料集上訓練這個 DCGAN。每個 epoch 結束存一張 16 個樣本的格子。到第幾個 epoch，生成的圓才明顯是圓？
-2. **（中等）** 把判別器的批次正規化換成譜範數。兩個版本並排訓練。哪一個收斂更快？三個種子之間，哪一個變異數更低？
+2. **（中等）** 把判別器的批次正規化換成譜正規化（spectral normalization）。兩個版本並排訓練。哪一個收斂更快？三個種子之間，哪一個變異數更低？
 3. **（困難）** 實作條件式 DCGAN：類別標籤同時餵給 G 和 D。G 裡把 one-hot 接到雜訊上，D 裡多接一個類別 embedding 通道。用第 7 課「圓對方塊」的合成資料集訓練，並用指定標籤抽樣，顯示類別條件有用。
 
 ## Key Terms｜關鍵術語
@@ -301,9 +301,9 @@ def build_sn_discriminator(img_channels=3, feat=64):
 | 判別器（D） | 「那個評的」 | 二元分類器。訓練來分辨真實影像和生成影像 |
 | 極小極大 | 「那場賽局」 | 對 G 取最小、對 D 取最大的對抗損失。均衡是 p_G = p_data |
 | 非飽和損失 | 「數值上比較正常的版本」 | G 的損失是 -log(D(G(z)))，不是 log(1 - D(G(z)))。避免訓練前段梯度消失 |
-| 模式崩塌 | 「生成器只做一種東西」 | G 只產出資料分布的一小部分。用譜範數、小批次判別，或更大的批次來修 |
+| 模式崩塌 | 「生成器只做一種東西」 | G 只產出資料分布的一小部分。用譜正規化（spectral normalization）、小批次判別，或更大的批次來修 |
 | TTUR | 「兩個學習率」 | D 學得比 G 快，通常是 2 到 4 倍。用來穩住訓練 |
-| 譜範數 | 「1-Lipschitz 的層」 | 一種權重正規化，把每一層的 Lipschitz 常數加上界。不讓 D 變得任意陡 |
+| 譜正規化（spectral normalization） | 「1-Lipschitz 的層」 | 一種權重正規化，把每一層的 Lipschitz 常數加上界。不讓 D 變得任意陡 |
 | FID | 「Fréchet Inception Distance」 | 真實集合和生成集合在 Inception-v3 特徵分布之間的距離。標準評估指標（metric） |
 
 ## Further Reading｜延伸閱讀

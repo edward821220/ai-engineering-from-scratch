@@ -9,9 +9,9 @@
 
 ## The Problem｜問題
 
-VAE 的樣本會糊，因為 MSE 解碼器損失對*平均*影像是貝氏最佳——很多張都說得通的數字，平均起來是一個糊掉的數字。你要的損失（loss）獎勵的是*像真的*，不是逐像素靠近任何一個目標。像真的沒有閉式。你得把它學出來。
+VAE 的樣本會糊，因為 MSE 解碼器損失對*平均*影像是貝氏最佳——很多張都說得通的數字，多個合理數字的平均會模糊。你要的損失（loss）獎勵的是*像真的*，不是逐像素靠近任何一個目標。像真的沒有閉式。你得把它學出來。
 
-Goodfellow 的想法：訓練一個分類器（classifier）`D(x)` 來分辨真影像和假的。訓練一個產生器（generator）`G(z)` 去騙 `D`。`G` 的損失信號，就是 `D` 當下覺得什麼看起來像真的。`G` 一變好，這個信號就更新，追的是移動目標。兩個網路都收斂的話，`G` 已經學會資料分布（distribution），卻從來沒寫下 `log p(x)`。
+Goodfellow 的想法：訓練一個分類器（classifier）`D(x)` 來分辨真影像和假的。訓練一個產生器（generator）`G(z)` 去騙 `D`。`G` 的損失信號，就是 `D` D 目前判定為真實的特徵。`G` 一變好，這個信號就更新，追的是移動目標。兩個網路都收斂的話，`G` 已經學會資料分布（distribution），卻從來沒寫下 `log p(x)`。
 
 這就是對抗訓練（adversarial training）。數學是一場極小極大（minimax）賽局：
 
@@ -19,7 +19,7 @@ Goodfellow 的想法：訓練一個分類器（classifier）`D(x)` 來分辨真�
 min_G max_D  E_real[log D(x)] + E_fake[log(1 - D(G(z)))]
 ```
 
-2026 年 GAN 不再是最強的產生器，擴散和流匹配（flow matching）拿走了那頂王冠。但 StyleGAN 2／3 仍是出貨過最銳的臉部模型，GAN 鑑別器（discriminator）被當成擴散訓練裡的*知覺損失（perceptual loss）*，而對抗訓練撐起快速的一步蒸餾（distillation），像是 SDXL-Turbo、SD3-Turbo、LCM，讓你能出貨即時的擴散。
+2026 年 GAN 不再是最強的產生器，擴散和流匹配（flow matching）拿走了那頂王冠。但 StyleGAN 2／3 仍是曾經發布過的最清晰臉部模型，GAN 鑑別器（discriminator）被當成擴散訓練裡的*知覺損失（perceptual loss）*，而對抗訓練撐起快速的一步蒸餾（distillation），像是 SDXL-Turbo、SD3-Turbo、LCM，讓你能支援即時擴散生成。
 
 ## The Concept｜核心概念
 
@@ -121,11 +121,11 @@ if step % 200 == 0:
 | 擴散訓練器裡的知覺損失 | 在影像裁塊上放一個小的 GAN 鑑別器 |
 | 任何多模態、開放式的 | 別用——改用擴散或流匹配 |
 
-GAN 很銳，但很窄。領域一打開，照片、任意文字 prompt、影片，就改用擴散。對抗這個手法留下來當元件（component），用在知覺損失和蒸餾，而不是單獨的產生器。
+GAN 很銳，但很窄。當任務領域擴大時，照片、任意文字 prompt、影片，就改用擴散。對抗這個手法留下來當元件（component），用在知覺損失和蒸餾，而不是單獨的產生器。
 
 ## Ship It｜交付成果
 
-存成 `outputs/skill-gan-debugger.md`。這個 skill 吃一次失敗的 GAN 訓練，也就是損失曲線、樣本網格、資料集（dataset）大小，輸出可能原因的排序、一行修法，和重跑協議。
+存成 `outputs/skill-gan-debugger.md`。這個 skill 根據失敗的 GAN 訓練記錄，也就是損失曲線、樣本網格、資料集（dataset）大小，輸出可能原因的排序、一行修法，和重跑協議。
 
 ## Exercises｜練習
 
@@ -152,9 +152,9 @@ GAN 在開放領域的樣本品質上已經不贏，但推論（inference）成�
 
 - **沒有預填（prefill），也沒有解碼階段。** 一次 `G(z)` 前向。首 token 時間（TTFT）約等於總延遲（latency）。
 - **沒有 KV cache 的壓力。** 唯一的狀態是權重。批次大小被活化記憶體（activation memory）限制，不是被快取限制。
-- **連續批次（continuous batching）很單純。** 每個請求的 FLOPs 都一樣、是固定的，所以在伺服器的目標佔用率放一個靜態批次，通常就是最好。不需要處理途中請求的排程器。
+- **連續批次（continuous batching）很單純。** 每個請求的 FLOPs 都一樣、是固定的，所以在伺服器的目標佔用率放一個固定批次，通常就是最好。不需要處理途中請求的排程器。
 
-這就是為什麼 GAN 蒸餾，SDXL-Turbo、SD3-Turbo、ADD、LCM，是 2026 年快速文字生影像的主力手法：它把 20 到 50 步的擴散管線（pipeline）縮成 1 到 4 次 GAN 式前向，同時保住擴散基底的分布。對抗損失留下來，當訓練時的旋鈕，把慢的產生器變成快的。
+這就是為什麼 GAN 蒸餾，SDXL-Turbo、SD3-Turbo、ADD、LCM，是 2026 年快速文字生影像的主力手法：它把 20 到 50 步的擴散管線（pipeline）縮成 1 到 4 次 GAN 式前向，同時保住擴散基底的分布。對抗損失留下來，當訓練時的旋鈕，將慢速生成器轉為快速生成器。
 
 ## Further Reading｜延伸閱讀
 

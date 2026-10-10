@@ -16,9 +16,9 @@
 
 ## The Problem｜問題
 
-每篇 AI 論文、教學文章和 Kaggle 競賽都會使用 Jupyter notebook。Notebook 讓你能分段執行程式碼、直接查看輸出、混合程式碼與說明，並快速反覆嘗試。不用 notebook 學 AI，就像寫數學作業卻沒有草稿紙。
+每篇 AI 論文、教學文章和 Kaggle 競賽都會使用 Jupyter notebook。Notebook 讓你能分段執行程式碼（code）、直接查看輸出、混合程式碼與說明，並快速反覆嘗試。不用 notebook 學 AI，就像寫數學作業卻沒有草稿紙。
 
-不過，notebook 也有實際的陷阱。有人無論做什麼都用 notebook，包括它最不擅長的工作。知道何時該用 notebook、何時該改用程式檔案，能避免日後陷入除錯惡夢。
+不過，notebook 也有實際的陷阱。有人無論做什麼都用 notebook，包括它最不擅長的工作。知道何時該用 notebook、何時該改用程式檔案，能避免日後陷入除錯（debugging）惡夢。
 
 ## The Concept｜核心概念
 
@@ -48,15 +48,15 @@ s0-cell-order
 
 ## Build It｜動手實作
 
-### 步驟 1：選擇介面
+### 步驟 1：選擇介面（interface）
 
 三種選擇，使用相同的檔案格式：
 
 | 介面 | 安裝方式 | 適合情境 |
 |-----------|---------|----------|
-| JupyterLab | `pip install jupyterlab` 然後執行 `jupyter lab` | 完整 IDE 體驗、多個分頁、檔案瀏覽器和終端機 |
+| JupyterLab | `pip install jupyterlab` 然後執行 `jupyter lab` | 完整 IDE 體驗、多個分頁、終端機（terminal） |
 | Jupyter Notebook | `pip install notebook` 然後執行 `jupyter notebook` | 簡單、輕量，一次使用一個 notebook |
-| VS Code | 安裝 "Jupyter" 擴充功能 | 已整合在編輯器中，支援 Git 整合和除錯 |
+| VS Code | 安裝 "Jupyter" 擴充功能 | 已編輯器（editor），支援 Git 整合和除錯 |
 
 三種介面都能讀寫相同的 `.ipynb` 檔案。選你喜歡的即可。JupyterLab 是 AI 工作中最常見的選擇。
 
@@ -86,7 +86,7 @@ jupyter lab
 
 | 按鍵 | 動作 |
 |-----|--------|
-| `Tab` | 自動完成 |
+| `Tab` | 自動完成（autocomplete） |
 | `Shift+Tab` | 顯示函式簽章（function signature） |
 | `Ctrl+/` | 切換註解 |
 
@@ -108,7 +108,7 @@ data.mean(), data.std()
 
 ### 步驟 4：Magic commands
 
-這些不是 Python 語法，而是 Jupyter 專用指令：以 `%` 開頭的 line magic，或以 `%%` 開頭的 cell magic。
+這些不是 Python 語法，而是 Jupyter 專用指令（command）：以 `%` 開頭的 line magic，或以 `%%` 開頭的 cell magic。
 
 **測量程式碼執行時間：**
 
@@ -224,7 +224,7 @@ AI 工作常見的流程：
 
 **不依序執行。**你先執行儲存格 5，再執行儲存格 2，接著執行儲存格 7。你的 notebook 在本機看似正常，但別人由上而下執行時就會出錯。解法：分享前選擇 Kernel > Restart & Run All。
 
-**隱藏狀態。**你刪除建立變數的儲存格，但該變數仍留在記憶體中。notebook 看起來乾淨，實際上卻依賴一個已消失的儲存格。解法：定期重新啟動核心。
+**隱藏狀態。**你刪除建立變數的儲存格，但該變數仍留在記憶體（memory）中。notebook 看起來乾淨，實際上卻依賴一個已消失的儲存格。解法：定期重新啟動核心。
 
 **記憶體洩漏。**載入 4 GB 資料集、訓練模型，再載入另一個資料集；記憶體卻沒有釋放。解法：使用 `del variable_name` 和 `gc.collect()`，或重新啟動核心。
 

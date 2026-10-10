@@ -163,7 +163,7 @@ Brown 上的二元 n-gram HMM 大約 93% 準確率。從 85% 跳到 93%，主要
 從零做完整的依存剖析超出這一課。標準教科書講法在 Jurafsky 和 Martin。要知道的兩支古典家族：
 
 - **基於轉移（transition-based）**的剖析器（arc-eager、arc-standard）像移進－歸約剖析器：讀 token，移進堆疊，再做歸約動作造出邊。貪婪解碼很快。經典實作是 MaltParser。現代神經版本：Chen 和 Manning 的基於轉移剖析器。
-- **基於圖（graph-based）**的剖析器（Eisner 演算法（algorithm）、Dozat-Manning 雙仿射）為每條可能的中心－依存邊打分，再挑最大生成樹。較慢，但較準。
+- **基於圖（graph-based）**的剖析器（Eisner 演算法（algorithm）、Dozat-Manning 雙仿射）為每條可能的中心－依存邊打分，再挑最大權重生成樹（maximum spanning tree）。較慢，但較準。
 
 多數應用工作，呼叫 spaCy：
 
@@ -193,7 +193,7 @@ at         tag=IN    pos=ADP    dep=prep       head=running
 每個正式環境的自然語言處理函式庫（library）都把詞性和依存剖析器放進標準管線。
 
 - **spaCy**（`en_core_web_sm`／`md`／`lg`／`trf`）。快、準，和 tokenization、命名實體辨識（named entity recognition）、詞形還原接在一起。`token.tag_`（Penn）、`token.pos_`（UD）、`token.dep_`（依存關係）。
-- **Stanford NLP（stanza）**。Stanford 接在 CoreNLP 之後的後繼。60 種以上語言目前最好。
+- **Stanford NLP（stanza）**。Stanford 推出的 CoreNLP 後繼系統。在 60 多種語言上達到最先進水準。
 - **trankit**。以 transformer 為基礎，UD 準確率好。
 - **NLTK**。`pos_tag`。能用、慢、較舊。教學夠用。
 
@@ -203,7 +203,7 @@ at         tag=IN    pos=ADP    dep=prep       head=running
 - **從大型語言模型輸出做結構化抽取。** 驗證生成的句子遵守文法約束（例如主詞和動詞一致、必要的修飾語）。
 - **面向情感分析（aspect-based sentiment）。** 依存剖析告訴你哪個形容詞修飾哪個名詞。
 - **查詢理解。** 「movies directed by Wes Anderson starring Bill Murray」經由剖析拆成結構化約束。
-- **跨語言轉移。** UD 標記和依存關係不綁語言，所以能對新語言做零樣本（zero-shot）的結構化分析。
+- **跨語言遷移。** UD 標記和依存關係不綁語言，所以能對新語言做零樣本（zero-shot）的結構化分析。
 - **算力低的管線。** 如果你無法交付 transformer，詞性加依存剖析加專名表（gazetteer）可以走得意外地遠。
 
 ## Ship It｜交付成果

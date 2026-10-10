@@ -97,7 +97,7 @@ def eer(same_scores, diff_scores):
     return (best[0] + best[1]) / 2, best[2]
 ```
 
-回（EER、EER 處的閾值）。兩個都要報。
+回傳……。兩個都要報。
 
 ### 步驟 4：用 SpeechBrain 做正式環境
 
@@ -140,7 +140,7 @@ for turn, _, speaker in diarization.itertracks(yield_label=True):
 
 - **通道不合。** 在 VoxCeleb（網頁影片）上訓練的模型，不等於電話音訊。一定要在目標通道上評估。
 - **短語句。** 測試音訊低於 3 秒，EER 會急劇變差。
-- **註冊時有雜訊。** 一次吵的註冊會毒掉錨點。用至少 3 段乾淨樣本再平均。
+- **註冊時有雜訊。** 單次含雜訊的註冊會污染參考 embedding。用至少 3 段乾淨樣本再平均。
 - **各種條件共用一個固定閾值。** 一定要在目標領域的留出開發集上調閾值。
 - **在沒有正規化的 embedding 上算餘弦。** 先做 L2 正規化。否則幅度會主導。
 

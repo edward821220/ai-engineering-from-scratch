@@ -21,15 +21,15 @@ transformer 出現之前，有兩族架構填上這個缺口。
 
 ## The Concept｜核心概念
 
-**TextCNN**（Kim，2014）。token 先做成 embedding。寬度 `k` 的一維卷積，把濾波器滑過連續 `k` 個 embedding，產出特徵圖（feature map）。對那張圖做全域最大池化，挑出最強的活化。把幾種濾波器寬度的最大池化輸出接起來。送進分類器頭。
+**TextCNN**（Kim，2014）。token 先做成 embedding。寬度 `k` 的一維卷積，把濾波器滑過連續 `k` 個 embedding，產出特徵圖（feature map）。對那張圖做全域最大池化（global max-pooling），挑出最強的活化。把幾種濾波器寬度的最大池化輸出接起來。送進分類器頭。
 
 它為什麼行。濾波器是可學習的 n-gram。最大池化與位置無關，所以「not good」在評論開頭或中間都會觸發同一個特徵（feature）。三種寬度、每種 100 個濾波器，就是 300 個學來的 n-gram 偵測器。訓練是平行的；沒有循序依賴。
 
 **RNN。** 在每個時間步 `t`，隱藏狀態是 `h_t = f(W * x_t + U * h_{t-1} + b)`。`W`、`U`、`b` 跨時間共用。時間 `T` 的隱藏狀態是整個前綴的摘要。分類時，在 `h_1 ... h_T` 上池化（最大、平均，或最後一個）。
 
-普通 RNN 會梯度消失（vanishing gradient）。**LSTM** 加上閘，決定忘掉什麼、存什麼、輸出什麼，讓梯度在長序列上穩得住。**GRU** 把 LSTM 簡化成兩個閘；參數較少，表現相近。
+普通 RNN 會遇到梯度消失問題（vanishing gradient）。**LSTM** 加上閘，決定忘掉什麼、存什麼、輸出什麼，讓梯度在長序列上穩得住。**GRU** 把 LSTM 簡化成兩個閘；參數較少，表現相近。
 
-**雙向 RNN** 一個往前、一個往後，再把隱藏狀態接起來。每個 token 的表示同時看見左右脈絡。標記任務少不了它。
+**雙向 RNN（bidirectional RNN）** 一個往前、一個往後，再把隱藏狀態接起來。每個 token 的表示同時看見左右脈絡。標記任務少不了它。
 
 ```figure
 rnn-unroll
@@ -148,7 +148,7 @@ class BertCNN(nn.Module):
 
 什麼時候用、要對上約束：
 
-- **邊緣／在裝置（device）上推論（inference）。** 用 GloVe embedding 的 TextCNN，比 transformer 小 10 到 100 倍。部署目標是手機的話，這就是那一疊。
+- **邊緣／在裝置（device）上推論（inference）。** 用 GloVe embedding 的 TextCNN，比 transformer 小 10 到 100 倍。部署目標是手機的話，這就是適合的技術組合。
 - **串流／逐筆進來的分類。** RNN 一次處理一個 token；transformer 需要整段序列。即時進來的文字，LSTM 仍然贏。
 - **拿來當基準模型（baseline）的小模型。** 新任務上快速迭代。在 CPU 上 5 分鐘就能訓練一個 TextCNN。
 - **資料有限的序列標記。** BiLSTM-CRF（第 06 課）對 1000 到 1 萬句標好的句子，仍是正式環境等級的命名實體辨識（named entity recognition）架構。
@@ -187,7 +187,7 @@ Refuse to recommend fine-tuning a transformer when data is under ~500 labeled ex
 
 | 術語 | 常見說法 | 實際意義 |
 |------|-----------------|-----------------------|
-| TextCNN | 給文字用的 CNN | 在 word embedding 上疊一維卷積，再做全域最大池化。Kim（2014）。 |
+| TextCNN | 給文字用的 CNN | 在 word embedding 上疊一維卷積，再做全域最大池化（global max-pooling）。Kim（2014）。 |
 | RNN | 循環網路 | 每個時間步更新隱藏狀態：`h_t = f(W x_t + U h_{t-1})`。 |
 | LSTM | 有閘的 RNN | 加上輸入閘、遺忘閘、輸出閘，以及細胞狀態。長序列也能訓練得穩。 |
 | GRU | 較簡單的 LSTM | 兩個閘，不是三個。準確率相近，參數較少。 |

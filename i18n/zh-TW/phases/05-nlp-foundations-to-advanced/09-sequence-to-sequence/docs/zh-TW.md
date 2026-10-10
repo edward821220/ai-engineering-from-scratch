@@ -13,13 +13,13 @@
 
 序列到序列架構（Sutskever、Vinyals、Le，2014）用一個故意做簡單的食譜破解了這件事。兩個 RNN。一個讀來源句，產出固定大小的脈絡向量（context vector）。另一個讀那個向量，一個 token 一個 token 生成目標句。和你在第 08 課寫的程式一樣，只是接法不同。
 
-值得學，有兩個理由。第一，脈絡向量的瓶頸是自然語言處理裡最適合教學的失敗。它說明注意力和 transformer 到底好在哪。第二，訓練食譜——teacher forcing、排程抽樣、推論（inference）時的集束搜尋（beam search）——仍適用於每個現代生成系統，包含大型語言模型。
+值得學，有兩個理由。第一，脈絡向量的瓶頸是自然語言處理裡最適合教學的失敗。它說明注意力和 transformer 到底好在哪。第二，訓練食譜——teacher forcing、排程取樣、推論（inference）時的集束搜尋（beam search）——仍適用於每個現代生成系統，包含大型語言模型。
 
 ## The Concept｜核心概念
 
 **編碼器（encoder）。** 讀來源句的 RNN。它最後的隱藏狀態（hidden state）就是**脈絡向量**——整段輸入的固定大小摘要。據說除了原文本身，什麼都沒丟。
 
-**解碼器（decoder）。** 另一個 RNN，用脈絡向量初始化。每一步拿前一個生成的 token 當輸入，在目標詞彙表上產出一個分布。用抽樣或 argmax 挑下一個 token。再餵回去。重複到產出 `<EOS>`，或碰到最大長度。
+**解碼器（decoder）。** 另一個 RNN，用脈絡向量初始化。每一步拿前一個生成的 token 當輸入，在目標詞彙表上產出一個分布。用取樣或 argmax 挑下一個 token。再餵回去。重複到產出 `<EOS>`，或碰到最大長度。
 
 **訓練：** 解碼器每一步的交叉熵（cross-entropy）損失，沿序列加總。兩個網路都做沿時間的反向傳播（backpropagation through time）。
 
@@ -164,7 +164,7 @@ print(tok.decode(out[0], skip_special_tokens=True))
 
 ### 暴露偏差和它的緩解
 
-- **排程抽樣（scheduled sampling）。** 訓練時把 teacher forcing 的比例退火，讓模型學會從自己的錯誤恢復。
+- **排程取樣（scheduled sampling）。** 訓練時把 teacher forcing 的比例退火，讓模型學會從自己的錯誤恢復。
 - **最小風險訓練。** 用句子級的 BLEU，而不是 token 級的交叉熵來訓練。更接近你真正要的東西。
 - **用強化學習 fine-tune。** 用一個指標獎勵序列生成器。現代大型語言模型的 RLHF 在用。
 

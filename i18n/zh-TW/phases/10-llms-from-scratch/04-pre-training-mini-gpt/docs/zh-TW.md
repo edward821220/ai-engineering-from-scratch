@@ -10,7 +10,7 @@
 ## Learning Objectives｜學習目標
 
 - 從零實作完整的 GPT-2 架構（1.24 億參數）：token embedding、位置 embedding、transformer 區塊與語言模型輸出頭
-- 使用交叉熵損失的下一個 token 預測任務，在文字語料庫上訓練 GPT 模型
+- 使用交叉熵損失的next-token prediction，在文字語料庫上訓練 GPT 模型
 - 實作具備溫度取樣（temperature sampling）與 top-k/top-p 過濾的自回歸文字生成
 - 監控訓練損失曲線，驗證模型學會了連貫的語言模式
 

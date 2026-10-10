@@ -132,7 +132,7 @@ flowchart TD
 | OpenAI Moderation (`omni-moderation`) | API | 13 種文字與圖像維度 | ~100ms | 免費 | 否 |
 | LlamaGuard 4 (2B / 8B) | 模型 | 14 種 MLCommons 維度 | ~150ms | 自架硬體成本 | 是 |
 | NeMo Guardrails | 框架 | 客製化規則（Colang） | ~50ms + LLM | 免費 | 是 |
-| Guardrails AI | 函式庫 | Hub 上提供 50+ 驗證器 | ~10-50ms | 開源免費 + 雲端版 | 是 |
+| Guardrails AI | 函式庫 | Hub 上提供 50+ 驗證器 | ~10-50ms | 免費方案 + 代管服務 | 是 |
 | LLM Guard (Protect AI) | 函式庫 | 20+ 種輸入／輸出掃描器 | ~10-100ms | 免費 | 是 |
 | Rebuff AI | 函式庫 + 金絲雀服務 | 啟發式 + 向量 + 金絲雀金鑰 | ~20ms + 查詢 | 免費 | 是 |
 | Lakera Guard | API | Prompt 注入、PII、毒性 | ~30ms | 商業 SaaS | 否 |

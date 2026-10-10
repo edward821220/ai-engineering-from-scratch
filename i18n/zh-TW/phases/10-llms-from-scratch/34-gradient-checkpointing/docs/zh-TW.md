@@ -41,7 +41,7 @@
 
 ### 選擇性檢查點（Korthikanti，2022 年）
 
-並非所有活化值的儲存成本都相同。注意力 softmax 輸出大小為 `B*L*L*heads`，隨序列長度呈**二次方**暴增；而 FFN 隱藏活化值大小為 `B*L*4d`，僅隨長度呈線性增長。對於長序列，softmax 絕對主導了記憶體佔用。
+並非所有活化值的儲存成本都相同。注意力 softmax 輸出大小為 `B*L*L*heads`，隨序列長度呈**二次方**暴增；而 FFN 隱藏活化值大小為 `B*L*4d`，僅隨長度呈線性增長。對於長序列，絕對。
 
 選擇性檢查點保留儲存代價低廉的活化值（線性投影、殘差），僅針對代價高昂的活化值（注意力機制）進行重算。你只需支付極微小的額外運算量來重算，卻能省去 O(L^2) 的龐大記憶體。
 
@@ -260,7 +260,7 @@ def should_recompute(layer_type, activation_bytes, recompute_flops_ratio):
 
 - **torch.utils.checkpoint**：`from torch.utils.checkpoint import checkpoint`——PyTorch 中的PyTorch 的標準包裝器。包裝一個函數；僅儲存輸入，在反向傳播時自動重算。
 - **Megatron-Core 活化值重算**：支援 `selective`、`full` 與 `block` 模式。2024 年後尖端訓練的標配。
-- **FSDP2 卸載**：FSDP2 具備 `module.to_empty(device="cpu")` 與 `offload_policy`，將活化值分片搬運至 CPU 而非重算。
+- **FSDP2 卸載**：FSDP2 具備 `module.to_empty(device="cpu")` 與 `offload_policy`，分片 而非重算。
 - **DeepSpeed ZeRO-Offload**：為最佳化器狀態與活化值提供 CPU 卸載，與檢查點互為補充。
 
 ## Ship It｜交付成果

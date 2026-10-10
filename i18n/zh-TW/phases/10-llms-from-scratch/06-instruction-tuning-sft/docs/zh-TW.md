@@ -1,6 +1,6 @@
 # 指令調校：Instruction Tuning（SFT）
 
-> 基底模型只會預測下一個 token。僅此而已。它不會遵循指令、不會回答問題，也不會拒絕有害請求。SFT（Supervised Fine-Tuning）是連接 token 預測器與實用助理之間的橋樑。你曾交談過的每一個模型——Claude、GPT、Llama Chat——都經歷過這一步驟。
+> 基模型只會預測下一個 token。僅此而已。它不會遵循指令、不會回答問題，也不會拒絕有害請求。SFT（Supervised Fine-Tuning）是連接 token 預測器與實用助理之間的橋樑。你曾交談過的每一個模型——Claude、GPT、Llama Chat——都經歷過這一步驟。
 
 **Type:** Build
 **Languages:** Python (with numpy)
@@ -11,16 +11,16 @@
 
 - 實作監督式 fine-tuning（Supervised Fine-Tuning）（SFT），將基底語言模型轉化為遵循指令的助理
 - 使用包含系統、使用者與助理角色的聊天範本格式化訓練資料，並對非助理 token 進行損失遮罩
-- 解釋為何 SFT 是必要的：基底模型只會接續文字，而非回答問題
-- 透過在保留指令集上比對基底模型與 fine-tuning 後模型的回應，評估 SFT 的品質
+- 解釋為何 SFT 是必要的：基模型只會接續文字，而非回答問題
+- 透過在保留指令集上比對基模型與 fine-tuning 後模型的回應，評估 SFT 的品質
 
 ## The Problem｜問題
 
 你在第 4 課中訓練了一個模型。它能在給定序列下預測下一個 token。餵給它「The transformer architecture」，它可能會接續「has revolutionized natural language processing。」對於一個下一個 token 預測器來說，這令人印象深刻。
 
-現在試試這個：餵給它「What is the capital of France?」基底模型不會回答「Paris」。它會延續這種句型模式。它可能會產出「What is the capital of Germany? What is the capital of Spain?」，因為它從包含問題清單的文件中學到了這種規律。或者它可能會產出「is a question that many people ask」，因為這也是一個合理的下一個 token 接續。模型完全沒有「回答」的概念。它只知道「接續」。
+現在試試這個：餵給它「What is the capital of France?」基模型不會回答「Paris」。它會延續這種句型模式。它可能會產出「What is the capital of Germany? What is the capital of Spain?」，因為它從包含問題清單的文件中學到了這種規律。或者它可能會產出「is a question that many people ask」，因為這也是一個合理的下一個 token 接續。模型完全沒有「回答」的概念。它只知道「接續」。
 
-這就是 GPT-3（基底模型，2020 年 6 月發布）與 ChatGPT（經過指令調校的模型，2022 年 11 月發布）之間的鴻溝。兩者擁有相同的架構、相同的預訓練。差別在於 2 萬到 10 萬組精心打造的（指令，回應）配對，教會了模型遵循對話模式。
+這就是 GPT-3（基模型，2020 年 6 月發布）與 ChatGPT（經過指令調校的模型，2022 年 11 月發布）之間的鴻溝。兩者擁有相同的架構、相同的預訓練。差別在於 2 萬到 10 萬組精心打造的（指令，回應）配對，教會了模型遵循對話模式。
 
 史丹佛的 Alpaca 證明了你不需要數百萬個範例。2023 年 3 月，他們僅使用由 GPT-3.5 生成的 52,000 組指令－回應配對，就對 Llama 7B 進行了 fine-tuning。Total cost: $600. The result was a chatbot that could follow instructions, answer questions, and hold conversations. Not as good as ChatGPT, but shockingly close for $600 and a few hours of training（總成本僅 600 美元，訓練數小時即產出能遵循指令的助理）。
 
@@ -390,7 +390,7 @@ def sft_train(model, dataset, num_epochs=2, lr=2e-5, seq_len=64):
 
 學習率為 2e-5，與 Llama 2 Chat 相符。相較於預訓練中使用的 3e-4，整整小了 15 倍。梯度經過遮罩：指令 token 產生零梯度，只有回應 token 能推動權重更新。
 
-### 步驟 5：比較基底模型與 SFT 模型
+### 步驟 5：比較基模型與 SFT 模型
 
 SFT 的核心在於改變行為。我們透過檢查模型面對指令格式輸入時的回應，相較於面對原始文字接續時的表現，來衡量這種轉變。
 
@@ -587,7 +587,7 @@ The model learns to predict the next token given all previous tokens."""
 | 術語 | 常見說法 | 實際意義 |
 |------|----------------|----------------------|
 | SFT | 「在對話上 fine-tune」 | 監督式 fine-tuning（Supervised Fine-Tuning）（Supervised Fine-Tuning）：在（指令，回應）配對上接續訓練，僅在回應 token 上計算損失 |
-| 指令調校（Instruction tuning） | 「教會模型遵循指令」 | 在明確的指令－回應配對上訓練，讓基底模型學會對話模式，而非學習新知識 |
+| 指令調校（Instruction tuning） | 「教會模型遵循指令」 | 在明確的指令－回應配對上訓練，讓基模型學會對話模式，而非學習新知識 |
 | 損失遮罩（Loss masking） | 「忽略 prompt」 | 將指令 token 的損失設為零，使梯度僅由回應 token 的預測流出 |
 | ChatML | 「Chat Markup Language」 | 一種使用 `<\|im_start\|>` 與 `<\|im_end\|>` 分隔符號來標記對話中說話者角色的 token 格式 |
 | Alpaca 格式 | 「史丹佛格式」 | 包含 instruction/input/output 欄位的 JSON 格式，曾用於以 600 美元成本生成的 5.2 萬個 GPT-3.5 範例 |

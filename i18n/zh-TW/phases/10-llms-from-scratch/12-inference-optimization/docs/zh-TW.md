@@ -623,7 +623,7 @@ def compare_speculation_strategies(vocab_size=1000, num_trials=20):
     return results
 ```
 
-### 步驟 6：KV 快取記憶體分析器
+### 步驟 6：KV 快取KV 快取記憶體效能分析器
 
 為真實模型配置計算 KV 快取的記憶體需求。
 

@@ -11,7 +11,7 @@
 
 2018 年，每一個 NLP 任務——情感（sentiment）、命名實體辨識（named entity recognition）、問答、蘊涵（entailment）——都在自己的有標籤（label）資料上從零訓練自己的模型。沒有一個預訓練好、可以 fine-tune 的「懂英文」checkpoint。ELMo（2018）顯示，你可以用雙向 LSTM 預訓練脈絡 embedding；有幫助，但泛化（generalization）不夠。
 
-BERT（Devlin et al. 2018）問：如果我們拿一個 transformer 編碼器（encoder），在網路上的每一句上訓練，強迫它從兩邊的脈絡預測缺掉的詞呢？然後你在下游任務上 fine-tune 一個頭。參數效率是一個啟示。
+BERT（Devlin et al. 2018）問：如果我們拿一個 transformer 編碼器（encoder），在網路上的每一句上訓練，強迫它從兩邊的脈絡預測缺掉的詞呢？然後你在下游任務上 fine-tune 一個頭。參數效率帶來重大啟發。
 
 結果：18 個月內，BERT 和它的變體（RoBERTa、ALBERT、ELECTRA）主宰了當時存在的每一個 NLP 排行榜。到 2020 年，地球上每一個搜尋引擎、內容審核管線（pipeline）、語意搜尋系統裡面都有一個 BERT。
 
@@ -42,7 +42,7 @@ target: the  quick brown fox jumps  over  the lazy dog
 - 10% 換成一個隨機 token。
 - 10% 保持原樣。
 
-為什麼不永遠用 `[MASK]`？因為 `[MASK]` 在推論（inference）時從不出現。若訓練時每個被遮位置都 100% 期待 `[MASK]`，預訓練和 fine-tune 之間就會有分布偏移。那 10% 隨機加 10% 不變，讓模型保持誠實。
+為什麼不永遠用 `[MASK]`？因為 `[MASK]` 在推論（inference）時從不出現。若訓練時每個被遮位置都 100% 期待 `[MASK]`，預訓練和 fine-tune 之間就會有分布偏移。那 10% 隨機加 10% 不變，避免模型只依賴遮罩 token。
 
 ### 下一句預測（NSP）——以及為什麼被拿掉
 
@@ -105,7 +105,7 @@ def create_mlm_batch(tokens, vocab_size, mask_prob=0.15, rng=None):
 
 ### 步驟 3：比較遮罩類型
 
-看這三路規則怎麼讓模型在沒有 `[MASK]` 時仍然可用。在沒遮罩的句子和有遮罩的句子上預測。兩者都應該給出合理的 token 分布，因為訓練時兩種模式都看過。
+看這三路規則怎麼讓模型在沒有 `[MASK]` 時仍然可用。在沒遮罩的句子和有遮罩的句子上預測。兩種情況都應產生合理的 token 分布，因為訓練時兩種模式都看過。
 
 ### 步驟 4：fine-tune 頭
 
@@ -124,11 +124,11 @@ inputs = tok(text, return_tensors="pt")
 out = model(**inputs).last_hidden_state   # (1, N, 768)
 ```
 
-**Embedding 模型是 fine-tune 過的 BERT。** `sentence-transformers` 的模型，例如 `all-MiniLM-L6-v2`，是用對比損失訓練的 BERT。編碼器是同一個。損失換了。
+**Embedding 模型是 fine-tune 過的 BERT。** `sentence-transformers` 的模型，例如 `all-MiniLM-L6-v2`，是用經對比損失訓練的 BERT。編碼器是同一個。損失換了。
 
-**交叉編碼器重排器也是 fine-tune 過的 BERT。** 在 `[CLS] query [SEP] doc [SEP]` 上做配對分類。查詢和文件之間的雙向注意力，正是交叉編碼器比雙編碼器品質好的原因。
+**交叉編碼器重排器也是 fine-tune 過的 BERT。** 在 `[CLS] query [SEP] doc [SEP]` 上做配對分類。查詢與文件間的雙向注意力，正是交叉編碼器比雙編碼器品質好的原因。
 
-**2026 年什麼時候不選 BERT。** 任何生成式的東西。編碼器沒有合理的方式自迴歸地產出 token。還有：10 億參數以下，小解碼器可以用更多彈性打平品質（Phi-3-Mini、Qwen2-1.5B）。
+**2026 年什麼時候不選 BERT。** 任何生成式的東西。編碼器沒有合理的方式自迴歸地產出 token。還有：10 億參數以下，小解碼器可以以較小解碼器的彈性達到相近品質（Phi-3-Mini、Qwen2-1.5B）。
 
 ## Ship It｜交付成果
 

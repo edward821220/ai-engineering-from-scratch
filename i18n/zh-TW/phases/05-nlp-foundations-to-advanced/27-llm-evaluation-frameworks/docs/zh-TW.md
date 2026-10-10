@@ -1,6 +1,6 @@
 # LLM 評估——RAGAS、DeepEval、G-Eval
 
-> 完全相符和 F1 抓不到語意等價。人工審查無法因應如此大的評估規模。LLM 當評審是正式環境（production）的答案——校準夠了，那個數字才信得過。
+> 完全相符和 F1 抓不到語意等價。人工審查無法因應如此大的評估規模。LLM-as-judge（LLM 當評審）是正式環境（production）的答案——校準夠了，那個數字才信得過。
 
 **Type:** Build
 **Languages:** Python
@@ -19,15 +19,15 @@
 
 - **RAGAS。** Retrieval-Augmented Generation ASsessment。四個 RAG 指標：忠實度（faithfulness）、答案相關性、脈絡精確率（precision）、脈絡召回率（recall）。後端是 NLI 加 LLM 評審。有研究支持，且輕量。
 - **DeepEval。** 給 LLM 用的 Pytest。G-Eval、任務完成、幻覺（hallucination）、偏差（bias）指標。原生就進 CI/CD。
-- **G-Eval。** 一個方法（也是 DeepEval 的一個指標）：LLM 當評審，帶逐步推理（chain-of-thought）、自訂準則、0 到 1 的分數。
+- **G-Eval。** 一個方法（也是 DeepEval 的一個指標）：LLM-as-judge（LLM 當評審），帶逐步推理（chain-of-thought）、自訂準則、0 到 1 的分數。
 
-三者都靠 LLM 當評審。這一課為這個方法、以及圍繞它的信任層建立直覺。
+三者都靠 LLM-as-judge（LLM 當評審）。這一課為這個方法、以及圍繞它的信任層建立直覺。
 
 ## The Concept｜核心概念
 
 ![Four evaluation dimensions, LLM-as-judge architecture](../assets/llm-evaluation.svg)
 
-**LLM 當評審。** 用一個 LLM 換掉靜態指標：給它評分準則，它為輸出打分。給定 `(query, context, answer)`，prompt 評審 LLM：「在忠實度上打 0 到 1 分。」回傳分數。
+**LLM-as-judge（LLM 當評審）。** 用一個 LLM 換掉靜態指標：給它評分準則，它為輸出打分。給定 `(query, context, answer)`，prompt 評審 LLM：「在忠實度上打 0 到 1 分。」回傳分數。
 
 為什麼行得通：LLM 以成本的一小部分逼近人的判斷。GPT-4o-mini $0.003 per scored case enables 1000-sample regression eval runs for under $5，也就是每個案例約 0.003 美元、1000 個樣本不到 5 美元。
 
@@ -48,7 +48,7 @@
 
 **G-Eval。** 定義一個自訂準則：「答案有沒有引用正確的來源？」框架自動展開成逐步推理的評估步驟，再打 0 到 1 分。適合 RAGAS 沒蓋到的、領域專用的品質維度（dimension）。
 
-**校準。** 在對上人類標籤（label）有相關之前，不要信原始的評審分數。跑 100 個手標的例子。畫評審對人。算 Spearman rho。若 rho 低於 0.7，評審的評分準則需要再修。
+**校準。** 在對上人類標籤（label）有相關之前，不要信原始的評審分數。跑 100 個手標的例子。先確認評審分數與人工標註結果的相關性；繪製評審與人工分數的比較圖。算 Spearman rho。若 rho 低於 0.7，評審的評分準則需要再修。
 
 ```figure
 n5-judge-gauge
@@ -226,7 +226,7 @@ Refuse to rely on a judge untested against ≥50 human-labeled examples. Refuse 
 
 | 術語 | 常見說法 | 實際意義 |
 |------|-----------------|-----------------------|
-| LLM 當評審 | 用 LLM 打分 | prompt 一個評審模型，依評分準則為輸出打 0 到 1 分。 |
+| LLM-as-judge（LLM 當評審） | 用 LLM 打分 | prompt 一個評審模型，依評分準則為輸出打 0 到 1 分。 |
 | RAGAS | RAG 的指標函式庫 | 開放原始碼的評估框架，有 4 個不需參考的 RAG 指標。 |
 | 忠實度 | 答案有沒有依據？ | 答案主張裡，被檢索脈絡蘊涵的比例。 |
 | 脈絡精確率 | 檢索到的區塊相關嗎？ | 前 K 個區塊裡，真正要緊的比例。 |
