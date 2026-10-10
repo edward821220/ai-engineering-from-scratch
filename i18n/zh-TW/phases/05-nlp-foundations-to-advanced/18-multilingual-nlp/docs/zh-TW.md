@@ -31,7 +31,7 @@
 
 | 模型 | 年份 | 覆蓋 | 備註 |
 |-------|------|----------|-------|
-| mBERT | 2018 | 104 種語言 | 在 Wikipedia 上訓練。第一個實用的多語語言模型。低資源語言較弱。 |
+| mBERT | 2018 | 104 種語言 | 在 Wikipedia 上訓練。第一個實用的多語言模型。低資源語言較弱。 |
 | XLM-R | 2019 | 100 種語言 | 在 CommonCrawl 上訓練（比 Wikipedia 大很多）。立下跨語言基準。Base 2.7 億，Large 5.5 億。 |
 | XLM-V | 2023 | 100 種語言 | 詞彙表有 100 萬個 token 的 XLM-R（對上 25 萬）。低資源較好。 |
 | mT5 | 2020 | 101 種語言 | 給多語生成用的 T5 架構。 |
@@ -210,7 +210,7 @@ Refuse to ship a multilingual model without per-language evaluation — aggregat
 | 跨語言遷移（cross-lingual transfer） | 在一種語言上訓練，在另一種上跑 | 在來源上 fine-tune，在目標上評估，不用目標語言的標籤。 |
 | 零樣本 | 沒有目標語言標籤 | 不在目標語言上 fine-tune 就遷移。 |
 | 少樣本 | 少量目標標籤 | 用 100 到 500 個目標語言例子做 fine-tune。 |
-| mBERT | 第一個多語語言模型 | 在 Wikipedia 上預訓練的 104 種語言 BERT。 |
+| mBERT | 第一個多語言模型 | 在 Wikipedia 上預訓練的 104 種語言 BERT。 |
 | XLM-R | 標準跨語言基準 | 在 CommonCrawl 上預訓練的 100 種語言 RoBERTa。 |
 | NLLB | Meta 的 200 種語言機器翻譯 | No Language Left Behind。含 55 個低資源語言。 |
 
