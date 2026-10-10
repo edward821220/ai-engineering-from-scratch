@@ -1,4 +1,4 @@
-# 評估（evaluation）——FID、CLIP score、人類偏好
+# 評估（evaluation）——FID、CLIP score、人類偏好（human preference）
 
 > 每份生成模型排行榜都會引用 FID、CLIP score，以及人類偏好競技場的勝率。每個數字都有失效模式，有心的研究者可以利用這些指標的弱點。你如果不知道這些失效模式，就分不出真正的改進，和一輪鑽指標。
 
@@ -9,7 +9,7 @@
 
 ## The Problem｜問題
 
-生成模型的評判，看的是*樣本品質*和*條件貼合（conditioning adherence）*。兩者都沒有閉式度量。你的模型得渲染 1 萬張影像；得有東西替它們標上數字；這些數字還得跨模型族、跨解析度、跨架構都信得過。三個指標撐過了 2014 到 2026：
+生成模型的評判，看的是*樣本品質（sample quality）*和*條件貼合（conditioning adherence）*。兩者都沒有閉式度量。你的模型得渲染 1 萬張影像；得有東西替它們標上數字；這些數字還得跨模型族、跨解析度、跨架構都信得過。三個指標撐過了 2014 到 2026：
 
 - **FID（Fréchet Inception Distance）。** 在 Inception 網路（network）的特徵空間（feature space）裡，真實與生成兩個分布（distribution）之間的距離。越低越好。
 - **CLIP score。** 生成影像的 CLIP 影像 embedding，和一段 prompt 的 CLIP 文字 embedding，兩者的餘弦相似度（cosine similarity）。越高越好。量的是 prompt 貼合。
@@ -29,12 +29,12 @@ Heusel et al.（2017）。步驟：
 2. 每一池擬合一個高斯：算平均數（mean）`μ_r, μ_g` 和共變異數（covariance）`Σ_r, Σ_g`。
 3. FID = `||μ_r - μ_g||² + Tr(Σ_r + Σ_g - 2 · (Σ_r · Σ_g)^0.5)`。
 
-解讀：特徵空間裡，兩個多變量高斯之間的 Fréchet 距離。越低 = 分布越像。
+解讀：特徵空間裡，兩個多變量高斯（multivariate Gaussian）之間的 Fréchet 距離。越低 = 分布越像。
 
 失效模式：
 
 - **小 N 有偏差（bias）。** FID 是特徵分布上的均方——N 小就會低估共變異數，給出假的低 FID。一律用 N ≥ 1 萬。
-- **依賴 Inception。** Inception-v3 在 ImageNet 上訓練。離 ImageNet 很遠的領域（人臉、藝術、帶文字的影像）會算出沒有意義的 FID。改用該領域自己的特徵抽取器。
+- **依賴 Inception。** Inception-v3 在 ImageNet 上訓練。離 ImageNet 很遠的領域（人臉、藝術、帶文字的影像）會算出沒有意義的 FID。改用該領域自己的特徵抽取器（feature extractor）。
 - **鑽指標。** 對 Inception 的先驗（prior）過度擬合（overfit），FID 會變低，視覺品質並沒有變好。用下面的 CMMD 打掉它。
 
 ### CLIP score——prompt 貼合
@@ -80,7 +80,7 @@ CMMD（Jayasumana et al.，2024）補上其中一部分：用 CLIP 特徵取代 
 3. 跟前一個模型在盲測競技場的勝率（整體偏好）。
 4. 失效模式分析：隨機抽 50 張輸出，標出已知問題（手部結構、文字渲染、物體數量是否一致）。
 
-任何單一指標都是謊言。三個互相佐證的指標，加上質性檢視，才構成一個主張。
+任何單一指標都是謊言。三個互相佐證的指標，加上質性檢視（qualitative inspection），才構成一個主張。
 
 ```figure
 gx-fid-distributions
@@ -88,7 +88,7 @@ gx-fid-distributions
 
 ## Build It｜動手實作
 
-`code/main.py` 在合成的「特徵向量」上實作 FID、類似 CLIP score 的分數，以及 Elo 彙總（用 4 維向量代替 Inception 特徵）。你會看到：
+`code/main.py` 在合成的「特徵向量」（feature vector）上實作 FID、類似 CLIP score 的分數，以及 Elo 彙總（用 4 維向量代替 Inception 特徵）。你會看到：
 
 - 小 N 和大 N 上的 FID——那個偏差。
 - 「CLIP score」是特徵池之間的餘弦相似度。
@@ -149,7 +149,7 @@ def elo_update(r_a, r_b, winner, k=32):
 
 ## Ship It｜交付成果
 
-存成 `outputs/skill-eval-report.md`。這個 skill 吃一個新的模型檢查點（checkpoint）加基準，輸出完整的評估計畫：樣本數、指標、失效模式探針、簽核標準。
+存成 `outputs/skill-eval-report.md`。這個 skill 吃一個新的模型檢查點（checkpoint）加基準，輸出完整的評估計畫：樣本數（sample size）、指標、失效模式探針、簽核標準。
 
 ## Exercises｜練習
 
