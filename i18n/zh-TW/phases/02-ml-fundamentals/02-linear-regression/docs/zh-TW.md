@@ -520,9 +520,7 @@ print(f"Ridge coefficient: {ridge.coef_[0]:.4f}")
 ## Exercises｜練習
 
 1. 實作批次梯度下降法（batch gradient descent）、隨機梯度下降法（stochastic gradient descent，SGD）和小批次梯度下降法（mini-batch gradient descent）。在相同資料集上比較收斂速度。哪一種收斂最快？哪一種方法的成本曲線最平滑？
-
 2. 使用三次函數（y = ax^3 + bx^2 + cx + d + noise）產生資料。以 1、3 和 10 次多項式擬合，並比較訓練集（training set）R^2 與測試集（test set）R^2。多項式次數（degree）到幾次時，過度擬合才變得明顯？
-
 3. 實作 LASSO 迴歸（Lasso regression），其 L1 正則化（L1 regularization）懲罰項為 penalty = alpha * sum(|w_i|)。在多特徵房屋資料上訓練，並比較哪些權重會變成零，以及嶺迴歸的權重有何不同。為什麼 L1 會產生稀疏解（sparse solution），而 L2 不會？
 
 ## Key Terms｜關鍵術語
