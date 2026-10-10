@@ -11,12 +11,12 @@
 
 - 打造一個完整的深度學習（deep learning）框架，大約 500 行，包含 Module、Linear、ReLU、Sigmoid、Dropout、BatchNorm、Sequential、損失函數、最佳化器和 DataLoader
 - 說明 Module 這個抽象，也就是 forward、backward、parameters，以及為什麼必須在 train 和 eval 模式之間切換
-- 把所有零件接成一個能動的訓練迴圈，在圓形分類上訓練一個 4 層網路
+- 把所有零件接成一個能動的訓練迴圈（training loop），在圓形分類上訓練一個 4 層網路
 - 把框架裡的每個零件對到 PyTorch 的對應物：nn.Module、nn.Sequential、optim.Adam、DataLoader
 
 ## The Problem｜問題
 
-十課的積木散在不同檔案裡。這裡一個 `Value` 類別，那裡一個訓練迴圈，權重初始化在另一個檔案，學習率排程又在另一個。要訓練一個網路，你得從五課裡複製貼上，再手動接起來。
+十課的積木散在不同檔案裡。這裡一個 `Value` 類別，那裡一個訓練迴圈，權重初始化（weight initialization）在另一個檔案，學習率排程又在另一個。要訓練一個網路，你得從五課裡複製貼上，再手動接起來。
 
 框架解決的就是這件事。PyTorch 給你 `nn.Module`、`nn.Sequential`、`optim.Adam`、`DataLoader`，以及把它們綁在一起的訓練迴圈模式。TensorFlow 給你 `keras.Layer`、`keras.Sequential`、`keras.optimizers.Adam`。這些不是魔法。它們是組織方式，讓你能定義、訓練、評估網路，不必每次把底層接線重做一次。
 
