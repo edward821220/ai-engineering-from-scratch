@@ -1,6 +1,6 @@
 # 從零做自注意力（self-attention）
 
-> 注意力（attention）是一張查詢表：每個詞都問「誰跟我有關？」——然後學會答案。
+> 注意力（attention）是一張查詢（query）表：每個詞都問「誰跟我有關？」——然後學會答案。
 
 **Type:** Build
 **Languages:** Python
@@ -9,24 +9,24 @@
 
 ## Learning Objectives｜學習目標
 
-- 只用 NumPy，從零實作縮放點積自注意力（scaled dot-product self-attention），包含查詢（query）、鍵（key）、值（value）的投影，以及 softmax 的加權和
+- 只用 NumPy，從零實作縮放點積自注意力（scaled dot-product self-attention），包含查詢（query）、鍵（key）、值（value）的投影（projection），以及 softmax 的加權總和
 - 做出多頭注意力（multi-head attention）層：拆開頭、平行算注意力、再把結果串接起來
-- 追蹤注意力矩陣怎麼抓住 token 之間的關係，並解釋為什麼除以 sqrt(d_k) 能避免 softmax 飽和
+- 追蹤注意力矩陣（attention matrix）怎麼抓住 token 之間的關係，並解釋為什麼除以 sqrt(d_k) 能避免 softmax 飽和
 - 套上因果遮罩（causal masking），把雙向注意力改成自迴歸（autoregressive）、解碼器（decoder）風格的注意力
 
 ## The Problem｜問題
 
 RNN 一次處理序列裡的一個 token。等你走到第 50 個 token，第 1 個 token 的資訊已經被擠過 50 次壓縮。長程依賴被壓進固定大小的隱藏狀態（hidden state）——再多的 LSTM 閘控也解不開這個瓶頸。
 
-2014 年 Bahdanau 的注意力論文給出修法：讓解碼器回頭看編碼器（encoder）的每個位置，決定哪些對目前這一步要緊。但它仍然栓在 RNN 上。2017 年的 “Attention Is All You Need” 問得更尖：如果注意力是*唯一*的機制呢？沒有循環。沒有卷積（convolution）。只有注意力。
+2014 年 Bahdanau 的注意力論文提出解法：讓解碼器回頭看編碼器（encoder）的每個位置，決定哪些對目前這一步要緊。但它仍是硬接在 RNN 上的附加機制。2017 年的 “Attention Is All You Need” 問得更尖：如果注意力是*唯一*的機制呢？沒有循環。沒有卷積（convolution）。只有注意力。
 
-自注意力讓序列裡每個位置，在單一個平行步驟裡注意到其他每個位置。這就是 transformer 又快、又能縮放、又主導的原因。
+自注意力讓序列裡每個位置，在單一個平行步驟裡對其他每個位置分配注意力。這就是 transformer 又快、又能縮放、又主導的原因。
 
 ## The Concept｜核心概念
 
 ### 資料庫查找的類比
 
-把注意力想成一次軟的資料庫查找：
+注意力可以看成一次軟性的資料庫查找：
 
 ```
 Traditional database:
@@ -37,12 +37,11 @@ Attention:
 ```
 
 每個 token 產生三個向量：
-
 - **查詢（Q）**：「我在找什麼？」
 - **鍵（K）**：「我含有什麼？」
 - **值（V）**：「被選中時我提供什麼資訊？」
 
-一個查詢和所有鍵的內積（dot product）產生注意力分數。高分表示「這個鍵對上我的查詢」。那些分數拿來加權值。輸出是值的加權和。
+一個查詢和所有鍵的內積（dot product）產生注意力分數（attention score）。高分表示「這個鍵對上我的查詢」。這些分數用來為值加權。輸出是值的加權總和。
 
 ### Q、K、V 怎麼算
 
@@ -132,9 +131,9 @@ Attention weights:   [0.52, 0.09, 0.07, 0.14, 0.08]   (sums to ~1.0)
 
 現在每個 token 有一組權重，說明要多注意其他每個 token。
 
-### 值的加權和
+### 值的加權總和
 
-每個 token 的最終輸出，是所有值向量的加權和：
+每個 token 的最終輸出，是所有值向量的加權總和：
 
 ```
 output_i = sum( attention_weight[i][j] * v_j  for all j )
@@ -153,7 +152,7 @@ flowchart LR
   Q --> S["Q · Kᵀ / √dk"]
   K --> S
   S --> SM["softmax"]
-  SM --> WS["加權和"]
+  SM --> WS["加權總和"]
   V --> WS
   WS --> O["輸出"]
 ```
@@ -226,7 +225,7 @@ class SelfAttention:
 
 ### 步驟 4：在一句話上跑
 
-為一句話做出假的 embedding，看注意力權重。
+為一個句子產生假的 embedding，觀察注意力權重。
 
 ```python
 sentence = ["The", "cat", "sat", "on", "the", "mat"]
@@ -308,7 +307,6 @@ print(attn_weights[0].detach().numpy().round(3))
 ## Ship It｜交付成果
 
 這一課產出：
-
 - `outputs/prompt-attention-explainer.md`——一個 prompt，用資料庫查找的類比來解釋注意力
 
 ## Exercises｜練習
