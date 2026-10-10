@@ -1,6 +1,6 @@
 # DPO：直接偏好最佳化
 
-> RLHF 確實有效。但它同時需要訓練三個模型（SFT、獎勵模型、策略模型）、駕馭 PPO 的不穩定性，並仔細調校 KL 懲罰。DPO 問了一個問題：如果可以跳過這一切呢？DPO 直接在偏好配對上最佳化語言模型。不需要獎勵模型，不需要 PPO，只需單一訓練迴圈，達到相同成果。
+> RLHF 確實有效。但它同時需要訓練三個模型（SFT、獎勵模型（reward model）、策略模型（policy model））、駕馭 PPO 的不穩定性，並仔細調校 KL 懲罰。DPO 問了一個問題：如果可以跳過這一切呢？DPO 直接在偏好配對（preference pair）上最佳化語言模型。不需要獎勵模型，不需要 PPO，只需單一訓練迴圈，達到相同成果。
 
 **Type:** Build
 **Languages:** Python (with numpy)
@@ -150,7 +150,7 @@ DPO 啟發了一系列簡化對齊方法。
 
 **KTO（Kahneman-Tversky Optimization，2024 年）：** 連配對都不需要。KTO 適用於非成對的回饋——只需將每個回應標記為「好」或「壞」，無需與替代選項進行比較。這大幅簡化了資料收集。與其展示兩個回應並詢問「哪一個更好？」，不如展示一個回應並詢問「這好嗎？」。其損失函數應用了展望理論中的損失趨避（loss aversion）：對壞回應的懲罰重於對好回應的獎勵。
 
-**ORPO（Odds Ratio Preference Optimization，2024 年）：** 將 SFT 與對齊整合至單一訓練步驟中。ORPO ORPO 不必先做 SFT 再做 DPO，而是直接修改 SFT 損失以納入偏好訊號。其損失包含兩項：針對勝出回應的標準next-token prediction損失，加上一個擴大勝出與落敗回應機率差距的勝算比項。一個訓練迴圈搞定一切。
+**ORPO（Odds Ratio Preference Optimization，2024 年）：** 將 SFT 與對齊整合至單一訓練步驟中。ORPO 不必先做 SFT 再做 DPO，而是直接修改 SFT 損失以納入偏好訊號。其損失包含兩項：針對勝出回應的標準 next-token prediction 損失，加上一個擴大勝出與落敗回應機率差距的勝算比項。一個訓練迴圈搞定一切。
 
 **SimPO（Simple Preference Optimization，2024 年）：** 徹底移除了參考模型。SimPO 不再計算相對於凍結參考模型的對數機率比，而是直接使用以長度正規化後的回應平均對數機率作為隱式獎勵。這節省了記憶體（不需要參考模型）並簡化了訓練。長度正規化防止了模型盲目偏好較短的回應。
 
@@ -166,7 +166,7 @@ DPO 啟發了一系列簡化對齊方法。
 
 ### 真實世界部署
 
-**Zephyr-7B（HuggingFace，2023 年 10 月）：** Mistral 7B 基底，在 UltraChat（20 萬範例）上進行 SFT，隨後在 UltraFeedback（6 萬偏好配對）上執行 DPO。在 MT-Bench 上拿下 6.47 分——為當時 7B 模型的最高分。相比之下，Llama 2 Chat 70B 的得分為 6.86，意味著 Zephyr 僅透過 DPO 對齊就達到了參數量是其 10 倍的模型 94% 以上的實力。
+**Zephyr-7B（HuggingFace，2023 年 10 月）：** Mistral 7B 基模型，在 UltraChat（20 萬範例）上進行 SFT，隨後在 UltraFeedback（6 萬偏好配對）上執行 DPO。在 MT-Bench 上拿下 6.47 分——為當時 7B 模型的最高分。相比之下，Llama 2 Chat 70B 的得分為 6.86，意味著 Zephyr 僅透過 DPO 對齊就達到了參數量是其 10 倍的模型 94% 以上的實力。
 
 **Llama 3（Meta，2024 年 4 月）：** 在初期 RLHF 階段之後接續使用了 DPO。這種結合表明 DPO 與 RLHF 可以相輔相成——以 RLHF 進行廣泛對齊，以 DPO 進行針對性精煉。
 
