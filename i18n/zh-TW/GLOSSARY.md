@@ -1126,6 +1126,10 @@
 | alternating least squares | 交替最小平方法 | 否 |  | ALS。 |
 | noise reduction | 降噪 | 否 |  |  |
 | matrix factorization | 矩陣分解 | 否 |  |  |
+| co-occurrence | 共現 | 否 |  | 兩個詞出現在彼此脈絡裡。 |
+| subword | 子詞 | 否 |  | 詞的片段；字元 n-gram 或學出來的 token。 |
+| BPE | BPE | 是 |  | Byte-Pair Encoding；反覆合併最常相鄰的配對。 |
+| byte-level BPE | 位元組層級 BPE | 否 |  | 從 256 個位元組開始的 BPE。 |
 | truncated SVD | 截斷奇異值分解 | 否 |  |  |
 | SVD truncation | SVD 截斷 | 否 |  |  |
 | low-rank | 低秩 | 否 |  |  |
