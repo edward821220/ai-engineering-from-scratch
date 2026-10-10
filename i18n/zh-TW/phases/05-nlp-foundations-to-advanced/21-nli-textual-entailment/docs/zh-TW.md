@@ -1,6 +1,6 @@
-# 自然語言推論（natural language inference，NLI）（natural language inference）——文本蘊涵（textual entailment）
+# 自然語言推論（natural language inference，NLI）——文本蘊涵（textual entailment）
 
-> 「t 蘊涵 h」的意思是，人讀了 t 會認定 h 為真。NLI 是預測蘊涵、矛盾或中立的任務。表面無聊，在正式環境（production）裡卻是承重的。
+> 「t 蘊涵 h」的意思是，人讀了 t 會認定 h 為真。NLI 是預測蘊涵、矛盾或中立的任務。表面無聊，在正式環境（production）裡卻是不可或缺的基礎。
 
 **Type:** Learn
 **Languages:** Python
@@ -162,7 +162,7 @@ Refuse to ship zero-shot classification without a 100-example labeled sanity che
 | 術語 | 常見說法 | 實際意義 |
 |------|-----------------|-----------------------|
 | NLI | 自然語言推論（natural language inference，NLI） | 前提和假設關係的三路分類。 |
-| RTE | 辨識文本蘊涵 | NLI 的舊名；同一個任務。 |
+| RTE | 辨識文本蘊涵（Recognizing Textual Entailment） | NLI 的舊名；同一個任務。 |
 | 蘊涵 | 「t 蘊涵 h」 | 典型讀者給定 t 會認定 h 為真。 |
 | 矛盾 | 「t 排除 h」 | 典型讀者給定 t 會認定 h 為假。 |
 | 中立 | 「定不下來」 | 從 t 到 h 兩邊都推不出。 |
