@@ -11,5 +11,6 @@
   "phases/11-llm-engineering/10-evaluation/docs/en.md": "6d034f8ea8714a1effae7a38bb3078d65d54389eacb1ea3336b273dac57980f1",
   "phases/11-llm-engineering/11-caching-cost/docs/en.md": "bec924754c74950f7a7f6e975846b477cb63cc8aec4e8942cffdb4bbbd076bd3",
   "phases/11-llm-engineering/12-guardrails/docs/en.md": "7bca84f499c6a75c2f97253f3fa4cf85befb0fbcf66e4c882e125279686ad73f",
-  "phases/11-llm-engineering/13-production-app/docs/en.md": "b0a346e45927205a67e1db24f0d67e16adde62736840bd2ac923a5fc03cd6101"
+  "phases/11-llm-engineering/13-production-app/docs/en.md": "b0a346e45927205a67e1db24f0d67e16adde62736840bd2ac923a5fc03cd6101",
+  "phases/11-llm-engineering/14-model-context-protocol/docs/en.md": "26356da586c4f90922e0ab61af4ea47d81deaf3c9b2cc91e4ae8ac44efaadd7b"
 }
