@@ -1,6 +1,6 @@
 # 機器學習管線（ML pipeline）
 
-> 模型（model）不是產品，管線（pipeline）才是。管線涵蓋從原始資料到從原始資料到部署後產生的預測（deployed prediction）之間的一切，而且每一步都必須可重現（reproducible）。
+> 模型（model）不是產品，管線（pipeline）才是。管線涵蓋從原始資料到部署後產生的預測（deployed prediction）之間的一切，而且每一步都必須可重現（reproducible）。
 
 **Type:** Build
 **Language:** Python
@@ -173,7 +173,7 @@ wandb.log({"accuracy": accuracy})
 
 做完實驗追蹤，還要管理模型（model）版本：哪個模型（model）在正式環境？哪個在預備環境（staging）？上週的是哪個？
 
-MLflow 的 Model Registry（模型（model）登錄（model registry））提供：
+MLflow 的 Model Registry（模型登錄）提供：
 - **版本追蹤：** 每個儲存的模型（model）都有版本號
 - **階段轉換：** 「Staging」、「Production」、「Archived」
 - **核准流程（approval workflow）：** 模型（model）必須明確晉升（promote）至正式環境
