@@ -11,7 +11,7 @@
 
 - 用冪次迭代（power iteration）實作 SVD，並說明 U、Sigma 和 V^T 的幾何意義
 - 將截斷奇異值分解（truncated SVD）用於影像壓縮，並量測壓縮率與重建誤差
-- 透過 SVD 計算 Moore–Penrose pseudoinverse，解決超定最小平方法（least squares）問題
+- 透過 SVD 計算 Moore–Penrose 廣義反矩陣（pseudoinverse），解決超定最小平方法（least squares）問題
 - 串連 SVD 與 PCA、推薦系統（潛在因子）和 NLP 中的潛在語意分析（Latent Semantic Analysis）
 
 ## The Problem｜問題
@@ -24,7 +24,7 @@ SVD 適用於任何矩陣，不論形狀或秩，不需要額外條件。它把�
 
 ### SVD 的幾何意義
 
-每個矩陣，不論形狀，都依序完成三步：旋轉、縮放、再旋轉：旋轉、縮放、旋轉。SVD 把這個分解明確寫出來。
+每個矩陣，不論形狀，都依序完成三步：旋轉、縮放、再旋轉。SVD 把這個分解明確寫出來。
 
 ```
 A = U * Sigma * V^T
@@ -196,7 +196,7 @@ SVD with rank k:
 
 ### SVD 在推薦系統中的應用
 
-Netflix Prize 讓這個方法聲名大噪。你有一個使用者－電影評分矩陣，其中大多數項目都缺失。
+Netflix Prize 讓這個方法聲名大噪。你有一個使用者－電影評分矩陣，其中大多數元素都缺失。
 
 ```
              Movie1  Movie2  Movie3  Movie4  Movie5
@@ -281,9 +281,9 @@ graph TD
 
 這種方法用於訊號處理（signal processing）、科學量測和資料清理。只要矩陣受到加成性雜訊污染，截斷 SVD 就是有原則的訊號與雜訊分離方法。
 
-### 用 SVD 計算pseudoinverse
+### 用 SVD 計算廣義反矩陣
 
-Moore–Penrose pseudoinverse A+，將反矩陣的概念推廣到非方陣和奇異矩陣。用 SVD 計算它很簡單。
+Moore–Penrose 廣義反矩陣 A+，將反矩陣的概念推廣到非方陣和奇異矩陣。用 SVD 計算它很簡單。
 
 ```
 If A = U * Sigma * V^T, then:
@@ -299,7 +299,7 @@ For A (m x n):      A+ is (n x m)
 For Sigma (m x n):  Sigma+ is (n x m)
 ```
 
-pseudoinverse可求解最小平方法（least squares）問題。如果 Ax = b 沒有精確解（超定系統），那麼 x = A+ b 就是最小平方法（least squares）解（讓 ||Ax - b|| 最小）。
+廣義反矩陣可求解最小平方法（least squares）問題。如果 Ax = b 沒有精確解（超定系統），那麼 x = A+ b 就是最小平方法（least squares）解（讓 ||Ax - b|| 最小）。
 
 ```
 Overdetermined system (more equations than unknowns):
@@ -473,7 +473,7 @@ print(f"Denoised error: {np.linalg.norm(denoised - clean):.4f}")
 print(f"Improvement:    {(1 - np.linalg.norm(denoised - clean) / np.linalg.norm(noisy - clean)):.1%}")
 ```
 
-### 步驟 5：pseudoinverse
+### 步驟 5：廣義反矩陣
 
 ```python
 A = np.array([[1, 1], [2, 1], [3, 1]], dtype=float)
@@ -533,7 +533,7 @@ julia svd.jl
 | 右奇異向量（right singular vector） | 「輸入方向」 | V 的一個欄。輸入空間中的方向，矩陣會將它映射到第 i 個左奇異向量（經 sigma_i 縮放後）。 |
 | 截斷 SVD（truncated SVD） | 「低秩近似」 | 只保留前 k 個奇異值及其向量，得到原矩陣在秩 k 下有證明的最佳近似（Eckart–Young 定理）。 |
 | 秩（rank） | 「真正的維度」 | 非零奇異值的數量，表示矩陣實際使用多少個獨立方向。 |
-| pseudoinverse（pseudoinverse） | 「pseudoinverse」 | V Sigma+ U^T。對非零奇異值取倒數，零值則維持為零。可解非方陣或奇異矩陣的最小平方法（least squares）問題。 |
+| 廣義反矩陣（pseudoinverse） | 「廣義反矩陣」 | V Sigma+ U^T。對非零奇異值取倒數，零值則維持為零。可解非方陣或奇異矩陣的最小平方法（least squares）問題。 |
 | 條件數（condition number） | 「對誤差有多敏感」 | sigma_max / sigma_min。條件數越大，微小的輸入變化就越可能造成很大的輸出變化。SVD 可以直接揭示條件數。 |
 | 潛在因子（latent factor） | 「隱藏變數」 | SVD 找到的低秩空間中的一個維度。在推薦系統中，潛在因子可能對應某種電影類型偏好；在 NLP 中則可能對應某個主題。 |
 | Frobenius 範數（Frobenius norm） | 「矩陣的總大小」 | 所有元素平方和的平方根，也等於所有奇異值平方和的平方根。用於量測近似誤差。 |
