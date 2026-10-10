@@ -16,5 +16,6 @@
   "phases/10-llms-from-scratch/15-speculative-decoding-eagle3/docs/en.md": "e7ccc1f2140d91351e1990b1556e97a2f6375b05ad1d7b36d5c852e1cec66ef5",
   "phases/10-llms-from-scratch/16-differential-attention-v2/docs/en.md": "89705e3112b66cdf2bb5444d632cafb5c4b168fe4693e534c92fb0d1051ae5df",
   "phases/10-llms-from-scratch/17-native-sparse-attention/docs/en.md": "ad7929f9d22e8abedc598a0c9779ac28461ac789d853787ac047a172a04d0755",
-  "phases/10-llms-from-scratch/18-multi-token-prediction/docs/en.md": "5147945b9cea6351169e38c9bea631ed9769807fa4858f257b4e0f789139472d"
+  "phases/10-llms-from-scratch/18-multi-token-prediction/docs/en.md": "5147945b9cea6351169e38c9bea631ed9769807fa4858f257b4e0f789139472d",
+  "phases/10-llms-from-scratch/19-dualpipe-parallelism/docs/en.md": "281c6d6c76b8c64f6b80f61accd664241985e31d2ff36795c016d8746b1ccd99"
 }
