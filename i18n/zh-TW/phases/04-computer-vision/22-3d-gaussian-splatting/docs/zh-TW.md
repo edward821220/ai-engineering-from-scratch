@@ -10,7 +10,7 @@
 ## Learning Objectives｜學習目標
 
 - 說明為什麼 2026 年，照片級 3D 重建在正式環境的預設從 NeRF 換成了 3D 高斯濺射
-- 說出每個高斯的六個參數：位置、旋轉四元數（quaternion）、尺度、不透明度、球諧（spherical harmonics）顏色、可選特徵（feature）。各自貢獻幾個浮點數
+- 說出每個高斯的六個參數：位置（position）、旋轉四元數（quaternion）、尺度（scale）、不透明度（opacity）、球諧（spherical harmonics）顏色、可選特徵（feature）。各自貢獻幾個浮點數
 - 用 `alpha` 合成從零實作一個 2D 高斯濺射的光柵器，再顯示 3D 的情況投影之後是同一個迴圈
 - 用 `nerfstudio`、`gsplat` 或 `SuperSplat`，從 20 到 50 張照片重建一個場景，並匯出成 `KHR_gaussian_splatting` 這個 glTF 擴充，或 OpenUSD 26.03 的 `UsdVolParticleField3DGaussianSplat` schema
 
@@ -36,7 +36,7 @@ opacity          alpha      (1,)    post-sigmoid opacity [0, 1]
 SH coefficients  c_lm       (3 * (L+1)^2,)   view-dependent colour
 ```
 
-旋轉加尺度做出一個 3×3 共變異數矩陣（covariance matrix）（covariance）：`Sigma = R S S^T R^T`。那就是這個高斯在 3D 裡的形狀。球諧讓顏色隨觀看方向改變，鏡面高光、微微的光澤、依視角的光暈，都不用為每個視角存一張紋理。球諧 3 階時，每個顏色通道 16 個係數，光是顏色，每個高斯就有 48 個浮點數。
+旋轉加尺度做出一個 3×3 共變異數矩陣（covariance matrix）：`Sigma = R S S^T R^T`。那就是這個高斯在 3D 裡的形狀。球諧讓顏色隨觀看方向改變，鏡面高光、微微的光澤、依視角的光暈，都不用為每個視角存一張紋理。球諧 3 階時，每個顏色通道 16 個係數，光是顏色，每個高斯就有 48 個浮點數。
 
 一個場景通常有 100 萬到 500 萬個高斯。每個大約存 60 個浮點數（3 + 4 + 3 + 1 + 48，再加上其他）。500 萬個高斯的場景是 240 MB。比帶逐點紋理的對等點雲小得多，也比在高解析度下重渲的 NeRF MLP 權重小一個數量級。
 
