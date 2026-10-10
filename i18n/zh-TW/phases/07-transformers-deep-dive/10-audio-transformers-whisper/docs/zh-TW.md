@@ -1,6 +1,6 @@
 # 音訊 Transformer——Whisper 架構
 
-> 音訊是頻率對時間的一張影像。Whisper 是以梅爾頻譜圖為輸入並產生語音的 ViT。
+> 音訊是頻率對時間的一張影像。Whisper 是以梅爾頻譜圖（mel-spectrogram）為輸入並產生語音的 ViT。
 
 **Type:** Learn
 **Languages:** Python
@@ -9,13 +9,13 @@
 
 ## The Problem｜問題
 
-Whisper 之前（OpenAI，Radford et al. 2022），最前沿的自動語音辨識（ASR）是 wav2vec 2.0 和 HuBERT——自監督的特徵（feature）抽取器，加上一個 fine-tune 過的頭。品質高，資料管線（pipeline）貴，換領域就脆。多語語音辨識要每個語系各一個模型。
+Whisper 之前（OpenAI，Radford et al. 2022），最前沿的自動語音辨識（ASR）是 wav2vec 2.0 和 HuBERT——自監督的特徵（feature）抽取器，加上一個 fine-tune 過的頭。品質高，資料管線（pipeline）貴，跨領域泛化能力弱。多語言語音辨識要每個語系各一個模型。
 
 Whisper 下了三個賭注：
 
 1. **什麼都拿來訓練。** 68 萬小時、從網路上抓來的弱標籤（label）音訊，跨 97 種語言。沒有乾淨的學術語料庫（corpus）。沒有音素標籤。
-2. **多任務、單一模型。** 一個解碼器同時訓練轉錄、翻譯、語音活動偵測、語言辨識、和時間戳記，用任務 token 來切。
-3. **標準的編碼器–解碼器 transformer。** 編碼器吃對數 mel 頻譜。解碼器自迴歸（autoregressive）地產出文字 token。沒有聲碼器、沒有 CTC、沒有 HMM。
+2. **多任務、單一模型。** 一個解碼器同時訓練轉錄、翻譯、語音活動偵測（voice activity detection）、語言辨識（language identification）、和時間戳記（timestamp），用任務 token 來切。
+3. **標準的編碼器–解碼器（encoder–decoder）transformer。** 編碼器吃對數梅爾頻譜圖（log-mel spectrogram）。解碼器自迴歸（autoregressive）地產出文字 token。沒有聲碼器、沒有 CTC、沒有 HMM。
 
 結果：Whisper large-v3 在口音、雜訊、以及完全沒有乾淨標籤資料的語言上都穩。它是 2026 年每一個開源語音助理、和大多數商業語音助理的預設語音前端。
 
@@ -25,11 +25,11 @@ Whisper 下了三個賭注：
 
 ### 步驟 1——重取樣加開窗
 
-音訊 16 kHz。裁或補到 30 秒。算對數 mel 頻譜：80 個梅爾頻率槽、10 毫秒跳躍長度（stride）→ 約 3000 個音框（frame）× 80 個特徵。這就是 Whisper 看到的「輸入影像」。
+音訊 16 kHz。裁或補到 30 秒。算對數梅爾頻譜圖：80 個梅爾頻率槽、10 毫秒跳躍長度（stride）→ 約 3000 個音框（frame）× 80 個特徵。這就是 Whisper 看到的「輸入影像」。
 
-### 步驟 2——卷積的莖
+### 步驟 2——卷積 stem
 
-兩層 Conv1D，核（kernel）3、步幅 2，把 3000 個音框壓成 1500。序列長度減半，參數沒加多少。
+兩層 Conv1D，核（kernel）3、步幅（stride）2，把 3000 個音框壓成 1500。序列長度減半，參數沒加多少。
 
 ### 步驟 3——編碼器
 
@@ -37,7 +37,7 @@ Whisper 下了三個賭注：
 
 ### 步驟 4——解碼器
 
-24 層的 transformer 解碼器。它自迴歸地從一個 BPE 詞彙產出 token，那個詞彙是 GPT-2 的超集，再加幾個音訊專用的特殊 token。
+24 層的 transformer 解碼器。它自迴歸地從 BPE 詞彙表產生 token，那個詞彙表是 GPT-2 的超集，再加幾個音訊專用的特殊 token。
 
 ### 步驟 5——任務 token
 
@@ -71,13 +71,13 @@ Whisper 下了三個賭注：
 | Large-v3 | 15.5 億 | 32 | 1280 | 20 | ~10 GB |
 | Large-v3-turbo | 8.09 億 | 32 | 1280 | 20 | ~6 GB（4 層解碼器） |
 
-Large-v3-turbo（2024）把解碼器從 32 層砍到 4。解碼快 8 倍，WER 退步不到 1 個點。這個解碼速度就是為什麼 2026 年即時語音代理的預設是 Whisper-turbo。
+Large-v3-turbo（2024）把解碼器從 32 層砍到 4。解碼快 8 倍，WER 退步不到 1 個點。這個解碼速度就是為什麼 2026 年即時語音 agent 的預設是 Whisper-turbo。
 
 ### Whisper 不做的事
 
 - 不做說話者分離（誰在說話）。那個配 pyannote。
-- 原生不做即時串流——30 秒視窗是固定的。現代的包裝（`faster-whisper`、`WhisperX`）用 VAD 加重疊把串流接上去。
-- 沒有外部切塊，就沒有超過 30 秒的長文脈絡。實務上仍然好用，因為人說話做轉錄很少需要長程脈絡。
+- 原生不做即時串流——30 秒視窗是固定的。現代的包裝（`faster-whisper`、`WhisperX`）用 VAD 加上重疊，附加串流功能。
+- 沒有外部切分，就沒有超過 30 秒的長文脈絡。實務上仍然好用，因為人說話做轉錄很少需要長程脈絡。
 
 ### 2026 年的版圖
 
@@ -95,15 +95,15 @@ n5-mel-decode
 
 ## Build It｜動手實作
 
-見 `code/main.py`。我們不訓練 Whisper——我們做對數 mel 頻譜的管線，加上任務 token 的 prompt 格式化。這些才是正式環境（production）裡你真正會碰到的部分。
+見 `code/main.py`。我們不訓練 Whisper——我們做對數梅爾頻譜圖的管線，加上任務 token 的 prompt 格式化。這些才是正式環境（production）裡你真正會碰到的部分。
 
 ### 步驟 1：合成音訊
 
 產生 1 秒、440 Hz 的正弦波，以 16 kHz 取樣。16000 個樣本。
 
-### 步驟 2：對數 mel 頻譜（簡化）
+### 步驟 2：對數梅爾頻譜圖（簡化）
 
-完整的 mel 頻譜需要 FFT。我們做簡化的分框加每框能量，把管線秀出來，而且不用 `librosa`：
+完整的梅爾頻譜圖需要 FFT。我們做簡化的分框加每框能量，把管線秀出來，而且不用 `librosa`：
 
 ```python
 def frame_signal(x, frame_size=400, hop=160):
@@ -113,7 +113,7 @@ def frame_signal(x, frame_size=400, hop=160):
     return frames
 ```
 
-音框 = 25 毫秒，hop = 10 毫秒。對得上 Whisper 的開窗。教學上，每框能量代替 mel 頻帶。
+音框 = 25 毫秒，跳躍長度 = 10 毫秒。對得上 Whisper 的開窗。教學上，每框能量代替梅爾頻率槽。
 
 ### 步驟 3：補到 30 秒
 
@@ -165,21 +165,21 @@ for s in segments:
 
 ## Ship It｜交付成果
 
-見 `outputs/skill-asr-configurator.md`。這個 skill 為新的語音應用挑 ASR 模型、解碼參數、和前處理管線。
+見 `outputs/skill-asr-configurator.md`。這個 skill 為新的語音應用挑 ASR 模型、解碼參數、和前處理（preprocessing）管線。
 
 ## Exercises｜練習
 
-1. **簡單。** 跑 `code/main.py`。確認 1 秒、16 kHz、10 毫秒 hop 的訊號大約是 100 個音框。30 秒：約 3000 個音框。
-2. **中等。** 用 `numpy.fft` 做完整的對數 mel 頻譜。確認 80 個 mel 頻帶在數值誤差內對得上 `librosa.feature.melspectrogram(n_mels=80)`。
+1. **簡單。** 跑 `code/main.py`。確認 1 秒、16 kHz、跳躍長度 10 毫秒的訊號大約是 100 個音框。30 秒：約 3000 個音框。
+2. **中等。** 用 `numpy.fft` 做完整的對數梅爾頻譜圖。確認 80 個梅爾頻率槽在數值誤差內對得上 `librosa.feature.melspectrogram(n_mels=80)`。
 3. **困難。** 實作串流推論（inference）：把音訊切成 10 秒視窗、2 秒重疊，每一塊跑 Whisper，再把轉錄合併。在一段 5 分鐘的 podcast 樣本上，量詞錯誤率對上一次過完。
 
 ## Key Terms｜關鍵術語
 
 | 術語 | 常見說法 | 實際意義 |
 |------|-----------------|-----------------------|
-| Mel 頻譜 | 「音訊的影像」 | 二維表示：一軸是頻率帶，另一軸是時間音框；每一格是對數縮放的能量。 |
-| 對數 mel | 「Whisper 看到的東西」 | 通過對數的 mel 頻譜；近似人對響度的知覺。 |
-| 音框 | 「一個時間切片」 | 25 毫秒的樣本視窗；以 10 毫秒步幅重疊。 |
+| 梅爾頻譜圖 | 「音訊的影像」 | 二維表示：一軸是頻率帶，另一軸是時間音框；每一格是對數縮放的能量。 |
+| 對數梅爾頻譜圖 | 「Whisper 看到的東西」 | 通過對數的梅爾頻譜圖；近似人對響度的知覺。 |
+| 音框 | 「一個時間切片」 | 25 毫秒的樣本視窗；以 10 毫秒跳躍長度重疊。 |
 | 任務 token | 「語音的 prompt 前綴」 | 解碼器 prompt 裡的特殊 token，像 `<\|transcribe\|>`／`<\|translate\|>`。 |
 | 語音活動偵測（VAD） | 「找出語音」 | 在 ASR 之前拿掉靜音的閘；成本砍掉非常多。 |
 | CTC | 「Connectionist Temporal Classification」 | 經典的 ASR 損失，訓練時不用對齊；Whisper 不用它。 |
@@ -194,5 +194,5 @@ for s in segments:
 - [Baevski et al. (2020). wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations](https://arxiv.org/abs/2006.11477) ——前身；某些情境下特徵仍然最前沿。
 - [SYSTRAN/faster-whisper](https://github.com/SYSTRAN/faster-whisper) ——正式環境包裝，比參考快 4 倍。
 - [Jia et al. (2024). Moonshine: Speech Recognition for Live Transcription and Voice Commands](https://arxiv.org/abs/2410.15608) ——2024 年適合邊緣的 ASR，形狀像 Whisper 但更小。
-- [HuggingFace blog — "Fine-Tune Whisper For Multilingual ASR with 🤗 Transformers"](https://huggingface.co/blog/fine-tune-whisper) ——標準的 fine-tuning 配方，包含 mel 頻譜前處理和 token 時間戳記的處理。
+- [HuggingFace blog — "Fine-Tune Whisper For Multilingual ASR with 🤗 Transformers"](https://huggingface.co/blog/fine-tune-whisper) ——標準的 fine-tuning 配方，包含梅爾頻譜圖前處理和 token 時間戳記的處理。
 - [HuggingFace `modeling_whisper.py`](https://github.com/huggingface/transformers/blob/main/src/transformers/models/whisper/modeling_whisper.py) ——完整實作（編碼器、解碼器、交叉注意力、生成），對得上這一課的架構圖。
