@@ -1003,6 +1003,13 @@
 | MCMC | MCMC | 是 |  | Markov chain Monte Carlo 縮寫。 |
 | L-BFGS | L-BFGS | 是 |  | 擬牛頓最佳化演算法名稱。 |
 | conditional random field | 條件隨機場 | 否 |  |  |
+| named entity recognition | 命名實體辨識 | 否 |  | 把 token 片段標成人物、組織、地點等類型。 |
+| hidden Markov model | 隱藏馬可夫模型 | 否 |  | 以發射與轉移機率做序列標記。 |
+| LSTM | LSTM | 是 |  | Long Short-Term Memory。 |
+| BiLSTM | BiLSTM | 是 |  | 雙向 LSTM。 |
+| gazetteer | 專名表 | 否 |  | 已知專名的查表清單。 |
+| zero-shot | 零樣本 | 否 |  | 沒有該任務的標註例子就直接做。 |
+| few-shot | 少樣本 | 否 |  | 只用少數標註例子。 |
 | second moment | 二階矩 | 否 |  | Adam 語境，梯度平方的平均量。 |
 | natural gradient | 自然梯度 | 否 |  | 使用 Fisher 資訊矩陣的梯度方法。 |
 | Fisher information matrix | Fisher 資訊矩陣 | 否 |  | 衡量參數資訊量的矩陣。 |
