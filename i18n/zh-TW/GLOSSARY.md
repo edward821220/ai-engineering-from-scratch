@@ -1004,6 +1004,9 @@
 | L-BFGS | L-BFGS | 是 |  | 擬牛頓最佳化演算法名稱。 |
 | conditional random field | 條件隨機場 | 否 |  |  |
 | named entity recognition | 命名實體辨識 | 否 |  | 把 token 片段標成人物、組織、地點等類型。 |
+| part-of-speech tagging | 詞性標記 | 否 |  | 給每個 token 一個文法類別。 |
+| syntactic parsing | 句法剖析 | 否 |  | 還原句子的樹狀結構。 |
+| dependency parsing | 依存剖析 | 否 |  | 每個詞依存於一個中心詞。 |
 | hidden Markov model | 隱藏馬可夫模型 | 否 |  | 以發射與轉移機率做序列標記。 |
 | LSTM | LSTM | 是 |  | Long Short-Term Memory。 |
 | BiLSTM | BiLSTM | 是 |  | 雙向 LSTM。 |
