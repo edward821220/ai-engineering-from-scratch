@@ -12,7 +12,7 @@
 - 分辨語意分割、實例分割（instance segmentation）和全景分割（panoptic segmentation），並依問題選對的任務
 - 用 PyTorch 從零做一個 U-Net：編碼器區塊、瓶頸（bottleneck）、帶轉置卷積（transposed convolution）的解碼器、跳躍連接
 - 實作逐像素的交叉熵（cross-entropy）、Dice 損失（Dice loss），以及醫學和工業分割目前預設的組合損失
-- 讀每個類別的 IoU 和 Dice，判斷分數差是來自小物體的召回率（recall）、邊界準不準，還是類別不平衡
+- 讀每個類別的交並比（intersection over union，IoU）和 Dice，判斷分數差是來自小物體的召回率（recall）、邊界準不準，還是類別不平衡
 
 ## The Problem｜問題
 
@@ -256,7 +256,7 @@ def combined_loss(logits, targets, num_classes, lam=1.0):
     return ce + lam * dc, {"ce": ce.item(), "dice": dc.item()}
 ```
 
-Dice 先按類別算，再平均，這是巨觀平均（macro-average）Dice。`eps` 避免批次裡沒有出現的類別除以 0。
+Dice 先按類別算，再平均，這是宏平均（macro-average）Dice。`eps` 避免批次裡沒有出現的類別除以 0。
 
 ### 步驟 5：IoU 指標
 
