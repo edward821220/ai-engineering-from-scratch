@@ -1,6 +1,6 @@
 # 進階 RAG（分塊、重新排序與混合搜尋）
 
-> 基礎 RAG 僅僅是檢索 top-k 個最相似的區塊。這對簡單問題尚能應付。一旦面對多跳推理（multi-hop reasoning）、語意模糊的查詢與海量語料庫時，它便徹底瓦解。進階 RAG 正是在「只能在 10 份文件上跑跑 demo 的玩具」與「能在 1,000 萬份文件上穩定運行的生產級系統」之間的決定性差距。
+> 基礎 RAG 僅僅是檢索 top-k 個最相似的區塊。這對簡單問題尚能應付。一旦面對多跳推理（multi-hop reasoning）、語意模糊的查詢與海量語料庫時，它便徹底瓦解。進階 RAG 正是在「只能在 10 份文件上跑跑 demo 的玩具」與「能在 1,000 萬份文件上穩定執行的生產級系統」之間的決定性差距。
 
 **Type:** Build
 **Languages:** Python
@@ -63,7 +63,7 @@ RRF_score(d) = sum over rankings R:
 
 另一份文件在向量搜尋中排名第 3，在 BM25 中排名第 2，其得分為：1/(60+3) + 1/(60+2) = 0.0159 + 0.0161 = 0.0320
 
-RRF 能自然權衡兩路訊號。在兩份清單中皆名列前茅的文件會獲得最高綜合分；僅在其中一份榜單奪冠但在另一份榜上無名的文件，則獲得中等評分。這套演算法極具穩健性，因為它純粹依據排名（Rank）而非原始相似度分數進行融合，徹底規避了兩套系統間分數尺度與分佈不對稱的棘手難題。
+RRF 能自然權衡兩路訊號。在兩份清單中皆名列前茅的文件會獲得最高綜合分；僅在其中一份榜單奪冠但在另一份榜上無名的文件，則獲得中等評分。這套演算法極具穩健性，因為它純粹依據排名（Rank）而非原始相似度分數進行融合，徹底規避了兩套系統間分數尺度與分布不對稱的棘手難題。
 
 ### 重新排序（Reranking）
 
@@ -88,7 +88,7 @@ graph LR
 - Voyage rerank-2.5：代管 API、在代管選項中擁有極低延遲
 - Jina-Reranker-v2 Multilingual：開源權重、支援 100+ 種語言
 - bge-reranker-v2-m3：開源權重、綜合表現強勁的標竿基準
-- cross-encoder/ms-marco-MiniLM-L-6-v2：開源權重、可在 CPU 上高效運行以供快速原型驗證
+- cross-encoder/ms-marco-MiniLM-L-6-v2：開源權重、可在 CPU 上高效執行以供快速原型驗證
 - ColBERTv2 / Jina-ColBERT-v2：晚期互動多向量重新排序器——在評分時複雜度取決於 token 數而非完整文件推論
 
 ### 查詢轉換（Query Transformation）
@@ -259,7 +259,7 @@ def hybrid_search(query, chunks, vector_embeddings, vocab, idf, bm25_index, top_
 
 ### 步驟 4：簡易重新排序器
 
-在正式環境中，此處通常會調用交叉編碼器模型。此處我們實作一個依據字詞重疊、關鍵詞權重與短語匹配對「查詢—文件」進行關聯度評分的重新排序器。
+在正式環境中，此處通常會呼叫交叉編碼器模型。此處我們實作一個依據字詞重疊、關鍵詞權重與短語匹配對「查詢—文件」進行關聯度評分的重新排序器。
 
 ```python
 def rerank(query, candidates, chunks):
@@ -513,7 +513,7 @@ response = collection.query.hybrid(
 | 術語 | 常見說法 | 實際意義 |
 |------|----------------|----------------------|
 | BM25 | 「關鍵字搜尋」 | 一種機率排名演算法，依據詞頻、逆文件頻率與文件長度正規化為文件評分 |
-| 混合搜尋（Hybrid search） | 「兼採兩者之長」 | 平行運行語意向量搜尋與 BM25 關鍵字搜尋，隨後透過排名融合演算法合併結果 |
+| 混合搜尋（Hybrid search） | 「兼採兩者之長」 | 平行執行語意向量搜尋與 BM25 關鍵字搜尋，隨後透過排名融合演算法合併結果 |
 | 倒數排名融合（Reciprocal Rank Fusion, RRF） | 「合併排名清單」 | 透過對所有清單累加 1/(k + rank) 來合併多份排序榜單，完全不受各系統分數尺度影響 |
 | 重新排序（Reranking） | 「二次細部打分」 | 使用運算成本較高但極度精準的交叉編碼器模型，對初篩候選集進行深度重新評分 |
 | 交叉編碼器（Cross-encoder） | 「聯合評估模型」 | 將查詢與文件合併為單一輸入並輸出關聯度分數的模型；精度遠高於雙編碼器，但無法大規模預先計算 |
@@ -529,7 +529,7 @@ response = collection.query.hybrid(
 - Cormack et al., "Reciprocal Rank Fusion Outperforms Condorcet and Individual Rank Learning Methods" (2009) ——證明 RRF 優於更複雜機器學習融合方法的原創奠基論文
 - Gao et al., "Precise Zero-Shot Dense Retrieval without Relevance Labels" (2022) ——證明假設性文件 embedding 在無需任何訓練資料下顯著提升檢索品質的 HyDE 原創論文
 - Nogueira & Cho, "Passage Re-ranking with BERT" (2019) ——證實以交叉編碼器在 BM25 之上重新排序能大幅拉升檢索品質的先驅研究
-- [Khattab et al., "DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines" (2023)](https://arxiv.org/abs/2310.03714) ——將 Prompt 建構與權重挑選視為檢索管線上的編譯最佳化問題；邁向「程式化調用 LLM」的必讀之作
-- [Edge et al., "From Local to Global: A Graph RAG Approach to Query-Focused Summarization" (Microsoft Research 2024)](https://arxiv.org/abs/2404.16130) ——微軟 GraphRAG 論文：結合實體關係抽取與 Leiden 社群偵測技術，專門解決宏觀全域性摘要檢索
+- [Khattab et al., "DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines" (2023)](https://arxiv.org/abs/2310.03714) ——將 Prompt 建構與權重挑選視為檢索管線上的編譯最佳化問題；邁向「程式化呼叫 LLM」的必讀之作
+- [Edge et al., "From Local to Global: A Graph RAG Approach to Query-Focused Summarization" (Microsoft Research 2024)](https://arxiv.org/abs/2404.16130) ——微軟 GraphRAG 論文：結合實體關係抽取與 Leiden 社群偵測技術，專門解決巨觀全域性摘要檢索
 - [Asai et al., "Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection" (ICLR 2024)](https://arxiv.org/abs/2310.11511) ——透過反思 token 實現自我評估與動態檢索的 Self-RAG，跨越靜態檢索邁向 Agent 前沿
 - [LangChain Query Construction blog](https://blog.langchain.dev/query-construction/) ——如何在檢索前將自然語言查詢轉換為結構化資料庫查詢（Text-to-SQL、Cypher）的實用專文

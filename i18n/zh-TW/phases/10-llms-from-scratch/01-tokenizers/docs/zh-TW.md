@@ -317,7 +317,7 @@ for sentence in test_sentences:
     print(f"  Roundtrip: {'PASS' if decoded == sentence else 'FAIL'}")
 ```
 
-壓縮比告訴你 tokenizer 的效能如何。0.50 的壓縮比意味著 tokenizer 將文字壓縮為原始位元組數量一半的 token。數值越低越好。在訓練語料庫上，壓縮比會相當不錯。但在分佈外（out-of-distribution）的文字上，例如「unhappiness」（並未出現在語料庫中），壓縮比會變差——tokenizer 會退回使用字元層級來編碼未曾見過的模式。
+壓縮比告訴你 tokenizer 的效能如何。0.50 的壓縮比意味著 tokenizer 將文字壓縮為原始位元組數量一半的 token。數值越低越好。在訓練語料庫上，壓縮比會相當不錯。但在分布外（out-of-distribution）的文字上，例如「unhappiness」（並未出現在語料庫中），壓縮比會變差——tokenizer 會退回使用字元層級來編碼未曾見過的模式。
 
 ### 步驟 4：與 tiktoken 進行比較
 
@@ -375,7 +375,7 @@ def analyze_vocabulary(tokenizer, test_texts):
     print(f"\nUnused tokens: {len(unused)} out of {len(tokenizer.vocab)}")
 ```
 
-這揭示了詞彙表中的齊夫分佈（Zipf distribution）。少數 token 佔據了極大比例（空格、「the」、「e」）。大多數 token 很少被使用。正式環境中的 tokenizer 會針對這種分佈進行最佳化——常見模式獲得較短的 token ID，罕見模式則使用較長的表示方式。
+這揭示了詞彙表中的齊夫分布（Zipf distribution）。少數 token 佔據了極大比例（空格、「the」、「e」）。大多數 token 很少被使用。正式環境中的 tokenizer 會針對這種分布進行最佳化——常見模式獲得較短的 token ID，罕見模式則使用較長的表示方式。
 
 ## Use It｜實際應用
 

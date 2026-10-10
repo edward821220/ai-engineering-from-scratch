@@ -344,7 +344,7 @@ class PreTrainingDataLoader:
 
 ### 步驟 5：資料集統計量
 
-計算關鍵數值：總 token 數、不重複 token 數、壓縮比、文件長度分佈。
+計算關鍵數值：總 token 數、不重複 token 數、壓縮比、文件長度分布。
 
 ```python
 from collections import Counter

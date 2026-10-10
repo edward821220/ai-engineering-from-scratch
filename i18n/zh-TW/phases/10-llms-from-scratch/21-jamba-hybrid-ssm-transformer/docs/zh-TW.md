@@ -10,7 +10,7 @@
 ## Learning Objectives｜學習目標
 
 - 解釋 Jamba 區塊中的三種核心原語——Transformer 層、Mamba 層、MoE——以及 1:7 的交錯交織配方
-- 在宏觀層面陳述 SSM 遞迴的運作機制，以及為何它能實現常數級記憶體推論
+- 在巨觀層面陳述 SSM 遞迴的運作機制，以及為何它能實現常數級記憶體推論
 - 計算 Jamba 模型在 256k 脈絡長度下的 KV 快取體積，並與純 Transformer 模型所需開銷進行對比
 - 說明 Mamba-3 的三項核心創新（指數梯形離散化、複數值狀態更新、MIMO），以及每項創新各自解決的痛點
 
@@ -150,7 +150,7 @@ swiglu-ffn
 
 ## Ship It｜交付成果
 
-本課產出 `outputs/skill-hybrid-picker.md`。給定工作負載規格（脈絡長度分佈、任務組合、記憶體預算），它會在純 Transformer、Jamba 風格混合模型與純 SSM 之間做出權威推薦，並針對記憶體與模型品質權衡給出詳盡的決策論證。
+本課產出 `outputs/skill-hybrid-picker.md`。給定工作負載規格（脈絡長度分布、任務組合、記憶體預算），它會在純 Transformer、Jamba 風格混合模型與純 SSM 之間做出權威推薦，並針對記憶體與模型品質權衡給出詳盡的決策論證。
 
 ## Exercises｜練習
 

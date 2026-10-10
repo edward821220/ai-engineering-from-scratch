@@ -1,6 +1,6 @@
 # 差分注意力（V2）
 
-> Softmax 注意力機制會向每個不相干的 token 分散微量的機率。在超過 10 萬個 token 的脈絡下，這些雜訊累積起來會徹底淹沒真實訊號。Differential Transformer（Ye 等人，ICLR 2025）透過將注意力計算為兩個 softmax 的差值，抵消共同的雜訊底限，解決了這個難題。DIFF V2（微軟，2026 年 1 月）則是生產級技術堆疊的重構版本：decode 延遲與基準 Transformer 持平、無需自訂核心，且完全相容於 FlashAttention。本課將端到端剖析 V1 到 V2 的演進，並提供可在標準 Python 中運行的差分運算實作。
+> Softmax 注意力機制會向每個不相干的 token 分散微量的機率。在超過 10 萬個 token 的脈絡下，這些雜訊累積起來會徹底淹沒真實訊號。Differential Transformer（Ye 等人，ICLR 2025）透過將注意力計算為兩個 softmax 的差值，抵消共同的雜訊底限，解決了這個難題。DIFF V2（微軟，2026 年 1 月）則是生產級技術堆疊的重構版本：decode 延遲與基準 Transformer 持平、無需自訂核心，且完全相容於 FlashAttention。本課將端到端剖析 V1 到 V2 的演進，並提供可在標準 Python 中執行的差分運算實作。
 
 **Type:** Build
 **Languages:** Python (stdlib)
@@ -51,7 +51,7 @@ A_2 = softmax(Q_2 K_2^T / sqrt(d))
 DiffAttn = (A_1 - lambda * A_2) V
 ```
 
-相減操作消除了這兩個注意力圖所共享的任何雜訊分佈。若兩張圖在 127k 個不相干 token 上都具備大致均勻的權重（在隨機初始化時必然如此），相減會直接將其抵消。而真實訊號——集中在少數真正相關 token 上的尖銳權重——只有在兩張圖中以完全相同幅度出現時才會抵消，但模型一旦經過訓練就不會呈現相同幅度。
+相減操作消除了這兩個注意力圖所共享的任何雜訊分布。若兩張圖在 127k 個不相干 token 上都具備大致均勻的權重（在隨機初始化時必然如此），相減會直接將其抵消。而真實訊號——集中在少數真正相關 token 上的尖銳權重——只有在兩張圖中以完全相同幅度出現時才會抵消，但模型一旦經過訓練就不會呈現相同幅度。
 
 `lambda` 是每個頭的可學習純量，參數化為 `lambda = exp(lambda_q1 dot lambda_k1) - exp(lambda_q2 dot lambda_k2) + lambda_init`。它可以為負數。`lambda_init` 預設為微小的正數，如 0.8。
 
@@ -66,7 +66,7 @@ V1 保持了與基準 Transformer 完全相同的參數量。為了在每個頭�
 V2 將 query 頭的數量翻倍，同時保持 KV 頭數量不變（從 up-projection 中借用參數）。頭維度維持與基準模型完全一致。在執行差分相減後，將多餘的維度投影回原本的維度，以對齊基準 Transformer 的 O_W 投影。這帶來了三項重大突破：
 
 1. Decode 速度與基準模型持平（KV 快取僅需載入一次）。
-2. FlashAttention 無需自訂核心即可直接運行。
+2. FlashAttention 無需自訂核心即可直接執行。
 3. Decode 階段的算術強度（arithmetic intensity）顯著提升（每次從 HBM 載入位元組能執行更多運算）。
 
 V2 還移除了 V1 用於穩定相減操作的逐頭 RMSNorm。在 70B 規模的預訓練後期，該 RMSNorm 會破壞訓練穩定性。V2 以更簡潔的初始化方案取而代之，在不引入額外模組的前提下維持了訓練的平穩。

@@ -11,7 +11,7 @@
 
 你部署了一個具備函式呼叫能力的 agent。它流暢運作了三輪對話，接著意外降臨：模型呼叫了一個回傳 500 錯誤的工具、使用者在中途改變了心意，或者 agent 在未經人工核准的情況下逕自為訂單執行了退款操作。純手寫的 `while True:` 迴圈毫無攔截掛鉤可言：你無法暫停它、無法倒帶回溯，更無法分岔去探索「如果模型當時選了另一個工具會如何」。一旦這套系統走出展示 Demo 進入真實世界，它便淪為一個要嘛完全成功、要嘛徹底崩潰的黑盒子。
 
-一旦你看清了本質，下一步的演進便理所當然：Agent 本身早已是一座狀態機——系統提示 + 訊息歷史 + 待處理工具調用 + 下一步行動。將這座狀態機顯式化：定義代表「模型思考」、「工具執行」、「人工審批」的**節點（Nodes）**，以及代表它們之間條件轉移的**邊（Edges）**。一旦計算圖被顯式宣告，調度框架便能免費解鎖四大超能力：檢查點（步驟間狀態持久化）、中斷機制（暫停等待人工審核）、串流分發（逐字串流 token 與中間事件），以及時光旅行（回滾至先前狀態並探索不同分岔路徑）。
+一旦你看清了本質，下一步的演進便理所當然：Agent 本身早已是一座狀態機——系統提示 + 訊息歷史 + 待處理工具呼叫 + 下一步行動。將這座狀態機顯式化：定義代表「模型思考」、「工具執行」、「人工審批」的**節點（Nodes）**，以及代表它們之間條件轉移的**邊（Edges）**。一旦計算圖被顯式宣告，調度框架便能免費解鎖四大超能力：檢查點（步驟間狀態持久化）、中斷機制（暫停等待人工審核）、串流分發（逐字串流 token 與中間事件），以及時光旅行（回滾至先前狀態並探索不同分岔路徑）。
 
 這項抽象概念的標準實作範本正是 LangGraph。它絕非傳統 LangChain 意義下那種「丟給你一個 AgentExecutor，祝你好運」的黑盒子封裝，而是一套將狀態、持久化儲存與中斷機制視為一等公民的圖執行期執行引擎（Graph Runtime）。Agent 迴圈變成了由你親自繪製的計算圖，而非在程式碼中寫死的一行行迴圈。
 
@@ -25,7 +25,7 @@
 2. **節點（Nodes）**：簽署為 `state -> partial_state` 的 Python 函式。每個節點代表一個離散的執行步驟：「呼叫模型」、「執行工具」、「產生摘要」。
 3. **邊（Edges）**：節點之間的流轉轉移。靜態邊直接指向固定目標；條件邊則接受一個路由函式 `state -> next_node_name`，使計算圖能根據模型的輸出動態分岔。
 
-你編譯該計算圖。Compile 動作鎖定圖的拓撲結構、掛載檢查點儲存器（Checkpointer，對正式環境至關重要），並回傳一個可執行的 Runnable 實體。你在調用時傳入初始狀態與一個專屬的 `thread_id`。執行的每一個步驟，皆會自動持久化儲存一筆以 `(thread_id, checkpoint_id)` 為鍵值的檢查點快照。
+你編譯該計算圖。Compile 動作鎖定圖的拓撲結構、掛載檢查點儲存器（Checkpointer，對正式環境至關重要），並回傳一個可執行的 Runnable 實體。你在呼叫時傳入初始狀態與一個專屬的 `thread_id`。執行的每一個步驟，皆會自動持久化儲存一筆以 `(thread_id, checkpoint_id)` 為鍵值的檢查點快照。
 
 ### 四大超能力
 
@@ -45,7 +45,7 @@
 
 一個生產級的 ReAct agent 僅需 4 個節點與 2 條邊即可成型：
 
-1. `agent`——以當前的對話訊息歷史調用 LLM，回傳助理訊息（其中可能包含工具呼叫 tool_calls）。
+1. `agent`——以當前的對話訊息歷史呼叫 LLM，回傳助理訊息（其中可能包含工具呼叫 tool_calls）。
 2. `tools`——執行上一個助理訊息中的所有 tool_calls，並將工具回傳結果作為工具訊息附加至清單。
 3. 一條自 `agent` 出發的條件邊：若最新訊息包含 tool_calls 則路由至 `tools`，否則流向 `END` 終點。
 4. 一條自 `tools` 流回 `agent` 的靜態邊。
@@ -149,7 +149,7 @@ for event in app.stream(None, target, stream_mode="values"):
     pass  # replay from that point forward
 ```
 
-傳入 `None` 作為輸入會精準從給定的歷史檢查點重放；傳入具體數值則會在該檢查點狀態上附加增量後再接續重跑。這讓你能極速重現某次糟糕的 Agent 運行歷程，而完全無需重新執行整場完整對話。
+傳入 `None` 作為輸入會精準從給定的歷史檢查點重放；傳入具體數值則會在該檢查點狀態上附加增量後再接續重跑。這讓你能極速重現某次糟糕的 Agent 執行歷程，而完全無需重新執行整場完整對話。
 
 ### 步驟 5：在正式環境中替換檢查點儲存庫
 
@@ -181,7 +181,7 @@ with PostgresSaver.from_conn_string("postgresql://...") as checkpointer:
 ## Exercises｜練習
 
 1. **基礎題**。實作上述包含計算機與網路搜尋工具的 4 節點 ReAct 圖。驗證在一場 2 輪對話中，`list(app.get_state_history(config))` 能正確回傳至少 4 個歷史檢查點。
-2. **進階題**。新增一個在 `agent` 前運行的 `planner` 節點，並在狀態中寫入結構化的 `plan: list[str]`。指示 `agent` 將已完成的步驟標記為 done。若在檢查點恢復執行時 `plan` 發生丟失（因歸約器配置錯誤），測試應自動報錯。
+2. **進階題**。新增一個在 `agent` 前執行的 `planner` 節點，並在狀態中寫入結構化的 `plan: list[str]`。指示 `agent` 將已完成的步驟標記為 done。若在檢查點恢復執行時 `plan` 發生丟失（因歸約器配置錯誤），測試應自動報錯。
 3. **挑戰題**。建構一個透過 `Send` 在三個子圖（`researcher` 調研、`writer` 寫作、`reviewer` 審查）之間進行路由的督導者圖。每個子圖皆擁有自己獨立的狀態與檢查點。在外層圖加上 `interrupt_before=["writer"]`，使人類能在寫作開始前審核調研簡報。驗證從過往檢查點分岔重放時，系統僅重新執行被分岔的路徑。
 
 ## Key Terms｜關鍵術語
@@ -205,6 +205,6 @@ with PostgresSaver.from_conn_string("postgresql://...") as checkpointer:
 - [LangGraph Human-in-the-loop](https://langchain-ai.github.io/langgraph/concepts/human_in_the_loop/) ——`interrupt_before`、`interrupt_after`、`Command(resume=...)` 與狀態手動編輯模式指南
 - [Yao et al., "ReAct: Synergizing Reasoning and Acting in Language Models" (ICLR 2023)](https://arxiv.org/abs/2210.03629) ——所有 LangGraph Agent 所實作的核心 ReAct 架構模式原創論文
 - [Anthropic — Building effective agents (Dec 2024)](https://www.anthropic.com/research/building-effective-agents) ——如何評估何時採用鏈式、路由式、編排器—工作者或評估器—最佳化器等圖拓撲
-- Phase 11 · 09 (Function Calling) ——每個 LangGraph Agent 節點底層重複使用的工具調用核心原語
+- Phase 11 · 09 (Function Calling) ——每個 LangGraph Agent 節點底層重複使用的工具呼叫核心原語
 - Phase 11 · 14 (Model Context Protocol) ——透過 MCP 轉接器接入 LangGraph `ToolNode` 的外部標準化工具探索機制
 - Phase 11 · 17 (Agent framework tradeoffs) ——探討何時該選用 LangGraph，何時該選用 CrewAI、AutoGen 或 Agno 的選型權衡

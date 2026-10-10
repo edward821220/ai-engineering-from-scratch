@@ -31,7 +31,7 @@ Write a marketing email for our new product.
 You are a senior copywriter at a B2B SaaS company. Write a product launch email for DevFlow, a CI/CD pipeline debugger. Target audience: engineering managers at Series B startups. Tone: confident, technical, not salesy. Length: 150 words. Include one specific metric (3.2x faster pipeline debugging). End with a single CTA linking to a demo page. Output the email only, no subject line suggestions.
 ```
 
-第一個 Prompt 啟動了模型訓練資料中泛濫平庸的行銷信分佈。第二個 Prompt 則鎖定了狹窄且高品質的專業切片。相同的模型，相同的參數，產出的結果卻天差地別。
+第一個 Prompt 啟動了模型訓練資料中泛濫平庸的行銷信分布。第二個 Prompt 則鎖定了狹窄且高品質的專業切片。相同的模型，相同的參數，產出的結果卻天差地別。
 
 你所要求的與你所得到的之間的這段鴻溝，正是 Prompt 工程這門學科的全部意義所在。它不是應急的 hack 或權宜之計，它是人類意圖與機器能力之間最核心的主要介面。它是更宏大領域——脈絡工程（Context Engineering，第 5 課涵蓋）——的一個子集，後者處理的是進入模型脈絡視窗的一切內容，而不僅僅是 Prompt 文字本身。
 
@@ -977,7 +977,7 @@ Gemini 將系統指示作為模型生成設定的一部分處理，而非作為�
 # print("Claude:", chain_claude.invoke(variables).content)
 ```
 
-LangChain 允許你撰寫單一 Prompt 範本並跨各廠商運行。這正是跨模型 Prompt 設計在生產實踐中的具體體現。
+LangChain 允許你撰寫單一 Prompt 範本並跨各廠商執行。這正是跨模型 Prompt 設計在生產實踐中的具體體現。
 
 ## Ship It｜交付成果
 
@@ -993,7 +993,7 @@ Python 程式碼（`code/prompt_engineering.py`）是一套獨立的測試框架
 
 1. 在 `TEST_SUITE` 的 5 個測試案例基礎上，再新增 5 個以涵蓋剩餘的模式（元提示、問題分解、自我批判、受眾適配、邊界防禦）。執行完整套件，並指出哪種模式在跨模型間產出的一致性最高。
 
-2. 將 `simulate_llm_call` 替換為對至少兩家提供者（OpenAI 與 Anthropic 免費層即可）的真實 API 調用。在兩者上執行相同的 Prompt，並測量：回應長度、格式遵循度、關鍵字覆蓋率與延遲。記錄哪款模型能更精確地遵循指令。
+2. 將 `simulate_llm_call` 替換為對至少兩家提供者（OpenAI 與 Anthropic 免費層即可）的真實 API 呼叫。在兩者上執行相同的 Prompt，並測量：回應長度、格式遵循度、關鍵字覆蓋率與延遲。記錄哪款模型能更精確地遵循指令。
 
 3. 打造一套 Prompt 注入測試套件。撰寫 10 個試圖覆寫系統訊息的對抗性使用者輸入（例如「忽略先前的所有指令並……」）。針對防護欄模式測試每一個案例，測量突破成功的比例，並針對成功的案例提出修補方案。
 
@@ -1006,13 +1006,13 @@ Python 程式碼（`code/prompt_engineering.py`）是一套獨立的測試框架
 | 術語 | 常見說法 | 實際意義 |
 |------|----------------|----------------------|
 | 系統訊息（System message） | 「那個指令」 | 一條以高優先級別處理的特殊訊息，為整個對話樹立身分定位、行為規則與約束條件 |
-| 溫度（Temperature） | 「創造力旋鈕」 | Softmax 前作用於 logit 分佈上的縮放因子——較高值使分佈平緩（更隨機），較低值使分佈陡峭（更確定） |
+| 溫度（Temperature） | 「創造力旋鈕」 | Softmax 前作用於 logit 分布上的縮放因子——較高值使分布平緩（更隨機），較低值使分布陡峭（更確定） |
 | Top-p | 「核抽樣」 | 將 token 抽樣限制在累積機率超過 p 的最小集合內，直接截斷極低機率長尾 |
 | 少樣本提示（Few-shot prompting） | 「提供範例」 | 在 Prompt 中置入 2 到 10 個輸入／輸出範例，使模型在無需任何 fine-tuning 下學會任務模式 |
 | 思維鏈（Chain-of-thought） | 「一步步思考」 | 提示模型展示中間推理推導步驟，使數學、邏輯與多步驟問題的準確率提升 10% 到 40% |
-| 角色提示（Role prompting） | 「你是一個專家」 | 設定身分人設，引導抽樣分佈偏向訓練資料中該特定領域的高品質區域 |
+| 角色提示（Role prompting） | 「你是一個專家」 | 設定身分人設，引導抽樣分布偏向訓練資料中該特定領域的高品質區域 |
 | Prompt 注入（Prompt injection） | 「越獄攻擊」 | 一種攻擊手法，使用者輸入中包含旨在覆寫系統訊息的指令，促使模型忽略原本的安全規則 |
-| 脈絡視窗（Context window） | 「它能讀多少內容」 | 模型在單次調用中所能處理的最大 token 總數（輸入 + 輸出）——現行模型從 8K 到 2M 不等 |
+| 脈絡視窗（Context window） | 「它能讀多少內容」 | 模型在單次呼叫中所能處理的最大 token 總數（輸入 + 輸出）——現行模型從 8K 到 2M 不等 |
 | 助理預填（Assistant prefill） | 「幫它開個頭」 | 主動提供模型回應開頭的少數幾個 token，藉此引導輸出格式並徹底消除開場白贅字——Anthropic 原生支援 |
 | 元提示（Meta-prompting） | 「用 Prompt 寫 Prompt」 | 使用 LLM 本身來為其他 LLM 任務自動生成、批判並最佳化 Prompt |
 

@@ -1,6 +1,6 @@
 # 模型脈絡協定（Model Context Protocol, MCP）
 
-> MCP 為 AI 宿主應用程式（Host）提供了一套統一通用的通訊協定，用以探索並調用工具（Tools）、資源（Resources）與 Prompt。2026-07-28 的最新修訂版本使該協定徹底無狀態化（stateless）：能力宣告與版本脈絡隨每一次獨立請求傳遞，而非綁定在長連線的交握工作階段中。
+> MCP 為 AI 宿主應用程式（Host）提供了一套統一通用的通訊協定，用以探索並呼叫工具（Tools）、資源（Resources）與 Prompt。2026-07-28 的最新修訂版本使該協定徹底無狀態化（stateless）：能力宣告與版本脈絡隨每一次獨立請求傳遞，而非綁定在長連線的交握工作階段中。
 
 **Type:** Build
 **Languages:** Python
@@ -18,11 +18,11 @@
 
 ## The Problem｜問題
 
-你的應用程式需要查詢資料庫、排定行事曆以及讀取本機檔案。若缺乏通用的共享協定，每款 AI 宿主程式都必須為這同一套外部能力，重複編寫專屬的探索機制、調用邏輯、錯誤轉換、傳輸適配與授權黏合程式碼。
+你的應用程式需要查詢資料庫、排定行事曆以及讀取本機檔案。若缺乏通用的共享協定，每款 AI 宿主程式都必須為這同一套外部能力，重複編寫專屬的探索機制、呼叫邏輯、錯誤轉換、傳輸適配與授權黏合程式碼。
 
-MCP 大幅收斂了龐雜的整合矩陣。伺服器對外發布標準的 JSON-RPC 介面；任何相容的用戶端皆能探索該介面、將其呈現給模型或終端使用者、執行調用並解析回傳結果，完全無需為個別伺服器撰寫特定廠商的專屬轉接器。
+MCP 大幅收斂了龐雜的整合矩陣。伺服器對外發布標準的 JSON-RPC 介面；任何相容的用戶端皆能探索該介面、將其呈現給模型或終端使用者、執行呼叫並解析回傳結果，完全無需為個別伺服器撰寫特定廠商的專屬轉接器。
 
-但請務必認清關鍵邊界：MCP 僅僅將通訊協定標準化。它絕不代替模型決定何時調用工具、絕不保證不可信外部內容的安全性，也絕不將無狀態的請求自動轉換為持久化的應用層狀態。你的宿主程式與伺服器端依舊必須全權承擔這些架構決策。
+但請務必認清關鍵邊界：MCP 僅僅將通訊協定標準化。它絕不代替模型決定何時呼叫工具、絕不保證不可信外部內容的安全性，也絕不將無狀態的請求自動轉換為持久化的應用層狀態。你的宿主程式與伺服器端依舊必須全權承擔這些架構決策。
 
 ## The Concept｜核心概念
 
@@ -60,7 +60,7 @@ MCP 2026-07-28 徹底廢除了 `initialize` 與 `notifications/initialized`，�
 
 協定版本號與用戶端能力宣告為強制必填欄位；用戶端身分識別資訊則為強烈建議項目。若缺少 `_meta`、缺少必填欄位或欄位型別錯誤，視為格式畸形並回傳 Invalid Params（`-32602`）。若版本字串格式合法但伺服器未支援該版本，回傳 `UnsupportedProtocolVersionError`（`-32022`）。伺服器無需仰賴先前的任何交握協商紀錄，即可獨立處理任何合法請求。
 
-無狀態並不意味著應用程式永遠不能保留狀態。它的真實意義在於：狀態資訊絕不隱藏在底層 MCP 長連線或 `Mcp-Session-Id` 標頭之後。若工作流程需要跨請求的連續性，伺服器應核發一個不透明的代號句柄（opaque handle），由用戶端在後續的呼叫中作為一般工具引數傳入。授權狀態在每一次請求中依然必須嚴格重新校驗。
+無狀態並不意味著應用程式永遠不能保留狀態。它的真實意義在於：狀態資訊絕不隱藏在底層 MCP 長連線或 `Mcp-Session-Id` 標頭之後。若工作流程需要跨請求的連續性，伺服器應核發一個不透明代號（opaque handle），由用戶端在後續的呼叫中作為一般工具引數傳入。授權狀態在每一次請求中依然必須嚴格重新校驗。
 
 ### 探索與版本選型
 
@@ -90,7 +90,7 @@ MCP 2026-07-28 徹底廢除了 `initialize` 與 `notifications/initialized`，�
 }
 ```
 
-用戶端亦可直接調用業務方法並處理版本報錯，但透過探索能讓能力展示與版本協商更加顯式清晰。當遇到不支援的版本時，伺服器回傳錯誤碼為 `-32022` 的 `UnsupportedProtocolVersionError`，其附帶資料包含伺服器支援版本陣列 `supported` 與被拒絕的版本 `requested`。
+用戶端亦可直接呼叫業務方法並處理版本報錯，但透過探索能讓能力展示與版本協商更加顯式清晰。當遇到不支援的版本時，伺服器回傳錯誤碼為 `-32022` 的 `UnsupportedProtocolVersionError`，其附帶資料包含伺服器支援版本陣列 `supported` 與被拒絕的版本 `requested`。
 
 在 stdio 傳輸模式下，具備雙相容能力的用戶端會先以 `server/discover` 進行探測。若收到探索結果或如 `UnsupportedProtocolVersionError` 這類現代已知錯誤，即可斷定對方為現代伺服器；任何未被識別為現代特徵的錯誤或逾時，則允許向下相容退回 2025-11-25 的舊版 `initialize` 流程。舊版機制僅作為相容備援程式碼，絕非現代系統的預設實作。
 
@@ -105,7 +105,7 @@ MCP 2026-07-28 徹底廢除了 `initialize` 與 `notifications/initialized`，�
 
 伺服器應在所有結果的 `_meta` 中附加 `io.modelcontextprotocol/serverInfo`。該資訊由伺服器自主宣告，僅供展示、日誌紀錄與除錯之用，嚴禁作為安全性決策的依據。
 
-清單查詢與讀取操作的結果亦會附帶 `ttlMs`（快取存活時間）與 `cacheScope`（快取範疇）。確定性的 `tools/list` 排序規則搭配快取新鮮度提示，能讓用戶端安全快取探索結果，並顯著提升 Prompt 快取的命中率與穩定度。`cacheScope: public` 允許跨工作階段共享快取，`private` 則限制僅能在當前調用脈絡中重複使用。
+清單查詢與讀取操作的結果亦會附帶 `ttlMs`（快取存活時間）與 `cacheScope`（快取範疇）。確定性的 `tools/list` 排序規則搭配快取新鮮度提示，能讓用戶端安全快取探索結果，並顯著提升 Prompt 快取的命中率與穩定度。`cacheScope: public` 允許跨工作階段共享快取，`private` 則限制僅能在當前呼叫脈絡中重複使用。
 
 ### 傳輸格式與通訊協定
 
@@ -121,7 +121,7 @@ MCP 使用基於 stdio 或 Streamable HTTP 的 JSON-RPC 2.0 協定：
 
 ### 無需伺服器發起請求的用戶端輸入機制
 
-在舊版規範中，允許伺服器主動透過連線逆向發送 `sampling/createMessage`、`roots/list` 或 `elicitation/create` 等請求。現行協定全面改採多輪來回請求（MRTR）模式取而代之：符合條件的工具調用、資源讀取或 Prompt 取得操作會回傳 `resultType: input_required`，並附帶 `inputRequests` 或 `requestState` 中的至少一項。用戶端收集所需的補充輸入後，使用全新的 JSON-RPC ID 與對應的 `inputResponses` 重新呼叫原方法，並在有提供時精確回傳該 `requestState`。若原本未包含 `inputRequests`，重試呼叫時則省略 `inputResponses`。
+在舊版規範中，允許伺服器主動透過連線逆向發送 `sampling/createMessage`、`roots/list` 或 `elicitation/create` 等請求。現行協定全面改採多輪來回請求（MRTR）模式取而代之：符合條件的工具呼叫、資源讀取或 Prompt 取得操作會回傳 `resultType: input_required`，並附帶 `inputRequests` 或 `requestState` 中的至少一項。用戶端收集所需的補充輸入後，使用全新的 JSON-RPC ID 與對應的 `inputResponses` 重新呼叫原方法，並在有提供時精確回傳該 `requestState`。若原本未包含 `inputRequests`，重試呼叫時則省略 `inputResponses`。
 
 Roots（根目錄）、Sampling（模型取樣）與 Logging（日誌）功能雖仍相容，但已被正式標記為棄用（deprecated），新實作嚴禁採納。既有的 Roots 或 Sampling 需求改在 MRTR 的 `inputRequests` 內部傳遞，絕不可作為獨立的「伺服器對用戶端」JSON-RPC 請求發送。請優先採用顯式的檔案／目錄參數、資源 URI、伺服器端配置以及直接整合的模型提供者介面。在 stdio 下使用 stderr 輸出診斷資訊，在正式環境中使用 OpenTelemetry 記錄遙測資料。
 
@@ -183,7 +183,7 @@ def request(method, params=None):
 
 發起 `server/discover` 請求、選定相容版本，隨後呼叫 `tools/list`。若你已事先明確知曉伺服器版本且具備處理 `-32022` 錯誤的能力，直接呼叫 `tools/list` 亦屬完全合法操作。
 
-展示範例嚴格依工具名稱字母順序回傳清單，並綁定 `ttlMs`、`cacheScope`、`resultType` 以及伺服器識別資訊。工具調用則回傳已完成且不可快取的結果，因為其輸出數值高度依賴當前系統狀態。
+展示範例嚴格依工具名稱字母順序回傳清單，並綁定 `ttlMs`、`cacheScope`、`resultType` 以及伺服器識別資訊。工具呼叫則回傳已完成且不可快取的結果，因為其輸出數值高度依賴當前系統狀態。
 
 ### 步驟 4：將相同請求映射至 HTTP 協定
 
@@ -219,7 +219,7 @@ cd code
 python3 -m unittest discover tests -v
 ```
 
-首行輸出應正確回報探測到執行於 `2026-07-28` 協定下的 `demo-server`。接著檢視 `MCPClient.request`：確認其為每一次調用皆動態組裝 `_meta`。試著從某次請求中移除該詮釋資料，觀察伺服器如何堅決拒絕該請求。
+首行輸出應正確回報探測到執行於 `2026-07-28` 協定下的 `demo-server`。接著檢視 `MCPClient.request`：確認其為每一次呼叫皆動態組裝 `_meta`。試著從某次請求中移除該詮釋資料，觀察伺服器如何堅決拒絕該請求。
 
 ## Ship It｜交付成果
 
@@ -234,7 +234,7 @@ python3 -m unittest discover tests -v
 3. [MCP Registry Supply Chain, Admission, Drift, and Rollback](../../../13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift/docs/en.md) 探討命名空間所有權證明、產物溯源驗證、不可變版本釘選、即時漂移偵測、註冊中心審查證據與版本回滾機制。
 4. [MCP Conformance Engineering](../../../13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/docs/en.md) 涵蓋標準與負向網路傳輸日誌錄製、嚴格版本劃分、SDK 實作差異對比、代理審計證據、敏感資料遮除、健康閘門與發布回滾。
 
-當你的伺服器即將跨越團隊界限或信任邊界時，請依序修習上述課程。它們將引領你從單純的「介面可運行」，穩步邁向「合約在生產部署環境中永遠具備高安全度與可診斷性」。
+當你的伺服器即將跨越團隊界限或信任邊界時，請依序修習上述課程。它們將引領你從單純的「介面可執行」，穩步邁向「合約在生產部署環境中永遠具備高安全度與可診斷性」。
 
 ## Exercises｜練習
 

@@ -169,14 +169,14 @@ graph TD
 
 ### 實務參考數字
 
-多數正式環境 RAG 系統運行的基準參數：
+多數正式環境 RAG 系統執行的基準參數：
 
 - 每次查詢檢索 **k = 5 到 10** 個區塊
 - **區塊大小 = 256 到 512 tokens**，搭配 50-token 重疊
 - **脈絡預算**：每次查詢預留 2,500 到 5,000 tokens 給檢索內容
 - **整體 Prompt 大小**：約 8,000 到 16,000 tokens（系統提示 + 檢索區塊 + 對話歷程 + 當前問題）
 - **Embedding 維度**：依選用模型不同介於 384 到 3072 維之間
-- **索引吞吐量**：調用 API embedding 時約每秒 100 到 1,000 份文件
+- **索引吞吐量**：呼叫 API embedding 時約每秒 100 到 1,000 份文件
 - **查詢延遲**：檢索耗時 50 到 200ms，生成耗時 500 到 3000ms
 
 ```figure
@@ -433,4 +433,4 @@ Chroma 會在內部自動處理 embedding（預設使用 all-MiniLM-L6-v2），�
 - Sentence-BERT: Reimers & Gurevych (2019) ——all-MiniLM 等熱門 embedding 模型背後的論文，展示如何訓練用於語意相似度的雙編碼器
 - [Karpukhin et al., "Dense Passage Retrieval for Open-Domain Question Answering" (EMNLP 2020)](https://arxiv.org/abs/2004.04906) ——DPR 論文，證明了密集雙編碼器檢索在開放領域問答上全面超越 BM25，奠定了現代 RAG 檢索器的架構典範
 - [LlamaIndex High-Level Concepts](https://docs.llamaindex.ai/en/stable/getting_started/concepts.html) ——建構 RAG 管線時的核心概念總覽：資料載入器、節點剖析器、索引、檢索器與回應合成器
-- [LangChain RAG tutorial](https://python.langchain.com/docs/tutorials/rag/) ——主流編排框架視角下的同款「檢索後生成」可運行鏈式實作教學
+- [LangChain RAG tutorial](https://python.langchain.com/docs/tutorials/rag/) ——主流編排框架視角下的同款「檢索後生成」可執行鏈式實作教學

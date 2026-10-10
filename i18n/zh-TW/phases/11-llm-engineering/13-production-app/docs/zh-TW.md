@@ -28,7 +28,7 @@
 - 你每個月的 API 帳單飆破了 $12,000，但你根本無從得知究竟是哪個特定功能或使用者造成的。
 - 系統平均回應延遲高達 8 秒，而使用者在第 3 秒就已經失去耐心關閉分頁。
 
-今天所有真正在正式環境運行的 LLM 應用程式——Perplexity、Cursor、ChatGPT、Notion AI——都一一解決了上述問題。不是靠寫出更花俏的 prompt，而是靠嚴格縝密的工程實踐。
+今天所有真正在正式環境執行的 LLM 應用程式——Perplexity、Cursor、ChatGPT、Notion AI——都一一解決了上述問題。不是靠寫出更花俏的 prompt，而是靠嚴格縝密的工程實踐。
 
 這就是本次的總結專案（Capstone）。你將親手建構一個整合了 Prompt 管理（L01-02）、Embedding 與向量檢索（L04-07）、函式呼叫（L09）、評估機制（L10）、快取（L11）、防護欄（L12）、串流傳輸、錯誤重試、可觀測性與成本追蹤的完整生產服務。單一服務，全面串接。
 
@@ -60,7 +60,7 @@ graph LR
     Eval --> Cost --> Resp
 ```
 
-請求經由處理身分驗證與速率限制的 API 閘道進入系統。輸入防護欄在 Prompt 路由器挑選範本前，嚴密檢查 Prompt 注入與違規內容。語意快取檢查近期是否有語意相似的問題已被解答過。若快取未命中，啟用串流模式向 LLM 發起調用。輸出防護欄對回應內容進行合規驗證。評估記錄器寫入品質指標。成本追蹤器詳實核算每一個 token 的費用。最終，回應以串流形式推回給前端用戶端。
+請求經由處理身分驗證與速率限制的 API 閘道進入系統。輸入防護欄在 Prompt 路由器挑選範本前，嚴密檢查 Prompt 注入與違規內容。語意快取檢查近期是否有語意相似的問題已被解答過。若快取未命中，啟用串流模式向 LLM 發起呼叫。輸出防護欄對回應內容進行合規驗證。評估記錄器寫入品質指標。成本追蹤器詳實核算每一個 token 的費用。最終，回應以串流形式推回給前端用戶端。
 
 七大元件環環相扣。每一環都是你先前個別實作過的技術，工程的精髓就在於如何將它們無縫串接。
 
@@ -74,7 +74,7 @@ graph LR
 | 向量資料庫 | L06-07 | 記憶體索引（正式環境：Pinecone/Qdrant） | 提供快速最近鄰搜尋以檢索脈絡文件 |
 | 函式呼叫 | L09 | 工具註冊表 + JSON Schema | 外部資料查詢存取、結構化操作執行 |
 | 評估機制 | L10 | 自訂度量指標 + 日誌記錄 | 回應品質追蹤、延遲分析、準確度監控 |
-| 快取層 | L11 | 基於 Embedding 的語意快取 | 避免重複調用 LLM，大幅降低開銷與延遲 |
+| 快取層 | L11 | 基於 Embedding 的語意快取 | 避免重複呼叫 LLM，大幅降低開銷與延遲 |
 | 防護欄 | L12 | 正規表達式 + 分類器規則 | 阻斷 Prompt 注入、過濾 PII 個資與有害內容 |
 | 成本追蹤器 | L11 | Token 計數器 + 定價表 | 單次請求與累計全域成本核算 |
 | 串流引擎 | -- | 伺服器發送事件（SSE） | 逐 token 即時傳輸，將首字延遲壓至亞秒級 |
@@ -138,7 +138,7 @@ Give up: return fallback response
 | 輸出格式錯誤 | 是，附帶錯誤脈絡 | 直接回傳純文字原始結果 | 僅有些微格式呈現差異 |
 | 防護欄主動攔截 | 否 | 明確解釋該請求被拒絕的原因 | 清楚的安全性提示訊息 |
 | 向量資料庫斷線 | 不重試向量庫 | 跳過 RAG 檢索脈絡直接作答 | 缺乏專屬背景資訊，但服務可用 |
-| 快取層斷線 | 不重試快取 | 直接穿透調用 LLM | 延遲與成本略微上升，功能正常 |
+| 快取層斷線 | 不重試快取 | 直接穿透呼叫 LLM | 延遲與成本略微上升，功能正常 |
 
 **備用模型降級鏈（Fallback model chain）。** 當主要模型無法連線時，依序向下退避：
 
@@ -197,7 +197,7 @@ graph TD
 
 **Cursor**：當前開啟的檔案、周邊相鄰檔案、近期修改紀錄與終端機輸出共同構成脈絡。Prompt 路由器進行智慧分流：程式碼自動完成走極速微型模型（Cursor-small，約 20ms），側邊欄對話則走旗艦模型（Claude Sonnet 4.6 / GPT-5，約 3 秒）。脈絡被極致壓縮——僅截取高度相關的程式碼片段而非整份檔案；程式碼庫 embedding 提供長程關聯；推測編輯（Speculative edits）以串流輸出 diff 而非整份覆寫；MCP 整合使第三方工具無需客製程式碼即可即插即用。
 
-**ChatGPT**：擴充功能、函式呼叫與 MCP 伺服器讓模型能夠聯網、運行 Python 程式碼、產圖與存取資料庫。路由層負責判斷該啟用何種能力；長期記憶機制跨工作階段保存個人偏好；包含 1,500+ token 的系統規範透過 Prompt 快取實現大幅降價；多模型矩陣協同運作：GPT-5 處理核心文字、GPT-Image 產圖、Whisper 負責語音、o4-mini 負責深度推理。
+**ChatGPT**：擴充功能、函式呼叫與 MCP 伺服器讓模型能夠聯網、執行 Python 程式碼、產圖與存取資料庫。路由層負責判斷該啟用何種能力；長期記憶機制跨工作階段保存個人偏好；包含 1,500+ token 的系統規範透過 Prompt 快取實現大幅降價；多模型矩陣協同運作：GPT-5 處理核心文字、GPT-Image 產圖、Whisper 負責語音、o4-mini 負責深度推理。
 
 ### 規模化擴展策略
 
@@ -272,7 +272,7 @@ l5-prod-app-paths
 - 支援版本控制與 A/B 分流的 Prompt 範本管理中心
 - 基於向量餘弦相似度的語意智慧快取層
 - 雙向防護欄（攔截 Prompt 注入、個資脫敏、內容安全）
-- 支援 SSE 串流傳輸的模擬 LLM 調用器
+- 支援 SSE 串流傳輸的模擬 LLM 呼叫器
 - 具備隨機抖動的指數退避重試與備用模型降級鏈
 - 單次請求與全域累計的精確成本核算
 - 帶有 Request ID 串聯的結構化日誌
@@ -632,7 +632,7 @@ def check_output_guardrails(text):
     return GuardrailResult(passed=True)
 ```
 
-### 步驟 5：帶有重試與串流能力的 LLM 調用器
+### 步驟 5：帶有重試與串流能力的 LLM 呼叫器
 
 核心 LLM 呼叫引擎。具備指數退避重試、備用模型降級鏈與 token 級串流分發。
 
@@ -1137,7 +1137,7 @@ if __name__ == "__main__":
 
 4. **實作 Prompt 版本控制與自動回滾**。持久化儲存所有帶有時間戳記的 Prompt 版本。新增 API 端點以檢視各版本 Prompt 的品質指標（延遲、使用者評分、錯誤率）。實作自動回滾機制：若新版 Prompt 在連續 100 次請求中的錯誤率達到舊版的 2 倍以上，系統自動瞬時回滾至前一版。
 
-5. **導入 OpenTelemetry 分散式追蹤**。將系統中的每一個子元件（快取查詢、防護欄審查、LLM API 調用、成本核算）包裝為獨立的 Span，記錄各環節的精確耗時。將追蹤日誌匯出至主控台，展示單次端到端請求中各元件對整體延遲的貢獻佔比。
+5. **導入 OpenTelemetry 分散式追蹤**。將系統中的每一個子元件（快取查詢、防護欄審查、LLM API 呼叫、成本核算）包裝為獨立的 Span，記錄各環節的精確耗時。將追蹤日誌匯出至主控台，展示單次端到端請求中各元件對整體延遲的貢獻佔比。
 
 ## Key Terms｜關鍵術語
 
@@ -1158,7 +1158,7 @@ if __name__ == "__main__":
 
 - [FastAPI Documentation](https://fastapi.tiangolo.com/) ——本課採用的 Python 非同步網頁框架官方手冊，具備原生 SSE 串流支援與自動化 OpenAPI 文件
 - [OpenAI Production Best Practices](https://platform.openai.com/docs/guides/production-best-practices) ——全球最大 LLM 提供者總結的速率限制、錯誤復原與水平擴展官方最佳實踐
-- [Anthropic API Reference](https://docs.anthropic.com/en/api/messages-streaming) ——Claude 串流實作技術規格，涵蓋 Server-Sent Events 與串流期間的即時工具調用
+- [Anthropic API Reference](https://docs.anthropic.com/en/api/messages-streaming) ——Claude 串流實作技術規格，涵蓋 Server-Sent Events 與串流期間的即時工具呼叫
 - [OpenTelemetry Python SDK](https://opentelemetry.io/docs/languages/python/) ——分散式追蹤的行業通用標準，用於對 LLM 管線中的每一個環節進行毫秒級監控
 - [Semantic Caching with GPTCache](https://github.com/zilliztech/GPTCache) ——生產級開源語意快取函式庫，以規模化架構落實本課探討的各項快取概念
 - [Hamel Husain, "Your AI Product Needs Evals"](https://hamel.dev/blog/posts/evals/) ——LLM 應用程式評估驅動開發（EDD）的權威指南，與本課的評估架構相輔相成

@@ -117,7 +117,7 @@ flowchart TD
 
 ### 必備安全工具箱
 
-**OpenAI Moderation API**——完全免費且無調用次數上限。涵蓋仇恨言論、騷擾、暴力、色情與自殘等維度，輸出 0.0 到 1.0 的細緻風險評分。延遲約 100ms。即便主力模型採用 Claude 或 Gemini，仍強烈建議將此 API 作為輸出的全量審查工具。
+**OpenAI Moderation API**——完全免費且無呼叫次數上限。涵蓋仇恨言論、騷擾、暴力、色情與自殘等維度，輸出 0.0 到 1.0 的細緻風險評分。延遲約 100ms。即便主力模型採用 Claude 或 Gemini，仍強烈建議將此 API 作為輸出的全量審查工具。
 
 **LlamaGuard (Meta)**——開源的頂尖安全分類模型。支援作為輸入與輸出雙向過濾器。以 MLCommons AI Safety 分類體系為基準，涵蓋 13 類不安全情境。提供 LlamaGuard 3 1B（極速）、8B（平衡）等尺寸，可完全地端本機私有化部署。
 
@@ -770,7 +770,7 @@ if __name__ == "__main__":
 #         print(f"  {category}: {score:.4f}")
 ```
 
-OpenAI 的 Moderation API 完全免費且無速率限制。涵蓋 11 大類別：仇恨言論、騷擾、暴力、色情內容、自殘及其各項子分類。回傳 0.0 到 1.0 的機率評分。最新的 `omni-moderation-latest` 模型同時支援文字與圖像。延遲約 100ms。建議在每一次模型輸出時皆調用此 API 進行審查，即便你的主力模型採用 Claude 或 Gemini。
+OpenAI 的 Moderation API 完全免費且無速率限制。涵蓋 11 大類別：仇恨言論、騷擾、暴力、色情內容、自殘及其各項子分類。回傳 0.0 到 1.0 的機率評分。最新的 `omni-moderation-latest` 模型同時支援文字與圖像。延遲約 100ms。建議在每一次模型輸出時皆呼叫此 API 進行審查，即便你的主力模型採用 Claude 或 Gemini。
 
 ### LlamaGuard
 
@@ -793,7 +793,7 @@ OpenAI 的 Moderation API 完全免費且無速率限制。涵蓋 11 大類別�
 # print(result)
 ```
 
-LlamaGuard 輸出「safe」或「unsafe」字串，並附帶具體違反的危害類別代號（S1-S13）。它能完全本機私有化運行，零外部 API 相依。1B 參數版本可流暢運行於筆記型電腦 GPU；8B 版本更為精準，但約需 16GB 的 VRAM。
+LlamaGuard 輸出「safe」或「unsafe」字串，並附帶具體違反的危害類別代號（S1-S13）。它能完全本機私有化執行，零外部 API 相依。1B 參數版本可流暢執行於筆記型電腦 GPU；8B 版本更為精準，但約需 16GB 的 VRAM。
 
 ### NeMo Guardrails
 

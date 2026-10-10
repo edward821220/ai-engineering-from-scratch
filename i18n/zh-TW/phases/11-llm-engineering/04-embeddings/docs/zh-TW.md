@@ -221,7 +221,7 @@ cosine-similarity
 
 ## Build It｜動手實作
 
-我們將從零建構一套語意搜尋引擎。不使用現成的向量資料庫，不調用外部 embedding API。使用純 Python 搭配 numpy 進行數學運算。
+我們將從零建構一套語意搜尋引擎。不使用現成的向量資料庫，不呼叫外部 embedding API。使用純 Python 搭配 numpy 進行數學運算。
 
 ### 步驟 1：文字分塊
 
@@ -455,7 +455,7 @@ results = co.rerank(
 )
 ```
 
-若要在本機端運行且不依賴外部 API：
+若要在本機端執行且不依賴外部 API：
 
 ```python
 from sentence_transformers import SentenceTransformer

@@ -113,7 +113,7 @@ indices, weights = top_k(router_logits, k=2)
 output = sum_i weights[i] * expert[indices[i]](x)
 ```
 
-其核心吸引力在於：你可以擁有 64 個各為 7B 大小的專家（總參數量龐大無比），但每個 token 僅需運行其中的 2 個（每個 token 的算力消耗與純 7B 稠密模型完全相同）。Mixtral 8x7B 擁有 470 億個總參數，但每個 token 僅啟動 130 億個。DeepSeek-V3 擁有 6,710 億個總參數，但每個 token 僅啟動 370 億個。
+其核心吸引力在於：你可以擁有 64 個各為 7B 大小的專家（總參數量龐大無比），但每個 token 僅需執行其中的 2 個（每個 token 的算力消耗與純 7B 稠密模型完全相同）。Mixtral 8x7B 擁有 470 億個總參數，但每個 token 僅啟動 130 億個。DeepSeek-V3 擁有 6,710 億個總參數，但每個 token 僅啟動 370 億個。
 
 ```mermaid
 graph LR
@@ -276,7 +276,7 @@ config = {
 | Top-k 路由（Top-k routing） | 「每個 token 挑選 k 個專家」 | 路由器為每個專家計算得分並啟動最高的 k 個——典型 k 為 2（Mixtral）到 8（DeepSeek） |
 | YaRN | 「拉伸 RoPE」 | 一種進階 RoPE 擴展方法——在推論時內插旋轉角度，將脈絡長度從 8k 拉伸至 128k 以上 |
 | 滑動視窗注意力（Sliding-window attention） | 「不要關注全部內容」 | 每個 token 僅關注過去的 W 個 token——將注意力運算成本限制在每 token O(W)，用於 Gemma 2 與早期 Mistral |
-| 活躍參數（Active params） | 「每個 token 實際運行的參數量」 | 在 MoE 模型中，處理每個 token 時實際參與前向傳遞的參數量（遠小於總參數量）——直接決定了每 token 的運算 FLOPs |
+| 活躍參數（Active params） | 「每個 token 實際執行的參數量」 | 在 MoE 模型中，處理每個 token 時實際參與前向傳遞的參數量（遠小於總參數量）——直接決定了每 token 的運算 FLOPs |
 
 ## Further Reading｜延伸閱讀
 

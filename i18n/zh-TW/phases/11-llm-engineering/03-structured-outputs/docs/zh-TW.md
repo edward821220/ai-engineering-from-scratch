@@ -54,7 +54,7 @@ graph LR
 
 **JSON 模式（JSON mode）**：API 保證輸出為合法的 JSON。OpenAI 的 `response_format: { type: "json_object" }` 即啟用了此功能。輸出解析時絕不會報錯，但它可能不符合你預期的 Schema——可能出現多餘的鍵、型別錯誤或缺失欄位。
 
-**Schema 模式（Schema mode）**：API 接收一個 JSON Schema，並保證輸出嚴格符合該規範。在 2026 年，所有主流提供者皆原生支援此功能：OpenAI 的 `response_format: { type: "json_schema", json_schema: {...} }`（亦可透過 `tool_choice="required"` 達成）、Anthropic 帶有 `input_schema` 的工具調用，以及 Gemini 的 `response_schema` 搭配 `response_mime_type: "application/json"`。輸出將嚴格具備你指定的鍵值、型別與約束條件。
+**Schema 模式（Schema mode）**：API 接收一個 JSON Schema，並保證輸出嚴格符合該規範。在 2026 年，所有主流提供者皆原生支援此功能：OpenAI 的 `response_format: { type: "json_schema", json_schema: {...} }`（亦可透過 `tool_choice="required"` 達成）、Anthropic 帶有 `input_schema` 的工具呼叫，以及 Gemini 的 `response_schema` 搭配 `response_mime_type: "application/json"`。輸出將嚴格具備你指定的鍵值、型別與約束條件。
 
 **受限解碼（Constrained decoding）**：在生成過程中的每個 token 位置，解碼器會遮除所有會導致非法輸出的候選 token。若 Schema 要求輸入數字，而模型正打算產出字母，該字母 token 的機率會被直接強制設為零。模型只能產出導向合法結構的 token。這正是 OpenAI 結構化輸出模式以及 Outlines、Guidance 等開源函式庫底層的具體實作。
 
@@ -98,9 +98,9 @@ class Product(BaseModel):
 
 這會產生與上述完全相同的 JSON Schema。Instructor 函式庫（以及 OpenAI SDK）直接接受 Pydantic 模型：傳入模型類別，即可取回型別驗證通過的實例。若 LLM 輸出不符合規格，Instructor 會自動處理重試。
 
-### 函式呼叫／工具調用（Function Calling / Tool Use）
+### 函式呼叫／工具呼叫（Function Calling / Tool Use）
 
-解決相同問題的另一種介面形態。與其要求模型直接產出 JSON，不如定義帶有具型別參數的「工具」（函式）。模型會輸出帶有結構化引數的函式呼叫。OpenAI 稱其為「函式呼叫（function calling）」，Anthropic 稱其為「工具調用（tool use）」。產出的結果是一樣的：型別化的結構化資料。
+解決相同問題的另一種介面形態。與其要求模型直接產出 JSON，不如定義帶有具型別參數的「工具」（函式）。模型會輸出帶有結構化引數的函式呼叫。OpenAI 稱其為「函式呼叫（function calling）」，Anthropic 稱其為「工具呼叫（tool use）」。產出的結果是一樣的：型別化的結構化資料。
 
 ```mermaid
 graph TD
@@ -117,7 +117,7 @@ graph TD
     style R fill:#1a1a2e,stroke:#51cf66,color:#fff
 ```
 
-當模型需要自主決定該呼叫哪一個函式，而不僅僅是填寫參數時，工具調用更具優勢。如果你有 10 種不同的擷取 Schema，且模型必須依據輸入內容選出最適方案，工具調用便能同時完成 Schema 挑選與結構化輸出。
+當模型需要自主決定該呼叫哪一個函式，而不僅僅是填寫參數時，工具呼叫更具優勢。如果你有 10 種不同的擷取 Schema，且模型必須依據輸入內容選出最適方案，工具呼叫便能同時完成 Schema 挑選與結構化輸出。
 
 ### 常見失效模式
 
@@ -141,7 +141,7 @@ mx-schema-funnel
 
 ### 步驟 1：JSON Schema 驗證器
 
-從零建構一個驗證器，檢查 Python 物件是否符合給定的 JSON Schema。這套邏輯在輸出端運行以驗證合規性。
+從零建構一個驗證器，檢查 Python 物件是否符合給定的 JSON Schema。這套邏輯在輸出端執行以驗證合規性。
 
 ```python
 import json
@@ -453,7 +453,7 @@ def run_demo():
 
 OpenAI 的結構化輸出模式在內部採用了受限解碼。模型生成的每一個 token 都保證產出符合 Pydantic Schema 的規格。無需重試，無需額外驗證，約束條件直接熔鑄於解碼過程中。
 
-### Anthropic 工具調用
+### Anthropic 工具呼叫
 
 ```python
 # import anthropic
@@ -480,7 +480,7 @@ OpenAI 的結構化輸出模式在內部採用了受限解碼。模型生成的�
 # )
 ```
 
-Anthropic 透過工具調用實現結構化輸出。模型發出一個工具呼叫，其結構化引數嚴格符合宣告的 input_schema。相同的成果，不同的 API 介面表現形式。
+Anthropic 透過工具呼叫實現結構化輸出。模型發出一個工具呼叫，其結構化引數嚴格符合宣告的 input_schema。相同的成果，不同的 API 介面表現形式。
 
 ### Instructor 函式庫
 
@@ -504,7 +504,7 @@ Anthropic 透過工具調用實現結構化輸出。模型發出一個工具呼�
 # )
 ```
 
-Instructor 封裝了各大 LLM 用戶端，並自動加入驗證與重試機制。若首次嘗試未能通過驗證，它會將具體錯誤訊息作為脈絡傳回給模型並要求修正輸出。這在任何提供者上皆能平穩運行，不僅限於 OpenAI。
+Instructor 封裝了各大 LLM 用戶端，並自動加入驗證與重試機制。若首次嘗試未能通過驗證，它會將具體錯誤訊息作為脈絡傳回給模型並要求修正輸出。這在任何提供者上皆能平穩執行，不僅限於 OpenAI。
 
 ## Ship It｜交付成果
 
@@ -533,7 +533,7 @@ Instructor 封裝了各大 LLM 用戶端，並自動加入驗證與重試機制�
 | 受限解碼（Constrained decoding） | 「引導生成」 | 在生成過程中的每個 token 位置，主動遮除會導致無效輸出的 token——保證 100% 符合 Schema |
 | JSON Schema | 「JSON 範本」 | 一種用以描述 JSON 資料結構、型別與約束的宣告式規範語言（由 OpenAPI、JSON Forms 等廣泛採用） |
 | Pydantic | 「強化版 Python 資料類別」 | 透過型別驗證定義資料模型的 Python 函式庫，被 FastAPI 與 Instructor 用於自動生成 JSON Schema |
-| 函式呼叫（Function calling） | 「工具調用」 | LLM 輸出結構化的函式調用請求（名稱 + 具型別引數）而非自由文字——OpenAI 與 Anthropic 皆原生支援 |
+| 函式呼叫（Function calling） | 「工具呼叫」 | LLM 輸出結構化的函式呼叫請求（名稱 + 具型別引數）而非自由文字——OpenAI 與 Anthropic 皆原生支援 |
 | Instructor | 「LLM 的 Pydantic」 | 封裝 LLM 用戶端以回傳通過驗證的 Pydantic 實例的 Python 函式庫，並在驗證失敗時自動重試 |
 | Token 遮罩（Token masking） | 「過濾詞彙表」 | 在生成期間將特定 token 的機率強制設為零，使模型完全無法產出這些 token |
 | Schema 合規（Schema compliance） | 「符合結構外觀」 | 輸出具備所有必填欄位、型別完全正確、數值在合理約束內，且無多餘不允許的欄位 |
@@ -544,7 +544,7 @@ Instructor 封裝了各大 LLM 用戶端，並自動加入驗證與重試機制�
 - [OpenAI Structured Outputs Guide](https://platform.openai.com/docs/guides/structured-outputs) ——OpenAI 官方指南，剖析 API 中基於 JSON Schema 的受限解碼技術
 - [Willard & Louf, 2023 -- "Efficient Guided Generation for Large Language Models"](https://arxiv.org/abs/2307.09702) ——Outlines 論文，探討如何將 JSON Schema 編譯為有限狀態機以實作 token 層級約束
 - [Instructor documentation](https://python.useinstructor.com/) ——透過 Pydantic 驗證與自動重試，從任何 LLM 取得結構化輸出的標準函式庫
-- [Anthropic Tool Use Guide](https://docs.anthropic.com/en/docs/tool-use) ——Claude 如何透過帶有 JSON Schema input_schema 的工具調用實現結構化輸出
+- [Anthropic Tool Use Guide](https://docs.anthropic.com/en/docs/tool-use) ——Claude 如何透過帶有 JSON Schema input_schema 的工具呼叫實現結構化輸出
 - [JSON Schema specification](https://json-schema.org/) ——被所有主流結構化輸出系統採用的 Schema 語言完整規範
 - [Outlines library](https://github.com/outlines-dev/outlines) ——使用正規表達式與編譯為有限狀態機的 JSON Schema 的開源受限生成引擎
 - [Dong et al., "XGrammar: Flexible and Efficient Structured Generation Engine for Large Language Models" (MLSys 2025)](https://arxiv.org/abs/2411.15100) ——當前最尖端的語法引擎；下推自動機編譯能在每 token 約 100 ns 內完成遮除
