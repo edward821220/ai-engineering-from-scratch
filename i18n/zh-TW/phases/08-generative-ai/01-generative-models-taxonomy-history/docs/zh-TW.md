@@ -1,6 +1,6 @@
 # 生成模型——分類與歷史
 
-> 每個影像模型、文字模型、影片模型和 3D 模型，都落在五種類型的其中一個。選錯桶，你會跟數學纏鬥好幾個星期。選對了，這個領域過去十二年的進展會乾淨地疊在你腦子裡。
+> 每個影像模型、文字模型、影片模型和 3D 模型，都落在五種類型的其中一個。選錯桶，你會跟數學纏鬥好幾個星期。選對了，就能清楚掌握這個領域過去十二年的進展。
 
 **Type:** Learn
 **Languages:** Python
@@ -9,7 +9,7 @@
 
 ## The Problem｜問題
 
-生成模型只做一件事：給定從某個未知分布（distribution）`p_data(x)` 抽出的訓練樣本，輸出看起來像來自同一分布的新樣本。臉、句子、MIDI 檔、蛋白質結構——瞇著眼看，都是同一題。
+生成模型只做一件事：給定從某個未知分布（distribution）`p_data(x)` 抽出的訓練樣本，輸出看起來像來自同一分布的新樣本。臉、句子、MIDI 檔、蛋白質結構——粗略來看，都是同一題。
 
 難處是 `p_data` 住在有幾百萬個維度（dimension）的空間裡（一張 512×512 的 RGB 影像大約 78.6 萬維），樣本坐在那個空間裡薄薄的一層流形（manifold）上，而你大概只有 1000 萬個例子。硬算密度（density）沒有希望。每個生成模型都是妥協，把一個難題換成稍微不那麼難的題。
 
@@ -21,9 +21,9 @@
 
 **1. 顯式密度，算得出來。** 把 `log p(x)` 寫成你真的能算的一個和。自迴歸（autoregressive）模型（PixelCNN、WaveNet、GPT）把聯合機率拆成 `p(x) = ∏ p(x_i | x_<i)`。正規化流（normalizing flow，RealNVP、Glow）把 `p(x)` 建成簡單基底分布的可逆變換。好處：精確概似（likelihood）、乾淨的訓練損失（loss）。壞處：自迴歸的推論（inference）是序列的，長序列很慢；流需要可逆架構，架構上很受限制。
 
-**2. 顯式密度，近似。** 從下方框住 `log p(x)`，這個下界叫證據下界（ELBO），再把界調高。VAE（Kingma 2013）用編碼器–解碼器（encoder–decoder）配變分後驗（variational posterior）。擴散模型（DDPM，Ho 2020）訓練一個去噪器，隱含地調高一個加權的 ELBO。2026 年，擴散是影像、影片和 3D 的主力骨幹（backbone）。
+**2. 顯式密度，近似。** 從下方框住 `log p(x)`，這個下界叫證據下界（ELBO），再最佳化這個下界。VAE（Kingma 2013）用編碼器–解碼器（encoder–decoder）配變分後驗（variational posterior）。擴散模型（DDPM，Ho 2020）訓練一個去噪器，隱含地調高一個加權的 ELBO。2026 年，擴散是影像、影片和 3D 的主要骨幹（backbone）。
 
-**3. 隱式密度。** 完全跳過密度；學一個產生器（generator）`G(z)` 來產生樣本，和一個鑑別器（discriminator）`D(x)` 來分辨真假。GAN（Goodfellow 2014）。推論很快，一次前向，但訓練時出了名地不穩。StyleGAN 1／2／3 到 2026 年仍是固定領域照片級寫實（臉、臥室）的前沿。
+**3. 隱式密度。** 完全跳過密度；學一個產生器（generator）`G(z)` 來產生樣本，和一個鑑別器（discriminator）`D(x)` 來分辨真假。GAN（Goodfellow 2014）。推論很快，一次前向傳遞（forward pass），但訓練時出了名地不穩。StyleGAN 1／2／3 到 2026 年仍是固定領域照片級寫實（臉、臥室）的前沿。
 
 **4. 以分數為基礎／連續時間。** 直接學對數密度的梯度（gradient）`∇_x log p(x)`，也就是分數（score）。Song 與 Ermon（2019）指出分數匹配（score matching）把擴散推廣成一個 SDE。流匹配（flow matching，Lipman 2023）是 2024 到 2026 的熱門：訓練不用模擬、路徑更直、取樣（sampling）比 DDPM 快 4 到 10 倍。Stable Diffusion 3、Flux、AudioCraft 2 都用流匹配。
 
@@ -123,8 +123,8 @@ implicit (nearest-sample gen): 20 new samples printed, no p(x)
 每一族對到不同的推論伺服器成本曲線。正式環境推論（production inference）的文獻把 LLM 推論框成預填（prefill）加解碼；同一套拆法在這裡也適用：
 
 - **自迴歸（第 1 和第 5 桶）。** 序列解碼主導延遲（latency）；KV cache、連續批次（continuous batching）、推測解碼（speculative decoding）都直接適用。
-- **VAE／擴散／流匹配（第 2 和第 4 桶）。** 沒有 LLM 那種解碼。成本 = `num_steps × step_cost`，而 `step_cost` 是 transformer 或 U-Net 在完整潛在解析度上的一次前向。正式環境的旋鈕是步數（DDIM／DPM-Solver／蒸餾）、批次（batch）大小、和精度（precision），也就是 bf16／fp8／int4。
-- **GAN（第 3 桶）。** 一次前向。沒有噪聲排程，也沒有 KV cache。首 token 時間（TTFT）約等於總延遲。這就是為什麼 StyleGAN 在窄領域的使用體驗上仍然贏。
+- **VAE／擴散／流匹配（第 2 和第 4 桶）。** 沒有 LLM 那種解碼。成本 = `num_steps × step_cost`，而 `step_cost` 是 transformer 或 U-Net 在完整潛在解析度上的一次前向傳遞。正式環境的旋鈕是步數（DDIM／DPM-Solver／蒸餾）、批次（batch）大小、和精度（precision），也就是 bf16／fp8／int4。
+- **GAN（第 3 桶）。** 一次前向傳遞。沒有雜訊排程，也沒有 KV cache。首 token 時間（TTFT）約等於總延遲。這就是為什麼 StyleGAN 在窄領域的使用體驗上仍然贏。
 
 論文摘要裡看到「比擴散快」，把它讀成「步數更少乘上同樣的單步成本」，或「同樣的步數乘上更便宜的單步成本」。其他都是行銷。
 
