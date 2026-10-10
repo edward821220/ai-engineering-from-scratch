@@ -1,6 +1,6 @@
 # 共指解析（coreference resolution）
 
-> 「She called him. He did not answer. The doctor was at lunch.」。三個指稱指向兩個人，名字都沒出現。共指解析弄清誰是誰。
+> 「She called him. He did not answer. The doctor was at lunch.」三個指稱指向兩個人，名字都沒出現。共指解析弄清誰是誰。
 
 **Type:** Learn
 **Languages:** Python
@@ -36,9 +36,9 @@
 **架構。**
 
 1. **規則式（Hobbs，1978）。** 用文法規則、基於句法樹的代名詞解析。好的基準模型（baseline）。在代名詞上意外地難打贏。
-2. **提及配對分類器（classifier）。** 對每一對提及 (m_i, m_j)，預測它們是否共指。用傳遞閉包分群。2016 年以前的標準。
-3. **提及排序。** 為每個提及把候選先行語（antecedent）排序（包括「沒有先行語」）。取最高的。
-4. **基於 span 的端到端（Lee 等人，2017）。** transformer 編碼器。枚舉長度上限以內的所有候選 span。預測提及分數。為每個 span 預測先行語機率。貪婪地分群。現代的預設。
+2. **提及配對分類器（mention-pair classifier）。** 對每一對提及 (m_i, m_j)，預測它們是否共指。用傳遞閉包分群。2016 年以前的標準。
+3. **提及排序（mention-ranking）。** 為每個提及把候選先行語（antecedent）排序（包括「沒有先行語」）。取最高的。
+4. **基於 span 的端到端（span-based end-to-end，Lee 等人，2017）。** transformer 編碼器。枚舉長度上限以內的所有候選 span。預測提及分數。為每個 span 預測先行語機率。貪婪地分群。現代的預設。
 5. **生成式（2024 以後）。** prompt 一個 LLM：「List every pronoun in this text and its antecedent.」。簡單案例表現良好，但處理長文件和罕見所指時仍有困難。
 
 **評估指標。** 五個標準指標（MUC、B³、CEAF、BLANC、LEA），因為沒有單一指標抓得住分群品質。前三個的平均報成 CoNLL F1。2026 年在 CoNLL-2012 上的前沿：約 83 F1。
