@@ -25,5 +25,6 @@
   "phases/05-nlp-foundations-to-advanced/24-coreference-resolution/docs/en.md": "5737352d097d9de94f3107cee673829c3dd42daf2b0229f0771e0f78489ccabe",
   "phases/05-nlp-foundations-to-advanced/25-entity-linking/docs/en.md": "c3deeb045d0569a7afe14a30fcb58da1dd4f47317af7709c61ce090452b911c5",
   "phases/05-nlp-foundations-to-advanced/26-relation-extraction-kg/docs/en.md": "ef4e0adc778d183654f229858959b646052a784980c3aaff2e323634b2ca067e",
-  "phases/05-nlp-foundations-to-advanced/27-llm-evaluation-frameworks/docs/en.md": "61d6c8816e3e613a80375b344ac33445b0452b793c31f1d751ac6151e0bf3a14"
+  "phases/05-nlp-foundations-to-advanced/27-llm-evaluation-frameworks/docs/en.md": "61d6c8816e3e613a80375b344ac33445b0452b793c31f1d751ac6151e0bf3a14",
+  "phases/05-nlp-foundations-to-advanced/28-long-context-evaluation/docs/en.md": "32ab66f48dc4dc4adac19a41e368276ba4e7c16ccef8947f2a9ed108d925b289"
 }
