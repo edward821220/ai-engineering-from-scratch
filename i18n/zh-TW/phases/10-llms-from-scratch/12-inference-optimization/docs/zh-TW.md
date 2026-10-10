@@ -20,7 +20,7 @@
 
 模型本身在面對 1 個使用者還是 100 個使用者時並無不同。相同的權重、相同的架構、相同的數學運算。改變的是你如何排程這項工作。天真的推論方式浪費了 90% 以上可用的 GPU 算力。一位正在等待第 47 個 token 的使用者霸佔了整條批次槽位，而 GPU 記憶體匯流排在兩次矩陣乘法之間只能無所事事地閒置。與此同時，另一位新使用者的 2,000 token prompt 原本完全可以填補這段閒置時間來執行實質運算。
 
-這不是規模問題，而是排程問題。本課介紹的技術——KV 快取、連續批次處理、PagedAttention、推測解碼（speculative decoding）、前綴快取（prefix caching）——正是將 a $25k/month inference bill from a $5k/month（每月 2.5 萬美元帳單降低至 5,000 美元服務相同流量）區隔開來的關鍵所在。
+這不是規模問題，而是排程問題。本課介紹的技術——KV 快取、連續批次處理、PagedAttention、推測解碼（speculative decoding）、前綴快取（prefix caching）——正是將每月 2.5 萬美元的推論帳單，與服務相同流量、每月僅 5,000 美元的帳單區隔開來的關鍵所在。
 
 vLLM 在 4xA100-80GB 上部署 Llama 3 70B 時，在低並行下每個使用者能達到約 50 TPS，而在 100 個並行請求下透過連續批次處理與 PagedAttention 仍能維持每個使用者 15 到 25 TPS。若缺少這些最佳化，相同硬體在該並行度下只能提供每位使用者 5 TPS。相同的 GPU、相同的模型，卻帶來了整整 4 倍的吞吐量提升。
 
@@ -191,7 +191,7 @@ graph LR
 
 前綴快取儲存了常見前綴的 KV 快取，並跨請求重複使用。當帶有已知前綴的新請求到達時，系統直接引用已快取的 KV，只需為獨特的後綴部分計算 KV。
 
-對於一個所有請求共享的 2,000 token system prompt，前綴快取為每個請求省去了約 400 毫秒的 prefill。在每秒 100 個請求下，這每秒能省下 40 秒的 GPU 運算時間——每秒省下相當於 40 秒 GPU 運算的工作量。
+對於一個所有請求共享的 2,000 token system prompt，前綴快取為每個請求省去了約 400 毫秒的 prefill。在每秒 100 個請求下，每秒可省下 40 秒的 GPU 運算時間，相當於超過一張 GPU 的工作量。
 
 SGLang 的 RadixAttention 利用基數樹（radix tree / trie）以 token 內容為索引實作前綴快取。任何匹配既有前綴的請求都能免費取得 KV 快取。該架構支援部分匹配——若你與快取條目共享 2,000 個前綴 token 中的 1,500 個，你就能直接重複使用這 1,500 個，只需為剩下的 500 個重新計算。
 
@@ -623,7 +623,7 @@ def compare_speculation_strategies(vocab_size=1000, num_trials=20):
     return results
 ```
 
-### 步驟 6：KV 快取KV 快取記憶體效能分析器
+### 步驟 6：KV 快取記憶體效能分析器
 
 為真實模型配置計算 KV 快取的記憶體需求。
 
@@ -776,8 +776,8 @@ outputs = runner.generate(
 
 ## Further Reading｜延伸閱讀
 
-- Kwon et al., "Efficient Memory Management for Large Language Model Serving with PagedAttention" (2023) -- the vLLM paper that introduced paged KV cache management, now the industry standard for inference serving
-- Leviathan et al., "Fast Inference from Transformers via Speculative Decoding" (2023) -- the foundational paper proving that draft-verify speculation produces exact target model distributions while achieving 2-3x speedup
-- Li et al., "EAGLE: Speculative Sampling Requires Rethinking Feature Uncertainty" (2024) -- achieves higher acceptance rates by training a head on the target model's own features instead of using a separate draft model
-- Zheng et al., "SGLang: Efficient Execution of Structured Language Model Programs" (2024) -- introduces RadixAttention for prefix caching and a programming model for multi-call LLM programs
-- Williams et al., "Roofline: An Insightful Visual Performance Model for Multicore Architectures" (2009) -- the original roofline paper that formalized the ops:byte framework for reasoning about compute vs memory bottlenecks
+- Kwon et al., "Efficient Memory Management for Large Language Model Serving with PagedAttention" (2023) ——推出分頁式 KV 快取管理的 vLLM 論文，如今已是推論服務的業界標準。
+- Leviathan et al., "Fast Inference from Transformers via Speculative Decoding" (2023) ——奠基性的論文，證明草稿—驗證式推測能產生與目標模型完全一致的分布，同時達到 2-3 倍加速。
+- Li et al., "EAGLE: Speculative Sampling Requires Rethinking Feature Uncertainty" (2024) ——透過在目標模型自身的特徵上訓練一個預測頭，而非使用獨立的草稿模型，達到更高的接受率。
+- Zheng et al., "SGLang: Efficient Execution of Structured Language Model Programs" (2024) ——提出用於前綴快取的 RadixAttention，以及多次呼叫 LLM 程式的程式設計模型。
+- Williams et al., "Roofline: An Insightful Visual Performance Model for Multicore Architectures" (2009) ——首篇 roofline 論文，將用於推理運算與記憶體瓶頸的 ops:byte 框架形式化。
