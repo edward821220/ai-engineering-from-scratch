@@ -11,7 +11,7 @@
 
 - 用有系統的除錯策略，診斷常見的神經網路失敗：NaN 損失、平坦的損失曲線、過度擬合（overfitting）、振盪
 - 用「過度擬合一個批次（overfit one batch）」，確認模型（model）架構（architecture）和訓練迴圈（training loop）是對的
-- 檢查梯度（gradient）量級、活化值分布和權重（weight）範數，找出梯度消失或梯度爆炸
+- 檢查梯度（gradient）量級、活化值分布和權重（weight）範數，找出梯度消失（vanishing gradient）或梯度爆炸（exploding gradient）
 - 做一份除錯清單，涵蓋資料管線（pipeline）、模型架構、損失函數（loss function）、最佳化器（optimizer）和學習率（learning rate）
 
 ## The Problem｜問題
