@@ -1,6 +1,6 @@
 # 非同步與 Hogwild! 推論
 
-> 推測解碼（第 10 階段第 15 課）在單一序列內部實現 token 的平行化。多 agent（Multi-agent）框架跨完整序列進行平行化，但必須依賴顯式的協調機制（投票、子任務拆解）。Hogwild! 推論（Rodionov 等人，arXiv:2504.06261）則開闢了另一條道路：讓同一個 LLM 的 N 個實例針對同一個「共享鍵值快取（Shared KV Cache）」並行運作。每個 worker 都能即時看見其他所有 worker 生成的 token。現代推理模型——QwQ、DeepSeek-R1——在完全未經任何 fine-tuning 的情況下，就能透過該共享快取自發進行協調分工。這項方法雖處於實驗前沿，但它開啟了一條與推測解碼完全正交的全新推論平行化維度。本課以標準 Python 實作一個雙 worker 的 Hogwild! 模擬器，並剖析為何這種共享快取協作能從既有模型的推理能力中自然湧現。
+> 推測解碼（speculative decoding，第 10 階段第 15 課）在單一序列內部實現 token 的平行化。多 agent（Multi-agent）框架跨完整序列進行平行化，但必須依賴顯式的協調機制（投票、子任務拆解）。Hogwild! 推論（Rodionov 等人，arXiv:2504.06261）則開闢了另一條道路：讓同一個 LLM 的 N 個實例針對同一個「共享鍵值快取（Shared KV Cache）」並行運作。每個 worker 都能即時看見其他所有 worker 生成的 token。現代推理模型——QwQ、DeepSeek-R1——在完全未經任何 fine-tuning 的情況下，就能透過該共享快取自發進行協調分工。這項方法雖處於實驗前沿，但它開啟了一條與推測解碼完全正交的全新推論平行化維度。本課以標準 Python 實作一個雙 worker 的 Hogwild! 模擬器，並剖析為何這種共享快取協作能從既有模型的推理能力中自然湧現。
 
 **Type:** Build
 **Languages:** Python (stdlib)
@@ -22,7 +22,7 @@
 
 顯而易見的問題來了：我們能否跨序列實現平行化？針對同一個問題執行同一個模型的多個複本，讓它們相互合作、分工解題？
 
-先前的嘗試包括：投票集成（執行 N 個模型，採多數決答案）、思維樹（展開多條分岔推理路徑隨後再重組），以及多 agent 框架（為每個 agent 指派子任務，並由協調器統一指揮）。這些在特定任務領域中皆有所助益，但無一例外都引入了沉重的——投票規則、分岔與剪枝邏輯、agent 間的訊息傳遞協議。
+先前的嘗試包括：投票集成（voting ensemble，執行 N 個模型，採多數決答案）、思維樹（tree of thought，展開多條分岔推理路徑隨後再重組），以及多 agent 框架（為每個 agent 指派子任務，並由協調器統一指揮）。這些在特定任務領域中皆有所助益，但無一例外都引入了顯式協調機制——投票規則、分岔與剪枝邏輯、agent 間的訊息傳遞協議。
 
 Hogwild! 推論採取了截然不同的進路。N 個 worker 共同共享單一個 KV 快取。每個 worker 都能立即看見其他所有 worker 生成的 token，就如同看見自己剛生成的文字脈絡一樣。這些 worker——在完全沒有任何專項訓練或 fine-tuning 的情況下——自行摸索出如何分工合作。現代推理模型（QwQ、DeepSeek-R1、Claude 系列的思考模式）在閱讀共享快取後，會自然展現出如「我注意到 worker 2 已經處理了基礎情況，因此我將著手處理歸納步驟」的自發協調行為。
 
@@ -38,7 +38,7 @@ Hogwild! 推論採取了截然不同的進路。N 個 worker 共同共享單一�
 
 ### 協作行為為何能夠湧現
 
-所有 worker 共享同一份 prompt。通常類似於：「你是共同解決此問題的 N 個實例之一。每個實例皆能讀取共享記憶體，並看見其他實例寫下的內容。請避免重複勞動。」Prompt 加上共享快取就已足夠。推理模型在閱讀快取後，會注意到問題的哪些部分已經被嘗試解答過，並自發（通常會……，但並非每次都會）轉向未探索的子問題。
+所有 worker 共享同一份 prompt。通常類似於：「你是共同解決此問題的 N 個實例之一。每個實例皆能讀取共享記憶體，並看見其他實例寫下的內容。請避免重複勞動。」Prompt 加上共享快取就已足夠。推理模型在閱讀快取後，會注意到問題的哪些部分已經被嘗試解答過，並（通常但並非總是）自發轉向未探索的子問題。
 
 Hogwild! 論文（Rodionov 等人，2025 年）記錄了諸多令人驚嘆的現象：
 
@@ -67,7 +67,7 @@ Hogwild! 論文（Rodionov 等人，2025 年）記錄了諸多令人驚嘆的現
 N 個 worker 在無協調開銷下的 Hogwild! 時間：`T_serial * ((1 - p) + p / N)`，經典阿姆達爾定律（Amdahl's law）。
 納入協調開銷後：`T_serial * ((1 - p) + p / N) + c * steps_per_worker`。
 
-若要讓多 worker 真正具備產能，`c` 相對於單步 decode 時間必須極其微小。在產出 5,000 個以上 token 的推理模型中，workers 完全能承擔數百個 token 的協調代價，且依然能在整體時間上勝出。但在短對話任務中，協調開銷將佔據主導地位，此時 Hogwild! 的表現會比單一循序執行更差。
+若要讓多 worker 真正具備產能，`c` 相對於單步 decode 時間必須夠小。在產出 5,000 個以上 token 的推理模型中，workers 完全能承擔數百個 token 的協調代價，且依然能在整體時間上勝出。但在短對話任務中，協調開銷將佔據主導地位，此時 Hogwild! 的表現會比單一循序執行更差。
 
 ### 具體案例試算
 
@@ -94,7 +94,7 @@ N 個 worker 在無協調開銷下的 Hogwild! 時間：`T_serial * ((1 - p) + p
 
 ### 實驗現況
 
-截至 2026 年 4 月，Hogwild! 仍是一項擁有開源 PyTorch 實作的前沿研究方法，尚未被商業正式環境廣泛採用。需要不少系統工程工作：
+截至 2026 年 4 月，Hogwild! 仍是一項擁有開源 PyTorch 實作的前沿研究方法，尚未進入商業正式環境。需要不少系統工程工作：
 
 1. 跨並行行程的共享 KV 快取記憶體管理具備極高的系統工程門檻。
 2. 湧現式協調高度依賴於具體任務，基準測試評估體系仍在建立中。
@@ -168,7 +168,7 @@ continuous-batching
 
 2. 調降協調啟發式的權重（設定 `coordination_weight=0.1`）並重新執行。展示加速比如何崩潰，並解釋背後原因：當無法有效協調時，workers 會相互重複勞動。
 
-3. 為帶有 `p=0.8, c=500` 的 50,000 token 推理任務在 N=4 下計算預期 Hogwild! 加速比；隨後為帶有 `p=0.3, c=200` 的 1,000 token 對話任務在 N=4 下計算相同數值。解釋為何一個是大獲全勝，另一個卻是嚴重虧損。
+3. 為帶有 `p=0.8, c=500` 的 50,000 token 推理任務在 N=4 下計算預期 Hogwild! 加速比；隨後為帶有 `p=0.3, c=200` 的 1,000 token 對話任務在 N=4 下計算相同數值。解釋為何一個有利、另一個卻不利。
 
 4. 研讀 Hogwild! 論文第 4 節（初步評估）。指出作者所記錄的兩種失敗模式，並說明更周全的協調 prompt 如何緩解這兩種情況。
 
@@ -182,7 +182,7 @@ continuous-batching
 | 共享 KV 快取（Shared KV cache） | 「協調的中介平台」 | 所有 worker 共同讀寫的單一增長 KV 緩衝區；使 token 在各 worker 間立即可見 |
 | 湧現式協調（Emergent coordination） | 「不需要專案訓練」 | 具備強大推理能力的 LLM 在無任何 fine-tuning 或顯式協議下，自主閱讀共享快取並分工解題 |
 | 協調開銷（c） | 「花在重新辨識方向上的 token」 | 每個 worker 讀取擴展後的快取並決策下一步所需的 token 代價；相對於總 decode 時間必須維持極小 |
-| 可平行化比例（p） | 「能平行跑的部分」 | 任務層級的固有可平行度：總工作量中總工作量中可平行處理的比例 |
+| 可平行化比例（p） | 「能平行跑的部分」 | 任務層級的固有可平行度：總工作量中可平行處理的比例 |
 | RoPE 賦能 Hogwild! | 「旋轉位置具備平移不變性」 | 由於位置純粹編碼為旋轉角度，寫入共享快取不需要為先前 token 重新計算鍵值 |
 | 投票集成（Voting ensemble） | 「跑 N 次採多數決」 | 最簡單的平行推論拓撲；適合分類任務，不適合長篇連續推理 |
 | 思維樹（Tree of thought） | 「分岔與剪枝」 | 同時探索多條推理路徑並進行剪枝的策略；依賴顯式的協調演算法邏輯 |
@@ -195,4 +195,4 @@ continuous-batching
 - [Su et al. — RoFormer: Enhanced Transformer with Rotary Position Embedding (arXiv:2104.09864)](https://arxiv.org/abs/2104.09864) ——賦予共享快取推論工程可行性的 RoPE 經典論文
 - [Yao et al. — Tree of Thoughts: Deliberate Problem Solving with Large Language Models (arXiv:2305.10601)](https://arxiv.org/abs/2305.10601) ——與 Hogwild! 彼此正交的思維樹推理策略
 - [Leviathan et al. — Fast Inference from Transformers via Speculative Decoding (arXiv:2211.17192)](https://arxiv.org/abs/2211.17192) ——與 Hogwild! 完美複合增效的序列內推測解碼奠基之作
-- [Hogwild! reference PyTorch implementation](https://github.com/eqimp/hogwild_llm) ——該論文實驗的論文實驗的參考實作
+- [Hogwild! reference PyTorch implementation](https://github.com/eqimp/hogwild_llm) ——論文實驗的參考實作
