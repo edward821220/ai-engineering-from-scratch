@@ -1,4 +1,4 @@
-# 連鎖律與自動微分
+# 連鎖律與自動微分（automatic differentiation）
 
 > 連鎖律（chain rule）是每個會學習的神經網路（neural network）背後的引擎。
 
@@ -10,7 +10,7 @@
 ## Learning Objectives｜學習目標
 
 - 建立一個最小的 autograd 引擎（Value 類別）：記錄運算並以反向模式自動微分（reverse-mode autodiff）計算梯度
-- 用拓撲排序（topological sort）在計算圖中實作前向傳遞與反向傳遞
+- 用拓撲排序（topological sort）在計算圖中實作前向傳遞（forward pass）與反向傳遞（backward pass）
 - 只用從零寫的自動微分引擎，建構並訓練一個學習 XOR 的多層感知器（multi-layer perceptron）
 - 用數值有限差分（numerical finite difference）做梯度檢查（gradient checking），驗證自動微分的正確性
 
@@ -381,7 +381,7 @@ for x, y in zip(xs, ys):
     print(f"  input={x}  target={y:2d}  pred={model(x).data:6.3f}")
 ```
 
-這就是 micrograd：一個用純 Python 加自動微分寫成的完整神經網路（neural network）訓練迴圈。所有商業深度學習框架做的都是同一件事，只是規模巨大。
+這就是 micrograd：一個用純 Python 加自動微分寫成的完整神經網路（neural network）訓練迴圈（training loop）。所有商業深度學習（deep learning）框架做的都是同一件事，只是規模巨大。
 
 ### 步驟 6：梯度檢查
 
