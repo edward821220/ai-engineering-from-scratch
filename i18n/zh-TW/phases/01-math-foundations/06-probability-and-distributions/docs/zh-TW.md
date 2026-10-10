@@ -9,16 +9,16 @@
 
 ## Learning Objectives｜學習目標
 
-- 從零實作伯努利、類別、卜瓦松、均勻與常態分布的機率質量函數（PMF）和機率密度函數（PDF）
-- 計算期望值與變異數，並用中央極限定理（Central Limit Theorem）說明為什麼高斯分布無所不在
-- 用數值穩定技巧（減去最大 logit）打造 softmax 和 log-softmax 函數
+- 從零實作伯努利、類別、卜瓦松、均勻與常態分布（normal distribution）的機率質量函數（PMF）和機率密度函數（PDF）
+- 計算期望值與變異數（variance），並用中央極限定理（Central Limit Theorem）說明為什麼高斯分布無所不在
+- 用數值穩定性技巧（numerical stability trick，減去最大 logit）打造 softmax 和 log-softmax 函數
 - 從 logits 計算交叉熵損失，並把它連結到負對數概似（negative log-likelihood）
 
 ## The Problem｜問題
 
-一個分類器輸出 `[0.03, 0.91, 0.06]`；一個語言模型從 50,000 個候選中挑選下一個詞；一個擴散模型從學到的分布中採樣以生成圖片。這些都是機率的實際應用。
+一個分類器（classifier）輸出 `[0.03, 0.91, 0.06]`；一個語言模型（language model）從 50,000 個候選中挑選下一個詞；一個擴散模型從學到的分布中採樣以生成圖片。這些都是機率的實際應用。
 
-模型做的每個預測都是一個機率分布；每個損失函數都在衡量預測分布離真實分布有多遠；每次訓練步驟都在調整參數，讓一個分布更像另一個。沒有機率，你讀不了任何一篇 ML 論文、除錯不了任何一個模型，也搞不懂訓練損失為什麼變成 NaN。
+模型做的每個預測都是一個機率分布（probability distribution）；每個損失函數（loss function）都在衡量預測分布離真實分布有多遠；每次訓練步驟都在調整參數，讓一個分布更像另一個。沒有機率，你讀不了任何一篇 ML 論文、除錯不了任何一個模型，也搞不懂訓練損失為什麼變成 NaN。
 
 ## The Concept｜核心概念
 
@@ -43,7 +43,7 @@ Single die roll:
 
 其他一切（貝氏定理、期望值、分布）都從這三條規則推導出來。
 
-### 條件機率與獨立性
+### 條件機率（conditional probability）與獨立性（independence）
 
 P(A|B) 是在 B 已經發生的條件下，A 發生的機率。
 
@@ -96,7 +96,7 @@ integral from -inf to +inf of f(x) dx = 1
 
 ### 常見分布
 
-**伯努利（Bernoulli）：** 一次試驗、兩個結果。為二元分類建模。
+**伯努利（Bernoulli）：** 一次試驗、兩個結果。為二元分類（binary classification）建模。
 
 ```
 P(X = 1) = p
@@ -104,7 +104,7 @@ P(X = 0) = 1 - p
 Mean = p,  Variance = p(1-p)
 ```
 
-**類別（categorical）：** 一次試驗、k 個結果。為多類別分類建模（softmax 輸出）。
+**類別（categorical）：** 一次試驗、k 個結果。為多類別分類（multi-class classification）建模（softmax 輸出）。
 
 ```
 P(X = i) = p_i,  where sum of p_i = 1
@@ -154,7 +154,7 @@ Standard deviation = sqrt(Var(X))
 
 在 ML 中，期望值以損失函數的形式出現（對資料分布的平均損失）。變異數告訴你模型的穩定性——梯度變異數高，代表訓練雜訊較大。
 
-### 聯合分布與邊際分布
+### 聯合分布（joint distribution）與邊際分布（marginal distribution）
 
 聯合分布 P(X, Y) 一起描述兩個隨機變數。
 
