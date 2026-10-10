@@ -9,7 +9,7 @@
 
 ## Learning Objectives｜學習目標
 
-- 從零實作patch embedding（小塊 embedding）、學來的positional embedding（位置 embedding）、class token（類別 token）、以及 transformer 編碼器（encoder）區塊，組出一個最小的 ViT
+- 從零實作 patch embedding（小塊 embedding）、學來的 positional embedding（位置 embedding）、class token（類別 token）、以及 transformer 編碼器（encoder）區塊，組出一個最小的 ViT
 - 說明為什麼大家一度以為 ViT 需要海量預訓練資料，直到 DeiT 和 MAE 證明並非如此
 - 比較 ViT、Swin、ConvNeXt 的架構先驗：沒有、局部視窗注意力、卷積骨幹（backbone）
 - 用 `timm` 和標準的線性探測（linear probe）／fine-tuning 做法，在小資料集（dataset）上 fine-tune 一個預訓練的 ViT
@@ -246,7 +246,7 @@ model = timm.create_model("vit_base_patch16_224", pretrained=True, num_classes=1
 本課會產出：
 
 - `outputs/prompt-vit-vs-cnn-picker.md`：一份 prompt，依資料集大小、計算和推論堆疊，在 ViT、ConvNeXt、Swin 之間挑一個
-- `outputs/skill-vit-patch-and-pos-embed-inspector.md`：一項技能，檢查 ViT 的patch embedding（小塊 embedding） 和positional embedding（位置 embedding） 形狀是否對上模型預期的序列長度，抓出最常見的移植 bug
+- `outputs/skill-vit-patch-and-pos-embed-inspector.md`：一項技能，檢查 ViT 的 patch embedding（小塊 embedding） 和 positional embedding（位置 embedding） 形狀是否對上模型預期的序列長度，抓出最常見的移植 bug
 
 ## Exercises｜練習
 
