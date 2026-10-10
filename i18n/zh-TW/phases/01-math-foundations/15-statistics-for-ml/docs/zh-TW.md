@@ -100,7 +100,7 @@ r =  0:  no linear relationship (but there might be a nonlinear one!)
 Range: [-1, 1]
 ```
 
-皮爾森相關係數假設變數之間是線性關係，而且兩個變數大致符合常態分布。它容易受離群值（outlier）影響；單一極端點就可能讓 r 從 0.1 拉高到 0.9。
+皮爾森相關係數假設變數之間是線性關係，而且兩個變數大致符合常態分布（normal distribution）。它容易受離群值（outlier）影響；單一極端點就可能讓 r 從 0.1 拉高到 0.9。
 
 **斯皮爾曼等級相關係數（Spearman rank correlation）**衡量單調關聯（monotonic association）：
 
@@ -309,7 +309,7 @@ d = 0.8:  large effect
 
 ### 多重比較問題
 
-同時檢定許多假設，同時檢定許多假設（多重比較）時（multiple comparisons）時，有些結果會只是碰巧「顯著」。如果以 alpha = 0.05 檢定 20 個項目，即使沒有任何真實效果，預期仍會出現 1 個偽陽性（false positive）。
+同時檢定許多假設時，有些結果會只是碰巧「顯著」。如果以 alpha = 0.05 檢定 20 個項目，即使沒有任何真實效果，預期仍會出現 1 個偽陽性（false positive）。
 
 ```
 P(at least one false positive) = 1 - (1 - alpha)^m
