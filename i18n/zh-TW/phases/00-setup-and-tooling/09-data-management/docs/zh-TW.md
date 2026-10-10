@@ -140,7 +140,7 @@ print(f"Full model at: {model_dir}")
 
 ### 步驟 7：處理大型檔案
 
-模型（model）權重（model weights）和大型資料集不應放進 git。你有三種選擇：
+模型權重（model weights）和大型資料集不應放進 git。你有三種選擇：
 
 **選項 A：.gitignore（最簡單）**
 
@@ -213,11 +213,11 @@ dvc push
 
 | 資料集 | 課程內容 | 大小 | 學習重點 |
 |---------|---------|------|----------------|
-| IMDB | tokenization、分類 | 84 MB | 文字分類基礎 |
+| IMDB | tokenization、分類（classification） | 84 MB | 文字分類（text classification）基礎 |
 | WikiText | 語言建模（language modeling） | 181 MB | next-token prediction |
 | SQuAD | 問答（question answering） | 35 MB | 問答系統（QA systems）、文字片段 |
 | Common Crawl（子集） | embedding | 不定 | 大規模文字處理（large-scale text processing） |
-| MNIST | 視覺基礎 | 21 MB | 影像分類基礎 |
+| MNIST | 視覺基礎 | 21 MB | 影像分類（image classification）基礎 |
 | COCO（子集） | 多模態（multimodal） | 不定 | 圖文配對（image-text pairs） |
 
 你現在不必下載所有資料集；每一課會說明需要哪些資料集。
