@@ -5,5 +5,6 @@
   "phases/08-generative-ai/04-conditional-gans-pix2pix/docs/en.md": "d6bbfa6ac4d6dc5ee373169e15023f9789b88a85ed0a7152ff0d588615c3ded7",
   "phases/08-generative-ai/05-stylegan/docs/en.md": "4b67d997dd5a842de48754015af22b8a53395131d228b28145656a4fab111e75",
   "phases/08-generative-ai/06-diffusion-ddpm-from-scratch/docs/en.md": "f62dd0eaa055920ebe0ae369fd734c5b0e6ab90ce3f31f485487d7d4cd7a86f8",
-  "phases/08-generative-ai/07-latent-diffusion-stable-diffusion/docs/en.md": "31a712aa953cffde8d835b2d6776923c98ca0946f06adb2c53f2694863ba6941"
+  "phases/08-generative-ai/07-latent-diffusion-stable-diffusion/docs/en.md": "31a712aa953cffde8d835b2d6776923c98ca0946f06adb2c53f2694863ba6941",
+  "phases/08-generative-ai/08-controlnet-lora-conditioning/docs/en.md": "cc1f1598103a54fe7dda2459c8e0c172c22109098a64f730ac2dbb9d251e83b2"
 }
