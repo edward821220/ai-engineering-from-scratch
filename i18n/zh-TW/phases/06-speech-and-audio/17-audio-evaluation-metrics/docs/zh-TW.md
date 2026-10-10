@@ -1,6 +1,6 @@
 # 音訊評估：WER、MOS、UTMOS、MMAU、FAD，以及開放排行榜
 
-> 量不到的東西不能交付。這一課點名 2026 年每個音訊任務的指標（metric）：語音辨識（WER、CER、RTFx）、語音合成（MOS、UTMOS、SECS、語音辨識來回的 WER）、音訊語言（MMAU、LongAudioBench）、音樂（FAD、CLAP）、說話人（EER）。再加上你拿來比較的排行榜。
+> 量不到的東西不能交付。這一課點名 2026 年每個音訊任務的指標（metric）：語音辨識（speech recognition，WER、CER、RTFx）、語音合成（MOS、UTMOS、SECS、語音辨識來回的 WER）、音訊語言（MMAU、LongAudioBench）、音樂（FAD、CLAP）、說話人（EER）。再加上你拿來比較的排行榜。
 
 **Type:** Learn
 **Languages:** Python
@@ -9,7 +9,7 @@
 
 ## The Problem｜問題
 
-每個音訊任務都有多個指標，各自衡量不同面向。用錯指標，就是你交付一個儀表板上看起來很好、正式環境裡很糟的模型的方式。2026 年的標準清單：
+每個音訊任務都有多個指標，各自衡量不同面向。用錯指標，就可能交付一個儀表板上看起來很好、正式環境裡很糟的模型。2026 年的標準清單：
 
 | 任務 | 主要 | 次要 |
 |------|---------|-----------|
@@ -43,7 +43,7 @@
 
 **UTMOS（2022 到 2026）。** 學來的 MOS 預測器。在標準基準上和人類 MOS 相關大約 0.9。F5-TTS 的 UTMOS 是 3.95。真實音訊的 UTMOS 為 4.08。
 
-**SECS（說話人編碼器餘弦相似度）。** 給聲音仿製用。參考和仿製輸出之間的 ECAPA embedding 餘弦。&gt; 0.75 等於認得出來的仿製。
+**SECS（說話人編碼器餘弦相似度，speaker encoder cosine similarity）。** 給聲音仿製用。參考和仿製輸出之間的 ECAPA embedding 餘弦。&gt; 0.75 等於認得出來的仿製。
 
 **語音辨識來回的 WER。** 對 TTS 輸出跑 Whisper，再和輸入文字算 WER。抓可懂度退步。2026 年現況最好：CER &lt; 2%。
 
@@ -61,7 +61,7 @@
 
 ### 說話人分離
 
-**DER（說話人分離錯誤率）。** `(FA + Miss + Confusion) / total_speaker_time`。漏掉的語音、誤報的語音、說話人混淆，各自是一個比例。AMI 會議：DER 大約 10% 到 20% 算真實。pyannote 3.1 加商業的 Precision-2：錄得好的音訊上 DER &lt; 10%。
+**DER（說話人分離錯誤率）。** `(FA + Miss + Confusion) / total_speaker_time`。漏掉的語音、誤報的語音、說話人混淆，各自是一個比例。AMI 會議：DER 約 10% 到 20% 屬合理範圍。pyannote 3.1 加商業的 Precision-2：錄得好的音訊上 DER &lt; 10%。
 
 **JER（Jaccard 錯誤率）。** DER 的替代。對短片段偏差比較穩。
 
@@ -79,13 +79,13 @@
 
 **CLAP 分數。** 用 CLAP embedding 的文字和音訊對齊分數。&gt; 0.3 等於對齊還算合理。
 
-**聆聽小組 MOS。** 消費級音樂的最後一句話仍然是這個。Suno v5 在 TTS Arena 上 ELO 1293（來自配對的人類偏好）。
+**聆聽小組 MOS。** 消費級音樂評估仍以此為最終依據。Suno v5 在 TTS Arena 上 ELO 1293（來自配對的人類偏好）。
 
 ### 音訊語言基準
 
 **MMAU（大規模多音訊理解）。** 1 萬筆音訊問答。
 
-**MMAU-Pro。** 1800 題難的，四類：語音／聲音／音樂／多音訊。四選一隨機是 25%。Gemini 2.5 Pro 整體大約 60%。多音訊在所有模型上大約 22%。
+**MMAU-Pro。** 1800 道較難題目，四類：語音／聲音／音樂／多音訊。四選一隨機是 25%。Gemini 2.5 Pro 整體大約 60%。多音訊在所有模型上大約 22%。
 
 **LongAudioBench。** 好幾分鐘的片段，加上語意查詢。Audio Flamingo Next 贏過 Gemini 2.5 Pro。
 
@@ -107,7 +107,7 @@
 | TTS Arena（HF） | 英文 TTS | `huggingface.co/spaces/TTS-AGI/TTS-Arena` |
 | Artificial Analysis Speech | TTS 加語音轉文字，配對投票的 ELO | `artificialanalysis.ai/speech` |
 | MMAU-Pro | 音訊語言模型推理 | `sonalkum.github.io/mmau-pro` |
-| SpeakerBench／VoxSRC | 說話人辨識 | `voxsrc.github.io` |
+| SpeakerBench／VoxSRC | 語者辨識 | `voxsrc.github.io` |
 | MMAU 音樂子集 | 音樂語言模型 | （在 MMAU 裡） |
 | HEAR 基準 | 自監督音訊 | `hearbenchmark.com` |
 
@@ -188,9 +188,9 @@ def eer(same_scores, diff_scores):
 ## Pitfalls｜容易踩的坑
 
 - **UTMOS 外推。** 在 VCTK 風格的乾淨語音上訓練。吵的、仿製的、有情緒的音訊，分數會差。
-- **MOS 小組的偏差。** 20 位 Amazon Mechanical Turk 工人不等於 20 位目標使用者。賭注高就付錢找領域小組。
+- **MOS 小組的偏差。** 20 位 Amazon Mechanical Turk 工人不等於 20 位目標使用者。付費委託領域專家評分。
 - **FAD 看參考集。** 跨模型要比，參考分布要同一套。
-- **總 WER。** 整體 5% WER 可以藏起口音語音上的 30% WER。依人群切片報。
+- **總 WER。** 整體 5% WER 可以藏起口音語音上的 30% WER。依不同人口群體分層回報。
 - **公開基準飽和。** 多數前線模型在標準基準上接近天花板。做一套反映你流量的內部留出集。
 
 ## Ship It｜交付成果
