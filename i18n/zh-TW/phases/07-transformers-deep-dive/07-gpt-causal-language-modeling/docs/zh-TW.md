@@ -9,13 +9,13 @@
 
 ## The Problem｜問題
 
-語言模型回答一個問題：給定前面 `t-1` 個 token，token `t` 上的機率分布（probability distribution）是什麼？在那個訊號上訓練——下一個 token 的預測——你就得到一個模型，能一次一個 token 生成任意文字。
+語言模型回答一個問題：給定前面 `t-1` 個 token，token `t` 上的機率分布（probability distribution）是什麼？在那個訊號上訓練——next-token prediction——你就得到一個模型，能一次一個 token 生成任意文字。
 
 要在整段序列上端到端、平行地訓練，每個位置的預測只能依賴更早的位置。不然模型會偷看答案，輕易作弊。
 
-因果遮罩做的就是這件事。它是單一個上三角矩陣，裡面是 `-inf`，在 softmax 之前加到注意力分數上。softmax 之後，那些位置變成 0。每個位置只能注意到自己和更早的位置。而且因為你對整段序列只套一次，一次前向就得到 N 個平行的下一個 token 預測。
+因果遮罩（causal mask）做的就是這件事。它是單一個上三角矩陣，裡面是 `-inf`，在 softmax 之前加到注意力分數上。softmax 之後，那些位置變成 0。每個位置只能注意到自己和更早的位置。而且因為你對整段序列只套一次，一次前向傳遞就得到 N 個平行的 next-token prediction。
 
-GPT-1（2018）、GPT-2（2019）、GPT-3（2020）、GPT-4（2023）、GPT-5（2025）、Claude、Llama、Qwen、Mistral、DeepSeek、Kimi——它們都是只有解碼器的因果 transformer，核心迴圈相同。分開它們的是資料品質、規模、架構上的修煉，以及後訓練（SFT、RLHF、DPO，和它們的後繼）。
+GPT-1（2018）、GPT-2（2019）、GPT-3（2020）、GPT-4（2023）、GPT-5（2025）、Claude、Llama、Qwen、Mistral、DeepSeek、Kimi——它們都是只有解碼器的因果 transformer，核心迴圈相同。分開它們的是資料品質、規模、架構上的改良，以及後訓練（SFT、RLHF、DPO，和它們的後繼）。
 
 ## The Concept｜核心概念
 
@@ -36,9 +36,9 @@ M[i, j] = -inf    if j > i
 
 ### 三角形從哪來
 
-遮罩通常被講成栓在注意力上的補丁。反方向把推導跑一遍，它就不再神秘：注意力是前綴平均的第三次精煉，三角形是那個平均的迴圈邊界，寫成矩陣。
+遮罩通常被講成栓在注意力上的補丁。從反方向推導一遍，它就不再神秘：注意力是前綴平均（prefix averaging）的第三次精煉，三角形是那個平均的迴圈邊界，寫成矩陣。
 
-**第 1 階段——前綴平均。** 一條序列最笨的因果摘要：位置 `i` 變成位置 `0…i` 的平均數（mean）。寫成迴圈就是 `out[i] = X[:i+1].mean(0)`。同一個計算是一次矩陣乘法。取一張下三角的全 1 矩陣，每一列除以自己的個數，再乘：
+**第 1 階段——前綴平均。** 一條序列最簡單的因果摘要：位置 `i` 變成位置 `0…i` 的平均數（mean）。寫成迴圈就是 `out[i] = X[:i+1].mean(0)`。同一個計算是一次矩陣乘法。取一張下三角的全 1 矩陣，每一列除以自己的個數，再乘：
 
 ```python
 import numpy as np
@@ -62,7 +62,7 @@ A = softmax(S, axis=1)
 out = A @ X
 ```
 
-同一個三角形、同一個列隨機矩陣、同一次矩陣乘法。`-inf` 遮罩不是新機制。它是第 1 階段的那些零，搬進 softmax 的輸入域。
+同一個三角形、同一個列隨機矩陣（row-stochastic matrix）、同一次矩陣乘法。`-inf` 遮罩不是新機制。它是第 1 階段的那些零，搬進 softmax 的輸入域。
 
 **第 3 階段——隨內容而變的權重。** 第 2 階段裡，`S` 在訓練後是固定的：不管 token 說什麼，位置 7 對位置 3 的權重永遠一樣。讓分數依賴 token 本身：`S = Q @ K.T / sqrt(d_k)`。其他都不變。遮罩、softmax、矩陣乘法——一樣。
 
@@ -74,9 +74,9 @@ mask-derivation
 
 ### 平行訓練，串列推論（inference）
 
-訓練：整段 `(N, d_model)` 序列前向一次，算 N 個交叉熵（cross-entropy）損失（每個位置一個），加總，反向傳播（backpropagation）。沿著序列平行。這就是 GPT 訓練縮放得起來的原因——一個 GPU 行程裡，一個批次（batch）處理 100 萬個 token。
+訓練：整段 `(N, d_model)` 序列前向傳遞一次，算 N 個交叉熵（cross-entropy）損失（每個位置一個），加總，反向傳播（backpropagation）。沿著序列平行。這就是 GPT 訓練縮放得起來的原因——一個 GPU 行程裡，一個批次（batch）處理 100 萬個 token。
 
-推論：你一個 token 一個 token 生成。餵 `[t1, t2, t3]`，得到 `t4`。餵 `[t1, t2, t3, t4]`，得到 `t5`。餵 `[t1, t2, t3, t4, t5]`，得到 `t6`。KV 快取（第 12 課）存下 `t1…tn` 的隱藏狀態（hidden state），每一步就不用重算。但推論時的串列深度等於輸出長度。那就是自迴歸（autoregressive）稅，也是為什麼解碼是每個 LLM 的延遲（latency）瓶頸。
+推論：你一個 token 一個 token 生成。餵 `[t1, t2, t3]`，得到 `t4`。餵 `[t1, t2, t3, t4]`，得到 `t5`。餵 `[t1, t2, t3, t4, t5]`，得到 `t6`。KV 快取（第 12 課）存下 `t1…tn` 的隱藏狀態（hidden state），每一步就不用重算。但推論時的串列深度等於輸出長度。那就是自迴歸（autoregressive）帶來的代價，也是為什麼解碼是每個 LLM 的延遲（latency）瓶頸。
 
 ### 損失——往後移一位
 
@@ -91,18 +91,18 @@ mask-derivation
 
 ### 解碼策略
 
-訓練之後，抽樣的選擇比大家想的更要緊。
+訓練之後，取樣的選擇比大家想的更要緊。
 
 | 方法 | 它做什麼 | 何時用 |
 |--------|--------------|-------------|
 | 貪婪 | 每一步取 argmax | 確定性任務、程式碼補完 |
-| 溫度 | logits 除以 T，再抽樣 | 創作任務，T 越高越多樣 |
+| 溫度（temperature） | logits 除以 T，再取樣 | 創作任務，T 越高越多樣 |
 | Top-k | 只從機率最高的 k 個 token 抽 | 砍掉低機率的尾巴 |
 | Top-p（nucleus） | 從累積機率 ≥ p 的最小集合抽 | 2020 年之後的預設；會適應分布的形狀 |
 | Min-p | 留下 `p > min_p * max_p` 的 token | 2024 年之後；比 top-p 更能拒掉長尾 |
 | 推測解碼（speculative decoding） | 草稿模型提出 N 個 token，大模型驗證 | 同樣品質下快 2 到 3 倍 |
 
-2026 年，min-p 加溫度 0.7 是開放權重模型的合理預設。推測解碼是任何正式環境（production）推論堆疊的基本配備。
+2026 年，min-p 加溫度 0.7 是開放權重模型的合理預設。推測解碼是任何正式環境（production）推論堆疊的基本功能。
 
 ### 什麼讓「GPT 配方」行得通
 
@@ -135,13 +135,13 @@ def causal_mask(n):
 
 疊兩個解碼器區塊（遮罩自注意力加 FFN，沒有交叉注意力）。加上 token embedding、位置編碼、和反 embedding（和 token embedding 矩陣綁在一起——GPT-2 之後的標準手法）。
 
-### 步驟 3：端到端的下一個 token 預測
+### 步驟 3：端到端的 next-token prediction
 
-在 20 個 token 的玩具詞彙上，每個位置產出 logits。對往後移一位的目標算交叉熵損失。沒有梯度——這是前向的健全檢查。
+在 20 個 token 的玩具詞彙上，每個位置產出 logits。對往後移一位的目標算交叉熵損失。沒有梯度——這是前向傳遞的健全檢查。
 
-### 步驟 4：抽樣
+### 步驟 4：取樣
 
-實作貪婪、溫度、top-k、top-p、min-p。在固定 prompt 上各跑一次，比較輸出。一個抽樣函式是 10 行。
+實作貪婪、溫度、top-k、top-p、min-p。在固定 prompt 上各跑一次，比較輸出。一個取樣函式是 10 行。
 
 ## Use It｜實際應用
 
@@ -164,13 +164,13 @@ out = model.generate(
 print(tok.decode(out[0]))
 ```
 
-底層上，`generate()` 跑前向、抽出最後一個位置的 logits、抽出下一個 token、接上去、再重複。每一套正式環境的 LLM 推論堆疊（vLLM、TensorRT-LLM、llama.cpp、Ollama、MLX）都實作同一個迴圈，配上大量工程調校——批次預填、連續批次、KV 快取分頁、推測解碼。
+底層上，`generate()` 跑前向傳遞、抽出最後一個位置的 logits、抽出下一個 token、接上去、再重複。每一套正式環境的 LLM 推論堆疊（vLLM、TensorRT-LLM、llama.cpp、Ollama、MLX）都實作同一個迴圈，配上大量工程調校——批次預填、連續批次、KV 快取分頁、推測解碼。
 
 **GPT 對 BERT，各一行：** GPT 預測 `P(x_t | x_{<t})`。BERT 預測 `P(x_masked | x_unmasked)`。損失決定這個模型能不能生成。
 
 ## Ship It｜交付成果
 
-見 `outputs/skill-sampling-tuner.md`。這個 skill 為新的生成任務挑抽樣參數，並在需要確定性解碼時標出來。
+見 `outputs/skill-sampling-tuner.md`。這個 skill 為新的生成任務挑取樣參數，並在需要確定性解碼時標出來。
 
 ## Exercises｜練習
 
@@ -183,9 +183,9 @@ print(tok.decode(out[0]))
 | 術語 | 常見說法 | 實際意義 |
 |------|-----------------|-----------------------|
 | 因果遮罩 | 「那個三角形」 | 加到注意力分數上的上三角 `-inf` 矩陣，讓位置 `i` 只看得到位置 `≤ i`。 |
-| 下一個 token 預測 | 「那個損失」 | 模型分布對上每一個位置真正下一個 token 的交叉熵。 |
+| next-token prediction | 「那個損失」 | 模型分布對上每一個位置真正下一個 token 的交叉熵。 |
 | 自迴歸 | 「一次生一個」 | 把輸出餵回當輸入；只有訓練時能平行，生成時不行。 |
-| logits | 「softmax 之前的分數」 | LM 頭在 softmax 之前的原始輸出；抽樣發生在這些分數上。 |
+| logits | 「softmax 之前的分數」 | LM 頭在 softmax 之前的原始輸出；取樣發生在這些分數上。 |
 | 溫度 | 「創造力旋鈕」 | logits 除以 T；T 趨近 0 是貪婪，T 趨近無限是均勻。 |
 | Top-p | 「核採樣」 | 把分布切到加總 ≥ p 的最小集合；從剩下的抽。 |
 | Min-p | 「比 top-p 好」 | 留下 `p ≥ min_p × max_p` 的 token；截止點會適應分布有多尖。 |
