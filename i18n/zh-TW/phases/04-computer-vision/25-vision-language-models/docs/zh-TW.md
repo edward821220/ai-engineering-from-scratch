@@ -77,11 +77,11 @@ flowchart LR
 | GLM-4.6V | 約 700 億 | 自訂 | GLM | 6.4 萬 | 開放原始碼、OCR 強 |
 | MiniCPM-V-2.6 | 80 億 | SigLIP | MiniCPM | 3.2 萬 | 適合邊緣 |
 
-### 視覺代理
+### 視覺 agent
 
-Qwen3-VL-235B 在 OSWorld 上達到全球名列前茅。OSWorld 是**視覺代理（visual agent）**的基準，代理操作圖形介面（桌面、手機、網頁）。模型看螢幕截圖，理解介面，再輸出動作（點、打字、捲動）。再加上工具，它完成常見桌面工作的操作流程。2026 年大多數「AI PC」展示，底下跑的就是這個。
+Qwen3-VL-235B 在 OSWorld 上達到全球名列前茅。OSWorld 是**視覺 agent（visual agent）**的基準，agent 操作圖形介面（桌面、手機、網頁）。模型看螢幕截圖，理解介面，再輸出動作（點、打字、捲動）。再加上工具，它完成常見桌面工作的操作流程。2026 年大多數「AI PC」展示，底下跑的就是這個。
 
-### 代理能力加 RoPE 變體
+### agentic 能力加 RoPE 變體
 
 VLM 需要知道影格在影片的什麼時候。Qwen3-VL 從 T-RoPE（temporal Rotary Position Embedding）演進到**以文字為基礎的時間對齊**：明確的時間戳文字 token，和影片影格交錯。模型看到「`<timestamp 00:32>` frame, prompt」，就能推理時間關係。
 
@@ -254,13 +254,13 @@ answer = processor.decode(generated[0][inputs["input_ids"].shape[1]:], skip_spec
 
 本課會產出：
 
-- `outputs/prompt-vlm-selector.md`：依準度、延遲、上下文長度和預算，在 Qwen3-VL、InternVL3.5、LLaVA-Next、API 之間挑
+- `outputs/prompt-vlm-selector.md`：依準確率、延遲、上下文長度和預算，在 Qwen3-VL、InternVL3.5、LLaVA-Next、API 之間挑
 - `outputs/skill-cmer-monitor.md`：產出程式，在正式環境的 VLM 端點上裝 CMER、每個端點的儀表板，以及告警閾值
 
 ## Exercises｜練習
 
 1. **（簡單）** 在五張影像上，對任何開放的 VLM 跑三個 prompt（「這是什麼？」、「數物件」、「描述場景」）。用手把每個答案標成正確／部分正確／幻覺。算出一輪類似 CMER 的比率。
-2. **（中等）** 用 LoRA（秩 16）在 500 張目標領域、帶說明文字的影像上，fine-tune Qwen2.5-VL-3B 或 LLaVA-1.6-7B。比較零樣本和 fine-tuned 之後、MMBench 風格的準度。
+2. **（中等）** 用 LoRA（秩 16）在 500 張目標領域、帶說明文字的影像上，fine-tune Qwen2.5-VL-3B 或 LLaVA-1.6-7B。比較零樣本和 fine-tuned 之後、MMBench 風格的準確率。
 3. **（困難）** 把 VLM 的影像編碼器從預設的 SigLIP／CLIP 換成 DINOv3。只重訓投影器（LLM 和 DINOv3 都凍結）。量密集預測任務（計數、空間推理）有沒有變好。
 
 ## Key Terms｜關鍵術語
@@ -272,7 +272,7 @@ answer = processor.decode(generated[0][inputs["input_ids"].shape[1]:], skip_spec
 | DeepStack | 「Qwen3-VL 的特徵手法」 | 疊多層 ViT 特徵，而不是只用最後一層 |
 | 影像 token | 「<image> 佔位」 | 文字流裡的特殊 token，會被換成投影後的視覺 embedding |
 | CMER | 「幻覺 KPI」 | 跨模態錯誤率。文字信心高、但影像和文字相似度低的時候高 |
-| 視覺代理 | 「會點的 VLM」 | 操作圖形介面（OSWorld、手機、網頁）並呼叫工具的 VLM |
+| 視覺 agent | 「會點的 VLM」 | 操作圖形介面（OSWorld、手機、網頁）並呼叫工具的 VLM |
 | Q-former | 「固定數量的 token 橋」 | BLIP-2 風格的投影器，產出固定數量的視覺查詢 token |
 | 對齊／預訓練／指令調校 | 「三個階段」 | 標準的 VLM 訓練管線（pipeline） |
 
