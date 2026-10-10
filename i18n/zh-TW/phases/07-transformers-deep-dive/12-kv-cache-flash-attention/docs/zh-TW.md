@@ -9,16 +9,16 @@
 
 ## The Problem｜問題
 
-單純（naive）的自迴歸（autoregressive）解碼器，要生成 `N` 個 token 得做 `O(N²)` 的工作：每一步都對整個前綴重算注意力。4000 個 token 的回覆是 1600 萬次注意力運算，大多是多餘的。前綴 token 的每個隱藏狀態一旦算過就是確定的——你只需要拿新 token 的查詢，去對之前全部快取起來的鍵和值。
+樸素（naive）的自迴歸（autoregressive）解碼器，要生成 `N` 個 token 得做 `O(N²)` 的工作：每一步都對整個前綴重算注意力。4000 個 token 的回覆是 1600 萬次注意力運算，大多是多餘的。前綴 token 的每個隱藏狀態（hidden state）一旦算過就是確定的——你只需要拿新 token 的查詢，去對之前全部快取起來的鍵和值。
 
 除此之外，注意力本身需要搬移大量資料。標準注意力會實體化出 N×N 的分數矩陣、N×d 的 softmax 輸出、N×d 的最終輸出——對 HBM 的讀寫太多。N 大於等於 2000 時，注意力先被記憶體卡住，才輪到被 FLOP 卡住。經典注意力核（kernel）把現代 GPU 的利用率壓低 4 到 10 倍。
 
-兩項調校都來自 Dao 等人，把前沿推論從「慢」推到「快」：
+兩項調校都來自 Dao 等人，讓前沿推論從「慢」變成「快」：
 
 1. **KV cache。** 存每個前綴 token 的 K 和 V 向量。每個新 token 的注意力，是一個查詢對上快取的鍵。推論從 `O(N²)` 降成每個生成步驟 `O(N)`。
-2. **Flash Attention。** 把注意力計算分塊，完整的 N×N 矩陣永遠不進 HBM。softmax 加矩陣乘法全在 SRAM 裡做。A100 上實際時間快 2 到 4 倍；H100 配 FP8 快 5 到 10 倍。
+2. **Flash Attention。** 把注意力計算分塊（tiling），完整的 N×N 矩陣永遠不進 HBM。softmax 加矩陣乘法全在 SRAM 裡做。A100 上實際時間快 2 到 4 倍；H100 配 FP8 快 5 到 10 倍。
 
-到 2026 年兩者都是標配。每一套正式環境（production）推論堆疊（vLLM、TensorRT-LLM、SGLang、llama.cpp）都都以這些技術為前提。每個前沿模型發布時都啟用 Flash Attention Flash Attention。
+到 2026 年兩者都是標配。每一套正式環境（production）推論堆疊（vLLM、TensorRT-LLM、SGLang、llama.cpp）都預設這些技術已經就位。每個前沿模型出貨時都已啟用 Flash Attention。
 
 ## The Concept｜核心概念
 
@@ -51,7 +51,7 @@ per 32K context = 10.4 GB
 
 那 10 GB 就是為什麼 Llama 3 70B 在 12.8 萬脈絡、批次（batch）大小為 1 時，光 KV cache 就要吃掉 40 GB A100 的大部分。
 
-**GQA 是 KV cache 的大勝利。** 64 個頭的 MHA 會是 32 GB。MLA 壓得更小。
+**GQA 大幅降低 KV cache 成本。** 64 個頭的 MHA 會是 32 GB。MLA 壓得更小。
 
 調整維度，看快取大小怎麼動。把序列長度或批次往上推，看它多快衝過單張 GPU：
 
@@ -84,29 +84,28 @@ for each block of Q (tile size ~128 × 128):
     write O_tile to HBM
 ```
 
-每個區塊一次 HBM 來回。記憶體足跡從 `O(N²)` 降到 `O(N)`。反向傳播時重新計算部分前向值一些值，而不是把它們存起來——又是一次記憶體上的勝利。
+每個區塊一次 HBM 來回。記憶體足跡從 `O(N²)` 降到 `O(N)`。反向傳播時重新計算部分前向傳遞的值，而不是把它們存起來——又是一次記憶體上的勝利。
 
 **數值手法。** 跑動中的 softmax 跨區塊維持 `(max, sum)`，所以最後的正規化（normalization）是精確的。不是近似——Flash Attention 算出來和標準注意力輸出與一次計算完全相同（除了 fp16 不可結合）。
 
 **版本演進：**
 
-| 版本 | 年份 | 關鍵改變 | 參考硬體上的加速 |
+| 版本 | 年份 | 關鍵改變 | 參考硬體上的加速比 |
 |---------|------|-----------|-------------------------------|
 | Flash 1 | 2022 | 分塊的 SRAM 核 | A100 上 2 倍 |
 | Flash 2 | 2023 | 更好的平行、因果優先的順序 | A100 上 3 倍 |
 | Flash 3 | 2024 | Hopper 的非同步、FP8 | H100 上 1.5 到 2 倍（FP16 大約 740 TFLOPs） |
-| Flash 4 | 2026 | Blackwell 五階段管線（pipeline）、軟體 exp2 | 推論優先（一開始只有前向） |
+| Flash 4 | 2026 | Blackwell 五階段管線（pipeline）、軟體 exp2 | 推論優先（一開始只有前向傳遞） |
 
-Flash 4 發布時只有前向。訓練仍用 Flash 3。Flash 4 的 GQA 和 varlen 支援還在等（2026 年中）。
+Flash 4 發布時只有前向傳遞。訓練仍用 Flash 3。Flash 4 的 GQA 和 varlen 支援還在等（2026 年中）。
 
 ### 推測解碼（speculative decoding）——另一個延遲（latency）勝利
 
-便宜模型提出 N 個 token。大模型平行驗證全部 N 個。如果驗證接受 k 個 token，你付 1 次大模型前向，換 k 次生成。程式碼和散文上典型的 k 是 3 到 5。
+便宜模型提出 N 個 token。大模型平行驗證全部 N 個。如果驗證接受 k 個 token，你付 1 次大模型前向傳遞，換 k 次生成。程式碼和散文上典型的 k 是 3 到 5。
 
 2026 年的預設：
-
-- **EAGLE 2／Medusa。** 整合的草稿頭，共用驗證器的隱藏狀態（hidden state）。2 到 3 倍加速，品質不掉。
-- **用草稿模型的推測解碼。** 消費級硬體上 2 到 4 倍加速。
+- **EAGLE 2／Medusa。** 整合的草稿頭，共用驗證器的隱藏狀態（hidden state）。2 到 3 倍的加速比，品質不掉。
+- **用草稿模型的推測解碼。** 消費級硬體上 2 到 4 倍的加速比。
 - **Lookahead 解碼。** Jacobi 迭代；不需要草稿模型。小眾但免費。
 
 ### 連續批次（continuous batching）
@@ -171,7 +170,7 @@ def tiled_softmax_dot(q, K, V, tile=4):
     return [o / s for o in out]
 ```
 
-和一次算完的 `softmax(qK) V` 輸出與一次計算完全相同，但任何時刻的工作集是一個 `tile × d_head` 區塊，不是完整的 `N × d_head`。
+和一次算完的 `softmax(qK) V` 輸出與一次計算完全相同，但任何時刻的工作集（working set）是一個 `tile × d_head` 區塊，不是完整的 `N × d_head`。
 
 ### 步驟 3：在 100 個 token 的生成上比較單純解碼和有快取的解碼
 
@@ -201,7 +200,7 @@ vllm serve meta-llama/Llama-3.1-70B-Instruct \
     --kv-cache-dtype fp8
 ```
 
-跨請求的前綴快取是 2026 年的大勝利——同一個系統 prompt、few-shot 範例、或長脈絡文件，跨呼叫重用 KV。對工具 prompt 一直重複的 agent 工作負載，前綴快取常常是 5 倍吞吐量。
+跨請求的前綴快取（prefix caching）是 2026 年的大勝利——同一個系統 prompt、few-shot 範例、或長脈絡文件，跨呼叫重用 KV。對工具 prompt 一直重複的 agent 工作負載，前綴快取常常是 5 倍吞吐量。
 
 ## Ship It｜交付成果
 
@@ -210,7 +209,7 @@ vllm serve meta-llama/Llama-3.1-70B-Instruct \
 ## Exercises｜練習
 
 1. **簡單。** 跑 `code/main.py`。確認樸素解碼器和有快取的解碼器輸出相同；注意運算次數的差。
-2. **中等。** 實作前綴快取：給定 prompt P 和幾個補完，對 P 跑一次前向把 KV cache 填滿，再按每個補完分岔。量相對每次重新編碼 P 的加速。
+2. **中等。** 實作前綴快取：給定 prompt P 和幾個補完，對 P 跑一次前向傳遞把 KV cache 填滿，再按每個補完分岔。量相對每次重新編碼 P 的加速比。
 3. **困難。** 實作玩具 PagedAttention：KV cache 放在固定 16 個 token 的區塊，配空閒清單。序列結束就把區塊還回池子。模擬 1000 個長度不一的聊天補完。比記憶體碎片化和連續配置。
 
 ## Key Terms｜關鍵術語
@@ -231,7 +230,7 @@ vllm serve meta-llama/Llama-3.1-70B-Instruct \
 - [Dao et al. (2022). FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness](https://arxiv.org/abs/2205.14135) ——Flash 1。
 - [Dao (2023). FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning](https://arxiv.org/abs/2307.08691) ——Flash 2。
 - [Shah et al. (2024). FlashAttention-3: Fast and Accurate Attention with Asynchrony and Low-precision](https://arxiv.org/abs/2407.08608) ——Flash 3。
-- [FlashAttention-4 release notes (Dao-AILab, 2026)](https://github.com/Dao-AILab/flash-attention) ——Blackwell 五階段管線和軟體 exp2 手法；讀 repo README，看這一課提到的「只有前向」發布限制。
+- [FlashAttention-4 release notes (Dao-AILab, 2026)](https://github.com/Dao-AILab/flash-attention) ——Blackwell 五階段管線和軟體 exp2 手法；讀 repo README，看這一課提到的「只有前向傳遞」發布限制。
 - [Kwon et al. (2023). Efficient Memory Management for Large Language Model Serving with PagedAttention](https://arxiv.org/abs/2309.06180) ——vLLM 論文。
 - [Leviathan et al. (2023). Fast Inference from Transformers via Speculative Decoding](https://arxiv.org/abs/2211.17192) ——推測解碼。
 - [Li et al. (2024). EAGLE: Speculative Sampling Requires Rethinking Feature Uncertainty](https://arxiv.org/abs/2401.15077) ——EAGLE-1／2 論文，整合草稿的做法，這一課引用的就是它。
