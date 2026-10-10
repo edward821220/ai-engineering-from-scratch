@@ -881,6 +881,9 @@
 | teacher forcing | teacher forcing | 是 |  | 訓練時餵標準結果的前一個 token。 |
 | exposure bias | 暴露偏差 | 否 |  | 訓練用真 token、推論用自己的預測，造成的落差。 |
 | beam search | 集束搜尋 | 否 |  | 每一步保留前 k 條部分序列。 |
+| hallucination | 幻覺 | 否 |  | 模型輸出來源沒有支撐的內容。 |
+| cross-attention | 交叉注意力 | 否 |  | 解碼器對編碼器狀態做的注意力。 |
+| constrained decoding | 約束解碼 | 否 |  | 強迫某些 token 出現或不出現。 |
 | RNN | RNN | 是 |  | recurrent neural network 縮寫。 |
 | data augmentation | 資料增強 | 否 |  | 以變換擴增訓練資料。 |
 | dynamical system | 動態系統 | 否 |  | 狀態隨時間演化的系統。 |
