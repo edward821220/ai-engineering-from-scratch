@@ -41,14 +41,14 @@ Bahdanau、Cho 和 Bengio 在 2014 年發表了一個三行的修法。不要只
 | 注意力權重 `α_{t,i}` | 純量 | 對所有 `i` 做完 softmax 之後 |
 | 脈絡向量 `c_t` | `(d_h,)` | 和一個編碼器狀態同形 |
 
-**Bahdanau（加法）分數。** `e_{t,i} = v_α^T * tanh(W_a * s_{t-1} + U_a * h_i)`。
+**Bahdanau（加法注意力，additive attention）分數。** `e_{t,i} = v_α^T * tanh(W_a * s_{t-1} + U_a * h_i)`。
 
 - `s_{t-1}` 的形狀是 `(d_s,)`，`h_i` 的形狀是 `(d_h,)`。
 - `W_a` 的形狀是 `(d_attn, d_s)`。`U_a` 的形狀是 `(d_attn, d_h)`。
 - tanh 裡面的和，形狀是 `(d_attn,)`。
 - `v_α` 的形狀是 `(d_attn,)`。和 `v_α` 的內積縮成一個純量。**`v_α` 做的就是這件事。** 不是魔法。它是把注意力維度（dimension）的向量投影成純量分數的那個投影。
 
-**Luong（乘法）分數。** 三種：
+**Luong（乘法注意力，multiplicative attention）分數。** 三種：
 
 - `dot`：`e_{t,i} = s_t^T * h_i`。要求 `d_s == d_h`。硬約束。編碼器若是雙向就跳過。
 - `general`：`e_{t,i} = s_t^T * W * h_i`，`W` 的形狀是 `(d_s, d_h)`。拿掉維度必須相等的約束。
@@ -102,7 +102,7 @@ def general_attention(decoder_state, encoder_states, W):
     return weights @ encoder_states, weights
 ```
 
-各三行。這就是 這正是 Luong 方法受到採用的原因的原因。多數任務準確率一樣，程式少非常多。
+各三行。這正是 Luong 方法受到採用的原因。多數任務準確率一樣，程式少非常多。
 
 ### 步驟 3：完整數值範例
 
