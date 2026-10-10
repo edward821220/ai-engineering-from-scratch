@@ -24,7 +24,7 @@
 
 現在試試 70B 參數。光是 FP16 權重就需要 140GB。單張 GPU 根本裝不下。你至少需要 2 張 A100（2 x 80GB = 160GB）才能僅僅裝下權重。加上最佳化器狀態與梯度後，需求遠超於此：最少需要 3 張以上 GPU，而實務上根據分片策略通常需要 8 到 16 張。
 
-Llama 3 405B 是在 16,384 張 NVIDIA H100 GPU 上訓練完成的。The training run cost an estimated $100 million in compute. DeepSeek V3 trained a comparable model for roughly $5.6 million（估計約 1 億美元對比約 560 萬美元），全靠巧妙的架構設計（混合專家 MoE，意味著每個 token 僅啟動一小部分參數）與極致的訓練效率。
+Llama 3 405B 是在 16,384 張 NVIDIA H100 GPU 上訓練完成的，該次訓練的運算成本估計約 1 億美元；而 DeepSeek V3 訓練出能力相當的模型僅花費約 560 萬美元，全靠巧妙的架構設計（混合專家 MoE，意味著每個 token 僅啟動一小部分參數）與極致的訓練效率。
 
 本課涵蓋實現大規模訓練的四種策略：資料平行（data parallelism）、張量平行（tensor parallelism）、管線平行（pipeline parallelism）以及全分片資料平行（fully sharded data parallelism）。你將在純 Python 中模擬這每一種策略，在接觸複雜的分散式訓練框架之前了解各策略的運作機制。
 
@@ -214,7 +214,7 @@ Google 的 TPU 原生使用 BF16。NVIDIA 的 A100 與 H100 同時支援 FP16 �
 
 這種 3D 分解（8 x 16 x 128 = 16,384）正是擴展至數千張 GPU 的方法。每張 GPU 處理不同的資料分片（資料平行）、持有每一層的一塊切片（張量平行），並計算不同的一組層（管線平行）。
 
-DeepSeek V3 採取了不同策略。他們的混合專家架構每個 token 僅啟動 6,710 億參數中的 370 億參數。這意味著每張 GPU 僅需計算並儲存活躍參數的活化值。他們在 2,048 張 H800 GPU（不到 Meta GPU 數量的八分之一）上完成了訓練，成本為 $5.6M vs Meta's estimated $100M（約 560 萬美元對比 Meta 估計的 1 億美元）。
+DeepSeek V3 採取了不同策略。他們的混合專家架構每個 token 僅啟動 6,710 億參數中的 370 億參數。這意味著每張 GPU 僅需計算並儲存活躍參數的活化值。他們在 2,048 張 H800 GPU（不到 Meta GPU 數量的八分之一）上完成了訓練，成本約為 560 萬美元，對比 Meta 估計的 1 億美元。
 
 ```mermaid
 graph TD
@@ -543,7 +543,7 @@ def run_all_demos():
 
 3. 實作梯度累積模擬器。與其在每個微批次後都進行 all-reduce，不如在本地累積 K 步梯度後再進行 all-reduce。展示這如何將通訊量減少 K 倍，同時產出完全相同的最終梯度（從而產生完全相同的訓練結果）。
 
-4. 打造成本估算器。給定模型大小、目標 token 數、GPU 類型（A100 at $2/hr, H100 at $3.50/hr）以及平行策略，估算總美元訓練成本。與已知成本進行比對驗證：Llama 3 405B reportedly cost ~$100M, DeepSeek V3 cost ~$5.6M（傳聞 Llama 3 405B 約 1 億美元，DeepSeek V3 約 560 萬美元）。
+4. 打造成本估算器。給定模型大小、目標 token 數、GPU 類型（A100 每小時 2 美元，H100 每小時 3.50 美元）以及平行策略，估算總美元訓練成本。與已知成本進行比對驗證：Llama 3 405B 據報約 1 億美元，DeepSeek V3 約 560 萬美元。
 
 5. 為記憶體計算器新增 ZeRO-Offload。假設每個節點的 CPU RAM 為 512GB，NVMe 為 2TB。展示將最佳化器狀態卸載至 CPU 如何讓 70B 模型在 4 張 GPU 上訓練而非 16 張，其代價是最佳化器步驟慢 30 到 50%。
 

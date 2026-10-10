@@ -187,7 +187,7 @@ graph LR
 
 趨勢非常明顯：詞彙表正在持續擴大。GPT-2 使用 50,257。GPT-4 使用約 10 萬。Llama 3 使用 12.8 萬。GPT-4o 使用 20 萬。
 
-| Model | Vocab Size | Tokenizer Type | Avg Tokens per English Word |
+| 模型 | 詞彙表大小 | Tokenizer 類型 | 平均每個英文單字的 Token 數 |
 |-------|-----------|----------------|---------------------------|
 | BERT | 30,522 | WordPiece | ~1.4 |
 | GPT-2 | 50,257 | Byte-level BPE | ~1.3 |
