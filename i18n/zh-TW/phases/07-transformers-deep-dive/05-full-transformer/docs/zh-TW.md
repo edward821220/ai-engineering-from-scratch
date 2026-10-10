@@ -9,11 +9,11 @@
 
 ## The Problem｜問題
 
-單一個注意力層是特徵（feature）抽取器，不是一個模型。每一層一次矩陣乘法，容量不夠做語言。你需要深度——沒有對的配管，深度會壞掉。
+單一個注意力層是特徵（feature）抽取器，不是一個模型。每一層一次矩陣乘法，容量不夠做語言。你需要深度——沒有適當的架構支撐，深度就會失效。
 
 2017 年 Vaswani 論文把六個設計決定包成一塊，把一層注意力變成可以疊的區塊。之後的每個 transformer——只有編碼器（BERT）、只有解碼器（GPT）、編碼器–解碼器（T5）——繼承同一副骨架。2026 年的區塊被修過（RMSNorm、SwiGLU、pre-norm、RoPE），骨架還是同一副。
 
-這一課是骨架。後面的課把它特化——06 是編碼器，07 是解碼器，08 是編碼器–解碼器。
+本課介紹的就是這副骨架。後面的課把它特化——06 是編碼器，07 是解碼器，08 是編碼器–解碼器。
 
 ## The Concept｜核心概念
 
@@ -21,14 +21,14 @@
 
 ### 六個零件
 
-1. **Embedding 加位置訊號。** Token 變成向量。位置用 RoPE（現代）或正弦（經典）注入。
+1. **Embedding 加位置訊號（position signal）。** Token 變成向量。位置用 RoPE（現代）或正弦（經典）注入。
 2. **自注意力。** 每個位置注意到其他每個位置。解碼器裡要遮罩。
 3. **前饋網路（feed-forward network，FFN）。** 逐位置的兩層 MLP：`W_2 · activation(W_1 · x)`。預設展開比 4 倍。
-4. **殘差連接。** `x + sublayer(x)`。沒有這個，梯度（gradient）大約過了 6 層就消失。
-5. **層正規化。** `LayerNorm` 或 `RMSNorm`（現代）。穩住殘差流。
+4. **殘差連接（residual connection）。** `x + sublayer(x)`。沒有這個，梯度（gradient）大約過了 6 層就消失。
+5. **層正規化（layer normalization）。** `LayerNorm` 或 `RMSNorm`（現代）。穩住殘差流（residual stream）。
 6. **交叉注意力（cross-attention，只有解碼器）。** 查詢來自解碼器，鍵和值來自編碼器輸出。
 
-看一個向量流過一個區塊：注意力在位置之間混合，殘差把它往前帶，FFN 把它變換，正規化讓這條流保持穩定。
+看一個向量流過一個區塊：注意力在位置之間混合，殘差連接把它往前傳遞，FFN 把它變換，正規化讓這條流保持穩定。
 
 ```figure
 transformer-block
@@ -55,24 +55,24 @@ x → LN → MHA(masked self) → + → LN → MHA(cross to encoder) → + → L
 
 ### Pre-norm 對 post-norm
 
-原始論文：`x + sublayer(LN(x))` 對 `LN(x + sublayer(x))`。Post-norm 大約在 2019 年失寵——沒有小心的預熱（warmup），很難訓練得很深。Pre-norm（子層*之前*先做 `LN`）是 2026 年的預設：Llama、Qwen、GPT-3 之後、Mistral 都用它。
+原始論文：`x + sublayer(LN(x))` 對 `LN(x + sublayer(x))`。Post-norm 大約在 2019 年前後逐漸不再採用——沒有小心的預熱（warmup），很難訓練得很深。Pre-norm（子層*之前*先做 `LN`）是 2026 年的預設：Llama、Qwen、GPT-3 之後、Mistral 都用它。
 
 ### 2026 年現代化的區塊
 
-Vaswani 2017 交付的是 LayerNorm 加 ReLU。現代的堆疊兩個都換掉了。正式環境（production）的區塊實際長這樣：
+原始的 Vaswani 2017 採用的是 LayerNorm 加 ReLU。現代的堆疊兩個都換掉了。正式環境（production）的區塊實際長這樣：
 
 | 元件（component） | 2017 | 2026 |
 |-----------|------|------|
 | 正規化 | LayerNorm | RMSNorm |
 | FFN 活化（activation） | ReLU | SwiGLU |
-| FFN 展開 | 4 倍 | 2.6 倍（SwiGLU 用三個矩陣，參數（parameter）總數對得上） |
+| FFN 展開 | 4 倍 | 2.6 倍（SwiGLU 用三個矩陣，參數（parameter）總數相符） |
 | 位置 | 絕對正弦 | RoPE |
 | 注意力 | 完整 MHA | GQA（或 MLA） |
 | 偏置項（bias） | 有 | 沒有 |
 
 RMSNorm 拿掉 LayerNorm 的平均數（mean）對中（少一次減法），省計算，經驗上至少一樣穩。SwiGLU（`Swish(W1 x) ⊙ W3 x`）在 Llama、PaLM、Qwen 的論文裡，穩定比 ReLU／GELU 的 FFN 好大約 0.5 點困惑度（perplexity）。
 
-### 參數數量
+### 參數數量（parameter count）
 
 一個區塊，`d_model = d`，FFN 展開 `r`：
 
@@ -114,20 +114,20 @@ def decode(target_tokens, encoder_out, params):
     return x
 ```
 
-### 步驟 3：在玩具例子上做前向
+### 步驟 3：在玩具例子上做前向傳遞
 
 送進 6 個 token 的來源和 5 個 token 的目標。確認輸出形狀是 `(5, vocab)`。沒有訓練——這一課講的是架構，不是損失（loss）。
 
 ### 步驟 4：換成 RMSNorm 加 SwiGLU
 
-把 LayerNorm 和 ReLU-FFN 換成 RMSNorm 和 SwiGLU。確認形狀仍然對得上。這就是 2026 年的現代化，只換一個函式。
+把 LayerNorm 和 ReLU-FFN 換成 RMSNorm 和 SwiGLU。確認形狀仍然相符。這就是 2026 年的現代化，只換一個函式。
 
 ## Use It｜實際應用
 
 PyTorch／TF 的參考實作：`nn.TransformerEncoderLayer`、`nn.TransformerDecoderLayer`。但 2026 年大多數正式環境程式自己寫區塊，因為：
 
 - Flash Attention 是在注意力裡面呼叫，不經過 `nn.MultiheadAttention`。
-- GQA／MLA 不在標準函式庫（library）的參考裡。
+- GQA／MLA 不在標準函式庫（library）的參考實作裡。
 - RoPE、RMSNorm、SwiGLU 不是 PyTorch 的預設。
 
 HF 的 `transformers` 有乾淨的參考區塊，你該讀：`modeling_llama.py` 是 2026 年標準的純解碼器區塊。大約 500 行，值得走一次。
@@ -140,7 +140,7 @@ HF 的 `transformers` 有乾淨的參考區塊，你該讀：`modeling_llama.py`
 | 文字生成、聊天、程式碼、推理 | 只有解碼器 | GPT、Llama、Claude、Qwen |
 | 結構化輸入到結構化輸出（翻譯、摘要） | 編碼器–解碼器 | T5、BART、Whisper |
 
-只有解碼器贏了語言，因為它縮放最乾淨，理解和生成都處理。輸入有清楚的「來源序列」身份時（翻譯、語音辨識、結構化任務），編碼器–解碼器仍然最好。
+只有解碼器贏了語言，因為它縮放最乾淨，理解和生成都處理。輸入有清楚的「來源序列」身份時（翻譯、語音辨識、結構化任務），編碼器–解碼器仍是表現最佳的架構。
 
 ## Ship It｜交付成果
 
