@@ -17,21 +17,21 @@
 
 ![Audio classification ladder: k-NN on MFCCs to AST to BEATs](../assets/audio-classification.svg)
 
-**MFCC 上的 k-NN（1990 年代的基準模型）。** 把每一段的 MFCC 攤平，和一座標過的庫算餘弦相似度，回前 K 名的多數決。在乾淨、小的資料集（Speech Commands、ESC-50）上意外地強。不用 GPU。
+**MFCC 上的 k-NN（1990 年代的基準模型）。** 把每一段的 MFCC 攤平，與已標註的資料庫計算餘弦相似度（cosine similarity），再以前 K 名的多數決分類。在乾淨、小的資料集（Speech Commands、ESC-50）上意外地強。不用 GPU。
 
 **對數 mel 上的 2D CNN（2015 到 2019）。** 把 `(T, n_mels)` 的對數 mel 當成影像。用 ResNet-18 或 VGG 風格。時間軸做全域平均池化。類別上做 softmax。2026 年大多數 kaggle 比賽裡，這仍然是基準模型。
 
-**音訊頻譜圖 transformer，AST（2021 到 2024）。** 把對數 mel 切成小塊（例如 16×16），加上位置 embedding，送進 ViT。監督式學習在 AudioSet 上是當時最好（mAP 0.485）。
+**音訊頻譜圖 transformer，AST（2021 到 2024）。** 把對數 mel 切成小塊（例如 16×16），加上位置 embedding，送進 ViT。監督式學習（supervised learning）在 AudioSet 上是當時最好（mAP 0.485）。
 
 **BEATs 和 WavLM-base（2024 到 2026）。** 在數百萬小時上做自監督預訓練。再用你本來需要的監督資料的 1% 到 10% 來 fine-tune。2026 年，非語音音訊的預設起點是這個。BEATs-iter3 在 AudioSet 上比 AST 高 1 到 2 個 mAP，計算量只有四分之一。
 
 **凍結的 Whisper 編碼器當骨幹（2024）。** 拿 Whisper 的編碼器，拿掉解碼器，接一個線性分類器。語言識別和簡單事件分類上接近目前最好，而且完全不用音訊增強。這是「白送」的基準模型。
 
-### 真正的挑戰是類別不平衡
+### 真正的挑戰是類別不平衡（class imbalance）
 
 ESC-50：50 類，每類 40 段，平衡，容易。UrbanSound8K：10 類，不平衡到 10 比 1。AudioSet：632 類，長尾到 100,000 比 1。行得通的做法：
 
-- 訓練時平衡抽樣（評估時不要）。
+- 訓練時使用平衡抽樣（balanced sampling），評估時不用。
 - Mixup：把兩段片段和它們的標籤線性內插，當增強。
 - SpecAugment：遮掉隨機的時間帶和頻率帶。簡單，但是要緊。
 
@@ -78,7 +78,7 @@ def summarize(mfcc_frames):
     return mean + var
 ```
 
-簡單但強：沿時間的平均加變異，給 13 係數 MFCC 一個 26 維的固定 embedding。馬上跑完。直到 2017 年，這種方法在 ESC-50 上仍勝過當時最佳的神經網路基準，這還打贏 ESC-50 上當時最好的神經網路基準。
+簡單但強：沿時間的平均加變異，給 13 係數 MFCC 一個 26 維的固定 embedding。馬上跑完。直到 2017 年，這種方法在 ESC-50 上仍勝過當時最佳的神經網路基準。
 
 ### 步驟 3：k-NN
 
@@ -158,9 +158,9 @@ logits = model(**inputs).logits
 
 ## Exercises｜練習
 
-1. **簡單。** 跑 `code/main.py`。它在 4 類合成資料集（不同音高的純音）上訓練 k-NN MFCC 基準模型。回報混淆矩陣。
+1. **簡單。** 跑 `code/main.py`。它在 4 類合成資料集（不同音高的純音）上訓練 k-NN MFCC 基準模型。回報混淆矩陣（confusion matrix）。
 2. **中等。** 把 `summarize` 換成［平均、變異、偏度、峰度］。在同一份合成資料集上，四階動差池化會不會贏過平均加變異？
-3. **困難。** 用 `torchaudio` 在 ESC-50 第 1 折上訓練 2D CNN。回報 5 折交叉驗證準確率。加上 SpecAugment（時間遮罩 20、頻率遮罩 10），回報差多少。
+3. **困難。** 用 `torchaudio` 在 ESC-50 第 1 折上訓練 2D CNN。回報 5 折交叉驗證（cross-validation）準確率。加上 SpecAugment（時間遮罩 20、頻率遮罩 10），回報差多少。
 
 ## Key Terms｜關鍵術語
 
