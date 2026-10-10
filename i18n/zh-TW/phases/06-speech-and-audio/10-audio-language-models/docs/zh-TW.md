@@ -1,6 +1,6 @@
-# 音訊語言模型：Qwen2.5-Omni、Audio Flamingo、GPT-4o Audio
+# 音訊語言模型（audio-language model）：Qwen2.5-Omni、Audio Flamingo、GPT-4o Audio
 
-> 2026 年的音訊語言模型，在語音、環境聲、音樂上推理。Qwen2.5-Omni-7B 在 MMAU-Pro 上和 GPT-4o Audio 打平。Audio Flamingo Next 在 LongAudioBench 上超過 Gemini 2.5 Pro。開放和封閉的開放模型與封閉模型的差距幾乎消失。多音訊任務除外，那裡大家都接近亂猜。
+> 2026 年的音訊語言模型，在語音、環境聲、音樂上推理。Qwen2.5-Omni-7B 在 MMAU-Pro 上和 GPT-4o Audio 打平。Audio Flamingo Next 在 LongAudioBench 上超過 Gemini 2.5 Pro。開放模型與封閉模型的差距幾乎消失。多音訊（multi-audio）任務除外，那裡大家都接近亂猜。
 
 **Type:** Learn
 **Languages:** Python
@@ -9,14 +9,14 @@
 
 ## The Problem｜問題
 
-你有 5 秒音訊：狗叫，有人喊「stop!」，然後靜音。有用的問題跨好幾個軸：
+你有 5 秒音訊：狗叫，有人喊「stop!」，然後靜音。有用的問題涵蓋多個面向：
 
 - **轉錄。** 「說了什麼？」這屬於 ASR 的範疇。
-- **語意推理。** 「這個人有沒有危險？」要把狗叫、喊聲、靜音合在一起懂。
+- **語意推理（semantic reasoning）。** 「這個人有沒有危險？」要把狗叫、喊聲、靜音合在一起懂。
 - **音樂推理。** 「旋律是哪些樂器在演奏？」
 - **長音訊檢索。** 「這堂 90 分鐘的課，講師在哪裡解釋梯度下降法？」
 
-一個模型、一個 prompt，把這些都答出來，就是**音訊語言模型**（LALM／ALM）。和純 ASR 分開：LALM 產出自由形式的自然語言答案，不只是逐字稿。
+一個模型、一個 prompt，把這些都答出來，就是**音訊語言模型**（LALM／ALM）。和純 ASR 分開：LALM 產出開放式自然語言回答，不只是逐字稿。
 
 ## The Concept｜核心概念
 
@@ -26,15 +26,15 @@
 
 2026 年每一個 LALM 骨架都一樣：
 
-1. **音訊編碼器。** Whisper 編碼器、BEATs、CLAP、WavLM，或每個模型自己的編碼器。
-2. **投影器（projector）。** 線性層或 MLP，把音訊編碼器的特徵（feature）接到 LLM 的 token embedding 空間。
+1. **音訊編碼器（audio encoder）。** Whisper 編碼器、BEATs、CLAP、WavLM，或每個模型自己的編碼器。
+2. **投影器（projector）。** 線性層或 MLP，將音訊編碼器的特徵（feature）映射到 LLM 的 token embedding 空間。
 3. **LLM。** 以 Llama、Qwen、Gemma 為基礎的解碼器。吃交錯的文字和音訊 token，再生成文字。
 
 訓練：
 
 - **第 1 階段。** 凍結編碼器和 LLM。只用 ASR 或說明文字資料訓練投影器。
 - **第 2 階段。** 在遵循指令的音訊任務上做完整或 LoRA fine-tune（問答、推理、音樂理解）。
-- **第 3 階段（可選）。** 語音進、語音出，加上語音解碼器。Qwen2.5-Omni 和 AF3-Chat 做這個。
+- **第 3 階段（可選）。** 語音輸入、語音輸出，加上語音解碼器。Qwen2.5-Omni 和 AF3-Chat 做這個。
 
 ### 2026 年的模型版圖
 
@@ -63,20 +63,20 @@
 | Audio Flamingo 3 | 約 54% | — | — | — | — |
 | Audio Flamingo Next | LongAudioBench 上的目前最好 | — | — | — | — |
 
-**多音訊這一欄對每個人都難看。** 4 選 1 的隨機是 25%。大多數模型就在那附近。LALM 仍然很難比較兩段片段。
+**多音訊這一欄對所有模型都很不利。** 4 選 1 的隨機是 25%。大多數模型就在那附近。LALM 仍然很難比較兩段片段。
 
 ### 2026 年 LALM 有用的地方
 
 - **客服錄音的合規稽核。** 「專員有沒有提到規定要講的揭露？」
 - **無障礙。** 向聽障使用者描述聲音事件（不只是轉錄）。
 - **內容審核。** 偵測暴力語言、威脅的語氣、背景脈絡。
-- **Podcast 或會議分章。** 語意摘要，不只是說話人輪次。
+- **Podcast 或會議分章。** 語意摘要，不只是說話者輪替。
 - **音樂目錄分析。** 「找出所有 B 段有轉調的曲目。」
 
 ### 它們還沒有用的地方
 
 - 細到和弦以下的樂理。
-- 長對話裡歸給說話人的推理（超過 10 分鐘就變差）。
+- 長對話裡的說話者歸屬推理（超過 10 分鐘就變差）。
 - 多音訊比較（22% 到 26% 只比亂猜高一點）。
 - 即時串流推理（大多數是離線批次推論）。
 
@@ -140,7 +140,7 @@ for item in mcq:
 print(f"Accuracy: {correct / len(mcq):.3f}")
 ```
 
-`audio_path` 指向資料集儲存庫裡的 `data.zip`（大約 47 GB），評分前要先下載並解壓。這個完全匹配的迴圈是健全性檢查，不是基準的計分器，所以數字不能和公開的 MMAU-Pro 結果比。官方評估器用 embedding 相似度（NV-Embed-v2）對多選題，用 LLM 裁判給開放題評分，用正則規則檢查遵循指令的答案：把預測寫進 `model_output` 欄，再跑 [MMAU-Pro repo](https://github.com/sonalkum/MMAUPro) 的 `evaluate_mmau_pro_comprehensive.py`。每個 `category`（語音、聲音、音樂、多音訊，以及其他）分開報。總分會把模型失敗的地方藏起來。
+`audio_path` 指向資料集儲存庫裡的 `data.zip`（大約 47 GB），評分前要先下載並解壓。這個精確比對迴圈是健全性檢查，不是基準的計分器，所以數字不能和公開的 MMAU-Pro 結果比。官方評估器用 embedding 相似度（NV-Embed-v2）對多選題，用 LLM 裁判給開放題評分，用正則規則檢查遵循指令的答案：把預測寫進 `model_output` 欄，再跑 [MMAU-Pro repo](https://github.com/sonalkum/MMAUPro) 的 `evaluate_mmau_pro_comprehensive.py`。每個 `category`（語音、聲音、音樂、多音訊，以及其他）分開報。總分會把模型失敗的地方藏起來。
 
 ## Use It｜實際應用
 
@@ -149,16 +149,16 @@ print(f"Accuracy: {correct / len(mcq):.3f}")
 | 自由形式的音訊問答（開放） | Qwen2.5-Omni-7B |
 | 長音訊上最好的開放模型 | Audio Flamingo Next |
 | 最好的封閉模型 | Gemini 2.5 Pro |
-| 語音進、語音出的代理 | Qwen2.5-Omni 或 GPT-4o Audio |
+| 語音進、語音出的 agent | Qwen2.5-Omni 或 GPT-4o Audio |
 | 音樂推理 | Audio Flamingo 3 或 2（專門做音樂的 AF-CLAP） |
 | 客服稽核 | 經 API 的 Gemini 2.5 Pro，再用 RAG 查你的政策文件 |
 
 ## Pitfalls｜容易踩的坑
 
 - **多音訊上過度信任。** 如果任務是「哪一段有 X」，接近亂猜的表現是真的。
-- **長音訊變差。** 超過 10 分鐘，大多數模型的說話人歸屬就壞了。先做說話人分離（第 6 課），再摘要。
-- **靜音上的幻覺。** 和 Whisper 同一類問題，用 Whisper 編碼器的 LALM 繼承了它。用 VAD 當閘。
-- **基準挑最好看的。** 廠商部落格突出最好的類別。多音訊子集要自己跑 MMAU-Pro。
+- **長音訊變差。** 超過 10 分鐘，大多數模型的說話人歸屬（speaker attribution）就失效了。先做說話人分離（第 6 課），再摘要。
+- **靜音上的幻覺。** 和 Whisper 同一類問題，用 Whisper 編碼器的 LALM 繼承了它。用 VAD 當閘門。
+- **挑選對自己有利的基準結果。** 廠商部落格突出最好的類別。多音訊子集要自己跑 MMAU-Pro。
 
 ## Ship It｜交付成果
 
@@ -168,7 +168,7 @@ print(f"Accuracy: {correct / len(mcq):.3f}")
 
 1. **簡單。** 跑 `code/main.py`，看玩具投影器模式，以及假的 LALM 怎麼把（音訊 embedding、文字 token）路由到輸出 token。
 2. **中等。** 在 100 題 MMAU-Pro 語音題上給 Qwen2.5-Omni-7B 評分。和論文報的數字比。
-3. **困難。** 做一個最小的音訊說明文字基準模型：BEATs 編碼器加 2 層投影器加凍結的 Llama-3.2-1B。只 fine-tune 投影器，資料用 AudioCaps。在 Clotho-AQA 上和 SALMONN 比。
+3. **困難。** 做一個最小的音訊說明文字（audio captioning）基準模型：BEATs 編碼器加 2 層投影器加凍結的 Llama-3.2-1B。只 fine-tune 投影器，資料用 AudioCaps。在 Clotho-AQA 上和 SALMONN 比。
 
 ## Key Terms｜關鍵術語
 
