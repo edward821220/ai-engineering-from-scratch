@@ -4,5 +4,6 @@
   "phases/03-deep-learning-core/03-backpropagation/docs/en.md": "e481014372b43289e15b4d7b70a4045eb786168afb10fe15d1fff84b4bccb7ee",
   "phases/03-deep-learning-core/04-activation-functions/docs/en.md": "da086a041c9bd97f2465a02c2f3a877eb997969ef5e39f9b8d9585f38370aca3",
   "phases/03-deep-learning-core/05-loss-functions/docs/en.md": "aa64f3d64a9dab9b7e68b117158d8876bf350adc30d2cd3cddf4d11702d3085c",
-  "phases/03-deep-learning-core/06-optimizers/docs/en.md": "9af59689813d171106b558fca9875f7992c8e834b8d7a69310bbaf7428ff9ad9"
+  "phases/03-deep-learning-core/06-optimizers/docs/en.md": "9af59689813d171106b558fca9875f7992c8e834b8d7a69310bbaf7428ff9ad9",
+  "phases/03-deep-learning-core/07-regularization/docs/en.md": "c6e31ead99cce8cf40dda09a94a3a2b95978f162e4fe67bc3f3e1b9763ae170d"
 }
