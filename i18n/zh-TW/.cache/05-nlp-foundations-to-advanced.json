@@ -4,5 +4,6 @@
   "phases/05-nlp-foundations-to-advanced/03-word-embeddings-word2vec/docs/en.md": "566500e6c43ebc3624a117e76843be1100be7951ac7780c37f15241299846b27",
   "phases/05-nlp-foundations-to-advanced/04-glove-fasttext-subword/docs/en.md": "b92cf9d14b8729b4a378b0b4f468f4d957f6600c15d876b091d8dec54d8d3e47",
   "phases/05-nlp-foundations-to-advanced/05-sentiment-analysis/docs/en.md": "6c0d5587fd261631bbf70042e355315dd840b25ea237f8525e5970dd10f87534",
-  "phases/05-nlp-foundations-to-advanced/06-named-entity-recognition/docs/en.md": "1234e5808229ac25f3c65b1fe1baab736e525591c4cf847cc28690af25d46e71"
+  "phases/05-nlp-foundations-to-advanced/06-named-entity-recognition/docs/en.md": "1234e5808229ac25f3c65b1fe1baab736e525591c4cf847cc28690af25d46e71",
+  "phases/05-nlp-foundations-to-advanced/07-pos-tagging-parsing/docs/en.md": "05fb67fdbec5afafc9e35f4d96de29663c1a37022ad70bbe3f97e804366c8a6e"
 }
