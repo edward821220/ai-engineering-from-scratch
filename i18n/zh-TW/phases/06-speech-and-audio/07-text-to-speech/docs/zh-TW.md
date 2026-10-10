@@ -1,6 +1,6 @@
 # 文字轉語音（TTS）：從 Tacotron 到 F5 與 Kokoro
 
-> ASR 將語音轉成文字。TTS 把文字倒成語音。2026 年的堆疊是三塊：文字到 token，token 到 mel，mel 到波形。每一塊都有一個筆電放得下的預設模型。
+> ASR 將語音轉成文字。TTS 把文字倒成語音。2026 年的堆疊是三塊：文字到 token，token 到梅爾頻譜圖（mel-spectrogram），梅爾頻譜圖到波形。每一塊都有一個筆電放得下的預設模型。
 
 **Type:** Build
 **Languages:** Python
@@ -9,25 +9,25 @@
 
 ## The Problem｜問題
 
-你有一個字串：「Please remind me to water the plants at 6 pm.」。你要一段 3 秒的音訊，聽起來自然，韻律正確（停頓、重音），「plants」的母音對，而且即時語音助理在 CPU 上要在 300 毫秒以內跑完。你還要能換聲音、處理語碼轉換的輸入（「remind me at 6 pm, daijoubu?」），名字不能念得丟臉。
+你有一個字串：「Please remind me to water the plants at 6 pm.」。你要一段 3 秒的音訊，聽起來自然，韻律（prosody）正確（停頓、重音），「plants」的母音發對，而且即時語音助理在 CPU 上要在 300 毫秒以內跑完。你還要能換聲音、處理語碼轉換的輸入（「remind me at 6 pm, daijoubu?」），名字不能念得丟臉。
 
 現代 TTS 管線（pipeline）長這樣：
 
-1. **文字前端。** 正規化文字（日期、數字、電子郵件），轉成音素或子詞 token，預測韻律特徵（feature）。
-2. **聲學模型。** 文字到 mel 頻譜圖。Tacotron 2（2017）、FastSpeech 2（2020）、VITS（2021）、F5-TTS（2024）、Kokoro（2024）。
-3. **聲碼器。** Mel 到波形。WaveNet（2016）、WaveRNN、HiFi-GAN（2020）、BigVGAN（2022）、2024 年之後的神經編解碼器聲碼器。
+1. **文字前端。** 正規化文字（日期、數字、電子郵件），轉成音素（phoneme）或子詞 token，預測韻律特徵（feature）。
+2. **聲學模型。** 文字到梅爾頻譜圖。Tacotron 2（2017）、FastSpeech 2（2020）、VITS（2021）、F5-TTS（2024）、Kokoro（2024）。
+3. **聲碼器（vocoder）。** 梅爾頻譜圖到波形。WaveNet（2016）、WaveRNN、HiFi-GAN（2020）、BigVGAN（2022）、2024 年之後的神經編解碼器聲碼器。
 
-2026 年，聲學模型和聲碼器的分界，被端到端擴散和流匹配模型弄模糊。但除錯時，三塊的心智模型仍然成立。
+2026 年，端到端擴散和流匹配（flow matching）模型讓聲學模型和聲碼器之間的分界變得模糊。但除錯時，三塊的心智模型仍然成立。
 
 ## The Concept｜核心概念
 
 ![Tacotron, FastSpeech, VITS, F5/Kokoro side-by-side](../assets/tts.svg)
 
-**Tacotron 2（2017）。** 序列到序列：字元 embedding，到雙向 LSTM 編碼器，到對位置敏感的注意力，再到自迴歸 LSTM 解碼器，發出 mel 音框。慢（自迴歸），長文本上不穩。仍然被當成基準模型（baseline）引用。
+**Tacotron 2（2017）。** 序列到序列：字元 embedding，到雙向 LSTM 編碼器，到對位置敏感的注意力，再到自迴歸 LSTM 解碼器，發出梅爾音框。慢（自迴歸），長文本上不穩。仍然被當成基準模型（baseline）引用。
 
-**FastSpeech 2（2020）。** 非自迴歸。時長預測器輸出每個音素佔幾個 mel 音框。一輪就完成，比 Tacotron 快 10 倍。自然度少一些（單調對齊），但到處都在交付。
+**FastSpeech 2（2020）。** 非自迴歸。時長預測器輸出每個音素佔幾個梅爾音框。一輪就完成，比 Tacotron 快 10 倍。自然度少一些（單調對齊），但到處都在交付。
 
-**VITS（2021）。** 編碼器、以流為基礎的時長、HiFi-GAN 聲碼器一起端到端訓練，用變分推論。品質高，單一模型。2022 到 2024 開放原始碼 TTS 的主力。變體：YourTTS（多說話人零樣本）、XTTS v2（2024，Coqui）。
+**VITS（2021）。** 編碼器、以流為基礎的時長、HiFi-GAN 聲碼器一起端到端訓練，用變分推論（variational inference）。品質高，單一模型。2022 到 2024 開放原始碼 TTS 的主力。變體：YourTTS（多說話人零樣本）、XTTS v2（2024，Coqui）。
 
 **F5-TTS（2024）。** 流匹配上的擴散 transformer。韻律自然，5 秒參考音訊就能零樣本聲音仿製（voice cloning）。2026 年開放原始碼 TTS 排行榜的頂端。3.35 億參數（parameter）。
 
@@ -45,12 +45,12 @@
 | 2022 | BigVGAN | 50 倍即時 | 跨說話人和語言泛化 |
 | 2024 | SNAC、DAC（神經編解碼器） | 和自迴歸模型整合 | 離散 token、位元效率高 |
 
-到 2026 年，大多數「TTS」模型是從文字到波形的端到端。Mel 頻譜圖是內部表示。
+到 2026 年，大多數「TTS」模型是從文字到波形的端到端。梅爾頻譜圖是內部表示。
 
 ### 評估
 
 - **MOS（平均意見分數，Mean Opinion Score）。** 1 到 5 分，由群眾評分。仍然是黃金標準。慢得痛苦。
-- **CMOS（比較式 MOS）。** A 對 B 的偏好。每次標註的信賴區間更緊。
+- **CMOS（比較式 MOS）。** A 對 B 的偏好。每筆標註的信賴區間較窄。
 - **UTMOS、DNSMOS。** 無參考的神經 MOS 預測器。排行榜用。
 - **CER（字元錯誤率），經由 ASR。** 把 TTS 輸出丟進 Whisper，對輸入文字算 CER。可懂度的代理。
 - **SECS（說話人 embedding 的餘弦相似度）。** 聲音仿製的品質。
@@ -80,7 +80,7 @@ ph = phonemize("Hello world", language="en-us", backend="espeak")
 # 'həloʊ wɜːld'
 ```
 
-音素是通用的橋。品質低於 VITS 的東西，不要餵原始文字。
+音素是通用的橋梁。品質低於 VITS 的東西，不要餵原始文字。
 
 ### 步驟 2：跑 Kokoro（2026 年 CPU 的預設）
 
@@ -121,7 +121,7 @@ class HiFiGAN(nn.Module):
         return self.blocks(mel)  # -> waveform
 ```
 
-訓練：對抗（短視窗上的判別器）加 mel 頻譜圖重建損失加特徵匹配損失。已經商品化。用 `hifi-gan` 儲存庫或 nvidia-NeMo 的預訓練檢查點。
+訓練：對抗（短視窗上的判別器）加梅爾頻譜圖重建損失加特徵匹配損失。已成為成熟商品。用 `hifi-gan` 儲存庫或 nvidia-NeMo 的預訓練檢查點。
 
 ### 步驟 5：完整管線（偽程式）
 
@@ -146,7 +146,7 @@ soundfile.write("out.wav", wav, 24000)
 | 低資源語言 | 在 5 到 20 小時目標語言資料上訓練 VITS |
 | 有表現力／情緒標籤 | ElevenLabs v2.5，或 StyleTTS 2 fine-tune |
 
-到 2026 年，開放原始碼的領先是：**品質用 F5-TTS，效率用 Kokoro**。除非你在做歷史，否則不要去拿 Tacotron。
+到 2026 年，開放原始碼的領先是：**品質用 F5-TTS，效率用 Kokoro**。除非你是語音合成史的研究者，否則不要去拿 Tacotron。
 
 ## Pitfalls｜容易踩的坑
 
@@ -171,7 +171,7 @@ soundfile.write("out.wav", wav, 24000)
 |------|-----------------|-----------------------|
 | 音素 | 聲音單位 | 抽象的聲音類。英文有 39 個（ARPABet）。 |
 | 時長預測器 | 每個音素多長 | 非自迴歸模型的輸出。每個音素幾個整數框。 |
-| 聲碼器 | Mel 到波形 | 把 mel 頻譜映到原始樣本的神經網路。 |
+| 聲碼器 | 梅爾頻譜圖到波形 | 把梅爾頻譜圖映到原始樣本的神經網路。 |
 | HiFi-GAN | 標準聲碼器 | 以 GAN 為基礎。2020 到 2024 的主力。 |
 | MOS | 主觀品質 | 人類評分者的 1 到 5 分平均意見分數。 |
 | SECS | 聲音仿製指標 | 目標和輸出說話人 embedding 之間的餘弦相似度。 |
