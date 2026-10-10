@@ -33,7 +33,7 @@ timeline
     2015 : ResNet : Identity skip connections unlock 100+ layer training
 ```
 
-古典視覺裡，沒有別的東西比這四次跳躍更要緊。
+傳統視覺裡，沒有別的東西比這四次跳躍更要緊。
 
 ### LeNet-5（1998）
 
@@ -357,7 +357,7 @@ for p in r18.parameters():
 r18.fc = nn.Linear(r18.fc.in_features, 10)
 ```
 
-三行。你現在有一個 10 類別的 CIFAR 分類器，繼承了 繼承 ImageNet 預訓練所學到的表示（representation）。
+三行。你現在有一個 10 類別的 CIFAR 分類器，繼承了 ImageNet 預訓練所學到的表示（representation）。
 
 ## Ship It｜交付成果
 
