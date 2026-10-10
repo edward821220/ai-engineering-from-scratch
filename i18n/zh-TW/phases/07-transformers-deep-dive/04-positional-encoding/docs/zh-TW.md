@@ -1,4 +1,4 @@
-# 位置編碼——正弦、RoPE、ALiBi
+# 位置編碼（positional encoding）——正弦、RoPE、ALiBi
 
 > 注意力具有排列不變性。「The cat sat on the mat」和「mat the on sat cat the」沒有位置訊號時，會得到同一個輸出。三個演算法（algorithm）修這個——各自對「位置」是什麼下不同的賭注。
 
@@ -9,15 +9,15 @@
 
 ## The Problem｜問題
 
-縮放點積注意力是順序盲的。注意力矩陣 `softmax(Q K^T / √d) V` 由成對相似度算出。把 `X` 的列打亂，輸出的列也以同樣方式打亂。注意力內部沒有任何東西在乎位置。
+縮放點積注意力不感知順序。注意力矩陣 `softmax(Q K^T / √d) V` 由成對相似度算出。把 `X` 的列打亂，輸出的列也以同樣方式打亂。注意力內部沒有任何東西在乎位置。
 
 這在詞袋（bag of words）模型裡不是 bug。對語言、程式碼、音訊、影片——任何順序帶有意義的東西——它是致命的。
 
-修法是想辦法把位置注入 embedding。三個時代的答案：
+解法是設法把位置資訊注入 embedding。三個時代的答案：
 
-1. **絕對正弦**（Vaswani 2017）。把位置的 `sin/cos` 加到 embedding 上。簡單、不用學習、訓練長度之外外推很差。
+1. **絕對正弦**（Vaswani 2017）。把位置的 `sin/cos` 加到 embedding 上。簡單、不用學習、訓練長度之外的外插（extrapolation）很差。
 2. **RoPE（Rotary Position Embedding）**（Su 2021）。把 Q 和 K 向量轉一個和位置成正比的角度。在內積（dot product）裡直接編碼*相對*位置。2026 年的主流。
-3. **ALiBi——帶線性偏置（bias）的注意力**（Press 2022）。完全跳過 embedding；依距離，給注意力分數加上每個頭的線性懲罰。長度外推非常好。
+3. **ALiBi——帶線性偏置（bias）的注意力**（Press 2022）。完全跳過 embedding；依距離，給注意力分數（attention score）加上每個頭的線性懲罰。長度外插非常好。
 
 到 2026 年，前沿的開放模型基本上都用 RoPE：Llama 2/3/4、Qwen 2/3、Mistral、Mixtral、DeepSeek-V3、Kimi。少數長脈絡模型用 ALiBi 或它的現代變體。絕對正弦是歷史。
 
@@ -47,23 +47,23 @@ PE[pos, 2i+1] = cos(pos / 10000^(2i / d_model))
 θ_i = base^(-2i / d_head),  base = 10000 by default
 ```
 
-對鍵也套上同一個旋轉，位置是 `pos_k`。內積 `q'_m · k'_n` 變成只跟 `(m - n)` 有關的函式。也就是：**注意力分數只依賴相對距離**，雖然旋轉是依絕對位置來轉的。漂亮的手法。
+對鍵也套上同一個旋轉，位置是 `pos_k`。內積 `q'_m · k'_n` 變成只跟 `(m - n)` 有關的函式。也就是：**注意力分數只依賴相對距離**，雖然旋轉是依絕對位置來轉的。巧妙的作法。
 
-延伸 RoPE：可以縮放 `base`（NTK-aware、YaRN、LongRoPE），不用重新訓練就外推到更長的脈絡。Llama 3 就是這樣從 8000 延伸到 12.8 萬脈絡。
+延伸 RoPE：可以縮放 `base`（NTK-aware、YaRN、LongRoPE），不用重新訓練就外插到更長的脈絡。Llama 3 就是這樣從 8000 延伸到 12.8 萬脈絡。
 
 ### ALiBi
 
-跳過 embedding 的手法。直接偏置注意力分數：
+跳過 embedding 這條路。直接為注意力分數加入偏置：
 
 ```
 attn_score[i, j] = (q_i · k_j) / √d  -  m_h · |i - j|
 ```
 
-其中 `m_h` 是每個頭自己的斜率（例如 `1 / 2^(8·h/H)`）。較近的 token 被抬高；較遠的被懲罰。訓練時沒有額外成本。論文顯示，長度外推打贏正弦，並在原本的訓練長度上打平 RoPE。
+其中 `m_h` 是每個頭自己的斜率（例如 `1 / 2^(8·h/H)`）。較近的 token 的注意力分數會被提高；較遠的則受到懲罰。訓練時沒有額外成本。論文顯示，長度外插打贏正弦，並在原本的訓練長度上打平 RoPE。
 
 ### 2026 年選哪個
 
-| 變體 | 外推 | 訓練成本 | 誰在用 |
+| 變體 | 外插 | 訓練成本 | 誰在用 |
 |---------|---------------|---------------|---------|
 | 絕對正弦 | 差 | 免費 | 原始 transformer、早期 BERT |
 | 學來的絕對位置 | 沒有 | 很小 | GPT-2、GPT-3 |
@@ -71,7 +71,7 @@ attn_score[i, j] = (q_i · k_j) / √d  -  m_h · |i - j|
 | RoPE 加 YaRN | 非常好 | fine-tune 階段 | Qwen2-1M、Llama 3.1 128K |
 | ALiBi | 非常好 | 免費 | BLOOM、MPT、Baichuan |
 
-RoPE 贏，是因為它接進注意力而不改架構、編碼相對位置，而且它的 `base` 超參數（hyperparameter）給長脈絡 fine-tuning 一個乾淨的旋鈕。
+RoPE 贏，是因為它接進注意力而不改架構、編碼相對位置（relative position），而且它的 `base` 超參數（hyperparameter）給長脈絡 fine-tuning 一個乾淨的旋鈕。
 
 ```figure
 rope-explorer
@@ -153,26 +153,26 @@ model = AutoModel.from_pretrained("meta-llama/Llama-3.2-3B")
 
 ## Ship It｜交付成果
 
-見 `outputs/skill-positional-encoding-picker.md`。這個 skill 依目標脈絡長度、外推需求、訓練預算，為新模型挑編碼策略。
+見 `outputs/skill-positional-encoding-picker.md`。這個 skill 依目標脈絡長度、外插需求、訓練預算，為新模型挑編碼策略。
 
 ## Exercises｜練習
 
 1. **簡單。** 把正弦 `PE` 矩陣畫成熱圖，`max_len=512, d=128`。確認「維度索引變大，條紋變寬」的模式。
 2. **中等。** 實作 NTK-aware 的 RoPE 縮放。在長度 256 的序列上訓練一個小語言模型，再在長度 1024 上測有縮放和沒縮放。量困惑度（perplexity）。
-3. **困難。** 在同一個注意力模組裡實作 ALiBi 和 RoPE。在長度 512 的複製任務上訓練一個 4 層 transformer。測試時外推到 2048。比較退化。
+3. **困難。** 在同一個注意力模組裡實作 ALiBi 和 RoPE。在長度 512 的複製任務上訓練一個 4 層 transformer。測試時外插到 2048。比較退化。
 
 ## Key Terms｜關鍵術語
 
 | 術語 | 常見說法 | 實際意義 |
 |------|-----------------|-----------------------|
 | 位置編碼 | 「告訴注意力順序」 | 任何加到 embedding 或注意力上、用來編碼位置的訊號。 |
-| 正弦 | 「最早的那個」 | 幾何頻率的 `sin/cos` 加到 embedding 上；不會外推。 |
+| 正弦 | 「最早的那個」 | 幾何頻率的 `sin/cos` 加到 embedding 上；不會外插。 |
 | RoPE | 「旋轉 embedding」 | 依位置相關的角度旋轉 Q、K；內積編碼相對距離。 |
-| ALiBi | 「線性偏置的手法」 | 把 `-m·\|i-j\|` 加到注意力分數上；不需要 embedding，外推很好。 |
+| ALiBi | 「線性偏置的手法」 | 把 `-m·\|i-j\|` 加到注意力分數上；不需要 embedding，外插很好。 |
 | base | 「RoPE 的旋鈕」 | RoPE 裡的頻率縮放器；加大它，推論（inference）時就能延伸脈絡。 |
 | NTK-aware | 「一種 RoPE 縮放手法」 | 重縮放 `base`，讓脈絡變長時高頻維度不被擠扁。 |
-| YaRN | 「花俏的那個」 | 每個維度的內插加外推，保住注意力熵。 |
-| 外推 | 「訓練長度之外也行」 | 位置方案能不能在訓練時看過的 `max_len` 之後，仍然給出正確輸出？ |
+| YaRN | 「花俏的那個」 | 每個維度的內插加外插，保住注意力熵。 |
+| 外插 | 「訓練長度之外也行」 | 位置方案能不能在訓練時看過的 `max_len` 之後，仍然給出正確輸出？ |
 
 ## Further Reading｜延伸閱讀
 
