@@ -1,4 +1,4 @@
-# 影像生成（image generation）：GAN
+# 影像生成（image generation）：生成對抗網路（GAN）
 
 > GAN 是兩個神經網路（neural network）在玩一場固定的賽局。一個負責畫，一個負責評。它們一起變好，直到畫出來的東西騙過負責評的那個。
 
@@ -9,14 +9,14 @@
 
 ## Learning Objectives｜學習目標
 
-- 說明生成器（generator）和判別器（discriminator）之間的極小極大賽局，以及為什麼均衡對應到 p_model = p_data
+- 說明生成器（generator）和判別器（discriminator）之間的極小極大（minimax）賽局，以及為什麼均衡對應到 p_model = p_data
 - 用 PyTorch 實作 DCGAN，在 60 行以內生成看得出結構的 32x32 合成影像
-- 用三個標準手法把 GAN 訓練穩住：非飽和損失、譜正規化（spectral normalization）（spectral norm）、TTUR（兩時間尺度更新規則，two-timescale update rule）
+- 用三個標準手法把 GAN 訓練穩住：非飽和損失、譜正規化（spectral normalization）、TTUR（兩時間尺度更新規則，two-timescale update rule）
 - 讀訓練曲線，分辨健康的收斂（convergence）、模式崩塌（mode collapse）、振盪，以及判別器完全贏
 
 ## The Problem｜問題
 
-分類教網路把影像映到標籤。生成把問題倒過來：抽出新的影像，看起來像來自同一個分布。沒有一個「正確」輸出可以拿來相減。你只有一個想模仿的分布。
+分類教網路把影像映到標籤。生成把問題倒過來：取樣出新的影像，看起來像來自同一個分布。沒有一個「正確」輸出可以拿來相減。你只有一個想模仿的分布。
 
 標準損失（loss），MSE、交叉熵（cross-entropy），量不到「這個樣本是不是來自真實分布」。把每個像素（pixel）的誤差最小化，得到的是糊掉的平均，不是真實的樣本。突破是把損失學出來：訓練第二個網路，工作是分辨真假，再用它的判斷去推動生成器。
 
@@ -236,7 +236,7 @@ for epoch in range(10):
 
 `Adam(lr=2e-4, betas=(0.5, 0.999))` 是 DCGAN 的預設。較低的 beta1 讓動量項不要把對抗賽局穩得太死。
 
-### 步驟 5：抽樣
+### 步驟 5：取樣
 
 ```python
 @torch.no_grad()
@@ -248,7 +248,7 @@ def sample(G, n=16, z_dim=64, device="cpu"):
     return imgs.clamp(0, 1)
 ```
 
-抽樣之前一定要切到 eval 模式。對 DCGAN 這要緊，因為這時用的是批次正規化累積下來的統計，不是這個批次自己的統計。
+取樣之前一定要切到 eval 模式。對 DCGAN 這要緊，因為這時用的是批次正規化累積下來的統計，不是這個批次自己的統計。
 
 ### 步驟 6：譜正規化（spectral normalization）
 
@@ -291,7 +291,7 @@ def build_sn_discriminator(img_channels=3, feat=64):
 
 1. **（簡單）** 在上面的合成圓形資料集上訓練這個 DCGAN。每個 epoch 結束存一張 16 個樣本的格子。到第幾個 epoch，生成的圓才明顯是圓？
 2. **（中等）** 把判別器的批次正規化換成譜正規化（spectral normalization）。兩個版本並排訓練。哪一個收斂更快？三個種子之間，哪一個變異數更低？
-3. **（困難）** 實作條件式 DCGAN：類別標籤同時餵給 G 和 D。G 裡把 one-hot 接到雜訊上，D 裡多接一個類別 embedding 通道。用第 7 課「圓對方塊」的合成資料集訓練，並用指定標籤抽樣，顯示類別條件有用。
+3. **（困難）** 實作條件式 DCGAN：類別標籤同時餵給 G 和 D。G 裡把 one-hot 接到雜訊上，D 裡多接一個類別 embedding 通道。用第 7 課「圓對方塊」的合成資料集訓練，並用指定標籤取樣，顯示類別條件有用。
 
 ## Key Terms｜關鍵術語
 
