@@ -9,6 +9,14 @@
 | agent | agent | 是 | 智慧體、代理程式 | AI agent 語境中保留英文；一般法律／人員語境另依上下文。 |
 | fine-tuning | fine-tuning | 是 | 微調 | 依使用者指定保留英文。 |
 | embedding | embedding | 是 | 嵌入、嵌入向量 | 依使用者指定保留英文。 |
+| word embedding | word embedding | 是 | 詞嵌入 | 詞的 embedding。不要寫「嵌入」。 |
+| skip-gram | skip-gram | 是 |  | Word2Vec 由中心詞預測周圍詞。 |
+| CBOW | CBOW | 是 |  | continuous bag of words。由周圍詞預測中心詞。 |
+| negative sampling | 負採樣 | 否 |  | 用少數負例的二元分類取代整個詞彙表的 softmax。 |
+| distributional hypothesis | 分布假說 | 否 |  | 出現在相似脈絡的詞，意思也相似。 |
+| polysemy | 一詞多義 | 否 |  | 一個詞有多個意思。 |
+| static embedding | static embedding | 是 |  | 一個詞一個向量，不看脈絡。 |
+| contextual embedding | contextual embedding | 是 |  | 依脈絡為每次出現給不同向量。 |
 | eager execution | 立即執行 | 否 |  | PyTorch 的設計：呼叫當下就算出結果。 |
 | pure function | 純函式 | 否 |  | 輸出只取決於輸入，沒有副作用。 |
 | pytree | pytree | 是 |  | JAX 可走訪的巢狀清單、tuple、dict 與陣列。 |
