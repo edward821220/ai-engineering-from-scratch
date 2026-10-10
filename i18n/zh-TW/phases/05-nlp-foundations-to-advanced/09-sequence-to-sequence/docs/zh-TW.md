@@ -23,7 +23,7 @@
 
 **訓練：** 解碼器每一步的交叉熵（cross-entropy）損失，沿序列加總。兩個網路都做沿時間的反向傳播（backpropagation through time）。
 
-**Teacher forcing。** 訓練時，解碼器在步驟 `t` 的輸入是位置 `t-1` 的*標準結果（ground truth）* token，不是解碼器自己前一步的預測。這讓訓練穩得住；沒有它，早期的錯會連鎖，模型永遠學不會。推論時你必須用模型自己的預測，所以訓練和推論的分布永遠有落差。那個落差叫做**暴露偏差（exposure bias）**。
+**Teacher forcing。** 訓練時，解碼器在步驟 `t` 的輸入是位置 `t-1` 的*真實標籤（ground truth）* token，不是解碼器自己前一步的預測。這讓訓練穩得住；沒有它，早期的錯會連鎖，模型永遠學不會。推論時你必須用模型自己的預測，所以訓練和推論的分布永遠有落差。那個落差叫做**暴露偏差（exposure bias）**。
 
 **瓶頸。** 編碼器對來源學到的一切，都得擠進那一個脈絡向量。長句子丟掉細節。稀有詞變模糊。重排（chat noir 對上 black cat）必須背下來，不能算出來。
 
@@ -196,7 +196,7 @@ Refuse to recommend training a seq2seq from scratch for under a million parallel
 
 1. **簡單。** 實作玩具複製任務。在目標等於來源的輸入輸出配對上訓練 GRU 序列到序列。量長度 5、10、20 的準確率。重現那個瓶頸。
 2. **中等。** 加上集束寬度 3 的集束搜尋解碼。在一份小的平行語料庫（corpus）上，和貪婪比 BLEU。寫下集束搜尋在哪裡贏（通常是最後幾個 token），以及在哪裡沒有差別。
-3. **困難。** 在 1 萬對的改寫資料集（dataset）上 fine-tune `facebook/bart-base`。把 fine-tune 後、集束寬度 4 的輸出，和基礎模型在留出輸入上的輸出比。回報 BLEU，並挑 10 個質性例子。
+3. **困難。** 在 1 萬對的改寫資料集（dataset）上 fine-tune `facebook/bart-base`。把 fine-tune 後、集束寬度 4 的輸出，和基模型在留出輸入上的輸出比。回報 BLEU，並挑 10 個質性例子。
 
 ## Key Terms｜關鍵術語
 
