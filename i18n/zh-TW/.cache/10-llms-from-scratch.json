@@ -6,5 +6,6 @@
   "phases/10-llms-from-scratch/05-scaling-distributed/docs/en.md": "b9ae0ccea1f097aa7d3715f6578a007b167d065be32530ebb83dec516b2ca406",
   "phases/10-llms-from-scratch/06-instruction-tuning-sft/docs/en.md": "a0413c8311b56776f7368253cda3e0a3d8183a6acc4d8e612df8809ecf995e4b",
   "phases/10-llms-from-scratch/07-rlhf/docs/en.md": "0e599cb378e8f0291f17d037d75f07cde24451c27ac335a1dbfa49f026524090",
-  "phases/10-llms-from-scratch/08-dpo/docs/en.md": "a295d8092c3cba3c2595bbddb731802cc062d9e9cb686b6a5e7196e2eba4d4ed"
+  "phases/10-llms-from-scratch/08-dpo/docs/en.md": "a295d8092c3cba3c2595bbddb731802cc062d9e9cb686b6a5e7196e2eba4d4ed",
+  "phases/10-llms-from-scratch/09-constitutional-ai-self-improvement/docs/en.md": "df41ca148d4abf46b736a89e1bd5391248dcccd7267acb8e0fafc3b3213b18d4"
 }
