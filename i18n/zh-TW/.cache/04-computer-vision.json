@@ -25,5 +25,6 @@
   "phases/04-computer-vision/24-sam3-open-vocab-segmentation/docs/en.md": "56e317c037a7b9fb92c05d8738f795c30b11e5cc3e082127984a1ca25a2bd040",
   "phases/04-computer-vision/25-vision-language-models/docs/en.md": "8998f05f5d863f11139112ef6d845dce76cd3efc7756d6ea040ccb3bad018578",
   "phases/04-computer-vision/26-monocular-depth/docs/en.md": "47580e0cea05da1ab7b06b7aa0e1cdda34c405fe64b1e8717e2f2cf1696d0aaf",
-  "phases/04-computer-vision/27-multi-object-tracking/docs/en.md": "c94305127796ce8683c9625ebc1897373e86de8c1da82580815f656988c09e7c"
+  "phases/04-computer-vision/27-multi-object-tracking/docs/en.md": "c94305127796ce8683c9625ebc1897373e86de8c1da82580815f656988c09e7c",
+  "phases/04-computer-vision/28-world-models-video-diffusion/docs/en.md": "2b64fd3dbecb74fbc2cf8c017468033e16d103409dce31b25b62100838991acd"
 }
