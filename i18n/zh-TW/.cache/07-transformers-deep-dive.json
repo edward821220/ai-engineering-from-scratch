@@ -2,5 +2,6 @@
   "phases/07-transformers-deep-dive/01-why-transformers/docs/en.md": "a1112a1e30e5eb677b718e7e663972f6a487641feaf023c701c1a87c8b18db39",
   "phases/07-transformers-deep-dive/02-self-attention-from-scratch/docs/en.md": "54a8d6da2e4f1ea0b0b43a1bf09be1b3c41e2d5b974cef459b0ab8ea0af18177",
   "phases/07-transformers-deep-dive/03-multi-head-attention/docs/en.md": "143eb42fb1de2307cda1f2231b8d5cbb2144deced1dfd717a2c789edbf667f81",
-  "phases/07-transformers-deep-dive/04-positional-encoding/docs/en.md": "c7e45e8178d68f5a75b790a84c81a6749b2f2f54c88e30c3f36fabc705a0a511"
+  "phases/07-transformers-deep-dive/04-positional-encoding/docs/en.md": "c7e45e8178d68f5a75b790a84c81a6749b2f2f54c88e30c3f36fabc705a0a511",
+  "phases/07-transformers-deep-dive/05-full-transformer/docs/en.md": "cb33225ca1b2bbaf32a06d637343c22fbaaf3083081bcf04479409c53070a662"
 }
