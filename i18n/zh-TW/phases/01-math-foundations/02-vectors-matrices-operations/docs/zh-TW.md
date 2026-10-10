@@ -12,7 +12,7 @@
 - 建立具備逐元素（element-wise）運算、矩陣乘法（matrix multiplication）、轉置（transpose）、行列式（determinant）和反矩陣（inverse）的 Matrix 類別（class）
 - 區分逐元素乘法與矩陣乘法，並說明各自適用的時機
 - 只用從零打造的 Matrix 類別（class），實作單一個密集層（dense layer）：`relu(W @ x + b)`
-- 說明廣播（broadcasting）規則，以及神經網路框架中偏置相加的運作方式
+- 說明廣播（broadcasting）規則，以及神經網路框架（framework）中偏置相加的運作方式
 
 ## The Problem｜問題
 
@@ -24,7 +24,7 @@ output = activation(weights @ input + bias)
 
 那個 `@` 是矩陣乘法。`weights` 是一個矩陣，`input` 是一個向量（vector）。如果你不知道這些運算在做什麼，這行就是魔法；如果你知道，它就是一層的整個前向傳遞（forward pass），只用三個運算。
 
-模型處理的每張影像都是一個像素值矩陣（matrix）。每個詞 embedding 都是一個向量。每個神經網路的每一層都是一次矩陣變換（matrix transformation）。不精通矩陣運算就無法打造 AI 系統，就像不懂變數就無法寫程式一樣。
+模型（model）處理的每張影像都是一個像素（pixel）值矩陣（matrix）。每個詞 embedding 都是一個向量。每個神經網路的每一層都是一次矩陣變換（matrix transformation）。不精通矩陣運算就無法打造 AI 系統，就像不懂變數就無法寫程式一樣。
 
 本課從零建立這種熟練度。
 
@@ -70,16 +70,16 @@ Inner dimensions: 784 = 784  -- valid
 | 運算 | 作用 | 神經網路中的用途 |
 |-----------|-------------|-------------------|
 | 加法 | 逐元素相加 | 把偏置加進輸出 |
-| 純量乘法 | 縮放每個元素 | 學習率 × 梯度 |
+| 純量（scalar）乘法 | 縮放每個元素 | 學習率（learning rate）× 梯度 |
 | 矩陣乘法 | 變換向量 | 層的前向傳遞 |
 | 轉置 | 交換列與欄 | 反向傳播（backpropagation） |
 | 行列式 | 單一數字摘要 | 檢查是否可逆 |
 | 反矩陣 | 復原一個變換 | 解線性方程組 |
-| 單位矩陣（identity matrix） | 什麼都不做的矩陣 | 初始化、殘差連接 |
+| 單位矩陣（identity matrix） | 什麼都不做的矩陣 | 初始化（initialization）、殘差連接（residual connection） |
 
 ### 逐元素乘法 vs 矩陣乘法
 
-這個區別常常常讓初學者搞混。
+這個區別常讓初學者搞混。
 
 逐元素乘法：對相同位置的元素相乘。兩個矩陣必須是相同形狀。
 
@@ -99,7 +99,7 @@ Inner dimensions: 784 = 784  -- valid
 
 ### 廣播
 
-當你把偏置向量加進一個輸出矩陣時，兩邊形狀並不相同。廣播會把較小的陣列延展成相符的形狀。
+當你把偏置向量（bias vector）加進一個輸出矩陣時，兩邊形狀並不相同。廣播會把較小的陣列延展成相符的形狀。
 
 ```
 | 1  2  3 |   +   [10, 20, 30]
