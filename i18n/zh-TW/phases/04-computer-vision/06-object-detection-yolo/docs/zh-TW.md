@@ -10,7 +10,7 @@
 ## Learning Objectives｜學習目標
 
 - 說明格子加錨框（anchor box）的設計如何把偵測變成密集預測，並說出輸出張量裡每個數字是什麼
-- 計算框與框之間的 IoU，並從零實作非極大值抑制
+- 計算框與框之間的交並比（intersection over union，IoU），並從零實作非極大值抑制
 - 在預訓練骨幹（backbone）上做一個最小的 YOLO 風格偵測頭，包含分類、物件性（objectness）和框迴歸損失
 - 讀一列偵測指標，precision@0.5、召回率（recall）、mAP@0.5、mAP@0.5:0.95，並決定下一步該調整哪個參數
 
@@ -83,7 +83,7 @@ height    = anchor_h * exp(th)
 
 `sigmoid` 把中心偏移留在格子裡面。`exp` 讓寬度能從錨框自由縮放，不會正負號翻掉。`stride` 把格子座標縮回像素。從 v2 起，每個 YOLO 版本的這一步解碼都一樣。
 
-### IoU
+### 交並比（IoU）
 
 偵測裡兩個框之間的通用相似度：
 
