@@ -33,7 +33,7 @@ flowchart LR
     A[原始資料] --> B{選擇方法}
     B --> C[K-Means]
     B --> D[DBSCAN]
-    B --> E[階層式分群（hierarchical clustering）（hierarchical clustering）]
+    B --> E[階層式分群（hierarchical clustering）]
     B --> F[GMM]
     C --> G[非階層式分群（hierarchical clustering）、球形群集（spherical cluster）]
     D --> H[任意形狀、雜訊偵測]
@@ -477,7 +477,7 @@ gmm_model = GaussianMixture(n_components=3, random_state=42).fit(data)
 
 ## Exercises｜練習
 
-1. 實作 K-Means++ 初始化：不要隨機挑選所有質心；先隨機選第一個，之後每個質心被選中的機率，與它到最近既有質心的距離平方成正比。比較這種方法與隨機初始化的收斂速度（convergence）（convergence speed）。
+1. 實作 K-Means++ 初始化：不要隨機挑選所有質心；先隨機選第一個，之後每個質心被選中的機率，與它到最近既有質心的距離平方成正比。比較這種方法與隨機初始化的收斂速度（convergence speed）。
 2. 在程式中加入凝聚式階層分群，實作 Ward 法，並產生樹狀圖（以巢狀合併清單表示）。在不同高度切割樹狀圖，再與 K-Means 結果比較。
 3. 建立簡單的異常偵測管線（pipeline）：對相同資料分別執行 DBSCAN 和 GMM，標記兩種方法都判定為離群值的資料點（DBSCAN 中的雜訊點、GMM 中機率很低的點）。計算兩種方法判定結果的重疊程度，並討論它們何時會有不同判斷。
 
