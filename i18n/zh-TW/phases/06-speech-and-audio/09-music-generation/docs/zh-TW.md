@@ -13,7 +13,7 @@
 
 1. **器樂生成。** 「帶暖鍵盤的 lo-fi hip-hop 鼓」這類文字，到音訊。MusicGen、Stable Audio、AudioLDM。
 2. **歌曲生成（帶人聲和歌詞）。** 「下雨的德州夜晚，一首鄉村歌」，到完整的歌。Suno、Udio、YuE、ACE-Step。
-3. **有條件、可控制。** 把現有片段延長、重做橋段、換類型、分軌，或局部重畫。Udio 的局部重畫加分軌，是 2026 年值得對照的功能。
+3. **有條件、可控制。** 把現有片段延長、重做橋段、換類型、分軌（stems），或局部重畫（inpainting）。Udio 的局部重畫加分軌，是 2026 年值得對照的功能。
 
 ## The Concept｜核心概念
 
@@ -21,9 +21,9 @@
 
 ### 神經編解碼器 token 上的 token 語言模型
 
-Meta 的 **MusicGen**（2023，MIT）和許多衍生：條件是文字或旋律 embedding，自迴歸預測 EnCodec token（32 kHz、4 個碼本），再用 EnCodec 解碼。3 億到 33 億參數（parameter）。強的基準模型（baseline）。超過 30 秒就撐不住。
+Meta 的 **MusicGen**（2023，MIT）和許多衍生：以文字或旋律 embedding 為條件，自迴歸預測 EnCodec token（32 kHz、4 個碼本），再用 EnCodec 解碼。3 億到 33 億參數（parameter）。強的基準模型（baseline）。超過 30 秒就撐不住。
 
-**ACE-Step**（開放原始碼，40 億的 XL 在 2026 年 4 月發布）把這條路延伸到以歌詞為條件的完整歌曲。開放社群裡最接近 Suno 的東西。
+**ACE-Step**（開放原始碼，40 億的 XL 在 2026 年 4 月發布）把這條路延伸到以歌詞為條件的完整歌曲。開放社群中最接近 Suno 的模型。
 
 ### Mel 或潛在上的擴散
 
@@ -61,12 +61,12 @@ Meta 的 **MusicGen**（2023，MIT）和許多衍生：條件是文字或旋律 
 - **歐盟 AI Act** 加 **加州 SB 942**：AI 生成的音樂必須揭露。
 - **Riffusion／MusicGen** 在 MIT 下沒有合規包袱，但也沒有可商用的人聲。
 
-可以安全交付的模式：
+可安心部署的做法：
 
 1. 只生成器樂（MusicGen、Stable Audio Open、MIT／CC0 輸出）。
 2. 用商業 API（Suno、Udio、ElevenLabs Music），每次生成均附授權。
 3. 在自己擁有或已授權的曲庫上訓練（大多數企業最後走這條）。
-4. 給生成結果打浮水印，並寫上中繼資料。
+4. 給生成結果打浮水印（watermark），並寫上中繼資料（metadata）。
 
 ```figure
 sp-codec-tokens
@@ -99,7 +99,7 @@ wav = model.generate_with_chroma(
 )
 ```
 
-MusicGen-melody 吃色度圖，保住旋律、換音色。適合「把這段旋律做成弦樂四重奏」。
+MusicGen-melody 吃色度圖（chromagram），保住旋律、換音色。適合「把這段旋律做成弦樂四重奏」。
 
 ### 步驟 3：FAD 評估
 
@@ -135,11 +135,11 @@ music = musicgen.generate([description], duration=30)
 
 ## 2026 年仍然會交付出去的坑
 
-- **洗版權的 prompt。** 「Song in the style of Taylor Swift」。商業的 Suno／Udio 現在會擋。開放模型不會。自己加一份過濾清單。
+- **試圖規避著作權限制的 prompt。** 「Song in the style of Taylor Swift」。商業的 Suno／Udio 現在會擋。開放模型不會。自己加一份過濾清單。
 - **超過 30 秒就重複、就漂掉。** 自迴歸模型會繞圈。把多次生成交叉淡化，或用 ACE-Step 維持結構。
-- **速度漂掉。** 模型會離開 BPM。prompt 裡寫 BPM 標籤，再用 librosa 的 `beat_track` 事後過濾。
-- **人聲可懂度。** Suno 很好。開放模型的字常常糊掉。歌詞要緊就用商業 API，或 fine-tune。
-- **單聲道輸出。** 開放模型產出單聲道或假立體聲。再用正式的立體聲重建補上（ezst、Cartesia 的立體聲擴散）。
+- **速度飄移。** 模型的速度會偏離 BPM。prompt 裡寫 BPM 標籤，再用 librosa 的 `beat_track` 事後過濾。
+- **人聲可懂度。** Suno 很好。開放模型常無法清楚唱出歌詞。歌詞要緊就用商業 API，或 fine-tune。
+- **單聲道輸出。** 開放模型產出單聲道或假立體聲。再以正式的立體聲重建升級（ezst、Cartesia 的立體聲擴散）。
 
 ## Ship It｜交付成果
 
