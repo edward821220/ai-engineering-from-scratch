@@ -349,6 +349,8 @@
 | policy optimization | 策略最佳化 | 否 |  |  |
 | value learning | 價值學習 | 否 |  |  |
 | reward | 獎勵 | 否 |  | 強化學習語境。 |
+| reward model | 獎勵模型 | 否 |  | RLHF 語境中，依人類成對偏好訓練、替回應打分的模型。 |
+| preference pair | 偏好對 | 否 |  | 同一 prompt 的兩個回覆，標出一優一次，作為偏好訓練資料。 |
 | penalty | 懲罰 | 否 |  | 強化學習語境。 |
 | neural network | 神經網路 | 否 | 神經網絡 |  |
 | neuron | 神經元 | 否 |  |  |
@@ -360,6 +362,7 @@
 | dataset | 資料集 | 否 |  |  |
 | tokenization | tokenization | 是 |  | 文字處理步驟；保留 token 的英文用法。 |
 | tokenizer | tokenizer | 是 | 標記器、分詞器 | 依業界慣例保留英文。 |
+| fertility | fertility | 是 | 產詞率 | tokenizer 效率指標：每個字詞平均被切成多少 token；業界文件多保留英文。 |
 | stemming | 詞幹提取 | 否 |  | 用規則砍詞尾。結果不一定是真的詞。 |
 | lemmatization | 詞形還原 | 否 |  | 收回字典形式。需要詞性等文法脈絡。 |
 | language modeling | 語言建模 | 否 |  |  |
@@ -879,7 +882,7 @@
 | commutative | 可交換 | 否 |  | 運算順序不影響結果的性質。 |
 | recurrent neural network | 循環神經網路 | 否 |  | 具有迴圈結構、處理序列的網路；RNN。 |
 | context vector | 脈絡向量 | 否 |  | 編碼器最後隱藏狀態；序列到序列的瓶頸。 |
-| teacher forcing | teacher forcing | 是 |  | 訓練時餵標準結果的前一個 token。 |
+| teacher forcing | teacher forcing | 是 |  | 訓練時餵真實標籤的前一個 token。 |
 | exposure bias | 暴露偏差 | 否 |  | 訓練用真 token、推論用自己的預測，造成的落差。 |
 | beam search | 集束搜尋 | 否 |  | 每一步保留前 k 條部分序列。 |
 | hallucination | 幻覺 | 否 |  | 模型輸出來源沒有支撐的內容。 |
