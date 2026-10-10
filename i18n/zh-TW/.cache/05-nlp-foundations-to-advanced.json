@@ -16,5 +16,6 @@
   "phases/05-nlp-foundations-to-advanced/15-topic-modeling/docs/en.md": "0b8bfca1c418447199c2d11972a26da45b772de059db589c56f2e1127d38499b",
   "phases/05-nlp-foundations-to-advanced/16-text-generation-pre-transformer/docs/en.md": "92d3b5e90a0730efd6819090e514a562e02185a3a1b65f78b60331692adbb9ee",
   "phases/05-nlp-foundations-to-advanced/17-chatbots-rule-to-neural/docs/en.md": "2ef49d5cdfcc8229bfe5ee7b1954de73ab30ad64711e53997efc9cca59ba25f0",
-  "phases/05-nlp-foundations-to-advanced/18-multilingual-nlp/docs/en.md": "343fc51cb223c67fcf46906beb0ade26c859c437a03196285d44a74e088e720a"
+  "phases/05-nlp-foundations-to-advanced/18-multilingual-nlp/docs/en.md": "343fc51cb223c67fcf46906beb0ade26c859c437a03196285d44a74e088e720a",
+  "phases/05-nlp-foundations-to-advanced/19-subword-tokenization/docs/en.md": "6d67e864430ef41e47f3c0e115faead61da03cad377dca5a69f77513afc8f3eb"
 }
