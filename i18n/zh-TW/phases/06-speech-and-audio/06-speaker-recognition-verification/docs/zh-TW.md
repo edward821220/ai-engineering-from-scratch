@@ -9,23 +9,23 @@
 
 ## The Problem｜問題
 
-使用者說一句通行片語。你想知道：這是不是他聲稱的那個人（*驗證*，1 對 1），還是你註冊庫裡的第一個人（*識別*，1 對 N）？或兩者都不是，這是未知的語者（*開放集合*）？
+使用者說一句通行片語。你想知道：這是不是他聲稱的那個人（*驗證*，1 對 1），還是你註冊庫裡的第一個人（*識別*，1 對 N）？或兩者都不是，這是未知的語者（*開放集合（open-set）*）？
 
-2018 年以前：GMM-UBM 加 i-vector。EER 還可以，但對通道偏移（電話對上筆電）和情緒很脆。2018 到 2022：x-vector（用角度邊界訓練的 TDNN 骨幹（backbone））。2022 年之後：ECAPA-TDNN 和 WavLM-large 的 embedding。到 2026 年，這個領域由三個模型和一個指標主導。
+2018 年以前：GMM-UBM 加 i-vector。EER 還可以，但容易受通道偏移（channel shift，電話對上筆電）和情緒影響。2018 到 2022：x-vector（用角度邊界（angular margin）訓練的 TDNN 骨幹（backbone））。2022 年之後：ECAPA-TDNN 和 WavLM-large 的 embedding。到 2026 年，這個領域由三個模型和一個指標主導。
 
-那個指標是 **EER**，等錯誤率（Equal Error Rate）。把決策閾值設成錯誤接受率等於錯誤拒絕率。交叉點就是 EER。每篇論文、每個排行榜、每一次採購都用它。
+那個指標是 **EER**，等錯誤率（Equal Error Rate）。把決策閾值（threshold）設成錯誤接受率等於錯誤拒絕率。交叉點就是 EER。每篇論文、每個排行榜、每一次採購都用它。
 
 ## The Concept｜核心概念
 
 ![Enrollment + verification pipeline with embedding + cosine + EER](../assets/speaker-verification.svg)
 
-**管線（pipeline）。** 註冊：錄目標語者 5 到 30 秒，算出固定維度的 embedding（ECAPA-TDNN 是 192 維，WavLM-large 是 256 維）。驗證：取測試語句的 embedding，算餘弦相似度，再和閾值比。
+**管線（pipeline）。** 註冊：錄目標語者 5 到 30 秒，算出固定維度的 embedding（ECAPA-TDNN 是 192 維，WavLM-large 是 256 維）。驗證：取測試語句的 embedding，算餘弦相似度（cosine similarity），再和閾值比。
 
 **ECAPA-TDNN（2020，到 2026 年仍然主導）。** Emphasized Channel Attention, Propagation and Aggregation，時延神經網路。1D 卷積區塊帶 squeeze-excitation、多頭注意力池化，再接線性層到 192 維。在 VoxCeleb 1 加 2 上訓練（2,700 位語者、110 萬句），損失是加性角度邊界（Additive Angular Margin，AAM-softmax）。
 
 **WavLM-SV（2022 年之後）。** 用 AAM 損失 fine-tune 預訓練的 WavLM-large 自監督骨幹。品質更高，但比較慢。300 MB 以上，對上 15 MB。
 
-**x-vector（基準模型）。** TDNN 加統計池化。古典。CPU 和邊緣上仍然有用。
+**x-vector（基準模型）。** TDNN 加統計池化。傳統。CPU 和邊緣上仍然有用。
 
 **AAM-softmax。** 標準 softmax，在角度空間加上邊界 `m`：正確類用 `cos(θ + m)`。強迫類別之間在角度上分開。典型是 `m=0.2`，尺度 `s=30`。
 
@@ -33,13 +33,13 @@
 
 - 註冊和測試 embedding 之間的**餘弦**。依閾值決定。
 - **PLDA（機率 LDA）。** 把 embedding 投影到一個潛在空間，同一語者和不同語者有閉式的概似比。加在餘弦上面，EER 再降 10% 到 20%。2020 年以前的標準。現在只用在封閉集合。
-- **分數正規化。** `S-norm` 或 `AS-norm`：把每個分數對一群冒充者的平均和標準差做正規化。跨領域評估不可少。
+- **分數正規化（score normalization）。** `S-norm` 或 `AS-norm`：把每個分數對一群冒充者的平均和標準差做正規化。跨領域評估不可少。
 
 ### 2026 年你該知道的數字
 
 | 模型 | VoxCeleb1-O EER | 參數 | 吞吐量（A100） |
 |-------|-----------------|--------|-------------------|
-| x-vector（古典） | 3.10% | 500 萬 | 400 倍即時 |
+| x-vector（傳統） | 3.10% | 500 萬 | 400 倍即時 |
 | ECAPA-TDNN | 0.87% | 1500 萬 | 200 倍即時 |
 | WavLM-SV large | 0.42% | 3.16 億 | 20 倍即時 |
 | Pyannote 3.1 切段加 embedding | 0.65% | 600 萬 | 100 倍即時 |
@@ -47,7 +47,7 @@
 
 ### 語者分離
 
-多語者片段裡「誰在什麼時候說話」。管線：VAD，切段，每一段做 embedding，分群（凝聚或譜分群），再把邊界抹平。現代堆疊是 `pyannote.audio` 3.1，一次呼叫就把語者切段、embedding、分群包在一起。2026 年 AMI 上目前最好的 DER 大約 15%，2022 年是 23%。
+多語者片段裡「誰在什麼時候說話」。管線：VAD，切段，每一段做 embedding，分群（凝聚或譜分群），再平滑邊界。現代堆疊是 `pyannote.audio` 3.1，一次呼叫就把語者切段、embedding、分群包在一起。2026 年 AMI 上目前最好的 DER 大約 15%，2022 年是 23%。
 
 ```figure
 sp-eer-crossover
@@ -97,7 +97,7 @@ def eer(same_scores, diff_scores):
     return (best[0] + best[1]) / 2, best[2]
 ```
 
-回傳……。兩個都要報。
+回傳 (eer, threshold_at_eer)。兩個都要報。
 
 ### 步驟 4：用 SpeechBrain 做正式環境
 
@@ -164,12 +164,12 @@ for turn, _, speaker in diarization.itertracks(yield_label=True):
 | 開放集合 | 可能有未知的人 | 測試集可以有沒註冊的語者。 |
 | 註冊 | 登錄 | 算出語者的參考 embedding。 |
 | AAM-softmax | 那個損失 | 帶加性角度邊界的 softmax。強迫群分開。 |
-| PLDA | 古典評分 | 機率 LDA。在 embedding 上做概似比評分。 |
+| PLDA | 傳統評分 | 機率 LDA。在 embedding 上做概似比評分。 |
 | DER | 分離指標 | 語者分離錯誤率。漏掉加誤報加混淆。 |
 
 ## Further Reading｜延伸閱讀
 
-- [Snyder et al. (2018). X-Vectors: Robust DNN Embeddings for Speaker Recognition](https://www.danielpovey.com/files/2018_icassp_xvectors.pdf) ——古典的深度 embedding 論文。
+- [Snyder et al. (2018). X-Vectors: Robust DNN Embeddings for Speaker Recognition](https://www.danielpovey.com/files/2018_icassp_xvectors.pdf) ——傳統的深度 embedding 論文。
 - [Desplanques et al. (2020). ECAPA-TDNN](https://arxiv.org/abs/2005.07143) ——2020 到 2026 的主導架構。
 - [Chen et al. (2022). WavLM: Large-Scale Self-Supervised Pre-Training for Full Stack Speech Processing](https://arxiv.org/abs/2110.13900) ——語者驗證和分離的自監督骨幹。
 - [Bredin et al. (2023). pyannote.audio 3.1](https://github.com/pyannote/pyannote-audio) ——正式環境的分離加 embedding 堆疊。
