@@ -26,7 +26,7 @@
 
 把場景表示成約 100 萬個 3D Gaussian 組成的雲。每個有 59 個參數：位置 3 個；共變異數（covariance）6 個，或寫成四元數（quaternion）4 個加尺度 3 個；不透明度（opacity）1 個；球諧（spherical harmonics）顏色在 3 階有 48 個、在 0 階有 3 個。
 
-渲染 = 投影 + alpha 合成（alpha compositing）。很快（4090 上、1080p、約 100 fps）。可微分。用梯度下降法（gradient descent）對著真實照片（ground-truth）擬合。消費級 GPU 上，一個場景 5 到 30 分鐘擬合完。
+渲染 = 投影 + alpha 合成（alpha compositing）。很快（4090 上、1080p、約 100 fps）。可微分（differentiable）。用梯度下降法（gradient descent）對著真實照片（ground-truth）擬合。消費級 GPU 上，一個場景 5 到 30 分鐘擬合完。
 
 上面還有兩個 2023 到 2024 的新做法：
 
@@ -126,7 +126,7 @@ for step in range(steps):
 
 ## Ship It｜交付成果
 
-存成 `outputs/skill-3d-pipeline.md`。這個 skill 吃一份 3D 簡報（輸入：文字／一張影像／少數影像；輸出：網格／splat／NeRF；用途：渲染／遊戲／VR），輸出：管線（多視角擴散加擬合，或直接的網格模型）、基礎模型、迭代預算、拓撲後處理、需要的材質通道。
+存成 `outputs/skill-3d-pipeline.md`。這個 skill 吃一份 3D 簡報（輸入：文字／一張影像／少數影像；輸出：網格／splat／NeRF；用途：渲染／遊戲／VR），輸出：管線（多視角擴散加擬合，或直接的網格模型）、基模型（base model）、迭代預算、拓撲後處理、需要的材質通道。
 
 ## Exercises｜練習
 
@@ -139,7 +139,7 @@ for step in range(steps):
 | 術語 | 常見說法 | 實際意義 |
 |------|-----------------|-----------------------|
 | 3D Gaussian Splatting | 「3DGS」 | 場景是一團 3D Gaussian；可微分的 alpha 合成渲染。 |
-| NeRF | 「神經輻射場」 | MLP 在一個 3D 點輸出顏色加密度；沿射線積分來渲染。 |
+| NeRF | 「神經輻射場」 | MLP 在一個 3D 點輸出顏色加密度（density）；沿射線積分來渲染。 |
 | Triplane | 「三張 2D 平面」 | 把 3D 拆成三張軸對齊的 2D 特徵網格；比體積表示便宜。 |
 | SDS | 「分數蒸餾取樣」 | 拿 2D 擴散的分數（score）當偽梯度，來訓練 3D 模型。 |
 | 多視角擴散 | 「一次很多視角」 | 一次輸出一批一致相機視角的擴散模型。 |
@@ -148,13 +148,13 @@ for step in range(steps):
 
 ## 正式環境筆記：3D 還沒有共同的基底
 
-不像影像（潛在擴散加 DiT）和影片（時空 DiT），3D 在 2026 年沒有單一主導的執行期（runtime）。正式環境的決策樹依表示法分岔：
+不像影像（潛在擴散加 DiT）和影片（時空 DiT），3D 在 2026 年沒有單一主導的執行環境（runtime）。正式環境的決策樹依表示法分岔：
 
-- **NeRF／triplane。** 推論（inference）是射線步進（ray marching），再加上每個取樣點一次 MLP 前向。一張 512² 渲染要數百萬次 MLP 前向。把射線上的取樣點積極做成批次（batch）；SDPA／xformers 用得上。
-- **多視角擴散加 LRM 重建。** 兩階段管線。第 1 階段（多視角 DiT）是擴散伺服器，跟第 07 課一樣。第 2 階段（LRM transformer）是把那些視角一次前向跑完。整體的延遲輪廓是「擴散加一次到位」——各階段的服務元件就照這個挑。
+- **NeRF／triplane。** 推論（inference）是射線步進（ray marching），再加上每個取樣點一次 MLP 前向傳遞。一張 512² 渲染要數百萬次 MLP 前向傳遞。把射線上的取樣點積極做成批次（batch）；SDPA／xformers 用得上。
+- **多視角擴散加 LRM 重建。** 兩階段管線。第 1 階段（多視角 DiT）是擴散伺服器，跟第 07 課一樣。第 2 階段（LRM transformer）是把那些視角一次前向傳遞跑完。整體的延遲輪廓是「擴散加一次到位」——各階段的服務元件就照這個挑。
 - **SDS／DreamFusion。** 這是逐資產擬合，不是推論。建的是工作，不是請求處理器。
 
-多數 2026 的產品，對的做法是：「請求來了就跑多視角擴散，非同步重建成 3DGS，再把 3DGS 拿來即時看」。工作就乾淨地拆成 GPU 推論伺服器（快）和離線調校器（optimizer，慢）。
+多數 2026 的產品，對的做法是：「請求來了就跑多視角擴散，非同步重建成 3DGS，再把 3DGS 拿來即時看」。工作就乾淨地拆成 GPU 推論伺服器（inference server，快）和離線最佳化器（optimizer，慢）。
 
 ## Further Reading｜延伸閱讀
 
