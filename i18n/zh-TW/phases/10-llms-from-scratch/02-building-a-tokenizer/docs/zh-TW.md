@@ -12,7 +12,7 @@
 - 打造一個生產級的 BPE tokenizer，能處理 Unicode、空白字元正規化（normalization）與特殊 token
 - 實作位元組（byte）層級回退（byte-level fallback），使 tokenizer 能編碼任何輸入（包含 emoji、中日韓字元與程式碼）且不產生未知 token
 - 新增預先 tokenization 正規表示式模式，在套用 BPE 合併之前先在詞界處切分文字
-- 在語料庫上訓練自訂 tokenizer，並在多語言文字上評估其相對於 tiktoken 的壓縮比
+- 在語料庫上訓練自訂 tokenizer，並在多語言文字上評估其相對於 tiktoken 的壓縮率
 
 ## The Problem｜問題
 
@@ -64,7 +64,7 @@ graph LR
 
 位元組（byte）層級 BPE 透過將每個可能的位元組（byte）值（0-255）視為合法 token 來解決這個問題。你的基礎詞彙表剛好就是 256 個位元組值。任何檔案——純文字、二進位檔案、損毀資料——都可以被 tokenization，而且完全不會產生未知 token。
 
-GPT-2 加了一個技巧：將每個位元組（byte）映射到可列印的 Unicode 字元，使詞彙表保持人類可讀。位元組（byte） 0x20（空格）在他們的映射中變成字元「Ġ」。這純粹是為了外觀好看。演算法本身並不在意。
+GPT-2 加了一個技巧：將每個位元組（byte）映射到可列印的 Unicode 字元，使詞彙表保持人類可讀。位元組（byte） 0x20（空格）在他們的映射中變成字元「G」。這純粹是為了外觀好看。演算法本身並不在意。
 
 真正的威力在於：位元組（byte）層級 BPE 能處理地球上的每一種語言。中文字元每個佔 3 個 UTF-8 位元組（byte）。日文字元可能是 3 到 4 個位元組（byte）。阿拉伯文、天城文、emoji——全都是位元組（byte）序列。BPE 演算法在這些位元組（byte）序列中尋找規律的方式，與在英文 ASCII 位元組（byte）中尋找規律完全一模一樣。
 
@@ -434,7 +434,7 @@ for name, tok in [("Llama 3", llama_tok), ("Mistral", mistral_tok)]:
 | NFKC 正規化（normalization） | 「Unicode 清理」 | 標準等價分解後進行相容等價合成——「fi」連字變成「fi」，全形「Ａ」變成半形「A」 |
 | 聊天範本（Chat template） | 「訊息如何變成 token」 | 將角色／內容訊息列表轉換為平坦 token 序列的精確格式——因模型而異且必須與訓練格式完全相符 |
 | 特殊 token | 「控制用 token」 | 繞過 BPE 的保留 token ID——[BOS]、[EOS]、[PAD]、對話標記——在合併前進行精確比對 |
-| 產詞率（Fertility） | 「每個詞的 token 數」 | 輸出 token 數與輸入詞數的比例——GPT-4 英文約 1.3，韓文約 2-3，數值越高意味著脈絡被浪費得越多 |
+| Fertility | 「每個詞的 token 數」 | 輸出 token 數與輸入詞數的比例——GPT-4 英文約 1.3，韓文約 2-3，數值越高意味著脈絡被浪費得越多 |
 | tiktoken | 「OpenAI 的 tokenizer」 | 具備 Python 綁定的 Rust BPE 實作——比純 Python 快 10 到 100 倍 |
 | 合併表 | 「詞彙表」 | 訓練過程中學習到的位元組（byte）對合併有序列表——這就是 tokenizer 所學到的核心知識 |
 
