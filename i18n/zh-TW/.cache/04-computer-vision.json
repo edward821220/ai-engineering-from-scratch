@@ -21,5 +21,6 @@
   "phases/04-computer-vision/20-image-retrieval-metric/docs/en.md": "242ab4be9b9dc567f743984958434792bb3642856d2d776d079d27b6bc1060e5",
   "phases/04-computer-vision/21-keypoint-pose/docs/en.md": "88644bb7be201d54db0db32f6923a932673219bc5bef4664afa604be5c8a663d",
   "phases/04-computer-vision/22-3d-gaussian-splatting/docs/en.md": "0ede4133b98620602cbe40bc4ff92f43246dbe70e7575466b38207c470c0d55a",
-  "phases/04-computer-vision/23-diffusion-transformers-rectified-flow/docs/en.md": "422060f3286899edcccdb97e17eda8c8f426a18c38116cbe0ef210ebda4aa606"
+  "phases/04-computer-vision/23-diffusion-transformers-rectified-flow/docs/en.md": "422060f3286899edcccdb97e17eda8c8f426a18c38116cbe0ef210ebda4aa606",
+  "phases/04-computer-vision/24-sam3-open-vocab-segmentation/docs/en.md": "56e317c037a7b9fb92c05d8738f795c30b11e5cc3e082127984a1ca25a2bd040"
 }
