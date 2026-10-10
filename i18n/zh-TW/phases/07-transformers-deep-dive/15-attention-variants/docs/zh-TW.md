@@ -127,7 +127,7 @@ def strided_mask(n, window, stride):
     return M
 ```
 
-稠密的局部視窗，加上往序列起點每隔 `stride` 一個 token。感受野隨額外的層，以對數步長大。
+稠密的局部視窗，加上往序列起點每隔 `stride` 一個 token。感受野隨額外的層，以對數步數擴大。
 
 ### 步驟 4：差分注意力
 
