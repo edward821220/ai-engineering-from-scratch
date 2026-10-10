@@ -1,6 +1,6 @@
-# 預訓練資料管線
+# 預訓練資料管線（pipeline）
 
-> 模型是一面鏡子。它反映出你餵給它的任何資料。餵它垃圾，它就會極其流暢地反映出垃圾。
+> 模型（model）是一面鏡子。它反映出你餵給它的任何資料。餵它垃圾，它就會極其流暢地反映出垃圾。
 
 **Type:** Build
 **Languages:** Python
@@ -284,7 +284,7 @@ def deduplicate(documents, threshold=0.8, num_hashes=128, bands=16):
     return [doc for idx, doc in enumerate(documents) if idx not in removed], len(removed)
 ```
 
-`num_hashes=128` 與 `bands=16` 參數控制了精確率與召回率之間的權衡之間的權衡。更多的雜湊值能提供更精確的相似度估計。更多的分段能提高召回率（捕捉更多重複項），但代價是偽陽性增加。這些數值在典型網路文字上表現良好。
+`num_hashes=128` 與 `bands=16` 參數控制了精確率與召回率之間的權衡。更多的雜湊值能提供更精確的相似度估計。更多的分段能提高召回率（捕捉更多重複項），但代價是偽陽性增加。這些數值在典型網路文字上表現良好。
 
 ### 步驟 3：Tokenization 與序列打包
 
@@ -386,7 +386,7 @@ def compute_statistics(documents, token_ids, sequences, tokenizer_vocab_size):
 
 壓縮率（compression ratio）告訴你 tokenizer 在該語料庫上的效率。英文文字通常會壓縮到每個 token 約 3 到 4 個字元。如果你看到每個 token 只有 1.5 個字元，表示你的 tokenizer 切分得太過零碎。如果你看到 8 個字元以上，表示它學到了高度特定於該領域的合併規則。
 
-序列利用率（sequence utilization）則反映出打包後的序列中打包序列中實際資料所占的比例。低於 90% 意味著打包效率低落——你在 padding token 上浪費了運算資源。
+序列利用率（sequence utilization）則反映出打包後的序列中實際資料所占的比例。低於 90% 意味著打包效率低落——你在 padding token 上浪費了運算資源。
 
 ## Use It｜實際應用
 
@@ -435,7 +435,7 @@ HuggingFace 管線底層使用 Rust tokenizer，並在 4 個核心上進行平�
 | LSH | 「局部敏感雜湊」 | 將相似項目歸入同一個桶的方法——將兩兩比對複雜度從 O(n^2) 降低到近乎線性 |
 | 序列打包（Sequence packing） | 「串接文件」 | 將多份文件放入固定長度序列中並帶有正確注意力遮罩——消除 padding 浪費 |
 | Chinchilla 縮放定律 | 「用更多資料訓練」 | 在固定運算預算下，最佳效能需要大致等比例擴展模型大小與訓練 token 數 |
-| 產詞率（Fertility） | 「每個詞的 token 數」 | 每個詞的平均 token 數——GPT-4 英文約 1.3，非拉丁語系更高 |
+| Fertility | 「每個詞的 token 數」 | 每個詞的平均 token 數——GPT-4 英文約 1.3，非拉丁語系更高 |
 | 資料混合（Data mixing） | 「挑選訓練資料」 | 程式碼、文字、數學與多語言資料的配比——沒有標準公式，需要反覆實驗 |
 | 困惑度過濾器 | 「品質評分」 | 使用小型語言模型為文件評分——高困惑度代表該文字與乾淨的參考資料風格不同 |
 | 去重複（Deduplication） | 「移除副本」 | 消除完全相同與近似重複的文件——通常會移除 30-40% 的原始網路資料 |
