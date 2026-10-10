@@ -213,7 +213,7 @@ log P(sentence) = log P(word1) + log P(word2) + ... + log P(word_n)
 規則：
 - log(a * b) = log(a) + log(b)
 - 對數機率永遠 <= 0（因為 0 < P <= 1）
-- 越負代表越不可能
+- 越負代表機率越低
 - 交叉熵損失就是正確類別的負對數機率
 
 ### Softmax 作為機率分布
