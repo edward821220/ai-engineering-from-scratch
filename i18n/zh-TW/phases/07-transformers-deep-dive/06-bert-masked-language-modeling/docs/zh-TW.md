@@ -1,6 +1,6 @@
 # BERT——遮罩語言模型（masked language modeling）
 
-> GPT 預測下一個詞。BERT 預測缺掉的詞。差一句話——以及之後五年裡，所有長得像 embedding 的東西。
+> GPT 預測下一個詞。BERT 預測缺掉的詞。兩者只差一個預測任務，卻影響了之後五年所有長得像 embedding 的東西。
 
 **Type:** Build
 **Languages:** Python
@@ -9,11 +9,11 @@
 
 ## The Problem｜問題
 
-2018 年，每一個 NLP 任務——情感（sentiment）、命名實體辨識（named entity recognition）、問答、蘊涵（entailment）——都在自己的有標籤（label）資料上從零訓練自己的模型。沒有一個預訓練好、可以 fine-tune 的「懂英文」checkpoint。ELMo（2018）顯示，你可以用雙向 LSTM 預訓練脈絡 embedding；有幫助，但泛化（generalization）不夠。
+2018 年，每一個 NLP 任務——情感（sentiment）、命名實體辨識（named entity recognition）、問答、蘊涵（entailment）——都在自己的有標籤（label）資料上從零訓練自己的模型。沒有一個預訓練（pretraining）好、可以 fine-tune 的「懂英文」checkpoint。ELMo（2018）顯示，你可以用雙向 LSTM 預訓練脈絡 embedding；有幫助，但泛化（generalization）不夠。
 
 BERT（Devlin et al. 2018）問：如果我們拿一個 transformer 編碼器（encoder），在網路上的每一句上訓練，強迫它從兩邊的脈絡預測缺掉的詞呢？然後你在下游任務上 fine-tune 一個頭。參數效率帶來重大啟發。
 
-結果：18 個月內，BERT 和它的變體（RoBERTa、ALBERT、ELECTRA）主宰了當時存在的每一個 NLP 排行榜。到 2020 年，地球上每一個搜尋引擎、內容審核管線（pipeline）、語意搜尋系統裡面都有一個 BERT。
+結果：18 個月內，BERT 和它的變體（RoBERTa、ALBERT、ELECTRA）主宰了當時存在的每一個 NLP 排行榜。到 2020 年，地球上每一個搜尋引擎、內容審核管線（pipeline）、語意搜尋系統裡都內建了一個 BERT。
 
 2026 年，只有編碼器的模型仍然是分類、檢索（retrieval）、結構化抽取的正確工具——每個 token 比解碼器（decoder）快 5 到 10 倍，它們的 embedding 是每一套現代檢索堆疊的骨幹。ModernBERT（2024 年 12 月）把架構推到 8000 的脈絡，用 Flash Attention 加 RoPE 加 GeGLU。
 
@@ -42,13 +42,13 @@ target: the  quick brown fox jumps  over  the lazy dog
 - 10% 換成一個隨機 token。
 - 10% 保持原樣。
 
-為什麼不永遠用 `[MASK]`？因為 `[MASK]` 在推論（inference）時從不出現。若訓練時每個被遮位置都 100% 期待 `[MASK]`，預訓練和 fine-tune 之間就會有分布偏移。那 10% 隨機加 10% 不變，避免模型只依賴遮罩 token。
+為什麼不永遠用 `[MASK]`？因為 `[MASK]` 在推論（inference）時從不出現。若訓練時每個被遮位置都 100% 期待 `[MASK]`，預訓練和 fine-tune 之間就會有分布偏移（distribution shift）。那 10% 隨機加 10% 不變，避免模型只依賴遮罩 token。
 
 ### 下一句預測（NSP）——以及為什麼被拿掉
 
 原始 BERT 也訓練 NSP：給定兩句 A 和 B，預測 B 是否接在 A 後面。RoBERTa（2019）把它消融掉，顯示 NSP 有害、沒有幫助。現代編碼器跳過它。
 
-### 2026 年變了什麼：ModernBERT
+### 2026 年變了什麼:ModernBERT 
 
 2024 年的 ModernBERT 論文用 2026 年的元件重建了區塊：
 
@@ -68,7 +68,7 @@ target: the  quick brown fox jumps  over  the lazy dog
 | 任務 | 為什麼編碼器贏過解碼器 |
 |------|---------------------------|
 | 檢索／語意搜尋的 embedding | 雙向脈絡 = 每個 token 的 embedding 品質更好 |
-| 分類（情感、意圖、毒性） | 一次前向；沒有生成的額外成本 |
+| 分類（情感、意圖、毒性） | 一次前向傳遞；沒有生成的額外成本 |
 | 命名實體辨識／token 標註 | 每個位置都有輸出，天生雙向 |
 | 零樣本（zero-shot）蘊涵（NLI） | 分類頭加在編碼器上面 |
 | RAG 的重排器 | 交叉編碼器（cross-encoder）打分，比 LLM 重排器快 10 倍 |
@@ -101,7 +101,7 @@ def create_mlm_batch(tokens, vocab_size, mask_prob=0.15, rng=None):
 
 ### 步驟 2：在一個小語料庫（corpus）上跑 MLM 預測
 
-在 20 個詞的詞彙、200 句上訓練 2 層編碼器加 MLM 頭。沒有梯度——我們做前向的健全檢查。完整訓練需要 PyTorch。
+在 20 個詞的詞彙、200 句上訓練 2 層編碼器加 MLM 頭。沒有梯度——我們做前向傳遞的健全檢查。完整訓練需要 PyTorch。
 
 ### 步驟 3：比較遮罩類型
 
@@ -128,7 +128,7 @@ out = model(**inputs).last_hidden_state   # (1, N, 768)
 
 **交叉編碼器重排器也是 fine-tune 過的 BERT。** 在 `[CLS] query [SEP] doc [SEP]` 上做配對分類。查詢與文件間的雙向注意力，正是交叉編碼器比雙編碼器品質好的原因。
 
-**2026 年什麼時候不選 BERT。** 任何生成式的東西。編碼器沒有合理的方式自迴歸地產出 token。還有：10 億參數以下，小解碼器可以以較小解碼器的彈性達到相近品質（Phi-3-Mini、Qwen2-1.5B）。
+**2026 年什麼時候不選 BERT。** 任何生成式的東西。編碼器沒有合理的方式自迴歸地產出 token。還有：10 億參數以下，小解碼器能以更大的彈性達到相近品質（Phi-3-Mini、Qwen2-1.5B）。
 
 ## Ship It｜交付成果
 
