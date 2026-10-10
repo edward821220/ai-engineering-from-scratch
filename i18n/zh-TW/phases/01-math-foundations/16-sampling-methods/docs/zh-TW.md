@@ -10,7 +10,7 @@
 ## Learning Objectives｜學習目標
 
 - 只用均勻亂數（uniform random numbers），從零實作反函數取樣（inverse CDF／inverse transform sampling）、拒絕取樣（rejection sampling）和重要性取樣（importance sampling）
-- 為語言模型（language model）token 生成實作溫度取樣（temperature sampling）（temperature sampling）、top-k 取樣（top-k sampling）和 top-p（核取樣，nucleus sampling）
+- 為語言模型（language model）token 生成實作溫度取樣（temperature sampling）、top-k 取樣（top-k sampling）和 top-p（核取樣，nucleus sampling）
 - 說明重參數化技巧（reparameterization trick）以及它如何讓變分自編碼器（variational autoencoder，VAE）讓梯度透過取樣步驟反向傳播（backpropagation）
 - 執行 Metropolis-Hastings MCMC，從未正規化的目標分布（target distribution）取樣
 
@@ -20,7 +20,7 @@
 
 如果它總是選機率最高的 token，每次回應都會一模一樣。結果固定、毫無變化。如果完全隨機地選，輸出就會是一堆亂碼。答案介於這兩個極端之間，而控制這個範圍的機制就是抽樣。
 
-抽樣不只用於文字生成。強化學習（reinforcement learning）會透過抽樣軌跡（trajectory）估計策略梯度（policy gradient）（policy gradient）。變分自編碼器會從學得的分布中抽樣，並透過隨機性反向傳播，藉此學習潛在表徵（latent representation）。擴散模型（diffusion model）會抽樣產生影像所需的雜訊，再逐步去除雜訊。蒙地卡羅（Monte Carlo）方法會估計沒有封閉解的積分。馬可夫鏈蒙地卡羅（Markov chain Monte Carlo，MCMC）演算法則會探索無法逐一列舉的高維後驗分布（posterior distribution）。
+抽樣不只用於文字生成。強化學習（reinforcement learning）會透過抽樣軌跡（trajectory）估計策略梯度（policy gradient）。變分自編碼器會從學得的分布中抽樣，並透過隨機性反向傳播，藉此學習潛在表徵（latent representation）。擴散模型（diffusion model）會抽樣產生影像所需的雜訊，再逐步去除雜訊。蒙地卡羅（Monte Carlo）方法會估計沒有封閉解的積分。馬可夫鏈蒙地卡羅（Markov chain Monte Carlo，MCMC）演算法則會探索無法逐一列舉的高維後驗分布（posterior distribution）。
 
 每個生成式 AI 系統都是抽樣系統。抽樣策略會決定輸出的品質、多樣性和可控性。本課會從零打造各種主要抽樣方法，從均勻亂數開始，一路介紹到推動現代大型語言模型（large language model，LLM）和生成模型的技術。
 
@@ -38,7 +38,7 @@
 
 **探索。** MCMC 演算法會探索貝氏推論中的後驗分布。演化策略會抽樣產生參數擾動。湯普森取樣（Thompson sampling）會在 bandit 中平衡探索與利用。
 
-核心挑戰是：你只能直接從簡單分布（均勻分布（uniform distribution）、常態分布（normal distribution））取樣。其他情況下，你需要一種方法，將簡單分布的樣本變換成目標分布（target distribution）（target distribution）的樣本。
+核心挑戰是：你只能直接從簡單分布（均勻分布（uniform distribution）、常態分布（normal distribution））取樣。其他情況下，你需要一種方法，將簡單分布的樣本變換成目標分布（target distribution）的樣本。
 
 ### 均勻隨機抽樣
 
@@ -186,7 +186,7 @@ Variance of the estimator = Var(f(X)) / N
 
 ### 馬可夫鏈蒙地卡羅（MCMC）：Metropolis-Hastings
 
-MCMC 會建立一條馬可夫鏈（Markov chain），使其平穩分布（stationary distribution）（stationary distribution）為目標分布（target distribution） p(x)。經過足夠多步後，鏈中的樣本就會近似來自 p(x)。
+MCMC 會建立一條馬可夫鏈（Markov chain），使其平穩分布（stationary distribution）為目標分布（target distribution） p(x)。經過足夠多步後，鏈中的樣本就會近似來自 p(x)。
 
 ```
 Target: p(x)  (known up to a normalizing constant)
