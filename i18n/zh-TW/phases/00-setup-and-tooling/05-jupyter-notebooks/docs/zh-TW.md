@@ -54,9 +54,9 @@ s0-cell-order
 
 | 介面 | 安裝方式 | 適合情境 |
 |-----------|---------|----------|
-| JupyterLab | `pip install jupyterlab` 然後執行 `jupyter lab` | 完整 IDE 體驗、多個分頁、終端機（terminal） |
+| JupyterLab | `pip install jupyterlab` 然後執行 `jupyter lab` | 完整 IDE 體驗、多個分頁、檔案瀏覽器、終端機（terminal） |
 | Jupyter Notebook | `pip install notebook` 然後執行 `jupyter notebook` | 簡單、輕量，一次使用一個 notebook |
-| VS Code | 安裝 "Jupyter" 擴充功能 | 已編輯器（editor），支援 Git 整合和除錯 |
+| VS Code | 安裝 "Jupyter" 擴充功能 | 已整合在編輯器（editor）中，支援 Git 整合和除錯 |
 
 三種介面都能讀寫相同的 `.ipynb` 檔案。選你喜歡的即可。JupyterLab 是 AI 工作中最常見的選擇。
 
