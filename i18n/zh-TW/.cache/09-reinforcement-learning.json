@@ -2,5 +2,6 @@
   "phases/09-reinforcement-learning/01-mdps-states-actions-rewards/docs/en.md": "f6054bf219d82d9195bbfc01f132528a7727733157a0188d948725f9f3fd5f97",
   "phases/09-reinforcement-learning/02-dynamic-programming/docs/en.md": "d41f481163c0a0902e4261263c3e9db76ba7cd150e3e07cfbc87c2a919238ec4",
   "phases/09-reinforcement-learning/03-monte-carlo-methods/docs/en.md": "59ed85c22bceb45e65a953b3cc10cc54fec517a3ef5a35a901f69d433b947991",
-  "phases/09-reinforcement-learning/04-q-learning-sarsa/docs/en.md": "05b289d714aec7c06d0f1c9d5e048fb35dd020a71607f3c27c4983f3675563da"
+  "phases/09-reinforcement-learning/04-q-learning-sarsa/docs/en.md": "05b289d714aec7c06d0f1c9d5e048fb35dd020a71607f3c27c4983f3675563da",
+  "phases/09-reinforcement-learning/05-dqn/docs/en.md": "71b7cb797263d1bd4881a0a2127a6dd7e55e09f3590a6c92a5d101f4d8e8fca9"
 }
