@@ -5,5 +5,6 @@
   "phases/06-speech-and-audio/04-speech-recognition-asr/docs/en.md": "8636c6f5f698e085af96b807aff2733d606e41728a174fe1b80e31508c02f721",
   "phases/06-speech-and-audio/05-whisper-architecture-finetuning/docs/en.md": "90a39b539e0065af945955829839edeaaa63883fa9b5e21bf15c9b8c7db0efb5",
   "phases/06-speech-and-audio/06-speaker-recognition-verification/docs/en.md": "63ddce2e943e59e1b2aa18bb698df67409fd0011f0d8421139ec7c46cba2f217",
-  "phases/06-speech-and-audio/07-text-to-speech/docs/en.md": "d974cde93a3a8e692caf62fd9e48e18ebd8b889043bef6cf2367b4d89049a561"
+  "phases/06-speech-and-audio/07-text-to-speech/docs/en.md": "d974cde93a3a8e692caf62fd9e48e18ebd8b889043bef6cf2367b4d89049a561",
+  "phases/06-speech-and-audio/08-voice-cloning-conversion/docs/en.md": "dc41114b9bfa5d8fdc151f0efebe947230683806c1d2f888031a457c9bb8a480"
 }
