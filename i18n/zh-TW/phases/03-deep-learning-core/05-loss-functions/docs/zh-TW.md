@@ -16,7 +16,7 @@
 
 ## The Problem｜問題
 
-在分類問題上若在分類問題上使用 MSE 做最小化，模型會……，會很有把握地把每件事都預測成 0.5。它確實在把損失變小。它也完全沒用。
+在分類問題上最小化 MSE 的模型，會很有把握地把每件事都預測成 0.5。它確實在把損失變小。它也完全沒用。
 
 損失函數是模型真正在最佳化的唯一東西。不是準確率（accuracy）。不是 F1。也不是你拿去跟主管報告的任何指標（metric）。最佳化器（optimizer）拿損失函數的梯度，調整權重（weight），把那個數字變小。如果損失函數沒有抓住你在乎的事，模型會找數學上最便宜的方式去滿足它，而那種方式幾乎從來不是你要的。
 
@@ -76,7 +76,7 @@ dBCE/dp = -(y/p) + (1-y)/(1-p)
 CCE = -sum(y_i * log(p_i))
 ```
 
-只有真實類別會貢獻損失，因為其他的 y_i 都是 0。如果有 10 個類別，正確類別的機率是 0.1（隨機亂猜），損失是 -log(0.1) = 2.3。如果正確類別的機率是 0.9，損失是 -log(0.9) = 0.105。模型學會把機率質量（probability mass）（probability mass）集中到正確答案上。
+只有真實類別會貢獻損失，因為其他的 y_i 都是 0。如果有 10 個類別，正確類別的機率是 0.1（隨機亂猜），損失是 -log(0.1) = 2.3。如果正確類別的機率是 0.9，損失是 -log(0.9) = 0.105。模型學會把機率質量（probability mass）集中到正確答案上。
 
 ### 為什麼 MSE 不適合分類
 
@@ -116,7 +116,7 @@ alpha = 0.1、10 個類別時：目標不再是 [0, 0, 1, 0, ...]，而變成 [0
 
 **SimCLR 風格的對比損失（NT-Xent / InfoNCE）：**
 
-拿一張影像。做出兩個資料增強（data augmentation）後的視圖，例如裁切、旋轉、顏色抖動。這是正對：它們的 embedding 應該相似。批次（batch）裡的其他影像組成負對：embedding 應該不同。
+拿一張影像。做出兩個資料增強（data augmentation）後的視圖，例如裁切、旋轉、顏色抖動。這是正對（positive pair）：它們的 embedding 應該相似。批次（batch）裡的其他影像組成負對（negative pair）：embedding 應該不同。
 
 ```
 L = -log(exp(sim(z_i, z_j) / tau) / sum(exp(sim(z_i, z_k) / tau)))
@@ -128,7 +128,7 @@ sim() 是餘弦相似度（cosine similarity）。z_i 和 z_j 是正對。總和
 
 **三元組損失（triplet loss）：**
 
-拿三個輸入：錨點、正樣本（同一類別）、負樣本（不同類別）。
+拿三個輸入：錨點（anchor）、正樣本（positive，同一類別）、負樣本（negative，不同類別）。
 
 ```
 L = max(0, d(anchor, positive) - d(anchor, negative) + margin)
