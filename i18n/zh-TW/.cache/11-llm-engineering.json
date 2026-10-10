@@ -1,4 +1,5 @@
 {
   "phases/11-llm-engineering/01-prompt-engineering/docs/en.md": "56ad5f65393f96b4b8ffe53381303292d485eef71494ab69d45fef47e77ef136",
-  "phases/11-llm-engineering/02-few-shot-cot/docs/en.md": "74b50bbd6ed857280d5691db90fd7a5436584ea065f5b8eb145a67a7f8ca7e52"
+  "phases/11-llm-engineering/02-few-shot-cot/docs/en.md": "74b50bbd6ed857280d5691db90fd7a5436584ea065f5b8eb145a67a7f8ca7e52",
+  "phases/11-llm-engineering/03-structured-outputs/docs/en.md": "6d310ae5ce8f771c5668d8742f1d1b1c922e738c087225d7c4b31eed492e43d7"
 }
