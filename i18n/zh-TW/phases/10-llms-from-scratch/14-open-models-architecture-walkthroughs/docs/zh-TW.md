@@ -136,7 +136,7 @@ graph LR
 
 ### 旋鈕 6：Pre-norm 位置定案
 
-原始 transformer 在每個子層之後套用層正規化（Post-norm）。而自 GPT-2 以來的所有開源模型都將其放在每個子層*之前*（Pre-norm）。Pre-norm 在深層網路中顯然更容易訓練，因此較容易訓練深層模型。
+原始 transformer 在每個子層之後套用層正規化（Post-norm）。而自 GPT-2 以來的所有開源模型都將其放在每個子層*之前*（Pre-norm）。Pre-norm 在深層網路中更容易訓練。
 
 ### 模型架構全覽表
 
