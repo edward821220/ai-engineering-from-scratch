@@ -9,8 +9,8 @@
 
 ## Learning Objectives｜學習目標
 
-- 分辨以偵測為基礎的追蹤和以查詢為基礎的追蹤，並說出演算法（algorithm）家族（SORT、DeepSORT、ByteTrack、BoT-SORT、SAM 2 記憶追蹤器、SAM 3.1 Object Multiplex）
-- 從零實作 IoU 加匈牙利指派，做古典的以偵測為基礎的追蹤
+- 分辨以偵測為基礎的追蹤（tracking-by-detection）和以查詢為基礎的追蹤（query-based tracking），並說出演算法（algorithm）家族（SORT、DeepSORT、ByteTrack、BoT-SORT、SAM 2 記憶追蹤器、SAM 3.1 Object Multiplex）
+- 從零實作交並比（intersection over union，IoU）加匈牙利指派（Hungarian assignment），做傳統的以偵測為基礎的追蹤
 - 說明 SAM 2 的記憶庫，以及為什麼它處理遮擋比以 IoU 為基礎的關聯好
 - 讀懂三個追蹤指標（MOTA、IDF1、HOTA），並依用途挑哪個要緊
 
@@ -20,7 +20,7 @@
 
 所有以影片為核心的產品都需要追蹤：運動分析、監控、自駕車、醫學影片分析、野生動物監測、字標計數。核心積木是共用的：每一影格的偵測器、運動模型（Kalman 濾波或更豐富的東西）、關聯步驟（在 IoU、餘弦或學來的特徵上做匈牙利演算法），以及軌跡生命週期（誕生、更新、死亡）。
 
-2026 年帶來兩個新模式：**SAM 2 以記憶為基礎的追蹤**（用特徵記憶取代運動模型的關聯），以及 **SAM 3.1 Object Multiplex**（同一個概念的許多實例共用記憶）。這一課先走古典堆疊，再走到以記憶為基礎的做法。
+2026 年帶來兩個新模式：**SAM 2 以記憶為基礎的追蹤**（用特徵記憶取代運動模型的關聯），以及 **SAM 3.1 Object Multiplex**（同一個概念的許多實例共用記憶）。這一課先走傳統堆疊，再走到以記憶為基礎的做法。
 
 ## The Concept｜核心概念
 
@@ -57,7 +57,7 @@ flowchart LR
 
 Kalman 濾波為每條軌跡維持狀態 `(x, y, w, h, dx, dy, dw, dh)`，帶共變異數（covariance）。每一影格用等速模型**預測**狀態，再用配對上的偵測**更新**。預測不確定性高時，更新更相信偵測。軌跡因此平滑，短遮擋（1 到 5 影格）也能把軌跡接下去。
 
-每個古典追蹤器的運動預測步驟都用 Kalman 濾波。
+每個傳統追蹤器的運動預測步驟都用 Kalman 濾波。
 
 ### 匈牙利演算法
 
@@ -93,8 +93,8 @@ SAM 2 處理影片時，為每個實例留一份時空特徵的**記憶庫**。�
 ### 要知道的三個指標
 
 - **MOTA（多物件追蹤準確率，Multi-Object Tracking Accuracy）**。1 - (FN + FP + ID switches) / GT。依錯誤類型加權。一個指標把偵測失敗和關聯失敗混在一起。
-- **IDF1（ID F1）**。ID 精確率和召回率的調和平均。專門看每條標準結果軌跡能不能一直保住自己的 ID。對 ID 切換敏感的任務，比 MOTA 好。
-- **HOTA（高階追蹤準度，Higher Order Tracking Accuracy）**。拆成偵測準確率（DetA）和關聯準確率（AssA）。2020 年起的社群標準。最完整。
+- **IDF1（ID F1）**。ID 精確率和召回率的調和平均。專門看每條真實軌跡能不能一直保住自己的 ID。對 ID 切換敏感的任務，比 MOTA 好。
+- **HOTA（高階追蹤準確率，Higher Order Tracking Accuracy）**。拆成偵測準確率（DetA）和關聯準確率（AssA）。2020 年起的社群標準。最完整。
 
 監控（誰是誰）：回報 IDF1。運動分析（數傳球）：HOTA。一般學術比較：HOTA。
 
@@ -241,7 +241,7 @@ def count_id_switches(tracks_per_frame, gt_per_frame):
     return switches
 ```
 
-這是簡化的、靠近 IDF1 的指標：數標準結果物件換了幾次被指派的預測軌跡 ID。真正的 MOTA／IDF1／HOTA 工具在 `py-motmetrics` 和 `TrackEval`。
+這是簡化的、靠近 IDF1 的指標：數真實物件換了幾次被指派的預測軌跡 ID。真正的 MOTA／IDF1／HOTA 工具在 `py-motmetrics` 和 `TrackEval`。
 
 ## Use It｜實際應用
 
@@ -264,13 +264,13 @@ def count_id_switches(tracks_per_frame, gt_per_frame):
 本課會產出：
 
 - `outputs/prompt-tracker-picker.md`：依場景類型、遮擋形態和延遲預算，在 SORT、ByteTrack、BoT-SORT、SAM 2、SAM 3.1 之間挑
-- `outputs/skill-mot-evaluator.md`：寫出完整的評估套件，對標準結果軌跡算 MOTA／IDF1／HOTA
+- `outputs/skill-mot-evaluator.md`：寫出完整的評估套件，對真實軌跡算 MOTA／IDF1／HOTA
 
 ## Exercises｜練習
 
 1. **（簡單）** 用上面的合成追蹤器跑 3、10、30 個物件。回報每種的 ID 切換次數。指出只用 IoU 的關聯從哪裡開始失敗。
 2. **（中等）** 在關聯之前加等速 Kalman 預測。證明短遮擋（2 到 3 影格）不再造成 ID 切換。
-3. **（困難）** 用 `transformers` 接上 SAM 2 以記憶為基礎的追蹤器，當成另一個追蹤後端。在 30 秒的人群片段上同時跑 SimpleTracker 和 SAM 2，比較 ID 切換次數。用手標 5 個顯眼的人的標準結果 ID。
+3. **（困難）** 用 `transformers` 接上 SAM 2 以記憶為基礎的追蹤器，當成另一個追蹤後端。在 30 秒的人群片段上同時跑 SimpleTracker 和 SAM 2，比較 ID 切換次數。用手標 5 個顯眼的人的真實 ID。
 
 ## Key Terms｜關鍵術語
 
