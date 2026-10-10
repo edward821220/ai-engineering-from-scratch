@@ -6,5 +6,6 @@
   "phases/07-transformers-deep-dive/05-full-transformer/docs/en.md": "cb33225ca1b2bbaf32a06d637343c22fbaaf3083081bcf04479409c53070a662",
   "phases/07-transformers-deep-dive/06-bert-masked-language-modeling/docs/en.md": "10d1685c0fc344868e948575ae3bf51cb0058e6b0f07a247c20eafcc858f7b70",
   "phases/07-transformers-deep-dive/07-gpt-causal-language-modeling/docs/en.md": "631bdec6da1f43937a98f0e137a8d0e41cecab977e152b921fc140ebec3afd57",
-  "phases/07-transformers-deep-dive/08-t5-bart-encoder-decoder/docs/en.md": "26b9204335f4793b7910e02a3a03820cd0ea0c7d47a2aa9c37580dcac67baeb1"
+  "phases/07-transformers-deep-dive/08-t5-bart-encoder-decoder/docs/en.md": "26b9204335f4793b7910e02a3a03820cd0ea0c7d47a2aa9c37580dcac67baeb1",
+  "phases/07-transformers-deep-dive/09-vision-transformers/docs/en.md": "6ac276b0bbfd15180e9e8850a8a7577f0ff18fa090f4ab545b8a3ad6906b2288"
 }
