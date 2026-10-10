@@ -387,6 +387,16 @@ def check_phases():
             print(f"warning: phase directory {d.name} is not claimed by any volume", file=sys.stderr)
 
 
+def volume_has_translations(vol, lang):
+    for phase in vol["phases"]:
+        p_dir = ROOT / "i18n" / lang / "phases" / phase
+        if p_dir.is_dir():
+            for l_dir in p_dir.iterdir():
+                if l_dir.is_dir() and (l_dir / "docs" / f"{lang}.md").is_file():
+                    return True
+    return False
+
+
 def main():
     global BOOK_LANG
     ap = argparse.ArgumentParser()
@@ -402,9 +412,17 @@ def main():
 
     vols = CONFIG["volumes"]
     if args.volume:
-        vols = [v for v in vols if v["slug"] == args.volume]
-        if not vols:
-            sys.exit(f"unknown volume: {args.volume}")
+        requested = [s.strip() for s in args.volume.split(",") if s.strip()]
+        selected = []
+        for req in requested:
+            matching = [v for v in vols if v["slug"] == req or str(v["number"]) == req]
+            if not matching:
+                sys.exit(f"unknown volume: {req}")
+            selected.extend(matching)
+        seen = set()
+        vols = [v for v in selected if not (v["slug"] in seen or seen.add(v["slug"]))]
+    elif BOOK_LANG != "en":
+        vols = [v for v in vols if volume_has_translations(v, BOOK_LANG)]
 
     for vol in vols:
         md, chapters, words = assemble(vol)
