@@ -9,7 +9,7 @@
 
 ## The Problem｜問題
 
-2026 年，5 秒音訊就夠用消費級 GPU 高品質仿製任何人的聲音。ElevenLabs、F5-TTS、OpenVoice v2、VoiceBox 都交付零樣本或少樣本仿製。這項技術是恩惠（無障礙 TTS、配音、輔助聲音），也是武器（詐騙電話、政治深偽、智慧財產竊取）。
+2026 年，5 秒音訊就夠用消費級 GPU 高品質仿製任何人的聲音。ElevenLabs、F5-TTS、OpenVoice v2、VoiceBox 都交付零樣本（zero-shot）或少樣本仿製。這項技術是恩惠（無障礙 TTS、配音、輔助聲音），也是武器（詐騙電話、政治深偽、智慧財產竊取）。
 
 兩個緊鄰的任務：
 
@@ -28,20 +28,20 @@
 
 在用的有：F5-TTS（2024）、YourTTS（2022）、XTTS v2（2024）、OpenVoice v2（2024）。
 
-**少樣本 fine-tuning。** 錄目標聲音 5 到 30 分鐘。用 LoRA fine-tune 一個基礎模型，大約一小時。品質從「還可以」跳到「分不出來」。Coqui 和 ElevenLabs 都支援這個模式。社群把它用在 F5-TTS 上。
+**少樣本 fine-tuning。** 錄目標聲音 5 到 30 分鐘。用 LoRA fine-tune 一個基模型，大約一小時。品質從「還可以」跳到「分不出來」。Coqui 和 ElevenLabs 都支援這個模式。社群把它用在 F5-TTS 上。
 
 **聲音轉換（VC）。** 兩個家族：
 
 - **辨識再合成。** 跑類似 ASR 的模型，抽出內容表示（例如軟音素後驗、PPG），再用目標說話人 embedding 重新合成。不易受語言和口音影響。KNN-VC（2023）、Diff-HierVC（2023）用這個。
-- **解開。** 訓練一個自編碼器，在瓶頸的潛在空間把內容、說話人、韻律分開。推論時把說話人 embedding 換掉。品質較低，但比較快。AutoVC（2019）、VITS-VC 變體用這個。
+- **解開。** 訓練一個自編碼器（autoencoder），在瓶頸的潛在空間（latent space）把內容、說話人、韻律分開。推論時把說話人 embedding 換掉。品質較低，但比較快。AutoVC（2019）、VITS-VC 變體用這個。
 
-**以神經編解碼器為基礎的仿製（2024 年之後）。** VALL-E、VALL-E 2、NaturalSpeech 3、VoiceBox 把音訊當成 SoundStream／EnCodec 的離散 token，在編解碼器 token 上訓練大型自迴歸或流匹配模型。短 prompt 上的品質和 ElevenLabs 打得平。
+**以神經編解碼器（neural codec）為基礎的仿製（2024 年之後）。** VALL-E、VALL-E 2、NaturalSpeech 3、VoiceBox 把音訊當成 SoundStream／EnCodec 的離散 token，在編解碼器 token 上訓練大型自迴歸或流匹配模型。短 prompt 的品質可媲美 ElevenLabs。
 
 ### 倫理不是事後補上的
 
 **浮水印。** PerTh（Perth）和 SilentCipher（2024）把大約 16 到 32 位元的 ID 聽不出來地寫進音訊。重編碼、串流、常見編輯之後還在。正式環境能用的開放原始碼。
 
-**同意閘。** 每一份仿製輸出都必須配一份可驗證的同意紀錄。「我，Rohit，在 2026-04-22，授權這個聲音用於 X 目的。」存在一改就看得到的日誌裡。
+**同意閘。** 每一份仿製輸出都必須配一份可驗證的同意紀錄（consent record）。「我，Rohit，在 2026-04-22，授權這個聲音用於 X 目的。」記錄在可偵測竄改的日誌中。
 
 **偵測。** AASIST、RawNet2、Wav2Vec2-AASIST 當偵測器交付。ASVspoof 2025 挑戰賽公布，面對 ElevenLabs、VALL-E 2、Bark 的輸出，目前最好的偵測器 EER 是 0.8% 到 2.3%。
 
@@ -86,7 +86,7 @@ wav = tts.infer(
 )
 ```
 
-參考逐字稿必須和音訊完全一致。對不上就會把對齊弄破。
+參考逐字稿必須和音訊完全一致。對不上就會破壞對齊。
 
 ### 步驟 3：用 KNN-VC 做聲音轉換
 
@@ -109,7 +109,7 @@ watermarked = sc.embed(wav, sr=24000, message=payload)
 detected = sc.detect(watermarked, sr=24000)   # returns payload bytes
 ```
 
-大約 32 位元的酬載。MP3 重編碼和輕雜訊之後仍偵測得到。
+大約 32 位元的承載資料。MP3 重編碼和輕雜訊之後仍偵測得到。
 
 ### 步驟 5：同意閘
 
@@ -151,7 +151,7 @@ def cloned_inference(text, ref_audio, consent_record):
 
 1. **簡單。** 跑 `code/main.py`。它用兩個「說話人」在交換前後的餘弦，示範說話人 embedding 的交換。
 2. **中等。** 用 OpenVoice v2 仿製你自己的聲音。量參考和仿製之間的 SECS。用 Whisper 量 CER。
-3. **困難。** 對 20 份仿製打上 SilentCipher 浮水印，跑 128 kbps 的 MP3 編碼再解碼，偵測酬載。回報位元準度。
+3. **困難。** 對 20 份仿製打上 SilentCipher 浮水印，跑 128 kbps 的 MP3 編碼再解碼，偵測承載資料。回報位元準確率。
 
 ## Key Terms｜關鍵術語
 
