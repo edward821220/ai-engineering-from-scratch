@@ -11,9 +11,9 @@
 
 你每篇論文都讀了。注意力、多頭切分、位置編碼、編碼器和解碼器區塊、BERT 和 GPT 的損失（loss）、MoE、KV cache，你都實作過。現在讓它們在一個真實任務上一起工作。
 
-總驗收：在字元級的語言建模（language modeling）任務上，端到端訓練一個小的、只有解碼器的 transformer。它讀莎士比亞。它生成新的莎士比亞。小到在筆電上不到 10 分鐘就能訓練。正確到你換上更大的資料集（dataset）、訓練更久，就會得到真正的語言模型。
+總驗收：在字元級的語言建模（language modeling）任務上，端到端（end-to-end）訓練一個小的、只有解碼器的 transformer。它讀莎士比亞。它生成新的莎士比亞。小到在筆電上不到 10 分鐘就能訓練。正確到你換上更大的資料集（dataset）、訓練更久，就會得到真正的語言模型。
 
-這是這門課的「nanoGPT」。它不是原創——Karpathy 2023 年的 nanoGPT 教學是每個學生至少寫一次的參考實作。我們借它的形狀，再依我們講過的東西改裝。
+這是這門課的「nanoGPT」。它不是原創——Karpathy 2023 年的 nanoGPT 教學是每個學生至少寫一次的參考實作。我們沿用它的架構，再依本課講過的內容調整。
 
 ## The Concept｜核心概念
 
@@ -57,7 +57,7 @@ shift-by-one cross-entropy            ◀── Lesson 07
 - `SwiGLUFFN`——現代 FFN。
 - `Block`——先做正規化（pre-norm），殘差（residual）包住注意力加 FFN。
 - `GPT`——embedding、堆起來的區塊、LM head、generate()。
-- 訓練迴圈，用 AdamW、餘弦學習率、梯度（gradient）裁切。
+- 訓練迴圈（training loop），用 AdamW、餘弦學習率、梯度裁剪（gradient clipping）。
 - 莎士比亞文本上的字元級 tokenizer。
 
 ### 我們不交付什麼
@@ -71,9 +71,9 @@ shift-by-one cross-entropy            ◀── Lesson 07
 
 在 Mac M2 筆電上，4 層、4 頭、d_model = 128 的 GPT，在 `tinyshakespeare.txt` 上訓練 2,000 步：
 
-- 訓練損失從大約 4.2（隨機）降到大約 1.5，大約 6 分鐘。
+- 訓練損失從大約 4.2（隨機）降到大約 1.5，耗時約 6 分鐘。
 - 抽出的輸出有莎士比亞的形狀：古詞、換行、像「ROMEO:」的專名會出現。
-- 驗證損失（留出的最後 10% 文本）緊跟著訓練損失；這個大小和預算沒有過擬合（overfitting）。
+- 驗證損失（validation loss，留出的最後 10% 文本）與訓練損失相近；這個大小和預算沒有過擬合（overfitting）。
 
 ```figure
 n5-block-stack
@@ -81,10 +81,10 @@ n5-block-stack
 
 ## Build It｜動手實作
 
-這一課用 PyTorch。安裝 `torch`（CPU 版就行）。見 `code/main.py`。腳本處理：
+這一課用 PyTorch。安裝 `torch`（CPU 版就行）。見 `code/main.py`。腳本會執行以下工作：
 
 - 缺了就下載 `tinyshakespeare.txt`（或讀本地副本）。
-- 位元組級的字元 tokenizer。
+- 位元組級（byte-level）的字元 tokenizer。
 - 訓練／驗證以 90／10 切開。
 - 支援的硬體上用 bf16 autocast 的訓練迴圈。
 - 訓練完之後取樣。
@@ -100,7 +100,7 @@ encode = lambda s: [stoi[c] for c in s]
 decode = lambda xs: "".join(itos[x] for x in xs)
 ```
 
-65 個不重複字元。很小的詞彙。vocab_size 用 4 個位元組就裝得下。沒有 BPE，沒有 tokenizer 的戲。
+65 個不重複字元。很小的詞彙。vocab_size 用 4 個位元組就裝得下。沒有 BPE，也不需要複雜的 tokenizer。
 
 ### 步驟 2：模型
 
@@ -108,7 +108,7 @@ decode = lambda xs: "".join(itos[x] for x in xs)
 
 ### 步驟 3：訓練迴圈
 
-拿一個長度 256 的 token 視窗（window）隨機批次。前向。挪一位的交叉熵（cross-entropy）。反向。AdamW 一步。記日誌。重複。
+拿一個長度 256 的 token 視窗（window）隨機批次。前向傳遞。目標序列向後位移一格後算交叉熵（cross-entropy）。反向傳遞。AdamW 一步。記日誌。重複。
 
 ```python
 for step in range(max_steps):
@@ -123,7 +123,7 @@ for step in range(max_steps):
 
 ### 步驟 4：取樣
 
-給一個 prompt，反覆前向，從 top-p 的 logits 取樣，接上去，繼續。500 個 token 後停。
+給一個 prompt，反覆做前向傳遞，用 top-p 從 logits 取樣，接上去，繼續。500 個 token 後停。
 
 ### 步驟 5：讀輸出
 
@@ -136,17 +136,17 @@ The chief that well shame and hath been his friends,
 ...
 ```
 
-不是莎士比亞。但是莎士比亞的形狀。大約 80 萬參數、筆電上 6 分鐘，這是清楚的勝利。
+不是莎士比亞。但是莎士比亞的形狀。大約 80 萬參數、筆電上 6 分鐘，這是明確的成果。
 
 ## Use It｜實際應用
 
-這個總驗收是一套參考架構。要把它做成真的東西，有三個延伸：
+這個總驗收是一套參考架構。要把它發展成實際應用，有三個延伸：
 
 1. **換 tokenizer。** 用 BPE（例如 `tiktoken.get_encoding("cl100k_base")`）。詞彙從 65 跳到大約 5 萬。模型容量（capacity）得放大來補。
 2. **在更大的語料庫（corpus）上訓練。** 用 `OpenWebText` 或 `fineweb-edu`（HuggingFace）。單張 A100 上 100 億 token，1.25 億參數的 GPT 大約要 24 小時。
 3. **加上 RoPE、KV cache、Flash Attention。** 下面的練習帶你一個一個做。
 
-最後會是一個 1.25 億參數的 GPT，生成流暢英文。不是前沿模型。但同一條程式路徑——只是更大——就是 Karpathy、EleutherAI、Allen Institute 在 2026 年拿來訓練研究檢查點（checkpoint）的東西。
+最終會得到一個 1.25 億參數的 GPT，生成流暢英文。不是前沿模型。但同一條程式路徑——只是更大——就是 Karpathy、EleutherAI、Allen Institute 在 2026 年拿來訓練研究檢查點（checkpoint）的東西。
 
 ## Ship It｜交付成果
 
@@ -167,9 +167,9 @@ The chief that well shame and hath been his friends,
 | nanoGPT | 「Karpathy 的教學 repo」 | 最小的只有解碼器 transformer 訓練程式，大約 300 行；標準參考。 |
 | tinyshakespeare | 「標準玩具語料庫」 | 大約 1.1 MB 的文本；2015 年以來每個字元語言模型教學都用它。 |
 | 綁定的 embedding | 「共用輸入／輸出矩陣」 | LM head 的權重等於 token embedding 矩陣的轉置；省參數，品質更好。 |
-| bf16 autocast | 「訓練精度的手法」 | 前向和反向用 bf16，調校器狀態留在 fp32；2021 年以來的標準。 |
+| bf16 autocast | 「訓練精度的手法」 | 前向傳遞和反向傳遞用 bf16，調校器狀態留在 fp32；自 2021 年以來的標準做法。 |
 | 梯度裁剪 | 「擋住尖峰」 | 把全域梯度範數頂在 1.0；防止訓練爆掉。 |
-| 餘弦學習率排程 | 「2020 年之後的預設」 | 學習率先線性爬升，這段叫預熱，再依餘弦形狀衰到峰值的 10%。 |
+| 餘弦學習率排程（learning-rate schedule） | 「2020 年之後的預設」 | 學習率先線性爬升，這段叫預熱（warmup），再依餘弦形狀衰到峰值的 10%。 |
 | MFU | 「模型 FLOP 利用率」 | 達到的 FLOPs 除以理論峰值；2026 年稠密 40%、MoE 30% 就算強。 |
 | 驗證損失 | 「留出的損失」 | 模型沒看過的資料上的交叉熵；過擬合偵測器。 |
 
