@@ -18,9 +18,9 @@
 
 你手上有一批房屋面積與售價的資料，想根據房屋面積預測新房子的價格。你可以從散佈圖（scatter plot）目測趨勢，但你需要一個公式——一條能良好擬合資料的直線，讓你代入任何面積都能預測價格。
 
-線性迴歸能幫你找出這條直線。更重要的是，它介紹了整個 ML 訓練迴圈：定義模型、定義成本函數（cost function）、最佳化參數。每種 ML 演算法都遵循相同模式。在這裡先掌握最簡單的情況，你就能在其他地方認出這個模式。
+線性迴歸能幫你找出這條直線。更重要的是，它介紹了整個 ML 訓練迴圈（training loop）：定義模型、定義成本函數（cost function）、最佳化參數。每種 ML 演算法都遵循相同模式。在這裡先掌握最簡單的情況，你就能在其他地方認出這個模式。
 
-線性迴歸不只適用於簡單問題。實務系統會用它來預測需求、分析 A/B 測試、建立財務模型，也會把它當成各類迴歸任務的基準模型。
+線性迴歸不只適用於簡單問題。實務系統會用它來預測需求、分析 A/B 測試、建立財務模型，也會把它當成各類迴歸任務的基準模型（baseline）。
 
 ## The Concept｜核心概念
 
@@ -510,7 +510,7 @@ print(f"Ridge R-squared: {r2_score(y_test, ridge.predict(X_test_scaled)):.4f}")
 print(f"Ridge coefficient: {ridge.coef_[0]:.4f}")
 ```
 
-從頭實作的版本與 scikit-learn 會得到相同結果。差別在於 scikit-learn 處理了邊界情況、數值穩定性與效能最佳化。正式環境使用函式庫；從頭實作的版本則能幫你理解背後的運作方式。
+從頭實作的版本與 scikit-learn 會得到相同結果。差別在於 scikit-learn 處理了邊界情況、數值穩定性（numerical stability）與效能最佳化。正式環境使用函式庫；從頭實作的版本則能幫你理解背後的運作方式。
 
 ## Ship It｜交付成果
 
@@ -519,9 +519,9 @@ print(f"Ridge coefficient: {ridge.coef_[0]:.4f}")
 
 ## Exercises｜練習
 
-1. 實作批次梯度下降法（batch gradient descent）、隨機梯度下降法（stochastic gradient descent，SGD）和小批次梯度下降法（mini-batch gradient descent）。在相同資料集上比較收斂速度。哪一種收斂最快？哪一種的成本曲線最平滑？
+1. 實作批次梯度下降法（batch gradient descent）、隨機梯度下降法（stochastic gradient descent，SGD）和小批次梯度下降法（mini-batch gradient descent）。在相同資料集上比較收斂速度。哪一種收斂最快？哪一種方法的成本曲線最平滑？
 
-2. 使用三次函數（y = ax^3 + bx^2 + cx + d + noise）產生資料。以 1、3 和 10 次多項式擬合，並比較訓練集（training set）R^2 與測試集（test set）R^2。多項式次數到幾次時，過度擬合才變得明顯？
+2. 使用三次函數（y = ax^3 + bx^2 + cx + d + noise）產生資料。以 1、3 和 10 次多項式擬合，並比較訓練集（training set）R^2 與測試集（test set）R^2。多項式次數（degree）到幾次時，過度擬合才變得明顯？
 
 3. 實作 LASSO 迴歸（Lasso regression），其 L1 正則化（L1 regularization）懲罰項為 penalty = alpha * sum(|w_i|)。在多特徵房屋資料上訓練，並比較哪些權重會變成零，以及嶺迴歸的權重有何不同。為什麼 L1 會產生稀疏解（sparse solution），而 L2 不會？
 
@@ -530,7 +530,7 @@ print(f"Ridge coefficient: {ridge.coef_[0]:.4f}")
 | 術語 | 常見說法 | 實際意義 |
 |------|----------------|----------------------|
 | 線性迴歸（linear regression） | 「在資料上畫一條線」 | 找出能讓 wx+b 與實際 y 值之差的平方總和最小的權重 w 和偏置 b |
-| 成本函數（cost function） | 「模型有多糟」 | 將模型參數映射為單一數值，以衡量預測誤差，再由最佳化程序將其最小化 |
+| 成本函數（cost function） | 「模型有多糟」 | 將模型參數映射為單一數值，以衡量預測誤差，再透過最佳化將它最小化 |
 | 均方誤差（mean squared error） | 「平方誤差的平均數」 | (1/n) * sum((predicted - actual)^2)；大誤差受到的懲罰會不成比例地加重 |
 | 梯度下降法（gradient descent） | 「往下坡走」 | 反覆沿著能降低成本函數的方向調整參數，並使用偏導數計算方向 |
 | 學習率（learning rate） | 「步長」 | 控制每次梯度下降法更新中參數改變幅度的純量 |

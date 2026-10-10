@@ -12,7 +12,7 @@
 - 實作數值特徵（numerical feature）轉換——標準化（standardization）、最小–最大縮放（min-max scaling）、對數轉換（log transform）、分箱（binning）——並說明各方法的適用時機
 - 為類別特徵（categorical feature）建立 one-hot 編碼（one-hot encoding）、標籤編碼（label encoding）和目標編碼（target encoding），並指出目標編碼中的資料洩漏（data leakage）風險
 - 從頭建構 TF-IDF 向量化器，並說明它為何在文字分類（text classification）上優於原始詞數（word count）
-- 套用過濾法（filter method）特徵選擇——變異數閾值（variance threshold）、相關性（correlation）、互資訊（mutual information）——以降低維度（dimensionality）
+- 套用過濾法（filter method）（filter method）特徵選擇——變異數閾值（variance threshold）、相關性（correlation）、互資訊（mutual information）——以降低維度（dimensionality）
 
 ## The Problem｜問題
 
@@ -22,19 +22,19 @@
 
 這種事經常發生。在傳統機器學習（machine learning）中，資料的表示方式（representation）比演算法的選擇更重要。一個使用「坪數」和「房間數」的房價模型，不管學習器多精密，都會勝過拿「原始字串地址」餵進去的模型。演算法只能處理你給它的東西。
 
-特徵工程是把原始資料轉換成更容易讓模型找出模式的表示法的過程。特徵選擇則是丟棄只加雜訊（noise）、不加訊號（signal）的特徵。兩者合起來，是傳統機器學習中槓桿最高的工作。
+特徵工程是把原始資料轉換成更容易讓模型找出模式的表示法的過程。特徵選擇則是丟棄只加雜訊（noise）、不加訊號（signal）的特徵。兩者合起來，是傳統機器學習中最值得投入的工作。
 
 ## The Concept｜核心概念
 
-### 特徵處理管線
+### 特徵處理管線（feature pipeline）
 
 ```mermaid
 flowchart LR
-    A[原始資料] --> B[處理缺失值（missing value）]
+    A[原始資料] --> B[處理缺失值（missing value）（missing value）]
     B --> C[數值轉換]
     B --> D[類別編碼]
     B --> E[文字特徵]
-    C --> F[特徵交互作用（feature interaction）]
+    C --> F[特徵交互作用（feature interaction）（feature interaction）]
     D --> F
     E --> F
     F --> G[特徵選擇]
@@ -75,7 +75,7 @@ IDF(word) = log(total docs / docs containing word)
 TF-IDF = TF * IDF
 ```
 
-### 缺失值
+### 缺失值（missing value）
 
 真實資料總有破洞。處理策略：
 
@@ -85,15 +85,15 @@ TF-IDF = TF * IDF
 - **指標欄（indicator column）：** 補值前加一個「was_this_missing」二元欄位。資料缺失這件事本身就可能帶有資訊
 - **向前／向後填補（forward/backward fill）：** 用於時間序列（time series）資料
 
-### 特徵交互作用
+### 特徵交互作用（feature interaction）
 
-有時關係藏在組合裡。「身高」和「體重」各自的預測力，都不如「BMI = 體重 / 身高^2」。特徵交互作用會讓特徵空間（feature space）倍增，所以要靠領域知識（domain knowledge）挑對組合。
+有時關係藏在組合裡。「身高」和「體重」各自的預測力，都不如「BMI = 體重 / 身高^2」。特徵交互作用（feature interaction）會讓特徵空間（feature space）倍增，所以要靠領域知識（domain knowledge）挑對組合。
 
 ### 特徵選擇
 
 特徵不是越多越好。不相關的特徵會增加雜訊、拉長訓練時間，還可能造成過度擬合（overfitting）。
 
-**過濾法（建模前）：**
+**過濾法（filter method）（建模前）：**
 - 相關性：移除彼此高度相關的冗餘（redundant）特徵
 - 互資訊：衡量知道某個特徵後，對目標的不確定性減少多少
 - 變異數閾值：移除幾乎不變動的特徵
@@ -263,7 +263,7 @@ def tfidf(documents):
     return vectors, vocab
 ```
 
-### 步驟 4：從頭實作缺失值補值
+### 步驟 4：從頭實作缺失值（missing value）補值
 
 ```python
 def impute_mean(values):
@@ -572,7 +572,7 @@ preprocessor = ColumnTransformer([
 | one-hot 編碼（one-hot encoding） | 「做虛擬變數」 | 為每個類別建立一個二元欄位，每一列恰好有一欄為 1 |
 | 目標編碼（target encoding） | 「拿答案來編碼」 | 將每個類別替換成該類別的平均目標值，並以平滑化（smoothing）防止過度擬合 |
 | TF-IDF | 「高級版詞數統計」 | 詞頻乘以逆文件頻率：依詞在整個語料庫（corpus）中的辨識度加權 |
-| 補值（imputation） | 「填空格」 | 以估計值取代缺失值（平均數、中位數、眾數或模型預測值） |
+| 補值（imputation） | 「填空格」 | 以估計值取代缺失值（missing value）（平均數、中位數、眾數或模型預測值） |
 | 特徵選擇（feature selection） | 「刪掉爛欄位」 | 移除只增加雜訊或冗餘的特徵，只留下對目標帶有訊號的特徵 |
 | 互資訊（mutual information） | 「一件事能告訴你多少關於另一件事的資訊」 | 衡量觀察到變數（variable）X 後，對變數 Y 不確定性的減少量 |
 | 資料洩漏（data leakage） | 「不小心作弊」 | 訓練時使用了預測時不可能取得的資訊，造成虛假的樂觀結果 |

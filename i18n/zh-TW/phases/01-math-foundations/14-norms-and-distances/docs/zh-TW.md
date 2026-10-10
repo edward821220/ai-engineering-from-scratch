@@ -16,9 +16,9 @@
 
 ## The Problem｜問題
 
-你有兩個向量。它們可能是 word embedding，也可能是使用者輪廓，或像素陣列。你想知道：它們有多接近？
+你有兩個向量。它們可能是 word embedding，也可能是使用者輪廓，或像素（pixel）陣列。你想知道：它們有多接近？
 
-答案完全取決於你選擇哪一種距離函數（distance function）。兩個資料點在某種度量下可能是最近鄰，在另一種度量下卻相距甚遠。KNN 分類器、推薦引擎、向量資料庫（vector database）、分群演算法（clustering algorithm）和損失函數（loss function）都取決於這項選擇。選錯了，模型最佳化的目標就會跟著錯。
+答案完全取決於你選擇哪一種距離函數（distance function）。兩個資料點在某種度量下可能是最近鄰，在另一種度量下卻相距甚遠。KNN 分類器、推薦引擎（recommendation engine）、向量資料庫（vector database）、分群演算法（clustering algorithm）和損失函數（loss function）都取決於這項選擇。選錯了，模型最佳化的目標就會跟著錯。
 
 沒有一種距離適用所有情境。L2 適合空間資料；NLP 則以餘弦相似度為主。Jaccard 適合集合，編輯距離適合字串，馬氏距離能納入相關性，Wasserstein 距離則搬運機率質量（probability mass）。每一種距離都代表了對「相似」的不同假設。
 
@@ -81,7 +81,7 @@ The straight line, cutting diagonally through the grid.
 - 中低維度的連續資料
 - 特徵尺度相近時
 - 物理距離，例如空間資料和感測器讀數
-- 以像素為單位比較影像相似度
+- 以像素（pixel）為單位比較影像相似度
 
 L2 正則化（L2 regularization）與嶺迴歸（Ridge）的關係：把 ||w||_2^2 加進損失函數，會懲罰過大的權重。和 L1 不同，它不會把權重推到零，而是按比例將所有權重縮小。L2 懲罰會形成圓形限制區域，座標軸上沒有頂點，因此權重會變小，但很少會剛好變成零。
 
@@ -347,7 +347,7 @@ Wasserstein gives a meaningful gradient. KL does not.
 | 任務 | 最適合的距離 | 原因 |
 |------|--------------|-----|
 | 文字相似度 | 餘弦相似度 | 長度是雜訊，方向代表意義 |
-| 影像像素比較 | L2 | 空間關係重要，特徵尺度相近 |
+| 影像像素（pixel）比較 | L2 | 空間關係重要，特徵尺度相近 |
 | 稀疏高維特徵 | L1 | 穩健，不會放大罕見的大差異 |
 | 集合重疊（標籤、類別） | Jaccard | 資料本來就是集合，不是向量 |
 | 字串比對 | 編輯距離 | 操作方式符合人類編輯文字的直覺 |

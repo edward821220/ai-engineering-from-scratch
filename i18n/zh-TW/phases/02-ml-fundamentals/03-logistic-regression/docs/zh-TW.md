@@ -20,7 +20,7 @@
 
 邏輯斯迴歸能解決這個問題。它取用相同的線性組合（linear combination，wx + b），再將結果送入 sigmoid 函數，把任意數值壓縮到 (0, 1) 範圍內。輸出值就是機率。你可以設定閾值（threshold，通常是 0.5），據此做出判斷。
 
-這是實務上最廣泛使用的演算法之一。儘管名稱中有「迴歸」，邏輯斯迴歸其實是分類演算法，不是迴歸演算法。它的名稱來自所使用的邏輯斯函數（logistic function），也就是 sigmoid 函數。
+這是實務上最廣泛使用的演算法（algorithm）之一。儘管名稱中有「迴歸」，邏輯斯迴歸其實是分類演算法（algorithm），不是迴歸演算法（algorithm）。它的名稱來自所使用的邏輯斯函數（logistic function），也就是 sigmoid 函數。
 
 ## The Concept｜核心概念
 
@@ -55,7 +55,7 @@ sigmoid(z) = 1 / (1 + e^(-z))
 - 輸出值永遠介於 0 和 1 之間
 - 函數處處平滑且可微
 
-它的導數有個方便的形式：sigmoid'(z) = sigmoid(z) * (1 - sigmoid(z))。這讓梯度（gradient）計算有效率。
+它的導數（derivative）有個方便的形式：sigmoid'(z) = sigmoid(z) * (1 - sigmoid(z))。這讓梯度（gradient）計算有效率。
 
 ### 邏輯斯迴歸 = 線性模型 + sigmoid
 
@@ -523,6 +523,6 @@ print(f"\nClassification Report:\n{classification_report(y_te, y_pred)}")
 | 召回率（recall） | 「有多少相關項目被找出」 | TP / (TP + FN)，實際正類中由模型正確找出的比例 |
 | F1 分數（F1 score） | 「同時平衡精確率與召回率」 | 精確率與召回率的調和平均數：2*P*R / (P+R) |
 | 混淆矩陣（confusion matrix） | 「錯誤分類明細」 | 顯示各類別配對的 TP、TN、FP、FN 數量的表格 |
-| 閾值（threshold） | 「判斷切點」 | 機率高於此值時，模型預測為類別 1（預設 0.5，可調整） |
+| 閾值（threshold） | 「判斷切點」 | 機率高於這個閾值時，模型預測為類別 1（預設（default） 0.5，可調整） |
 | one-hot 編碼（one-hot encoding） | 「類別的二元欄位」 | 以全零向量表示類別，並在該類別的位置設為 1 |
 | 類別交叉熵（categorical cross-entropy） | 「多類別對數損失」 | 將二元交叉熵延伸至 k 個類別，並使用 one-hot 編碼標籤 |

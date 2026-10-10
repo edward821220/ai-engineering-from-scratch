@@ -12,7 +12,7 @@
 - 從頭實作 K-Means、DBSCAN 和高斯混合模型（Gaussian Mixture Model，GMM），並比較它們的分群（clustering）行為
 - 使用輪廓分數（silhouette score）評估分群品質，並以手肘法（elbow method）選出最佳 K 值
 - 說明何時 DBSCAN 優於 K-Means，並辨識哪些演算法能處理非球形群集（non-spherical cluster）和離群值（outlier）
-- 使用分群方法建立異常偵測（anomaly detection）管線，標記偏離正常模式的資料點（data point）
+- 使用分群方法建立異常偵測（anomaly detection）管線（pipeline），標記偏離正常模式的資料點（data point）
 
 ## The Problem｜問題
 
@@ -33,9 +33,9 @@ flowchart LR
     A[原始資料] --> B{選擇方法}
     B --> C[K-Means]
     B --> D[DBSCAN]
-    B --> E[階層式分群（hierarchical clustering）]
+    B --> E[階層式分群（hierarchical clustering）（hierarchical clustering）]
     B --> F[GMM]
-    C --> G[非階層式分群、球形群集（spherical cluster）]
+    C --> G[非階層式分群（hierarchical clustering）、球形群集（spherical cluster）]
     D --> H[任意形狀、雜訊偵測]
     E --> I[巢狀群集樹]
     F --> J[軟式指派（soft assignment）、橢圓形群集（elliptical cluster）]
@@ -62,13 +62,13 @@ Lloyd 演算法（Lloyd's algorithm）：
 
 **輪廓分數：** 對每個資料點，計算它到所屬群集其他資料點的平均距離（a），以及到最近其他群集各資料點的平均距離（b）。輪廓係數（silhouette coefficient）為 (b - a) / max(a, b)，範圍從 -1（分錯群）到 +1（分群良好）。將所有資料點的係數取平均，得到整體輪廓分數。
 
-### DBSCAN：密度式分群（density-based clustering）
+### DBSCAN：密度（density）式分群（density-based clustering）
 
-K-Means 假設群集呈球形，且要求事先指定 K 值。DBSCAN 不作這兩項假設，而是在高密度區域之間以低密度區域為界，找出群集。
+K-Means 假設群集呈球形，且要求事先指定 K 值。DBSCAN 不作這兩項假設，而是在高密度（density）區域之間以低密度（density）區域為界，找出群集。
 
 DBSCAN 有兩個參數（parameter）：
 - **eps**：鄰域半徑（neighborhood radius）
-- **min_samples**：形成高密度區域所需的最少資料點數
+- **min_samples**：形成高密度（density）區域所需的最少資料點數
 
 資料點分為三種類型：
 - **核心點（core point）**：eps 鄰域內至少有 min_samples 個資料點
@@ -77,9 +77,9 @@ DBSCAN 有兩個參數（parameter）：
 
 DBSCAN 會將彼此距離在 eps 以內的核心點連成同一個群集。邊界點會加入附近核心點所屬的群集；雜訊點則不屬於任何群集。
 
-優點：能找出任何形狀的群集、自動決定群集數量，也能辨識離群值。缺點：難以處理密度不同的群集。
+優點：能找出任何形狀的群集、自動決定群集數量，也能辨識離群值。缺點：難以處理密度（density）不同的群集。
 
-### 階層式分群
+### 階層式分群（hierarchical clustering）
 
 建立一棵呈現巢狀群集關係的樹狀圖（dendrogram）。
 
@@ -111,11 +111,11 @@ GMM 能表示橢圓形群集（不只像 K-Means 一樣處理球形群集），�
 | 方法 | 適用情況 | 避免使用的情況 |
 |--------|----------|------------|
 | K-Means | 大型資料集（dataset）、球形群集、已知 K 值 | 形狀不規則或含有離群值 |
-| DBSCAN | K 值未知、形狀任意、需要偵測離群值 | 密度不同或維度（dimension）非常高 |
-| 階層式分群 | 小型資料集、需要樹狀圖、K 值未知 | 大型資料集（記憶體（memory）用量為 O(n^2)） |
+| DBSCAN | K 值未知、形狀任意、需要偵測離群值 | 密度（density）不同或維度（dimension）非常高 |
+| 階層式分群（hierarchical clustering） | 小型資料集、需要樹狀圖、K 值未知 | 大型資料集（記憶體（memory）用量為 O(n^2)） |
 | GMM | 群集重疊、需要軟式指派 | 資料集極大或維度太多 |
 
-### 使用分群進行異常偵測
+### 以分群偵測異常
 
 分群方法也能自然地用於異常偵測：
 - **K-Means**：遠離所有質心的資料點就是異常
@@ -469,7 +469,7 @@ agg = AgglomerativeClustering(n_clusters=3).fit(data)
 gmm_model = GaussianMixture(n_components=3, random_state=42).fit(data)
 ```
 
-從頭實作的版本能清楚呈現這些函式庫（library）實際執行的運算。K-Means 反覆進行指派與重新計算；DBSCAN 從高密度的起始點逐步擴展群集；GMM 則在 E 步驟與 M 步驟間交替。函式庫版本加入數值穩定性（numerical stability）、更聰明的初始化方式（K-Means++）和 GPU 加速，但核心邏輯相同。
+從頭實作的版本能清楚呈現這些函式庫（library）實際執行的運算。K-Means 反覆指派資料點並重新計算質心；DBSCAN 從高密度（density）的起始點逐步擴展群集；GMM 則在 E 步驟與 M 步驟間交替。函式庫版本加入數值穩定性（numerical stability）、更聰明的初始化方式（K-Means++）和 GPU 加速，但核心邏輯相同。
 
 ## Ship It｜交付成果
 
@@ -477,9 +477,9 @@ gmm_model = GaussianMixture(n_components=3, random_state=42).fit(data)
 
 ## Exercises｜練習
 
-1. 實作 K-Means++ 初始化：不要隨機挑選所有質心；先隨機選第一個，之後每個質心被選中的機率，與它到最近既有質心的距離平方成正比。比較這種方法與隨機初始化的收斂速度（convergence speed）。
+1. 實作 K-Means++ 初始化：不要隨機挑選所有質心；先隨機選第一個，之後每個質心被選中的機率，與它到最近既有質心的距離平方成正比。比較這種方法與隨機初始化的收斂速度（convergence）（convergence speed）。
 2. 在程式中加入凝聚式階層分群，實作 Ward 法，並產生樹狀圖（以巢狀合併清單表示）。在不同高度切割樹狀圖，再與 K-Means 結果比較。
-3. 建立簡單的異常偵測管線：對相同資料分別執行 DBSCAN 和 GMM，標記兩種方法都判定為離群值的資料點（DBSCAN 中的雜訊點、GMM 中機率很低的點）。計算兩種方法判定結果的重疊程度，並討論它們何時會有不同判斷。
+3. 建立簡單的異常偵測管線（pipeline）：對相同資料分別執行 DBSCAN 和 GMM，標記兩種方法都判定為離群值的資料點（DBSCAN 中的雜訊點、GMM 中機率很低的點）。計算兩種方法判定結果的重疊程度，並討論它們何時會有不同判斷。
 
 ## Key Terms｜關鍵術語
 
@@ -489,13 +489,13 @@ gmm_model = GaussianMixture(n_components=3, random_state=42).fit(data)
 | 質心（centroid） | 「群集的中心」 | 指派到某個群集的所有資料點之平均位置；K-Means 以此代表該群集 |
 | 慣性（inertia） | 「群集有多緊密」 | 每個資料點到其所屬質心的平方距離總和；數值越低，群集越緊密 |
 | 輪廓分數（silhouette score） | 「群集分隔得多好」 | 對每個資料點計算 (b - a) / max(a, b)，其中 a 是群內平均距離，b 是到最近群集的平均距離 |
-| 核心點（core point） | 「位於高密度區域的資料點」 | 在 DBSCAN 中，eps 鄰域內至少有 min_samples 個鄰居的資料點 |
+| 核心點（core point） | 「位於高密度（density）區域的資料點」 | 在 DBSCAN 中，eps 鄰域內至少有 min_samples 個鄰居的資料點 |
 | 期望最大化演算法（EM algorithm） | 「軟式 K-Means」 | 期望最大化演算法：反覆計算隸屬機率（E 步驟），並更新分布參數（M 步驟） |
-| 樹狀圖（dendrogram） | 「群集樹」 | 顯示階層式分群中群集合併順序與距離的樹狀圖 |
+| 樹狀圖（dendrogram） | 「群集樹」 | 顯示階層式分群（hierarchical clustering）中群集合併順序與距離的樹狀圖 |
 | 異常（anomaly） | 「離群值」 | 不符合預期模式的資料點；DBSCAN 會將其辨識為雜訊點，GMM 則會給予低機率 |
 
 ## Further Reading｜延伸閱讀
 
 - [Stanford CS229 - Unsupervised Learning](https://cs229.stanford.edu/notes2022fall/main_notes.pdf)——Andrew Ng 的分群與 EM 演算法課堂筆記
 - [scikit-learn Clustering Guide](https://scikit-learn.org/stable/modules/clustering.html)——透過視覺範例實際比較各種分群演算法的指南
-- [DBSCAN original paper (Ester et al., 1996)](https://www.aaai.org/Papers/KDD/1996/KDD96-037.pdf)——提出密度式分群的原始論文
+- [DBSCAN original paper (Ester et al., 1996)](https://www.aaai.org/Papers/KDD/1996/KDD96-037.pdf)——提出密度（density）式分群的原始論文

@@ -12,7 +12,7 @@
 - 建立圖類別，支援相鄰矩陣（adjacency matrix）與相鄰串列（adjacency list）表示法，並實作廣度優先搜尋（breadth-first search，BFS）和深度優先搜尋（depth-first search，DFS）走訪
 - 計算圖拉普拉斯矩陣（graph Laplacian），並利用其特徵值（eigenvalues）偵測連通分量（connected components）、為節點（nodes）分群
 - 將一輪圖神經網路（Graph Neural Network，GNN）風格的訊息傳遞（message passing）實作為正規化相鄰矩陣（normalized adjacency matrix）乘法
-- 使用 Fiedler 向量（Fiedler vector）套用譜分群（spectral clustering），將圖分割成數個群集
+- 使用 Fiedler 向量（Fiedler vector）套用譜分群（spectral clustering），將圖分割（graph partitioning）成數個群集
 
 ## The Problem｜問題
 
@@ -49,7 +49,7 @@
 
 ### 相鄰矩陣
 
-相鄰矩陣（adjacency matrix）A 是圖的核心表示法。對於有 n 個節點的圖：
+相鄰矩陣（adjacency matrix）A 是圖的核心表示法。若圖有 n 個節點：
 
 ```
 A[i][j] = 1    if there is an edge from node i to node j
@@ -84,11 +84,11 @@ D[i][j] = 0    for i != j
 
 以三角形為例：D = diag(2, 2, 2)，因為每個節點都連到另外兩個節點。
 
-度數能反映節點的重要性。度數高的節點是樞紐節點（hub node）。網路的度分布（degree distribution）會揭示其結構。社群網路的度分布常符合冪律（power law）：少數樞紐節點（hub nodes）連結很多節點，多數葉節點（leaf nodes）連結很少。隨機圖（random graph）的度數則呈卜瓦松分布（Poisson distribution）。
+度數能反映節點的重要性。度數高的節點是樞紐節點（hub node）。網路的度分布（degree distribution）（degree distribution）會揭示其結構。社群網路的度分布（degree distribution）常符合冪律（power law）：少數樞紐節點（hub nodes）連結很多節點，多數葉節點（leaf nodes）連結很少。隨機圖（random graph）的度數則呈卜瓦松分布（Poisson distribution）。
 
 ### BFS 與 DFS
 
-廣度優先搜尋（BFS）和深度優先搜尋（DFS）是兩種基本的圖形走訪演算法，兩者都不可或缺。
+廣度優先搜尋（BFS）和深度優先搜尋（DFS）是兩種基本的圖形走訪（graph traversal）演算法，兩者都不可或缺。
 
 **廣度優先搜尋（BFS）：** 先探索所有鄰居節點（neighbor），再探索這些鄰居的鄰居。它使用佇列（queue，先進先出；FIFO）。
 
@@ -146,7 +146,7 @@ D = [[2, 0, 0],    A = [[0, 1, 1],    L = [[2, -1, -1],
 
 1. **L 是半正定（positive semidefinite）。** 所有特徵值都 >= 0。
 
-2. **零特徵值的數量等於連通分量（connected component）的數量。** 連通圖（connected graph）恰好有一個零特徵值；若圖有 3 個互不相連的部分，就會有 3 個零特徵值。
+2. **零特徵值的數量等於連通分量（connected component）的數量。** 連通圖（connected graph）恰好有一個零特徵值；若圖有 3 個連通分量，就會有 3 個零特徵值。
 
 3. **最小的非零特徵值（Fiedler 值，Fiedler value）衡量連通性（connectivity）。** Fiedler 值越大，圖的連結越緊密；越小則表示圖有薄弱處，也就是瓶頸（bottleneck）。
 
@@ -235,9 +235,9 @@ graph LR
 | 相鄰矩陣（adjacency matrix） | GNN 輸入表示法 |
 | 拉普拉斯矩陣（Laplacian） | 譜分群、社群偵測（community detection） |
 | BFS／DFS | 知識圖譜走訪、尋找路徑 |
-| 度分布（degree distribution） | 節點重要性、特徵工程（feature engineering） |
+| 度分布（degree distribution）（degree distribution） | 節點重要性、特徵工程（feature engineering） |
 | 訊息傳遞（message passing） | GNN 層（圖卷積網路（Graph Convolutional Network，GCN）、圖注意力網路（Graph Attention Network，GAT）、GraphSAGE） |
-| L 的特徵值 | 社群偵測（community detection）、圖分割（graph partitioning） |
+| L 的特徵值 | 社群偵測（community detection）、圖分割（graph partitioning）（graph partitioning） |
 | 譜分群（spectral clustering） | 非監督式（unsupervised）節點分群 |
 | PageRank | 節點重要性、網頁搜尋 |
 
@@ -458,7 +458,7 @@ Fiedler 向量負責完成主要工作：正值會落在一個群集，負值會
 | BFS | 知識圖譜走訪、最短路徑查詢 |
 | 訊息傳遞 | 每個 GNN 層、神經訊息傳遞 |
 | 譜隙 | 圖連通性、隨機漫步的混合時間 |
-| 度分布 | 冪律網路、節點特徵工程 |
+| 度分布（degree distribution） | 冪律網路、節點特徵工程 |
 | 連通分量 | 前處理（preprocessing）、處理不連通的圖 |
 | PageRank | 節點重要性排序、注意力（attention）初始化 |
 
@@ -480,7 +480,7 @@ H^(l+1) = sigma(D_hat^(-1/2) * A_hat * D_hat^(-1/2) * H^(l) * W^(l))
 
 4. **建立兩層訊息傳遞網路。** 使用不同的權重矩陣執行兩輪訊息傳遞。說明為何兩輪之後，每個節點都能取得其 2 跳鄰域的資訊。
 
-5. **分析真實圖資料。** 使用 Karate Club 圖（34 個節點、78 條邊），計算度分布、拉普拉斯矩陣特徵值和譜分群結果，再與已知的真實分群標籤（ground truth）比較。
+5. **分析真實圖資料。** 使用 Karate Club 圖（34 個節點、78 條邊），計算度分布（degree distribution）、拉普拉斯矩陣特徵值和譜分群結果，再與已知的真實分群標籤（ground truth）比較。
 
 ## Key Terms｜關鍵術語
 
@@ -500,7 +500,7 @@ H^(l+1) = sigma(D_hat^(-1/2) * A_hat * D_hat^(-1/2) * H^(l) * W^(l))
 ## Further Reading｜延伸閱讀
 
 - **Kipf & Welling（2017）**——「Semi-Supervised Classification with Graph Convolutional Networks」。開啟現代 GNN 研究的論文，說明譜圖卷積如何簡化為訊息傳遞。
-- **Spielman（2012）**——「Spectral Graph Theory」課程講義。深入介紹拉普拉斯矩陣、譜隙和圖分割的經典教材。
+- **Spielman（2012）**——「Spectral Graph Theory」課程講義。深入介紹拉普拉斯矩陣、譜隙和圖分割（graph partitioning）的經典教材。
 - **Hamilton（2020）**——「Graph Representation Learning」。從基礎到應用介紹 GNN 的專書。
 - **Bronstein et al.（2021）**——「Geometric Deep Learning: Grids, Groups, Graphs, Geodesics, and Gauges」。提出統一框架的論文。
 - **Veličković et al.（2018）**——「Graph Attention Networks」。將注意力機制加入訊息傳遞的研究。

@@ -51,7 +51,7 @@ P(class | features) = P(features | class) * P(class) / P(features)
 P(w1, w2, ..., wn | class) = P(w1 | class) * P(w2 | class) * ... * P(wn | class)
 ```
 
-你不必估計一個做不到的聯合分布，只要估計 n 個簡單的單特徵分布。每一個只需要一個計數。
+你不必估計一個做不到的聯合分布（joint distribution），只要估計 n 個簡單的單特徵分布。每一個只需要一個計數。
 
 這個假設顯然是錯的。任何文件裡「machine」和「learning」都不獨立。但分類器不需要正確的機率估計，它需要正確的排名——哪個類別的機率最高。獨立性假設會帶入系統性誤差，但這些誤差對所有類別的影響類似，所以排名仍然正確。
 
@@ -63,9 +63,9 @@ P(w1, w2, ..., wn | class) = P(w1 | class) * P(w2 | class) * ... * P(wn | class)
 
 2. **高偏差（high bias）、低變異（low variance）。** 獨立性假設是很強的先驗。它大幅限制模型，從而防止過度擬合。訓練資料有限時，一個稍有偏差但穩定的模型，勝過理論上正確卻非常不穩定的模型。這就是偏差－變異取捨的具體展現。
 
-3. **特徵冗餘會互相抵消。** 相關的特徵提供的是重複證據。分類器會把這份證據算兩次，但它也是對正確的類別算兩次。如果「machine」和「learning」總是一起出現，兩者都是「tech」類別的證據。單純貝氏把它們各算一次、合計兩次，但兩次都算在正確的類別上。
+3. **特徵冗餘（feature redundancy）會互相抵消。** 相關的特徵提供的是重複證據。分類器會把這份證據算兩次，但它也是對正確的類別算兩次。如果「machine」和「learning」總是一起出現，兩者都是「tech」類別的證據。單純貝氏把它們各算一次、合計兩次，但兩次都算在正確的類別上。
 
-第四個實務原因：單純貝氏非常快。訓練只是把資料走一遍、計算頻率。預測是一次矩陣乘法。一百萬份文件可以在幾秒內訓練完。這種速度讓你能更快迭代、嘗試更多特徵集合、跑更多實驗。
+第四個實務原因：單純貝氏非常快。訓練只是把資料走一遍、計算頻率。預測是一次矩陣乘法（matrix multiplication）。一百萬份文件可以在幾秒內訓練完。這種速度讓你能更快迭代、嘗試更多特徵集合、跑更多實驗。
 
 ### 逐步數學
 
@@ -166,7 +166,7 @@ alpha 的效果：
 |-------|--------|-------------|
 | 0.001 | 幾乎不平滑，信任資料 | 訓練集非常大，預期不會有沒見過的特徵 |
 | 0.1 | 輕度平滑 | 大型訓練集 |
-| 1.0 | 標準拉普拉斯平滑 | 預設的起點 |
+| 1.0 | 標準拉普拉斯平滑 | 預設（default）起點 |
 | 10.0 | 重度平滑，把分布壓平 | 訓練集非常小，預期有很多沒見過的特徵 |
 
 ### 對數空間計算
@@ -186,7 +186,7 @@ log_scores = X @ log_feature_probs.T + log_class_priors
 prediction = argmax(log_scores)
 ```
 
-一次矩陣乘法。這就是單純貝氏預測這麼快的原因——它和單層線性模型是同一種運算。
+一次矩陣乘法（matrix multiplication）。這就是單純貝氏預測這麼快的原因——它和單層線性模型是同一種運算。
 
 ### 單純貝氏與邏輯斯迴歸
 
@@ -239,7 +239,7 @@ naive-bayes
 
 1. **fit(X, y)：** 對每個類別計算各特徵的頻率。加上拉普拉斯平滑。計算對數機率（log probability）。儲存類別先驗（class prior）（類別頻率的對數）。
 
-2. **predict_log_proba(X)：** 對每個樣本、每個類別，計算 log P(class) 加上所有 log P(feature_i | class) 的和。這是一次矩陣乘法：X @ log_probs.T + log_priors。
+2. **predict_log_proba(X)：** 對每個樣本、每個類別，計算 log P(class) 加上所有 log P(feature_i | class) 的和。這是一次矩陣乘法（matrix multiplication）：X @ log_probs.T + log_priors。
 
 3. **predict(X)：** 回傳對數機率最高的類別。
 
@@ -266,7 +266,7 @@ class MultinomialNB:
         return self
 ```
 
-關鍵洞見：擬合之後，預測只是矩陣乘法再加上一個偏置（bias）。這就是單純貝氏這麼快的原因。
+關鍵洞見：擬合之後，預測只是矩陣乘法（matrix multiplication）再加上一個偏置（bias）。這就是單純貝氏這麼快的原因。
 
 ### GaussianNB
 
@@ -312,8 +312,8 @@ class GaussianNB:
 
 ### 預測速度
 
-單純貝氏的預測是一次矩陣乘法。對 n 個樣本、d 個特徵、k 個類別：
-- MultinomialNB：一次矩陣乘法 (n x d) @ (d x k) = O(n * d * k)
+單純貝氏的預測是一次矩陣乘法（matrix multiplication）。對 n 個樣本、d 個特徵、k 個類別：
+- MultinomialNB：一次矩陣乘法（matrix multiplication） (n x d) @ (d x k) = O(n * d * k)
 - GaussianNB：n * k 次高斯機率密度計算，每次涵蓋 d 個特徵 = O(n * d * k)
 
 兩者在每個維度上都是線性的。對比必須對所有訓練點算距離的 k 最近鄰法，或必須對所有支援向量（support vector）計算核函數（kernel function）的 RBF 核 SVM，單純貝氏在預測時快上好幾個數量級。
@@ -371,7 +371,7 @@ TF-IDF 的值是非負的，所以可以搭配 MultinomialNB。TF-IDF 加上 Mul
 
 ### 短文字用 BernoulliNB
 
-對短文字（推文、簡訊、聊天訊息），BernoulliNB 可以勝過 MultinomialNB。短文字的詞數很低，所以 MultinomialNB 依賴的頻率資訊很吵。BernoulliNB 只在乎出現或未出現，在短文字上更可靠。
+對短文字（推文、簡訊、聊天訊息），BernoulliNB 可以勝過 MultinomialNB。短文字的詞數很低，所以 MultinomialNB 依賴的頻率資訊雜訊較大。BernoulliNB 只在乎出現或未出現，在短文字上更可靠。
 
 ```python
 from sklearn.naive_bayes import BernoulliNB
@@ -383,7 +383,7 @@ text_clf = Pipeline([
 ])
 ```
 
-CountVectorizer 的 `binary=True` 旗標會把所有計數轉成 0/1。沒有這個旗標，BernoulliNB 仍然能跑，但它看到的是自己並不是為了處理而設計的計數。
+CountVectorizer 的 `binary=True` 旗標會把所有計數轉成 0/1。沒有這個旗標，BernoulliNB 仍然能跑，但但這些計數並非 BernoulliNB 設計來處理的輸入。
 
 ### 校準單純貝氏的機率
 

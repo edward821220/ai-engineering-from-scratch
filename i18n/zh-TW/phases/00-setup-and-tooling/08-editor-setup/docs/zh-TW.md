@@ -11,7 +11,7 @@
 
 - 安裝 VS Code，以及支援 Python、Jupyter、程式碼檢查（linting）和 Remote SSH 的必要擴充功能（extension）
 - 為 AI 工作流程設定儲存時自動格式化（format on save）、型別檢查（type checking），以及 notebook 輸出捲動
-- 設定 Remote SSH，讓你能像在本機一樣，編輯遠端 GPU 主機上的程式碼並進行除錯
+- 設定 Remote SSH，讓你能像在本機一樣，編輯遠端 GPU 主機（host）上的程式碼並進行除錯
 - 評估可替代的編輯器（Cursor、Windsurf、Neovim），以及它們用於 AI 工作時的取捨
 
 ## The Problem｜問題
@@ -22,7 +22,7 @@
 
 ## The Concept｜核心概念
 
-AI 工程的編輯器設定需要五個要素：
+AI 工程（AI engineering）的編輯器設定需要五個要素：
 
 ```mermaid
 graph TD
@@ -76,7 +76,7 @@ code --install-extension charliermarsh.ruff
 | Pylance | 快速型別檢查、自動完成、匯入解析（import resolution） |
 | Jupyter | 在 VS Code 內執行 notebook、變數瀏覽器（variable explorer） |
 | GitLens | 查看檔案變更者，並在程式碼行內顯示 git blame 資訊 |
-| Remote SSH | 將遠端 GPU 主機上的資料夾當成本機資料夾開啟 |
+| Remote SSH | 將遠端 GPU 主機（host）上的資料夾當成本機資料夾開啟 |
 | Debugpy | Python 逐步除錯 |
 | Black Formatter | 儲存時自動格式化程式碼，維持一致的風格 |
 | Ruff | 快速程式碼檢查，抓出常見問題 |
@@ -105,11 +105,11 @@ AI 工作常用的幾項設定：
 - **儲存時自動格式化：** 你不必再操心程式碼格式，Black 會處理。
 - **88 和 120 字元尺標：** Black 會在 88 個字元處換行；120 字元的尺標則提醒你 docstring 和註解是否太長。
 - **Notebook 輸出捲動：** 訓練迴圈會印出成千上萬行。沒有捲動功能，輸出面板就會被大量內容撐開。
-- **自動儲存：** 你總會忘記儲存，訓練程式就會執行舊程式碼。自動儲存能避免這個問題。
+- **自動儲存：** 你總會忘記儲存，訓練程式檔案就會執行舊程式碼。自動儲存能避免這個問題。
 
 ### 步驟 4：整合終端機
 
-VS Code 的整合式終端機可用來執行訓練程式、監控 GPU，以及管理環境。
+VS Code 的整合式終端機可用來執行訓練程式檔案、監控 GPU，以及管理環境。
 
 妥善設定終端機：
 
@@ -141,7 +141,7 @@ VS Code 的整合式終端機可用來執行訓練程式、監控 GPU，以及�
 1. 安裝 Remote SSH 擴充功能（已在步驟 2 完成）。
 2. 按下 `Ctrl+Shift+P`（或 `Cmd+Shift+P`），輸入 "Remote-SSH: Connect to Host"。
 3. 輸入 `user@your-gpu-box-ip`。
-4. VS Code 會自動在遠端機器上安裝伺服器元件。
+4. VS Code 會自動在遠端機器上安裝伺服器（server）元件（component）。
 
 若要免密碼連線，請設定 SSH 金鑰（SSH key）：
 
@@ -182,7 +182,7 @@ Host gpu-box
 - 使用 **telescope.nvim** 搜尋檔案或符號
 - 使用 **none-ls.nvim** 搭配 black 和 ruff 格式化及檢查程式碼
 
-如果你目前沒有使用 Vim，就別從現在開始。學習曲線會和 AI 工程學習互相拉扯。使用 VS Code 就好。
+如果你目前沒有使用 Vim，就別從現在開始。學習曲線會和 AI 工程（AI engineering）學習互相拉扯。使用 VS Code 就好。
 
 ## Use It｜實際應用
 
@@ -191,7 +191,7 @@ Host gpu-box
 1. 在 VS Code 開啟專案資料夾（project folder），或透過 Remote SSH 連線到 GPU 主機。
 2. 在編輯器中撰寫 Python，使用自動完成、型別提示和行內錯誤訊息。
 3. 使用 Jupyter 擴充功能，在 notebook 中直接執行程式碼。
-4. 使用整合式終端機執行訓練程式、`uv pip install` 和監控 GPU。
+4. 使用整合式終端機執行訓練程式檔案、`uv pip install` 和監控 GPU。
 5. 在 commit 前用 GitLens 檢視變更。
 
 ## Exercises｜練習

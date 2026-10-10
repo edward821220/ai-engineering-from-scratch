@@ -164,7 +164,7 @@ O(n^3) 的成本只在分解時支付一次。之後每次求解都只需 O(n^2)
 
 QR 分解會將 A 分解成正交矩陣（orthogonal matrix）Q 和上三角矩陣 R：A = QR。
 
-正交矩陣具有 Q^T Q = I 的性質。它的欄是標準正交（orthonormal）向量。乘上 Q 會保留長度和角度。
+正交矩陣滿足 Q^T Q = I。它的欄是標準正交（orthonormal）向量。乘上 Q 會保留長度和角度。
 
 ```
 A = Q @ R
@@ -272,7 +272,7 @@ w = (X^T X)^(-1) X^T y
 w = (X^T X + lambda * I)^(-1) X^T y
 ```
 
-正則化會改善矩陣的條件數，使求逆更準確，並將權重往零縮減，以避免過度擬合。當 lambda > 0 時，矩陣 X^T X + lambda * I 永遠是對稱正定矩陣，因此可以用 Cholesky 分解求解。
+正則化會改善矩陣的條件數，使求逆更準確，並將權重往零縮減，以避免過度擬合（overfitting）。當 lambda > 0 時，矩陣 X^T X + lambda * I 永遠是對稱正定矩陣，因此可以用 Cholesky 分解求解。
 
 ### 廣義反矩陣（pseudoinverse；Moore-Penrose）
 
@@ -331,7 +331,7 @@ small change in x                    huge change in x
 
 ### 迭代法：共軛梯度法
 
-對具有數百萬個未知數的大型稀疏系統（sparse system），LU 或 Cholesky 等直接法的成本太高。迭代法（iterative method）會在多次迭代中逐步改善初始猜測值，以近似求解。
+若要解含有數百萬個未知數的大型稀疏系統（sparse system），LU 或 Cholesky 等直接法的成本太高。迭代法（iterative method）會在多次迭代中逐步改善初始猜測值，以近似求解。
 
 共軛梯度法（conjugate gradient，CG）可在 A 為對稱正定矩陣時求解 Ax = b。在精確算術下，它至多 n 次迭代就能找到精確解；若 A 的特徵值聚集在一起，實務上通常會更快收斂。
 
@@ -567,7 +567,7 @@ print(f"Ridge weights (sklearn): {ridge_sk.coef_}")
 | 正規方程組（normal equations） |「微積分的捷徑」| A^T A x = A^T b。令 ||Ax - b||^2 的梯度為零即可得到。這就是線性迴歸的封閉解。 |
 | 廣義反矩陣（pseudoinverse） |「非方陣的反矩陣」| 透過 SVD 得到 A+ = V Sigma+ U^T。對任意方陣或長方矩陣、奇異或非奇異矩陣，都能求得最小範數的最小平方法解。 |
 | 條件數（condition number） |「這個解有多可靠？」| kappa = sigma_max / sigma_min。衡量解對輸入擾動的敏感度。大約會損失 log10(kappa) 位精度。 |
-| 嶺迴歸（ridge regression） |「正則化最小平方法」| 求解 (X^T X + lambda I) w = X^T y。加入 lambda I 可改善條件數，並將權重往零縮減，以避免過度擬合。 |
+| 嶺迴歸（ridge regression） |「正則化最小平方法」| 求解 (X^T X + lambda I) w = X^T y。加入 lambda I 可改善條件數，並將權重往零縮減，以避免過度擬合（overfitting）。 |
 | 共軛梯度法（conjugate gradient） |「大型矩陣的迭代式 Ax=b 求解法」| 用於對稱正定系統的迭代求解器，至多 n 步即可收斂。適合分解成本太高的大型稀疏系統。 |
 | 超定系統（overdetermined system） |「資料比參數多」| m x n 系統中 m > n，因此沒有精確解。最小平方法會找出最佳近似解。每個迴歸問題都是如此。 |
 | 回代（back substitution） |「從底部往上解」| 給定上三角方程組，先解最後一個方程式，再逐步向上代回。運算量為 O(n^2)。 |

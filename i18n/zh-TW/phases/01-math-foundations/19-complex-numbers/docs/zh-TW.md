@@ -9,14 +9,14 @@
 
 ## Learning Objectives｜學習目標
 
-- 以直角座標形式（rectangular form）和極式（polar form）進行複數（complex numbers）運算（complex arithmetic）：加法、乘法、除法與求共軛（conjugate）
+- 以直角座標形式（rectangular form）和極式（polar form）以直角座標形式和極式實作複數運算：加法、乘法、除法與求共軛（conjugate）
 - 運用歐拉公式（Euler's formula），在複指數函數（complex exponentials）和三角函數（trigonometric functions）之間轉換
 - 使用單位根（roots of unity）實作離散傅立葉轉換（Discrete Fourier Transform，DFT）
 - 說明複數旋轉如何構成 transformer 中的 RoPE（Rotary Position Embedding）和正弦位置編碼（sinusoidal positional encoding）
 
 ## The Problem｜問題
 
-你讀一篇傅立葉轉換（Fourier transform）的論文，裡面到處都是 `i`。你看 transformer 的位置編碼（positional encoding），會看到不同頻率下的 `sin` 和 `cos`；它們是複指數函數的實部（real part）和虛部（imaginary part）。你讀量子計算（quantum computing）相關內容，發現所有東西都以複數向量空間（complex vector spaces）表示。
+你讀一篇傅立葉轉換（Fourier transform）的論文，裡面到處都是 `i`。你看 transformer 的位置編碼（positional encoding），會看到不同頻率下的 `sin` 和 `cos`；它們是複指數函數的實部（real part）和虛部（imaginary part）。你讀量子計算（quantum computing）相關內容，發現所有東西都以複數向量空間（complex vector space）（complex vector spaces）表示。
 
 複數（complex numbers）看起來很抽象。以 -1 的平方根為基礎建立數系，感覺像是數學上的取巧。但它並非取巧，而是描述旋轉和振盪的自然語言。任何會旋轉、振動或振盪的現象，都適合用複數處理。
 
@@ -97,7 +97,7 @@ z = 0 + 4i  corresponds to the point (0, 4) on the imaginary axis
 
 ### 極式
 
-平面上的任意一點，都能用它到原點的距離，以及它相對於正實軸的角度來表示。
+平面上的任意一點，都能用它到原點的距離，以及它與正實軸的夾角來表示。
 
 ```
 z = r * (cos(theta) + i*sin(theta))
@@ -213,7 +213,7 @@ X[k] = sum_{n=0}^{N-1} x[n] * e^(-2*pi*i*k*n/N)
 
 「虛數」這個名稱只是歷史上的偶然。笛卡兒使用這個詞時帶有輕蔑意味。但 i 並不比當年遭人排斥的負數更「不真實」。負數能回答「從 3 減去 5 會得到什麼？」；虛數單位（imaginary unit）則能回答「什麼數平方後會得到 -1？」
 
-更有用的理解方式是：i 是一個旋轉 90 度的旋轉算子（rotation operator）。實數乘上 i 一次，就會向虛軸旋轉 90 度；再乘一次（i^2），就會再轉 90 度，指向負實軸。這就是 i^2 = -1 的原因。它一點也不神祕，只是由兩個四分之一圈組成的半圈旋轉。
+更有用的理解方式是：i 可視為將複數旋轉 90 度的算子（rotation operator）。實數乘上 i 一次，就會向虛軸旋轉 90 度；再乘一次（i^2），就會再轉 90 度，指向負實軸。這就是 i^2 = -1 的原因。它一點也不神祕，只是由兩個四分之一圈組成的半圈旋轉。
 
 這就是複數在工程領域無所不在的原因。凡是會旋轉的事物——電磁波、量子態（quantum states）、訊號振盪和位置編碼——都能自然地用複數描述。
 
@@ -234,7 +234,7 @@ PE(pos, 2i) = sin(pos / 10000^(2i/d))
 PE(pos, 2i+1) = cos(pos / 10000^(2i/d))
 ```
 
-每一組 sin 和 cos 都是不同頻率下複指數函數的實部和虛部。每個頻率都提供一種不同的解析度來編碼位置。低頻變化緩慢（粗略的位置資訊），高頻變化快速（細緻的位置資訊）。各頻率組合起來，會讓每個位置都有獨特的頻率指紋。
+每一組 sin 和 cos 都是不同頻率下複指數函數的實部和虛部。不同頻率能以不同解析度編碼位置。低頻變化緩慢（粗略的位置資訊），高頻變化快速（細緻的位置資訊）。各頻率組合起來，會讓每個位置都有獨特的頻率指紋。
 
 RoPE（Rotary Position Embedding）更進一步，直接讓 query 和 key 向量乘上複數旋轉矩陣。兩個 token 的相對位置會變成旋轉角度。注意力計算會使用旋轉後的向量，透過複數乘法讓模型掌握相對位置。
 

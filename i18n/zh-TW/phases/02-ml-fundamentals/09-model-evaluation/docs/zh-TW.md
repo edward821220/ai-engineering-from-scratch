@@ -9,7 +9,7 @@
 
 ## Learning Objectives｜學習目標
 
-- 從頭實作 K 折（K-fold）與分層 K 折（stratified K-fold）交叉驗證（cross-validation），並說明分層對類別不平衡資料為何重要
+- 從頭實作 K 折（K-fold）與分層 K 折（stratified K-fold）交叉驗證（cross-validation），並說明分層對類別不平衡（class imbalance）資料為何重要
 - 從頭計算精確率（precision）、召回率（recall）、F1 分數（F1 score）、AUC-ROC 與迴歸指標（regression metric）（MSE、RMSE、MAE、R 平方（R-squared））
 - 解讀學習曲線（learning curve），診斷模型是高偏差（high bias）還是高變異（high variance）
 - 辨識常見的評估錯誤：資料洩漏（data leakage）、選錯指標（metric），以及測試集（test set）污染
@@ -87,7 +87,7 @@ flowchart TB
 
 K=5 或 K=10 是標準選擇。每個資料點（data point）恰好被拿來驗證一次。平均分數比任何單一切分都更穩定。
 
-**分層 K 折**：保持每一折的類別分布（class distribution）不變。如果你的資料集是 70% A 類、30% B 類，每一折也會大致維持同樣的比例。這對類別不平衡資料集很重要——隨機切分可能把少數類（minority class）樣本全塞進同一折。
+**分層 K 折**：保持每一折的類別分布（class distribution）不變。如果你的資料集是 70% A 類、30% B 類，每一折也會大致維持同樣的比例。這對類別不平衡（class imbalance）資料集很重要——隨機切分可能把少數類（minority class）樣本全塞進同一折。
 
 ### 分類指標
 
@@ -100,7 +100,7 @@ K=5 或 K=10 是標準選擇。每個資料點（data point）恰好被拿來驗
 
 其他所有指標都從這張矩陣推導出來：
 
-- **準確率** = (TP + TN) / (TP + TN + FP + FN)。預測正確的比例。類別不平衡時會誤導。
+- **準確率** = (TP + TN) / (TP + TN + FP + FN)。預測正確的比例。類別不平衡（class imbalance）時會誤導。
 - **精確率** = TP / (TP + FP)。所有預測為正類的樣本中，實際真的是正類的有多少？當偽陽性代價高時用它（例如垃圾郵件篩選器把正常郵件誤判為垃圾郵件）。
 - **召回率**（亦稱敏感度（sensitivity）） = TP / (TP + FN)。所有實際為正類的樣本中，我們抓到了多少？當偽陰性代價高時用它（例如癌症篩檢漏掉腫瘤）。
 - **F1 分數** = 2 * precision * recall / (precision + recall)。精確率與召回率的調和平均數（harmonic mean）。兩者都重要、沒有誰明顯優先時用它來平衡。
@@ -110,7 +110,7 @@ K=5 或 K=10 是標準選擇。每個資料點（data point）恰好被拿來驗
 
 - **MSE**（Mean Squared Error，均方誤差） = mean((y_true - y_pred)^2)。以平方懲罰大誤差，對離群值（outlier）敏感。
 - **RMSE**（Root Mean Squared Error，均方根誤差） = sqrt(MSE)。與目標變數（target variable）同單位，比 MSE 更好解讀。
-- **MAE**（Mean Absolute Error，平均絕對誤差） = mean(|y_true - y_pred|)。線性對待所有誤差，比 MSE 對離群值更穩健。
+- **MAE**（Mean Absolute Error，平均絕對誤差） = mean(|y_true - y_pred|)。對所有誤差採線性懲罰，比 MSE 對離群值更穩健。
 - **R 平方（R-squared）** = 1 - SS_res / SS_tot，其中 SS_res = sum((y_true - y_pred)^2)，SS_tot = sum((y_true - y_mean)^2)。模型所解釋的變異數（variance）比例。R^2 = 1.0 是完美；R^2 = 0.0 代表模型不比永遠預測平均數好；模型比預測平均數還差時，R^2 甚至可以是負的。
 
 ### 學習曲線
@@ -134,11 +134,11 @@ K=5 或 K=10 是標準選擇。每個資料點（data point）恰好被拿來驗
 
 **資料洩漏**：測試集的資訊滲進訓練。例子：切分前就在完整資料集上擬合縮放器（scaler）、在時間序列（time series）預測裡混入未來資料、使用從目標衍生出來的特徵（feature）。永遠先切分，再前處理（preprocessing）。
 
-**類別不平衡（class imbalance）**：99% 的交易是正常交易，1% 是詐欺。一個永遠預測「正常」的模型能拿到 99% 的準確率。改用精確率、召回率、F1 或 AUC-ROC。
+**類別不平衡（class imbalance）（class imbalance）**：99% 的交易是正常交易，1% 是詐欺。一個永遠預測「正常」的模型能拿到 99% 的準確率。改用精確率、召回率、F1 或 AUC-ROC。
 
 **選錯指標**：該最佳化（optimization）召回率時卻在最佳化準確率（醫療診斷）；資料裡有極端離群值時卻在最佳化 RMSE（這種情況改用 MAE）。
 
-**沒有用分層切分（stratified split）**：類別不平衡時，隨機切分可能讓驗證折只剩極少的少數類樣本，估計就不穩。
+**沒有用分層切分（stratified split）**：類別不平衡（class imbalance）時，隨機切分可能讓驗證折只剩極少的少數類樣本，估計就不穩。
 
 **測試太多次**：每次你看了測試表現再回頭調整，就是在對測試集過度擬合。測試集只能用一次。
 
@@ -654,7 +654,7 @@ scores = cross_val_score(model, X, y, cv=StratifiedKFold(5), scoring="f1")
 
 ## Exercises｜練習
 
-1. 實作精確率–召回率曲線（precision-recall curve）：畫出不同閾值下的精確率對召回率。計算平均精確率（average precision，PR 曲線下面積）。在類別不平衡資料集上比較 PR 曲線與 ROC 曲線，並說明什麼情況下哪一個更有參考價值。
+1. 實作精確率–召回率曲線（precision-recall curve）：畫出不同閾值下的精確率對召回率。計算平均精確率（average precision，PR 曲線下面積）。在類別不平衡（class imbalance）資料集上比較 PR 曲線與 ROC 曲線，並說明什麼情況下哪一個更有參考價值。
 2. 建立巢狀交叉驗證（nested cross-validation）迴圈：外層迴圈評估模型表現，內層迴圈調整超參數。用它公平比較兩個模型，不把驗證資料洩漏進評估裡。
 3. 實作模型比較用的置換檢定（permutation test）：打亂標籤（label）、重新訓練、測量表現。重複 100 次建立虛無分布（null distribution）。針對觀察到的模型表現，計算對應這個分布的 p 值（p-value）。
 

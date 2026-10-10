@@ -38,7 +38,7 @@ graph TD
     C -->|No| G["拒絕"]
 ```
 
-每個內部節點（internal node）會比較特徵值與閾值（threshold）。每個葉節點（leaf node）都會做出預測。要分類新的資料點，就從根節點（root node）開始，沿著判斷路徑前進，直到抵達葉節點。
+每個內部節點（internal node）會比較特徵值與閾值（threshold）。每個葉節點（leaf node）都會做出預測。要分類新的資料點（data point），就從根節點（root node）開始，沿著判斷路徑前進，直到抵達葉節點。
 
 決策樹由上而下建立；在每個節點，挑選最能區分資料的特徵和閾值。「最好」由分割準則（split criterion）定義。
 
@@ -95,7 +95,7 @@ where the weights are the proportions of samples in each child.
 
 1. 對每個特徵 j（j = 1 到 n）：
    - 依照特徵 j 的值排序樣本
-   - 把每對相鄰且不同的值之間的中點當成候選閾值，逐一嘗試
+   - 將排序後相鄰且不同的特徵值取中點，作為候選閾值，逐一嘗試
    - 計算每個閾值的資訊增益
 2. 選出資訊增益最高的特徵與閾值
 3. 將資料切分成左側（feature <= threshold）與右側（feature > threshold）
@@ -119,7 +119,7 @@ where the weights are the proportions of samples in each child.
 
 預剪枝較簡單、速度也較快。後剪枝通常能產生更好的樹，因為它不會過早停止樹的生長，讓可能再形成有用分割的路徑得以延伸。
 
-### 決策樹迴歸（regression）
+### 迴歸樹（regression tree）（regression）
 
 在迴歸問題中，葉節點會輸出該節點中目標值的平均數。分割準則也會改變：
 
@@ -155,7 +155,7 @@ graph TD
 
 **bagging（bootstrap aggregating，bootstrap 聚合）：**每棵樹都使用 bootstrap 樣本訓練，也就是從訓練資料中有放回抽取的隨機樣本。每次 bootstrap 樣本約會包含原始資料中 63% 的不同樣本；其餘未出現在該樣本中的資料稱為袋外樣本（out-of-bag samples），可用於驗證。
 
-**特徵隨機化（feature randomization）：**在每次分割時，只考慮隨機抽取的一部分特徵。分類的預設值是 sqrt(n_features)，迴歸則是 n_features/3。這可以避免所有樹都用同一個主導特徵來切分。
+**特徵隨機化（feature randomization）：**在每次分割時，只考慮隨機抽取的一部分特徵。分類的預設值（default）是 sqrt(n_features)，迴歸則是 n_features/3。這可以避免所有樹都用同一個主導特徵來切分。
 
 關鍵洞見是：平均許多彼此去相關的樹（decorrelated trees），能降低變異數而不增加偏差（bias）。每棵樹單獨來看可能表現平平，但集成後的模型很強。
 
@@ -187,7 +187,7 @@ importance(feature_j) = sum over all nodes where feature_j is used:
 | 訓練時間 | 幾分鐘 | 幾小時 |
 | 超參數敏感度（hyperparameter sensitivity） | 低 | 高 |
 
-神經網路在資料具有空間或序列結構時更有優勢（例如影像、文字、音訊）。若資料是單純的特徵表格，樹模型就是預設選擇。
+神經網路在資料有空間或序列結構時更有優勢（例如影像、文字、音訊）。若資料是單純的特徵表格，樹模型就是預設選擇。
 
 ```figure
 decision-tree-depth
@@ -442,9 +442,9 @@ print(f"Feature importances: {rf.feature_importances_}")
 
 ## Exercises｜練習
 
-1. 在具有 3 個類別的二維資料集上訓練單一決策樹。手動追蹤分割過程，並畫出矩形決策邊界（decision boundaries）。比較 max_depth=2 與 max_depth=10 時的邊界。
+1. 在含有 3 個類別的二維資料集上訓練單一決策樹。手動追蹤分割過程，並畫出矩形決策邊界（decision boundaries）。比較 max_depth=2 與 max_depth=10 時的邊界。
 
-2. 為迴歸樹實作變異數減少分割。產生 200 個 y = sin(x) + noise 資料點，並訓練迴歸樹。將樹的分段常數預測畫在真實曲線上比較。
+2. 為迴歸樹實作變異數減少分割。產生 200 個 y = sin(x) + noise 資料點（data point），並訓練迴歸樹。將樹的分段常數預測畫在真實曲線上比較。
 
 3. 使用 1、5、10、50 和 200 棵樹建立隨機森林。繪製訓練準確率和測試準確率隨樹數量變化的圖。觀察測試準確率會達到平台期，但不會下降（隨機森林能抵抗過度擬合）。
 

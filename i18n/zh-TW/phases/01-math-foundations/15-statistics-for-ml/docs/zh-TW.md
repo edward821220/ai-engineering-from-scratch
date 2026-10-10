@@ -125,7 +125,7 @@ Spearman:   Ordinal data (rankings, ratings).
             Outliers are present.
 ```
 
-**黃金法則：**相關不代表因果（correlation does not imply causation）。冰淇淋銷量和溺水死亡人數相關，是因為兩者都在夏天增加。模型準確率和參數數量也相關，但增加參數不會自動提升準確率（參見：過度擬合）。
+**黃金法則：**相關不代表因果（correlation does not imply causation）。冰淇淋銷量和溺水死亡人數相關，是因為兩者都在夏天增加。模型準確率和參數數量也相關，但增加參數不會自動提升準確率（參見：過度擬合（overfitting））。
 
 ### 共變異數矩陣
 
@@ -139,7 +139,7 @@ Cov(X, Y) < 0:  when X increases, Y tends to decrease
 Cov(X, Y) = 0:  no linear co-movement
 ```
 
-若有 d 個特徵，共變異數矩陣（covariance matrix）C 就是 d x d 矩陣，其中 C[i][j] = Cov(feature_i, feature_j)。對角線項目 C[i][i] 是各特徵的變異數。
+若有 d 個特徵，共變異數矩陣（covariance matrix）C 就是 d x d 矩陣，其中 C[i][j] = Cov(feature_i, feature_j)。對角線元素 C[i][i] 是各特徵的變異數。
 
 ```
 C = | Var(x1)      Cov(x1,x2)  Cov(x1,x3) |
@@ -309,7 +309,7 @@ d = 0.8:  large effect
 
 ### 多重比較問題
 
-同時檢定許多假設，也就是進行多重比較（multiple comparisons）時，有些結果會只是碰巧「顯著」。如果以 alpha = 0.05 檢定 20 個項目，即使沒有任何真實效果，預期仍會出現 1 個偽陽性（false positive）。
+同時檢定許多假設，同時檢定許多假設（多重比較）時（multiple comparisons）時，有些結果會只是碰巧「顯著」。如果以 alpha = 0.05 檢定 20 個項目，即使沒有任何真實效果，預期仍會出現 1 個偽陽性（false positive）。
 
 ```
 P(at least one false positive) = 1 - (1 - alpha)^m
@@ -455,7 +455,7 @@ For highly skewed distributions, you might need n >= 100.
 
 ### ML 論文常見的統計錯誤
 
-1. **用訓練集測試。** 這一定會造成過度擬合。務必保留模型訓練時從未看過的資料。
+1. **用訓練集測試。** 這一定會造成過度擬合（overfitting）。務必保留模型訓練時從未看過的資料。
 
 2. **沒有信賴區間。** 只回報一個準確率數字，卻不說明不確定性，會讓結果無法重現、也無從驗證。
 
@@ -506,7 +506,7 @@ f3-bootstrap-resample
 | 共變異數矩陣（covariance matrix） | 所有特徵兩兩共變異數構成的矩陣。 |
 | 虛無假設（null hypothesis） | 預設沒有作用或沒有差異的假設。 |
 | p 值（p-value） | 虛無假設為真時，觀察到目前這麼極端資料的機率。 |
-| 信賴區間（confidence interval） | 在指定信賴水準下，參數可能落入的數值範圍。 |
+| 信賴區間（confidence interval） | 在指定信賴水準（confidence level）下，參數可能落入的數值範圍。 |
 | t 檢定（t-test） | 檢查平均數是否有顯著差異，使用 t 分布。 |
 | 卡方檢定（chi-squared test） | 檢查觀察頻數與期望頻數是否不同。 |
 | 效果量（effect size） | 不受樣本數影響的差異幅度指標，常用 Cohen's d。 |

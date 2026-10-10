@@ -9,7 +9,7 @@
 
 ## Learning Objectives｜學習目標
 
-- 安裝並啟動 JupyterLab、Jupyter Notebook，或安裝了 Jupyter 擴充功能的 VS Code
+- 安裝並啟動 JupyterLab、Jupyter Notebook，或安裝了 Jupyter 擴充功能（extension）的 VS Code
 - 使用 magic command（`%timeit`、`%%time`、`%matplotlib inline`）執行效能基準測試（benchmark），並在 notebook 中直接呈現圖表
 - 判斷何時該用 notebook、何時該用程式檔案（script），並採用「先在 notebook 中探索，再用程式檔案交付」的工作流程
 - 辨識並避開 notebook 常見的陷阱：不依序執行（out-of-order execution）、隱藏狀態（hidden state）和記憶體洩漏（memory leak）

@@ -16,9 +16,9 @@
 
 ## The Problem｜問題
 
-AI 程式出錯的方式和一般程式不同。網頁應用程式壞掉時會丟出堆疊追蹤（stack trace）；設定錯誤的訓練迴圈會跑上 8 小時、燒掉 200 美元的 GPU 時間，然後產出一個對任何輸入都只預測平均數的模型。程式從頭到尾沒有報錯——bug 只是一個放在錯誤裝置上的張量、一個忘記寫的 `.detach()`，或是標籤洩漏進了特徵裡。
+AI 程式出錯的方式和一般程式不同。網頁應用程式（web app）壞掉時會丟出堆疊追蹤（stack trace）；設定錯誤的訓練迴圈會跑上 8 小時、燒掉 200 美元的 GPU 時間，然後產出一個對任何輸入都只預測平均數的模型。程式從頭到尾沒有報錯——問題可能出在張量放錯裝置、一個忘記寫的 `.detach()`，或是標籤洩漏進了特徵裡。
 
-你需要能在這些沉默的失敗浪費你的時間和算力之前，就把它們抓出來的除錯工具。
+你需要能在這些在這些靜默失敗耗掉時間和運算資源前就將它們找出來的除錯工具（debugging tools）。
 
 ## The Concept｜核心概念
 
@@ -41,7 +41,7 @@ s0-flame-hot
 
 ### 第 1 部分：Print 除錯（沒錯，它有用）
 
-print 除錯常被看不起，但它不該被看不起。對張量程式來說，一個放對位置的 print 勝過在除錯器裡逐步執行，因為你需要一次看到形狀、dtype 和數值範圍。
+print 除錯常被低估，其實不該如此。對張量程式來說，一個放對位置的 print 勝過在除錯器（debugger）裡逐步執行，因為你需要一次看到形狀、dtype 和數值範圍。
 
 ```python
 def debug_print(name, tensor):
@@ -54,9 +54,9 @@ def debug_print(name, tensor):
 
 在每個可疑的操作後面呼叫它。找到 bug 後就把 print 移除。就是這麼簡單。
 
-### 第 2 部分：Python 除錯器（pdb 與 breakpoint）
+### 第 2 部分：Python 除錯器（debugger）（pdb 與 breakpoint）
 
-內建除錯器在 AI 工作中被低估了。把 `breakpoint()` 放進訓練迴圈，就能互動式檢查張量。
+內建除錯器（debugger）在 AI 工作中被低估了。把 `breakpoint()` 放進訓練迴圈，就能互動式檢查張量。
 
 ```python
 def training_step(model, batch, criterion, optimizer):
@@ -71,7 +71,7 @@ def training_step(model, batch, criterion, optimizer):
     optimizer.step()
 ```
 
-進入除錯器後，常用的指令有：
+進入除錯器（debugger）後，常用的指令有：
 
 - `p outputs.shape` 檢查形狀
 - `p loss.item()` 查看 loss 值
@@ -161,7 +161,7 @@ def train_step(model, data, target):
 # Run with: kernprof -l -v train.py
 ```
 
-### 第 6 部分：記憶體分析
+### 第 6 部分：記憶體分析（memory profiling）
 
 #### 用 tracemalloc 分析 CPU 記憶體
 
@@ -344,7 +344,7 @@ tensorboard --logdir=runs
 - **權重直方圖塌到零**：梯度消失
 - **梯度直方圖爆掉**：需要梯度裁剪
 
-### 第 9 部分：VS Code 除錯器
+### 第 9 部分：VS Code 除錯器（debugger）
 
 要做互動式除錯，用 `launch.json` 設定 VS Code：
 
@@ -364,9 +364,9 @@ tensorboard --logdir=runs
 }
 ```
 
-點按行號旁的邊欄就能設中斷點。用「變數」窗格檢查張量屬性。「偵錯主控台」讓你在執行途中執行任意 Python 運算式。
+點選行號旁的空白處就能設中斷點。用「變數」窗格檢查張量屬性。「偵錯主控台」讓你在執行途中執行任意 Python 運算式。
 
-這適合用來逐步檢查資料前處理管線、觀察每一個變換。
+這適合用來逐步檢查資料前處理管線（preprocessing pipeline）、觀察每一個變換。
 
 ## Use It｜實際應用
 
@@ -376,11 +376,11 @@ tensorboard --logdir=runs
 2. **前 10 步**：對 loss、輸出和梯度用 `debug_print`，確認沒有 NaN、數值都在合理範圍內。
 3. **訓練中**：記錄 loss、學習率和梯度範數，並用 TensorBoard 視覺化。
 4. **出錯時**：在故障點放 `breakpoint()`，互動式檢查張量。
-5. **效能問題**：分別測量資料載入、前向傳遞和反向傳遞的時間；快 OOM 時做記憶體分析。
+5. **效能問題**：分別測量資料載入、前向傳遞和反向傳遞的時間；快 OOM 時做記憶體分析（memory profiling）。
 
 ## Ship It｜交付成果
 
-執行除錯工具程式：
+執行除錯工具（debugging tools）程式：
 
 ```bash
 python phases/00-setup-and-tooling/12-debugging-and-profiling/code/debug_tools.py
@@ -394,4 +394,4 @@ python phases/00-setup-and-tooling/12-debugging-and-profiling/code/debug_tools.p
 2. 用 `cProfile` 分析一個訓練迴圈，找出最慢的函式。
 3. 用 `tracemalloc` 找出資料載入管線中哪一行配置最多記憶體。
 4. 為一個簡單的訓練作業設定 TensorBoard，判斷模型是否過度擬合。
-5. 在訓練迴圈裡使用 `breakpoint()`，練習在除錯器提示下檢查張量形狀、裝置和梯度值。
+5. 在訓練迴圈裡使用 `breakpoint()`，練習在除錯器（debugger）提示下檢查張量形狀、裝置和梯度值。

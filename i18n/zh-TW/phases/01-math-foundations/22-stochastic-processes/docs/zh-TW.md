@@ -20,7 +20,7 @@
 
 語言模型（language model）一次生成一個 token，每個 token 都取決於先前的上下文。模型輸出機率分布（probability distribution）、從中取樣，然後繼續生成。這就是隨機過程（stochastic process）。
 
-擴散模型會逐步對影像加入雜訊，直到影像完全變成雜訊；接著反轉這個過程，逐步去除雜訊，直到生成一張新影像。前向過程是馬可夫鏈；反向過程則是由模型學得、反向運行的馬可夫鏈。
+擴散模型會逐步對影像加入雜訊，直到影像完全變成雜訊；接著反轉這個過程，逐步去除雜訊，直到生成一張新影像。前向過程是馬可夫鏈；反向過程則是由模型學得、反向運作的馬可夫鏈。
 
 強化學習（reinforcement learning，RL）的 agent 會在環境中採取動作。每個動作都會以某種機率帶來新的狀態（state）。agent 遵循隨機策略（random policy），處於隨機環境中。整個系統就是馬可夫決策過程（Markov decision process）。
 
@@ -28,7 +28,7 @@
 
 以上都建立在四個基礎概念上：
 1. 隨機漫步——最簡單的隨機過程
-2. 馬可夫鏈——具有轉移矩陣（transition matrix）的結構化隨機性
+2. 馬可夫鏈——具有轉移矩陣（transition matrix）（transition matrix）的結構化隨機性
 3. Langevin 動力學——加入雜訊的梯度下降法（gradient descent）
 4. Metropolis-Hastings——從任意分布抽樣
 
@@ -38,7 +38,7 @@
 
 從位置 0 開始。每一步擲一枚公平硬幣：正面就向右移動（+1），反面就向左移動（-1）。
 
-走 n 步後，位置就是 n 個隨機 +1 或 -1 數值的總和。期望位置為 0（這是無偏漫步）。但距離原點的期望值會隨 sqrt(n) 增長。
+走 n 步後，位置就是 n 個隨機 +1 或 -1 數值的總和。期望位置為 0（這是無偏漫步）。但距離原點（origin）的期望值會隨 sqrt(n) 增長。
 
 這很違反直覺。漫步是公平的——沒有往任一方向漂移。但隨著時間經過，它會離起點越來越遠。走 n 步後的標準差（standard deviation）是 sqrt(n)。
 
@@ -51,13 +51,13 @@ Step 100: Expected distance from origin ~ 10 (sqrt(100))
 Step 10000: Expected distance from origin ~ 100 (sqrt(10000))
 ```
 
-**二維隨機漫步：** 每一步以相同機率往上、下、左或右移動。距離原點同樣依 sqrt(n) 縮放。路徑呈現類似分形（fractal）的樣態。
+**二維隨機漫步：** 每一步以相同機率往上、下、左或右移動。距離原點（origin）同樣依 sqrt(n) 縮放。路徑呈現類似分形（fractal）的樣態。
 
 **為什麼是 sqrt(n)？** 每一步都是機率相同的 +1 或 -1。走 n 步後，位置為 S_n = X_1 + X_2 + ... + X_n，其中每個 X_i 都是 +1 或 -1。每一步的變異數（variance）為 1，而且各步彼此獨立，所以 Var(S_n) = n。標準差 = sqrt(n)。根據中央極限定理（central limit theorem，CLT），S_n / sqrt(n) 會收斂至標準常態分布（standard normal distribution）。
 
 這種 sqrt(n) 縮放在 ML 中到處可見。隨機梯度下降法（stochastic gradient descent，SGD）的雜訊會依 1/sqrt(batch_size) 縮放。embedding 維度（embedding dimension）會依 sqrt(d) 縮放。平方根是獨立隨機加總的標誌。
 
-**與布朗運動的關係。** 令隨機漫步的步長為 1/sqrt(n)，每單位時間走 n 步。當 n 趨近無限大時，漫步會收斂至布朗運動 B(t)——一種連續時間過程，其中 B(t) 服從平均值為 0、變異數為 t 的常態分布（normal distribution）。
+**與布朗運動的關係。** 令隨機漫步的步長為 1/sqrt(n)，每單位時間走 n 步。當 n 趨近無限大時，漫步會收斂至布朗運動 B(t)——一種連續時間過程，其中 B(t) 服從平均值（mean）為 0、變異數為 t 的常態分布（normal distribution）。
 
 布朗運動是擴散的數學基礎。它能描述流體中粒子的隨機抖動、股價的波動，以及——最重要的——擴散模型中的雜訊過程。
 
@@ -71,7 +71,7 @@ Step 10000: Expected distance from origin ~ 100 (sqrt(10000))
 P(X_{t+1} = j | X_t = i, X_{t-1} = ...) = P(X_{t+1} = j | X_t = i)
 ```
 
-這就是馬可夫性質（Markov property）。有了它，就能用轉移矩陣 P 描述整個動態過程：
+這就是馬可夫性質（Markov property）。有了它，就能用轉移矩陣（transition matrix） P 描述整個動態過程：
 
 ```
 P[i][j] = probability of going from state i to state j
@@ -142,7 +142,7 @@ top-k 取樣（top-k sampling）會截取機率最高的 k 個 token。top-p 核
 
 布朗運動是隨機漫步在連續時間下的極限。位置 B(t) 有三個性質：
 1. B(0) = 0
-2. B(t) - B(s) 服從平均值為 0、變異數為 t - s 的常態分布（t > s）
+2. B(t) - B(s) 服從平均值（mean）為 0、變異數為 t - s 的常態分布（t > s）
 3. 不重疊時間區間上的增量彼此獨立（independent increments）
 
 布朗運動連續，但處處不可微——它在每一個尺度上都會抖動。它在平面上的分形維度（fractal dimension）為 2。
@@ -347,7 +347,7 @@ print(f"Expected distance: {np.sqrt(10000):.1f}")
 print(f"Actual distance: {abs(walk[-1])}")
 ```
 
-### 使用 NumPy 計算轉移矩陣
+### 使用 NumPy 計算轉移矩陣（transition matrix）
 
 ```python
 import numpy as np
@@ -421,15 +421,15 @@ p_theta(x_{t-1} | x_t) = N(x_{t-1}; mu_theta(x_t, t), sigma_t^2 * I)
 
 生成過程的每一步，都是一條已學得的馬可夫鏈中的一步。理解馬可夫鏈，就能理解擴散模型如何、以及為何能生成資料。
 
-SGLD（Stochastic Gradient Langevin Dynamics，隨機梯度 Langevin 動力學）結合小批次梯度下降法與 Langevin 雜訊。你不必計算完整梯度，而是使用隨機估計值並加入經校準的雜訊。隨著學習率遞減，SGLD 會從最佳化逐漸轉為抽樣——免費取得近似的貝氏後驗樣本。這是從神經網路取得不確定性估計最簡單的方法之一。
+SGLD（Stochastic Gradient Langevin Dynamics，隨機梯度 Langevin 動力學）結合小批次梯度下降法與 Langevin 雜訊。你不必計算完整梯度，而是使用隨機估計值並加入經校準的雜訊。隨著學習率遞減，SGLD 會從最佳化逐漸轉為抽樣——順帶取得近似的貝氏後驗樣本。這是從神經網路取得不確定性估計最簡單的方法之一。
 
 這些連結背後的關鍵洞見是：隨機過程不只是理論工具，也是現代 AI 系統內部的計算機制。調整 LLM 的溫度，就是在調整馬可夫鏈；訓練擴散模型，就是在學習反轉類似布朗運動的過程；執行貝氏推論，就是在建構一條會收斂至後驗分布的鏈。
 
 ## Exercises｜練習
 
-1. **模擬 1000 條各走 10000 步的隨機漫步。** 繪製最終位置的分布，確認它近似常態分布，平均值為 0、標準差 sqrt(10000) = 100。
+1. **模擬 1000 條各走 10000 步的隨機漫步。** 繪製最終位置的分布，確認它近似常態分布，平均值（mean）為 0、標準差 sqrt(10000) = 100。
 
-2. **用馬可夫鏈建立文字生成器。** 在小型語料上訓練：針對每個詞，計算轉移至下一個詞的次數。建立轉移矩陣，再從鏈中取樣生成新句子。
+2. **用馬可夫鏈建立文字生成器。** 在小型語料上訓練：針對每個詞，計算轉移至下一個詞的次數。建立轉移矩陣（transition matrix），再從鏈中取樣生成新句子。
 
 3. **以 Metropolis-Hastings 實作模擬退火法。** 從高溫開始（幾乎全都接受），再逐漸降溫（只接受更好的結果）。用它找出具有多個局部最小值之函數的最小值。
 
@@ -443,7 +443,7 @@ SGLD（Stochastic Gradient Langevin Dynamics，隨機梯度 Langevin 動力學�
 |------|----------------|----------------------|
 | 隨機漫步（random walk） | 「擲硬幣移動」 | 位置在每一步都會因隨機增量而改變的過程 |
 | 馬可夫性質（Markov property） | 「沒有記憶」 | 未來只取決於目前狀態，而不取決於過去歷史 |
-| 轉移矩陣（transition matrix） | 「機率表」 | P[i][j] = 從狀態 i 移動到狀態 j 的機率 |
+| 轉移矩陣（transition matrix）（transition matrix） | 「機率表」 | P[i][j] = 從狀態 i 移動到狀態 j 的機率 |
 | 平穩分布（stationary distribution） | 「長期平均」 | 滿足 pi*P = pi 的分布；也就是鏈的平衡分布 |
 | 布朗運動（Brownian motion） | 「隨機抖動」 | 隨機漫步在連續時間下的極限，B(t) ~ N(0, t) |
 | Langevin 動力學（Langevin dynamics） | 「加上雜訊的梯度下降法」 | 結合確定性梯度與隨機擾動的更新規則 |
