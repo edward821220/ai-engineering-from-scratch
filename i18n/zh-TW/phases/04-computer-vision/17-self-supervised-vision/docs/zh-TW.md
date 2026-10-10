@@ -9,9 +9,9 @@
 
 ## Learning Objectives｜學習目標
 
-- 把三種主要的自監督方法走一遍：對比（SimCLR）、老師與學生（DINO）、遮罩重建（MAE）。並說明各方法分別最佳化什麼目標
+- 把三種主要的自監督方法走一遍：對比式學習（contrastive learning，SimCLR）、老師與學生（teacher-student，DINO）、遮罩重建（masked reconstruction，MAE）。並說明各方法分別最佳化什麼目標
 - 從零實作 InfoNCE 損失（loss），並說明為什麼批次 512 行得通、批次 32 會失敗
-- 說明為什麼 MAE 的 75% 遮罩比例不是隨便定的，以及它和 BERT 對文字遮 15% 有何不同
+- 說明為什麼 MAE 的 75% 遮罩比例（mask ratio）不是隨便定的，以及它和 BERT 對文字遮 15% 有何不同
 - 用 DINOv2 或 MAE 的 ImageNet 檢查點，做線性探測（linear probe）和零樣本檢索
 
 ## The Problem｜問題
@@ -20,7 +20,7 @@
 
 自監督學習就是答案。一個現代的自監督 ViT，在 LAION 或 JFT 上訓練，fine-tuning 之後能打平或贏過監督式 ImageNet 的準確率（accuracy）。它遷移到下游任務（偵測、分割、深度）也比監督式預訓練好。DINOv2（Meta，2023）和 MAE（Meta，2022）是目前正式環境裡、可遷移視覺特徵的預設。
 
-觀念上的轉變是：前置任務（pretext task），也就是模型被訓練去做的那件事，不必是下游任務。要緊的是它逼模型學到有用的特徵。預測灰階影像的顏色、把影像旋轉再請模型分類轉了幾度、遮住小塊再重建，這些都做成功過。能放大的三種是對比學習、老師與學生的蒸餾、以及遮罩重建。
+觀念上的轉變是：前置任務（pretext task），也就是模型被訓練去做的那件事，不必是下游任務。要緊的是它逼模型學到有用的特徵。預測灰階影像的顏色、把影像旋轉再請模型分類轉了幾度、遮住小塊再重建，這些都做成功過。能放大的三種是對比式學習、老師與學生的蒸餾、以及遮罩重建。
 
 ## The Concept｜核心概念
 
@@ -28,7 +28,7 @@
 
 ```mermaid
 flowchart LR
-    A["對比<br/>SimCLR、MoCo、CLIP"] --> AT["正配對<br/>（同一張影像，兩次增強）<br/>拉近，<br/>負樣本推開"]
+    A["對比式學習<br/>SimCLR、MoCo、CLIP"] --> AT["正配對<br/>（同一張影像，兩次增強）<br/>拉近，<br/>負樣本推開"]
     B["老師與學生<br/>DINO、BYOL、iBOT"] --> BT["學生預測<br/>老師的輸出；<br/>老師是學生的 EMA"]
     C["遮罩重建<br/>MAE、BEiT、SimMIM"] --> CT["遮掉 75% 的小塊；<br/>重建像素或<br/>token 目標"]
 
@@ -37,9 +37,9 @@ flowchart LR
     style C fill:#dcfce7,stroke:#16a34a
 ```
 
-### 對比學習（SimCLR）
+### 對比式學習（SimCLR）
 
-拿一張影像，做兩次隨機增強（augmentation），得到兩個視角。兩個都送進同一個編碼器（encoder）加上投影頭。損失在說：這兩個 embedding 應該靠近，而且這個 embedding 應該離批次裡其他影像的 embedding 很遠。
+拿一張影像，做兩次隨機增強（augmentation），得到兩個視角。兩個都送進同一個編碼器（encoder）加上投影頭。損失函數會拉近這兩個 embedding，並讓它遠離批次中其他影像的 embedding。
 
 ```
 Loss for positive pair (z_i, z_j) among 2N views per batch:
@@ -250,7 +250,7 @@ with torch.no_grad():
 
 ## Further Reading｜延伸閱讀
 
-- [SimCLR (Chen et al., 2020)](https://arxiv.org/abs/2002.05709) ——對比學習的參考
+- [SimCLR (Chen et al., 2020)](https://arxiv.org/abs/2002.05709) ——對比式學習的參考
 - [DINO (Caron et al., 2021)](https://arxiv.org/abs/2104.14294) ——帶動量、置中、銳化的老師與學生
 - [MAE (He et al., 2022)](https://arxiv.org/abs/2111.06377) ——ViT 的遮罩自編碼器預訓練
 - [DINOv2 (Oquab et al., 2023)](https://arxiv.org/abs/2304.07193) ——把自監督 ViT 放大到正式環境可用的特徵
