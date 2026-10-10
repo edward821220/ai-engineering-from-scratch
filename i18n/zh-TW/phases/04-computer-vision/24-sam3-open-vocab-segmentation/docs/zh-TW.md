@@ -9,7 +9,7 @@
 
 ## Learning Objectives｜學習目標
 
-- 分辨 SAM（只有視覺 prompt）、Grounded SAM／SAM 2（偵測器加 SAM），以及 SAM 3（用可接受 prompt 的 的概念分割，原生接受文字 prompt）
+- 分辨 SAM（只有視覺 prompt）、Grounded SAM／SAM 2（偵測器加 SAM），以及 SAM 3（用可提示的概念分割，原生接受文字 prompt）
 - 說明 SAM 3 的架構：共享骨幹（backbone）、影像偵測器、以記憶為基礎的影片追蹤器、概念存在性預測頭，以及偵測器和追蹤器分開的設計
 - 用 Hugging Face 的 `transformers` 整合，做文字 prompt 的偵測、分割和影片追蹤
 - 依延遲、概念複雜度和部署目標，在 SAM 3、Grounded SAM 2、YOLO-World、SAM-MI 之間挑
@@ -18,9 +18,9 @@
 
 2023 年的 SAM 只吃視覺 prompt：你點一個點，或畫一個框，它回一張遮罩。要「這張照片裡所有的橘子」，得先用偵測器（Grounding DINO）產框，再讓 SAM 逐個分割。Grounded SAM 把這做成一條管線（pipeline），但它是兩個凍結模型的串接，誤差一定會累積。
 
-SAM 3（Meta，2025 年 11 月，ICLR 2026）把這段串接收掉。它接受短的名詞片語，或一張影像範例當 prompt，一次前向傳遞（forward pass）就回所有相符的遮罩和實例 ID。這就是**可接受 prompt 的 的概念分割（Promptable Concept Segmentation，PCS）**。再加上 2026 年 3 月的 Object Multiplex 更新（SAM 3.1），它能有效率地在影片裡追蹤同一個概念的多個實例。
+SAM 3（Meta，2025 年 11 月，ICLR 2026）把這段串接收掉。它接受短的名詞片語，或一張影像範例當 prompt，一次前向傳遞（forward pass）就回所有相符的遮罩和實例 ID。這就是**可提示的概念分割（Promptable Concept Segmentation，PCS）**。再加上 2026 年 3 月的 Object Multiplex 更新（SAM 3.1），它能有效率地在影片裡追蹤同一個概念的多個實例。
 
-這一課講的是這個結構上的轉變。2D 分割、偵測，以及文字與影像定位（text-image grounding），收進同一個模型。正式環境要問的不再是「我該串哪幾段管線」，而是「哪個可接受 prompt 的 的模型能從頭到尾處理我的用途」。
+這一課講的是這個結構上的轉變。2D 分割、偵測，以及文字與影像定位（text-image grounding），收進同一個模型。正式環境要問的不再是「我該串哪幾段管線」，而是「哪個可提示的模型能從頭到尾處理我的用途」。
 
 ## The Concept｜核心概念
 
@@ -49,7 +49,7 @@ flowchart LR
     style SAM3 fill:#dcfce7,stroke:#16a34a
 ```
 
-### 可接受 prompt 的 的概念分割
+### 可提示的概念分割
 
 「概念 prompt」是短的名詞片語（`"yellow school bus"`、`"striped red umbrella"`、`"hand holding a mug"`），或一張影像範例。模型回影像裡每個相符實例的分割遮罩，每個相符各有一個不重複的實例 ID。
 
@@ -72,7 +72,7 @@ SAM 3 在**400 萬個不重複的概念**上訓練。資料引擎一輪一輪標
 
 ### SAM 3.1 的 Object Multiplex
 
-2026 年 3 月的更新：**Object Multiplex** 用共享記憶，一次聯合追蹤同一個概念的許多實例。以前追 N 個實例就是 N 個分開的記憶庫。Multiplex 收進一個共享記憶，每個實例各自查詢。結果：多物件追蹤快非常多，準度不掉。
+2026 年 3 月的更新：**Object Multiplex** 用共享記憶，一次聯合追蹤同一個概念的許多實例。以前追 N 個實例就是 N 個分開的記憶庫。Multiplex 收進一個共享記憶，每個實例各自查詢。結果：多物件追蹤快非常多，準確率不掉。
 
 ### 2026 年 Grounded SAM 仍然有用的地方
 
@@ -162,7 +162,7 @@ def rle_encode(binary_mask):
     return ";".join(f"{v}x{c}" for v, c in runs)
 ```
 
-即使有很多高解析度遮罩，RLE 仍讓讓回應資料保持精簡。SAM 2、SAM 3、Grounded SAM 2 都能用同一種格式。
+即使有很多高解析度遮罩，RLE 仍讓回應資料保持精簡。SAM 2、SAM 3、Grounded SAM 2 都能用同一種格式。
 
 ### 步驟 3：統一的開放詞彙分割介面
 
@@ -235,7 +235,7 @@ scores = outputs.scores
 一個誠實的比較：在真實管線裡，把 Grounded SAM 2 換成 SAM 3 會怎樣？
 
 - 延遲：SAM 3 少一次前向傳遞（forward pass）（沒有分開的偵測器），但模型本身更重。通常差不多打平，或是稍微快一點。
-- 準度：少見或組合起來的概念（「條紋紅傘」）上，SAM 3 好非常多。常見的單詞概念差不多。
+- 準確率：少見或組合起來的概念（「條紋紅傘」）上，SAM 3 好非常多。常見的單詞概念差不多。
 - 彈性：Grounded SAM 2 讓你把偵測器換掉（DINO-X、Florence-2、Grounding DINO 1.5）。SAM 3 是一整塊。
 
 結論：2026 年開放詞彙分割的預設是 SAM 3。你需要偵測器的彈性，或不同的授權條款時，Grounded SAM 2 仍然是對的選擇。
@@ -278,7 +278,7 @@ results = model(image_path, prompts="yellow school bus")
 | 術語 | 常見說法 | 實際意義 |
 |------|----------------|----------------------|
 | 開放詞彙分割 | 「用文字來分割」 | 為自然語言描述的物件產出遮罩，而不是固定的標籤集合 |
-| PCS | 「可接受 prompt 的 的概念分割」 | SAM 3 的核心任務。給名詞片語或影像範例，分割所有相符的實例 |
+| PCS | 「可提示的概念分割」 | SAM 3 的核心任務。給名詞片語或影像範例，分割所有相符的實例 |
 | 概念 prompt | 「文字輸入」 | 短的名詞片語或影像範例。不是完整句子 |
 | 概念存在性預測頭 | 「它在這裡嗎？」 | SAM 3 的模組。在定位（localisation）之前，先決定這個概念在不在影像裡 |
 | SA-CO | 「SAM 3 的基準」 | 27 萬個概念的開放詞彙分割基準。是先前開放詞彙基準的 50 倍 |
