@@ -39,7 +39,7 @@ US       B-GPE
 架構的進展：
 
 - **規則。** 正規表示式加上專名表（gazetteer）查詢。已知實體的精確率（precision）高，新實體的涵蓋是零。
-- **HMM。** 隱藏馬可夫模型。給定標記時 token 的發射機率，以及標記到標記的轉移機率。用維特比解碼。在有標籤（label）的資料上訓練。
+- **HMM。** 隱藏馬可夫模型。給定標記時 token 的發射機率（emission probability），以及標記到標記的轉移機率（transition probability）。用維特比解碼（Viterbi decoding）。在有標籤（label）的資料上訓練。
 - **CRF。** 條件隨機場。像 HMM，但是判別式，所以你可以混用任意特徵（feature）（詞形、大小寫、鄰近的詞）。到 2026 年，資源少的部署裡，它仍是古典正式環境的主力。
 - **BiLSTM-CRF。** 用神經特徵取代手刻特徵。LSTM 從兩個方向讀句子，上面的 CRF 層強制標記序列一致。
 - **以 transformer 為基礎。** 用 token 分類頭 fine-tune BERT。準確率（accuracy）最好。算力也最多。
@@ -247,7 +247,7 @@ print(ner("Apple sued Google over its iPhone in the US."))
 
 ### 以 LLM 做的命名實體辨識（2026 年的選項）
 
-零樣本（zero-shot）和少樣本（few-shot）的 LLM 命名實體辨識，現在在很多領域和 fine-tune 過的模型不相上下，標註資料稀少時，表現往往更好。
+零樣本（zero-shot）和少樣本（few-shot）的 LLM 命名實體辨識，現在已在很多領域和 fine-tune 過的模型不相上下，標註資料稀少時，表現往往更好。
 
 - **零樣本 prompting。** 給 LLM 一份實體類型清單和一個範例綱要。要求 JSON 輸出。開箱就用；在新領域上準確率中等。
 - **ZeroTuneBio 風格的 prompting。** 把任務拆成抽出候選、解釋意思、判斷、再檢查。多階段 prompt（不是 one-shot）在生物醫學命名實體辨識上把準確率拉高不少。同一套模式適用法律、金融和科學領域。
