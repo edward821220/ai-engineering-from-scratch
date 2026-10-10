@@ -14,5 +14,6 @@
   "phases/11-llm-engineering/13-production-app/docs/en.md": "b0a346e45927205a67e1db24f0d67e16adde62736840bd2ac923a5fc03cd6101",
   "phases/11-llm-engineering/14-model-context-protocol/docs/en.md": "26356da586c4f90922e0ab61af4ea47d81deaf3c9b2cc91e4ae8ac44efaadd7b",
   "phases/11-llm-engineering/15-prompt-caching/docs/en.md": "abe8cd085fc41015985f4f324a89e8193593b341855dc82bdf697e68430cc350",
-  "phases/11-llm-engineering/16-langgraph-state-machines/docs/en.md": "cd449175f7292a9821644d0b829cd0576a68f0da3aedbbc9e3547b45fd7b05cb"
+  "phases/11-llm-engineering/16-langgraph-state-machines/docs/en.md": "cd449175f7292a9821644d0b829cd0576a68f0da3aedbbc9e3547b45fd7b05cb",
+  "phases/11-llm-engineering/17-agent-framework-tradeoffs/docs/en.md": "4c0c6119addcb3cf05f3a9e1884ae3bf75e4428a6196c90982653559c94c83b7"
 }
