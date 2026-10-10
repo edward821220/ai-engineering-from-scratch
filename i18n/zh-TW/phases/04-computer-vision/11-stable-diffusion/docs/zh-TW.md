@@ -1,6 +1,6 @@
 # Stable Diffusion：架構與 fine-tuning
 
-> Stable Diffusion 是跑在預訓練 VAE 的潛在空間（latent space）裡的 DDPM。文字條件從交叉注意力（cross-attention）灌進來，抽樣用快速的確定性 ODE 求解器，方向由無分類器引導（classifier-free guidance）來轉。
+> Stable Diffusion 是跑在預訓練變分自編碼器（variational autoencoder，VAE）的潛在空間（latent space）裡的 DDPM。文字條件從交叉注意力（cross-attention）灌進來，以快速的確定性 ODE 求解器取樣，並以無分類器引導（classifier-free guidance）控制生成方向。
 
 **Type:** Learn + Use
 **Languages:** Python
@@ -16,9 +16,9 @@
 
 ## The Problem｜問題
 
-直接在 512x512 的 RGB 影像上訓練 DDPM 很貴。每個訓練步驟都要對一個看得到 3x512x512 = 786,432 個輸入值的 U-Net 做反向傳播（backpropagation），抽樣還要對同一個 U-Net 做 50 次以上的前向傳遞（forward pass）。以 Stable Diffusion 1.5（2022 年釋出）的品質來說，像素（pixel）空間的擴散大約要 256 個 GPU 月的訓練，消費級 GPU 上一張影像要 10 到 30 秒。
+直接在 512x512 的 RGB 影像上訓練 DDPM 很貴。每個訓練步驟都要對一個看得到 3x512x512 = 786,432 個輸入值的 U-Net 做反向傳播（backpropagation），取樣還要對同一個 U-Net 做 50 次以上的前向傳遞（forward pass）。以 Stable Diffusion 1.5（2022 年釋出）的品質來說，像素（pixel）空間的擴散大約要 256 個 GPU 月的訓練，消費級 GPU 上一張影像要 10 到 30 秒。
 
-讓開放權重的文字到影像變得實用的手法，是**潛在擴散**（Rombach 等人，CVPR 2022）。先訓練一個 VAE，把 3x512x512 的影像映到 4x64x64 的潛在張量（tensor）再映回來，然後在那個潛在空間裡做擴散。計算量變成原來的四十八分之一，也就是 `(3*512*512)/(4*64*64) = 48x`。同一張 GPU 上，抽樣從幾十秒降到兩秒以內。
+讓開放權重的文字到影像變得實用的手法，是**潛在擴散**（Rombach 等人，CVPR 2022）。先訓練一個 VAE，把 3x512x512 的影像映到 4x64x64 的潛在張量（tensor）再映回來，然後在那個潛在空間裡做擴散。計算量變成原來的四十八分之一，也就是 `(3*512*512)/(4*64*64) = 48x`。同一張 GPU 上，取樣從幾十秒降到兩秒以內。
 
 幾乎每個現代影像生成模型，SDXL、SD3、FLUX、HunyuanDiT、Wan-Video，都是潛在擴散模型，差別在自編碼器（autoencoder）、去雜訊器（U-Net 或 DiT）、以及文字條件。學會 Stable Diffusion，你就學會了這套模板。
 
@@ -47,8 +47,8 @@ flowchart LR
 
 - **VAE**。凍結的自編碼器。編碼器把影像變成潛在，影像到影像和訓練會用到它。解碼器把潛在變回影像。
 - **文字編碼器**。CLIP 文字編碼器（SD 1.x/2.x）、CLIP-L 加 CLIP-G（SDXL），或 T5-XXL（SD3/FLUX）。產出一串 token embedding。
-- **U-Net**。去雜訊器。每一個解析度都有交叉注意力層，從潛在去注意文字 embedding。
-- **排程器**。抽樣演算法（algorithm）：DDIM、Euler、DPM-Solver++。選出 sigma，再把預測的雜訊混回潛在。
+- **U-Net**。去雜訊器。每一個解析度都有交叉注意力層，讓潛在表示去關注文字 embedding。
+- **排程器**。取樣演算法（algorithm）：DDIM、Euler、DPM-Solver++。選出 sigma，再把預測的雜訊混回潛在。
 - **安全檢查器**。選用的。對輸出影像做 NSFW，也就是不適宜內容，以及違法內容的篩選。
 
 ### 無分類器引導（CFG）
@@ -84,7 +84,7 @@ SD 1.5 的參數（parameter）大約 8.6 億。SDXL 大約 26 億。FLUX 大約
 
 ### LoRA fine-tuning
 
-完整 fine-tuning Stable Diffusion 要 20 GB 以上的 VRAM，並更新 8.6 億個參數。LoRA（低秩適配，Low-Rank Adaptation）把基礎模型凍結，只在注意力層注入很小的秩分解矩陣。一個 SD 的 LoRA adapter 通常 10 到 50 MB，消費級 GPU 上 10 到 60 分鐘就能訓練完，推論時直接套上去就好。
+完整 fine-tuning Stable Diffusion 要 20 GB 以上的 VRAM，並更新 8.6 億個參數。LoRA（低秩適配，Low-Rank Adaptation）把基模型凍結，只在注意力層注入很小的秩分解矩陣。一個 SD 的 LoRA adapter 通常 10 到 50 MB，消費級 GPU 上 10 到 60 分鐘就能訓練完，推論時直接套上去就好。
 
 ```
 Original: W_q : (d_in, d_out)   frozen
@@ -93,7 +93,7 @@ LoRA:     W_q + alpha * (A @ B)   where A : (d_in, r), B : (r, d_out)
 r is typically 4-32.
 ```
 
-幾乎每個社群 fine-tune 都用 LoRA 分散式。CivitAI 和 Hugging Face 上有幾百萬個。
+幾乎每個社群 fine-tune 都以 LoRA 形式發布。CivitAI 和 Hugging Face 上有幾百萬個。
 
 ### 你會看到的排程器
 
@@ -143,7 +143,7 @@ pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
 pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(pipe.scheduler.config)
 ```
 
-排程器的狀態和 U-Net 權重（weight）是分開的。你可以用 DDPM 訓練，再用任何排程器抽樣。
+排程器的狀態和 U-Net 權重（weight）是分開的。你可以用 DDPM 訓練，再用任何排程器取樣。
 
 ### 步驟 3：影像到影像
 
@@ -260,7 +260,7 @@ for step, batch in enumerate(dataloader):
 | 潛在擴散 | 「在潛在裡擴散」 | 整個 DDPM 跑在 VAE 潛在空間（4x64x64），不跑在像素空間（3x512x512）。計算量省 48 倍 |
 | VAE 縮放係數 | 「0.18215」 | 把 VAE 的原始潛在重縮放到大約單位變異數（variance）的常數。每條 SD 管線都寫死 |
 | 無分類器引導 | 「CFG」 | 把有條件和無條件的雜訊預測混在一起。對推論影響最大的那一顆旋鈕 |
-| 排程器 | 「抽樣器」 | 把雜訊加上模型預測，變成一條去雜訊後的潛在軌跡的演算法 |
+| 排程器 | 「取樣器」 | 把雜訊加上模型預測，變成一條去雜訊後的潛在軌跡的演算法 |
 | LoRA | 「低秩 adapter」 | 很小的秩分解矩陣，fine-tune 注意力層，不動基礎權重 |
 | 交叉注意力 | 「文字和影像的注意力」 | 從潛在 token 注意到文字 token。每個 U-Net 層級都把 prompt 的資訊灌進去 |
 | ControlNet | 「結構條件」 | 另外訓練的 adapter，用額外輸入（canny、深度、姿態、分割）來拉 Stable Diffusion |
