@@ -383,7 +383,7 @@ text_clf = Pipeline([
 ])
 ```
 
-CountVectorizer 的 `binary=True` 旗標會把所有計數轉成 0/1。沒有這個旗標，BernoulliNB 仍然能跑，但但這些計數並非 BernoulliNB 設計來處理的輸入。
+CountVectorizer 的 `binary=True` 旗標會把所有計數轉成 0/1。沒有這個旗標，BernoulliNB 仍然能跑，但這些計數並非 BernoulliNB 設計來處理的輸入。
 
 ### 校準單純貝氏的機率
 
