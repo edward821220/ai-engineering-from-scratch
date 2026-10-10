@@ -12,7 +12,7 @@
 - 實作數值特徵（numerical feature）轉換——標準化（standardization）、最小–最大縮放（min-max scaling）、對數轉換（log transform）、分箱（binning）——並說明各方法的適用時機
 - 為類別特徵（categorical feature）建立 one-hot 編碼（one-hot encoding）、標籤編碼（label encoding）和目標編碼（target encoding），並指出目標編碼中的資料洩漏（data leakage）風險
 - 從頭建構 TF-IDF 向量化器，並說明它為何在文字分類（text classification）上優於原始詞數（word count）
-- 套用過濾法（filter method）（filter method）特徵選擇——變異數閾值（variance threshold）、相關性（correlation）、互資訊（mutual information）——以降低維度（dimensionality）
+- 套用過濾法（filter method）特徵選擇——變異數閾值（variance threshold）、相關性（correlation）、互資訊（mutual information）——以降低維度（dimensionality）
 
 ## The Problem｜問題
 
@@ -30,11 +30,11 @@
 
 ```mermaid
 flowchart LR
-    A[原始資料] --> B[處理缺失值（missing value）（missing value）]
+    A[原始資料] --> B[處理缺失值（missing value）]
     B --> C[數值轉換]
     B --> D[類別編碼]
     B --> E[文字特徵]
-    C --> F[特徵交互作用（feature interaction）（feature interaction）]
+    C --> F[特徵交互作用（feature interaction）]
     D --> F
     E --> F
     F --> G[特徵選擇]
@@ -47,7 +47,7 @@ flowchart LR
 
 **縮放（scaling）：** 將特徵放到相同範圍，讓以距離為基礎的演算法（K-Means、KNN、SVM）平等對待所有特徵。最小–最大縮放把值映射到 [0, 1]；標準化（z 分數，z-score）則映射成平均數（mean）為 0、標準差（standard deviation）為 1。
 
-**對數轉換：** 壓縮右偏（right-skewed）分布（收入、人口數、詞數這類資料）。它能把乘法關係轉成加法關係。
+**對數轉換：** 壓縮右偏（right-skewed）分布（distribution，收入、人口數、詞數這類資料）。它能把乘法關係轉成加法關係。
 
 **分箱：** 將連續值轉成類別。當特徵與目標變數（target variable）之間是非線性但呈階梯狀的關係時（例如年齡分組）很有用。
 
