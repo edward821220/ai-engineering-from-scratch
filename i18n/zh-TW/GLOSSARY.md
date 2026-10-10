@@ -1254,6 +1254,10 @@
 | evidence | 證據 | 否 |  | 貝氏定理分母語境。 |
 | naive Bayes | 單純貝氏 | 否 | 朴素貝叶斯 |  |
 | Laplace smoothing | 拉普拉斯平滑 | 否 |  |  |
+| sentiment analysis | 情感分析 | 否 |  | 判斷文字是正面、負面或其他態度。 |
+| polarity | 極性 | 否 |  | 情感的正負方向。 |
+| negation scoping | 否定範圍 | 否 |  | 否定詞往後影響到下一個標點。 |
+| aspect-based sentiment | 面向情感分析 | 否 |  | 把情感歸到文中的特定面向。 |
 | false positive | 偽陽性 | 否 | 假陽性 | 檢定誤報語境；台灣醫檢用偽陽性。 |
 | false negative | 偽陰性 | 否 | 假陰性 |  |
 | conjugate prior | 共軛先驗 | 否 |  |  |
