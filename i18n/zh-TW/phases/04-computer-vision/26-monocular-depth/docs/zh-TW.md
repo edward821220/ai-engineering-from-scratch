@@ -12,7 +12,7 @@
 - 分辨相對深度和公尺深度，並說出每個正式環境模型解的是哪一種（MiDaS、Marigold、Depth Anything V3、ZoeDepth）
 - 用 Depth Anything V3（DINOv2 骨幹）對任意單張影像預測深度，不用校正
 - 說明為什麼單張影像也能估深度（透視線索、紋理梯度、學來的先驗），以及它恢復不了什麼（絕對尺度、被遮住的幾何）
-- 用深度圖和針孔相機（pinhole camera），把 2D 偵測抬成 3D 點
+- 用深度圖和針孔相機（pinhole camera）內參，把 2D 偵測提升為 3D 點
 
 ## The Problem｜問題
 
@@ -20,13 +20,13 @@
 
 單目深度估計，從一張 RGB 影格預測深度，以前的輸出又糊又不可靠。到 2026 年，大型預訓練編碼器改了這件事：Depth Anything V3 用凍結的 DINOv2 骨幹（backbone），產出的深度圖能跨室內、室外、醫學、衛星泛化。Marigold 把深度改寫成條件擴散問題。ZoeDepth 迴歸真正的公尺距離。
 
-深度也是 2D 偵測和 3D 理解之間的橋：把偵測框裡的像素乘上深度，就把 2D 物件抬成 3D 點雲。每一套 AR 遮擋、每一條避障管線（pipeline）、每一個「拿起杯子」的機器人，核心都是這個。
+深度也是 2D 偵測和 3D 理解之間的橋：把偵測框裡的像素乘上深度，就把 2D 物件提升為 3D 點雲。每一套 AR 遮擋、每一條避障管線（pipeline）、每一個「拿起杯子」的機器人，核心都是這個。
 
 ## The Concept｜核心概念
 
 ### 相對深度對上公尺深度
 
-- **相對深度**。有序的 `z`，沒有真實世界的單位。「像素 A 比像素 B 近，但但距離比值沒有對應到實際公尺尺度。」
+- **相對深度**。有序的 `z`，沒有真實世界的單位。「像素 A 比像素 B 近，但距離比值沒有對應到實際公尺尺度。」
 - **公尺深度**。從相機量起的絕對距離，單位公尺。模型必須學到影像線索和真實距離之間的統計關係。
 
 MiDaS 和 Depth Anything V3 產出相對深度。Marigold 產出相對深度。ZoeDepth、UniDepth、Metric3D 產出公尺深度。公尺模型對相機內參敏感。相對模型不敏感。
@@ -81,7 +81,7 @@ Marigold（Ke 等人，CVPR 2024）把深度估計改寫成條件式的影像到
 
 ### 內參和針孔相機
 
-要把像素 `(u, v)`、深度 `d` 抬到相機座標裡的 3D 點 `(X, Y, Z)`：
+要把像素 `(u, v)`、深度 `d` 提升為相機座標裡的 3D 點 `(X, Y, Z)`：
 
 ```
 fx, fy, cx, cy = camera intrinsics
@@ -149,7 +149,7 @@ def align_scale_shift(pred, target, mask=None):
 
 評估 MiDaS 或 Depth Anything 時，先跑 `align_scale_shift`，再跑 `abs_rel_error`。
 
-### 步驟 3：把深度抬成點雲
+### 步驟 3：把深度提升為點雲
 
 ```python
 import numpy as np
@@ -236,7 +236,7 @@ depth_np = np.array(out["depth"])
 ## Exercises｜練習
 
 1. **（簡單）** 在你桌面的任意 10 張影像上跑 Depth Anything V2。把深度存成灰階 PNG 再看。找出一個預測深度看起來不對的物件，說明單目線索為什麼失敗。
-2. **（中等）** 用 Depth Anything V2 的 RGB 加深度，抬成點雲，再用 `open3d` 渲染。比較兩個場景（室內／室外），哪一個看起來更可信。
+2. **（中等）** 用 Depth Anything V2 的 RGB 加深度，提升為點雲，再用 `open3d` 渲染。比較兩個場景（室內／室外），哪一個看起來更可信。
 3. **（困難）** 拿五對影像，差別只在一個已知物件的位置（例如瓶子靠近 30 公分）。用 UniDepth 對兩張都預測公尺深度。回報預測的距離差，對上真正的 30 公分。
 
 ## Key Terms｜關鍵術語
@@ -247,8 +247,8 @@ depth_np = np.array(out["depth"])
 | 相對深度 | 「有序的深度」 | 有序的 z 值，沒有真實世界單位 |
 | 公尺深度 | 「絕對距離」 | 以公尺計的深度。需要校正，或用公尺監督訓練過的模型 |
 | AbsRel | 「絕對相對誤差」 | |d_pred - d_gt| / d_gt 的平均。標準深度指標 |
-| Delta 準度 | 「delta < 1.25」 | 預測落在真實深度值 25% 以內的像素比例 |
-| 針孔相機 | 「fx, fy, cx, cy」 | 把 (u, v, d) 抬到 (X, Y, Z) 用的相機模型 |
+| Delta 準確率 | 「delta < 1.25」 | 預測落在真實深度值 25% 以內的像素比例 |
+| 針孔相機 | 「fx, fy, cx, cy」 | 把 (u, v, d) 提升為 (X, Y, Z) 用的相機模型 |
 | DPT | 「Dense Prediction Transformer」 | 放在凍結 ViT 編碼器上的卷積解碼器，用來估深度 |
 | DINOv2 骨幹 | 「它行得通的原因」 | 自監督特徵。沒有深度標籤也能跨領域泛化 |
 
@@ -258,4 +258,4 @@ depth_np = np.array(out["depth"])
 - [Marigold (Ke et al., CVPR 2024)](https://marigoldmonodepth.github.io/) ——以擴散為基礎的深度估計
 - [UniDepth (Piccinelli et al., 2024)](https://arxiv.org/abs/2403.18913) ——帶內參的公尺深度
 - [MiDaS v3.1 (Intel ISL)](https://github.com/isl-org/MiDaS) ——相對深度的標準基準模型
-- [DINOv3 blog post (Meta)](https://ai.meta.com/blog/dinov3-self-supervised-vision-model/) ——把深度準度抬起來的編碼器家族
+- [DINOv3 blog post (Meta)](https://ai.meta.com/blog/dinov3-self-supervised-vision-model/) ——提升深度準確率的編碼器家族
