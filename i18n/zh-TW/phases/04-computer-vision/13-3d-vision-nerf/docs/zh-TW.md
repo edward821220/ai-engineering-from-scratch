@@ -83,7 +83,7 @@ To render a pixel (u, v) of a new view:
   5. The sum is the rendered pixel colour
 ```
 
-損失（loss）拿渲染出來的像素（pixel），去比訓練照片裡的真實像素。對渲染那一步做反向傳播（backpropagation），更新 MLP。沒有 3D 的標準結果，也沒有顯式幾何。場景存在 MLP 的權重（weight）裡。
+損失（loss）拿渲染出來的像素（pixel），去比訓練照片裡的真實像素。對渲染那一步做反向傳播（backpropagation），更新 MLP。沒有 3D 的真實標籤，也沒有顯式幾何。場景存在 MLP 的權重（weight）裡。
 
 ### NeRF 裡的位置編碼
 
