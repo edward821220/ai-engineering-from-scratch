@@ -1,4 +1,4 @@
-# ControlNet、LoRA 與條件
+# ControlNet、LoRA 與條件（conditioning）
 
 > 只有文字，是不夠精確的控制訊號。ControlNet 讓你複製一個預訓練的擴散模型，再用深度圖、姿勢骨架、塗鴉或邊緣影像來駕馭它。LoRA 讓你 fine-tune 一個 20 億參數（parameter）的模型，實際只訓練 1000 萬個參數。兩者合起來，把 Stable Diffusion 從玩具變成 2026 年每家代理商都在出貨的影像管線（pipeline）。
 
@@ -9,13 +9,13 @@
 
 ## The Problem｜問題
 
-像「一個穿紅裙子的女人，在熱鬧的街上遛狗」這種 prompt，沒告訴模型狗在*哪裡*、女人是*什麼姿勢*、街道是*什麼透視*。文字大約只釘住你要指定一張影像所需的 10%。其餘是視覺的，沒辦法用文字有效描述。
+像「一個穿紅裙子的女人，在熱鬧的街上遛狗」這種 prompt，沒告訴模型狗在*哪裡*、女人是*什麼姿勢*、街道是*什麼透視*。文字大約只能指定描述一張影像所需資訊的 10%。其餘是視覺的，沒辦法用文字有效描述。
 
-每種信號都從零訓練一個新的條件模型，姿勢、深度、Canny、分割，貴到做不起來。你想把 26 億參數的 SDXL 骨幹（backbone）凍住，接上一個小的旁路網路（network）去讀條件，再讓它推一下骨幹的中間特徵（feature）。那就是 ControlNet。
+每種訊號都從零訓練一個新的條件模型，姿勢、深度、Canny、分割，成本高到難以實行。你想把 26 億參數的 SDXL 骨幹（backbone）凍住，接上一個小的旁路網路（network）去讀取條件，並調整骨幹的中間特徵（feature）。那就是 ControlNet。
 
-你也想教模型新概念，你的臉、你的產品、你的風格，卻不要重訓整個模型。你要一個小到 100 分之一的差值。那就是 LoRA——插進既有注意力（attention）權重的低秩配接器（low-rank adapter）。
+你也想教模型新概念（你的臉、你的產品、你的風格），卻不要重訓整個模型。你要一個小到 100 分之一的差值。那就是 LoRA——插進既有注意力（attention）權重的低秩配接器（low-rank adapter）。
 
-ControlNet 加 LoRA 加文字，就是 2026 年實作者的工具箱。大多數正式環境（production）的影像管線，會在 SDXL／SD3／Flux 基底上疊 2 到 5 個 LoRA、1 到 3 個 ControlNet，再加一個 IP-Adapter。
+ControlNet 加 LoRA 加文字，就是 2026 年實作者的工具箱。大多數正式環境（production）的影像管線，會在 SDXL／SD3／Flux 基模型（base model）上疊 2 到 5 個 LoRA、1 到 3 個 ControlNet，再加一個 IP-Adapter。
 
 ## The Concept｜核心概念
 
@@ -23,15 +23,15 @@ ControlNet 加 LoRA 加文字，就是 2026 年實作者的工具箱。大多數
 
 ### ControlNet（Zhang 等人，2023）
 
-拿一個預訓練的 SD。*複製* U-Net 的編碼器那一半。原版凍住。訓練複本去接受額外的條件輸入，邊緣、深度、姿勢。用*零卷積（zero convolution）*的跳躍連接把複本接回原版的解碼器那一半：1×1 卷積初始化成零——一開始是空操作，再學一個差值。
+拿一個預訓練的 SD。*複製* U-Net 的編碼器那一半。原版凍住。訓練複本去接受額外的條件輸入，邊緣、深度、姿勢。用*零卷積（zero convolution）*的跳躍連接（skip connection）把複本接回原版的解碼器那一半：1×1 卷積初始化成零——一開始是空操作，再學一個差值。
 
 ```
 SD U-Net decoder:   ... ← orig_enc_features + zero_conv(controlnet_enc(condition))
 ```
 
-零卷積的初始化表示 ControlNet 一開始是恆等——還沒訓練也不會搞砸。用 100 萬組（prompt、條件、影像）三元組，配標準擴散損失（loss）來訓練。
+零卷積的初始化表示 ControlNet 一開始是恆等（identity）——訓練前也不會造成損害。用 100 萬組（prompt、條件、影像）三元組，配標準擴散損失（loss）來訓練。
 
-每種模態的 ControlNet 以小的旁路模型出貨，SDXL 大約 3.6 億，SD 1.5 大約 7000 萬。推論（inference）時可以把它們疊起來：
+每種模態的 ControlNet 都以小型旁路模型出貨，SDXL 大約 3.6 億，SD 1.5 大約 7000 萬。推論（inference）時可以把它們疊起來：
 
 ```
 features += weight_a * control_a(depth) + weight_b * control_b(pose)
@@ -39,19 +39,19 @@ features += weight_a * control_a(depth) + weight_b * control_b(pose)
 
 ### LoRA（Hu 等人，2021）
 
-模型裡任何線性層 `W ∈ R^{d×d}`，凍住 `W`，加上一個低秩（rank）差值：
+模型裡任何線性層（linear layer） `W ∈ R^{d×d}`，凍住 `W`，加上一個低秩（rank）差值：
 
 ```
 W' = W + ΔW,  ΔW = B @ A,  A ∈ R^{r×d},  B ∈ R^{d×r}
 ```
 
-而且 `r << d`。注意力的標準是秩 4 到 16，重的 fine-tune 是秩 64 到 128。新參數的數量是 `2 · d · r`，不是 `d²`。SDXL 的注意力 `d=640`、`r=16`：每個配接器 2 萬個參數，不是 41 萬——少到 20 分之一。放到整個模型，LoRA 通常是 20 到 200 MB，基底是 5 GB。
+而且 `r << d`。注意力的標準是秩 4 到 16，高秩 fine-tuning是秩 64 到 128。新參數的數量是 `2 · d · r`，不是 `d²`。SDXL 的注意力 `d=640`、`r=16`：每個配接器 2 萬個參數，不是 41 萬——少到 20 分之一。放到整個模型，LoRA 通常是 20 到 200 MB，基模型是 5 GB。
 
-推論時可以縮放 LoRA：`W' = W + α · B @ A`。`α = 0.5-1.5` 是正常範圍。多個 LoRA 以相加方式疊起來。但書是：它們會以非線性的方式互相影響。
+推論時可以縮放 LoRA：`W' = W + α · B @ A`。`α = 0.5-1.5` 是正常範圍。多個 LoRA 以相加方式疊起來。但需注意，它們會以非線性方式互相影響。
 
 ### IP-Adapter（Ye 等人，2023）
 
-一個很小的配接器，文字之外再接受一張*影像*當條件。用 CLIP 影像編碼器產出影像 token，和文字 token 一起注入交叉注意力。每個基底模型大約 20 MB。讓你做「照這張參考圖的風格生成」，不必先做 LoRA。
+一個很小的配接器，文字之外再接受一張*影像*當條件。用 CLIP 影像編碼器產出影像 token，和文字 token 一起注入交叉注意力（cross-attention）。每個基模型大約 20 MB。讓你做「照這張參考圖的風格生成」，不必先做 LoRA。
 
 ## 可組合矩陣
 
@@ -75,7 +75,7 @@ v4-controlnet-zero
 `code/main.py` 在一維上模擬這兩個機制：
 
 1. **LoRA。** 一個預訓練的線性層 `W`。凍住它。訓練低秩的 `B @ A`，讓 `W + BA` 配上目標線性層。顯示 `r = 1` 就夠把一個秩 1 的修正學到完美。
-2. **精簡 ControlNet。** 一個「凍住的基底」預測器，和一個讀額外信號的「旁路網路」。旁路網路的輸出乘上一個可學的純量閘，初始化成零，這是我們版的零卷積。訓練，看閘爬上去。
+2. **精簡 ControlNet。** 一個「凍住的基模型」預測器，和一個讀額外信號的「旁路網路」。旁路網路的輸出乘上一個可學習的純量閘，初始化成零，這是我們版的零卷積。訓練，並觀察閘逐步升高。
 
 ### 步驟 1：LoRA 的數學
 
@@ -93,15 +93,15 @@ gated = gate * side_out  # gate initialized to 0
 h = base(x) + gated
 ```
 
-第 0 步的輸出和基底相同。訓練早期 `gate` 更新很慢——不會災難性地漂。
+第 0 步的輸出和基模型相同。訓練早期 `gate` 更新很慢——不會災難性地漂。
 
 ## 容易踩的坑
 
 - **把 LoRA 的強度拉太高。** `α = 2` 或 `α = 3` 是常見的「讓它更強」手法，會產出風格過重或直接壞掉的結果。保持 `α ≤ 1.5`。
 - **ControlNet 權重打架。** 姿勢 ControlNet 權重 1.0，再加深度 ControlNet 權重 1.0，通常會衝過頭。權重和大約 1.0 是安全預設。
-- **LoRA 配錯基底。** SDXL 的 LoRA 在 SD 1.5 上會不聲不響地變成空操作，因為注意力維度（dimension）對不上。Diffusers 0.30 以後會警告。
+- **LoRA 配錯基模型。** SDXL 的 LoRA 在 SD 1.5 上會不聲不響地變成空操作，因為注意力維度（dimension）對不上。Diffusers 0.30 以後會警告。
 - **Textual Inversion 會漂。** 在一個檢查點上訓練的 token，換到另一個會漂得很兇。LoRA 比較好搬。
-- **LoRA 權重併進與存放。** 你可以把 LoRA 烤進基底模型權重，推論更快，執行時不用再加，但你失去執行時縮放 `α` 的能力。兩份都留。
+- **LoRA 權重併進與存放。** 你可以把 LoRA 烤進基模型權重，推論更快，執行時不用再加，但你失去執行時縮放（runtime scaling） `α` 的能力。兩份都留。
 
 ## Use It｜實際應用
 
@@ -135,19 +135,19 @@ h = base(x) + gated
 | LoRA | 「低秩配接器」 | `W + B @ A`，`r << d`；參數比完整 fine-tune 少到 100 分之一。 |
 | 秩 r | 「那個旋鈕」 | LoRA 的壓縮；通常 4 到 16，重的個人化用 64 以上。 |
 | α | 「LoRA 強度」 | 執行時縮放 LoRA 差值。 |
-| IP-Adapter | 「參考影像」 | 小的影像條件配接器，用 CLIP 影像 token。 |
+| IP-Adapter | 「參考影像」 | 小的影像條件配接器（image-conditioning adapter），用 CLIP 影像 token。 |
 | DreamBooth | 「對主體做完整 fine-tune」 | 用大約 30 張某個主體的影像訓練整個模型。 |
 | Textual Inversion | 「新 token」 | 只學一個新的 word embedding；舊的，大多被換掉。 |
 
 ## 正式環境筆記：LoRA 熱切換、ControlNet 通道、多租戶服務
 
-真正的文字生影像 SaaS，會在同一個基底檢查點上服務幾百個 LoRA 和十來個 ControlNet。這個服務問題很像 LLM 的多租戶（multi-tenancy）。正式環境文獻把 LLM 那一面放在連續批次（continuous batching）和 LoRAX／S-LoRA 底下講：
+真正的文字生影像 SaaS，會在同一個基模型檢查點上服務幾百個 LoRA 和十來個 ControlNet。這個服務問題很像 LLM 的多租戶（multi-tenancy）。正式環境文獻把 LLM 那一面放在連續批次（continuous batching）和 LoRAX／S-LoRA 底下講：
 
-- **熱切換 LoRA，不要併進基底。** 把 `W' = W + α·B·A` 併進基底，每步推論大約快 3% 到 5%，但會凍住 `α` 和基底。讓 LoRA 以秩 r 的差值熱著留在 VRAM；diffusers 提供 `pipe.load_lora_weights()` 加 `pipe.set_adapters([...], adapter_weights=[...])`，依請求啟用。切換成本是 `2 · d · r · num_layers` 那些權重——MB 級、不到一秒。
-- **ControlNet 是第二條注意力通道。** 複製的編碼器和基底平行跑。兩個 ControlNet 權重各 1.0，等於每步多兩次前向，不是併成一次。批次（batch）大小的餘裕按平方下降。每個啟用的 ControlNet，單步成本按大約 1.5 倍來預算。
-- **LoRA 也要量化（quantization）。** 如果基底已經量化（見第 07 課，8 GB 上的 Flux），LoRA 差值也可以乾淨地量化成 8 位元或 4 位元。QLoRA 式的載入，讓你在 4 位元 Flux 基底上疊 5 到 10 個 LoRA，不會把記憶體（memory）撐爆。
+- **熱切換 LoRA，不要併進基模型。** 把 `W' = W + α·B·A` 併進基模型，每步推論大約快 3% 到 5%，但會凍住 `α` 和基模型。讓 LoRA 以秩 r 的差值熱著留在 VRAM；diffusers 提供 `pipe.load_lora_weights()` 加 `pipe.set_adapters([...], adapter_weights=[...])`，依請求啟用。切換成本是 `2 · d · r · num_layers` 那些權重——MB 級、不到一秒。
+- **ControlNet 是第二條注意力通道。** 複製的編碼器和基模型平行跑。兩個 ControlNet 權重各 1.0，等於每步多兩次前向，不是併成一次。批次（batch）大小的餘裕按平方下降。每個啟用的 ControlNet，單步成本按大約 1.5 倍來預算。
+- **LoRA 也要量化（quantization）。** 如果基模型已經量化（見第 07 課，8 GB 上的 Flux），LoRA 差值也可以乾淨地量化成 8 位元或 4 位元。QLoRA 式的載入，讓你在 4 位元 Flux 基模型上疊 5 到 10 個 LoRA，不會把記憶體（memory）撐爆。
 
-Flux 專用：Niels 的 Flux-on-8GB notebook 把基底量化成 4 位元；在那個量化基底上疊一個風格 LoRA，`pipe.load_lora_weights("user/style-lora")`，`weight_name="pytorch_lora_weights.safetensors"`，仍然行得通。這是大多數 SaaS 代理商 2026 年出貨的配方。
+Flux 專用：Niels 的 Flux-on-8GB notebook 把基模型量化成 4 位元；在那個量化基模型上疊一個風格 LoRA，`pipe.load_lora_weights("user/style-lora")`，`weight_name="pytorch_lora_weights.safetensors"`，仍然行得通。這是大多數 SaaS 代理商 2026 年出貨的配方。
 
 ## Further Reading｜延伸閱讀
 
