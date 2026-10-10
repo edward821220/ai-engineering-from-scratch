@@ -74,7 +74,7 @@ RoIAlign 在 COCO 上白白把遮罩 AP 拉高 3 到 4 個點。現在每一個�
 
 ### 一段話講完 RPN
 
-在特徵圖的每個位置放 K 個大小和形狀不同的錨框。每個錨框預測一個物件性（objectness）分數，以及一個迴歸（regression）偏移，把錨框修成更貼的框。依分數留下大約前 1,000 個框，用 交並比（intersection over union，IoU） 0.7 做非極大值抑制（non-maximum suppression），再把活下來的交給那些頭。RPN 用自己的一個小損失訓練。結構和第 6 課的 YOLO 損失一樣，只是只有兩類：有物體，或沒有物體。
+在特徵圖的每個位置放 K 個大小和形狀不同的錨框。每個錨框預測一個物件性（objectness）分數，以及一個迴歸（regression）偏移，把錨框修成更貼的框。依分數留下大約前 1,000 個框，用交並比（intersection over union，IoU）0.7 做非極大值抑制（non-maximum suppression），再把活下來的交給那些頭。RPN 用自己的一個小損失訓練。結構和第 6 課的 YOLO 損失一樣，只是只有兩類：有物體，或沒有物體。
 
 ### 遮罩頭
 
@@ -263,7 +263,7 @@ def train_step(model, images, targets, optimizer):
 
 `targets` 清單裡，每張影像一個 dict，要有 `boxes`、`labels`、`masks`。遮罩是 `(num_instances, H, W)` 的二元張量。訓練時模型回傳四個損失組成的 dict。評估時回傳預測清單。切哪一種，看 `model.training`。
 
-`pycocotools` 的評估器會同時給框和遮罩的 mAP@交並比（intersection over union，IoU）=0.5:0.95。兩個數字都要，才知道瓶頸（bottleneck）在框頭還是遮罩頭。
+`pycocotools` 的評估器會同時給框和遮罩的 mAP@IoU=0.5:0.95。兩個數字都要，才知道瓶頸（bottleneck）在框頭還是遮罩頭。
 
 ## Ship It｜交付成果
 
@@ -276,7 +276,7 @@ def train_step(model, images, targets, optimizer):
 
 1. **（簡單）** 用 100 個隨機框，把你的 RoIAlign 和 `torchvision.ops.roi_align` 比對。回報最大絕對差。再跑 RoIPool，也就是 2017 年以前的行為，顯示靠近邊界的框會差大約 1 到 2 個特徵圖像素。
 2. **（中等）** 在 50 張影像的自訂資料集上 fine-tuning `maskrcnn_resnet50_fpn_v2`。任何兩類都行：氣球、魚、坑洞、標誌。凍住骨幹，訓練 20 個 epoch（訓練週期），回報遮罩 AP@0.5。
-3. **（困難）** 把 Mask R-CNN 的遮罩頭從 28x28 改成在 56x56 預測。量改之前和改之後的 mAP@交並比（intersection over union，IoU）=0.75。說明增益有或沒有，為什麼和預期的邊界精度對記憶體（memory）取捨一致。
+3. **（困難）** 把 Mask R-CNN 的遮罩頭從 28x28 改成在 56x56 預測。量改之前和改之後的 mAP@IoU=0.75。說明增益有或沒有，為什麼和預期的邊界精度對記憶體（memory）取捨一致。
 
 ## Key Terms｜關鍵術語
 
@@ -287,7 +287,7 @@ def train_step(model, images, targets, optimizer):
 | RPN | 「區域提案器」 | 一個小的卷積頭，每張影像產出大約 1000 個有物體或沒有物體的提案 |
 | RoIAlign | 「不四捨五入的裁切」 | 從任何浮點座標的框，用雙線性取出固定大小的特徵格子 |
 | RoIPool | 「2017 年以前的裁切」 | 目的和 RoIAlign 一樣，但會把框的座標四捨五入。已經過時 |
-| 遮罩 AP | 「實例的 mAP」 | 用遮罩 交並比（intersection over union，IoU） 而不是框 交並比（intersection over union，IoU） 算的平均精確率（average precision）。COCO 實例分割的指標 |
+| 遮罩 AP | 「實例的 mAP」 | 用遮罩 IoU 而不是框 IoU 算的平均精確率（average precision）。COCO 實例分割的指標 |
 | 二元遮罩頭 | 「每個類別一張遮罩」 | 對每個提案、每個類別預測一張二元遮罩。只留下預測類別的那個通道 |
 | 背景類別 | 「類別 0」 | 兜住一切的「沒有物體」類別。真正類別的索引從 1 開始 |
 
