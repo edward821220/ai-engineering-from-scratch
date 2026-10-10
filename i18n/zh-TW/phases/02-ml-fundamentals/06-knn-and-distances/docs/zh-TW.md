@@ -359,7 +359,7 @@ distances, indices = index.search(query_vectors, k=5)
 
 | 術語 | 實際意義 |
 |------|----------------------|
-| K 最近鄰法（K-nearest neighbors） | 非參數演算法（algorithm）（non-parametric algorithm），找出距離查詢點最近的 K 個訓練資料點，再據此預測 |
+| K 最近鄰法（K-nearest neighbors） | 非參數演算法（non-parametric algorithm），找出距離查詢點最近的 K 個訓練資料點，再據此預測 |
 | 惰性學習（lazy learning） | 訓練時不做運算，所有運算都留到預測時才做。KNN 是典型例子 |
 | 積極式學習（eager learning） | 訓練時執行大量運算以建立精簡模型。多數機器學習演算法（algorithm）都屬於此類 |
 | 維度災難（curse of dimensionality） | 高維空間中的距離會趨於一致，鄰域也會擴大到涵蓋空間的大部分，使 KNN 難以奏效 |
