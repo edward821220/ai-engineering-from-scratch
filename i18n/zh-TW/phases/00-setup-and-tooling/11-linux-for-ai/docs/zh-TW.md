@@ -12,7 +12,7 @@
 - 在命令列上瀏覽 Linux 檔案系統（filesystem），並執行基本的檔案操作
 - 使用 `chmod` 和 `chown` 管理檔案權限（file permission），解決「Permission denied」錯誤
 - 使用 `apt` 安裝系統套件（system package），並把一台全新的 GPU 機器設定成可做 AI 工作
-- 辨識 macOS 與 Linux 之間辨識在遠端機器開發時常見的 macOS 與 Linux 差異
+- 辨識遠端機器開發時常讓人踩雷的 macOS 與 Linux 差異
 
 ## The Problem｜問題
 
