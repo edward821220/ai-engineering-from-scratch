@@ -21,5 +21,6 @@
   "phases/10-llms-from-scratch/20-deepseek-v3-walkthrough/docs/en.md": "04d8e96b26fd1cbfe18298e60320deff1339f9b052572b7144379ee59717d2e3",
   "phases/10-llms-from-scratch/21-jamba-hybrid-ssm-transformer/docs/en.md": "cc5b0d19b7cb44011c94c603517e7a8eb659df2e2b58043e5d89cd1299191ab8",
   "phases/10-llms-from-scratch/22-async-hogwild-inference/docs/en.md": "2ae5527935376bc320f68a0dc4563963b7887da9376394152477e8bfc2e31f23",
-  "phases/10-llms-from-scratch/25-speculative-decoding/docs/en.md": "dba09da1fd8d377afcef9e7197e9c80cfcf8bcef10ab9de547905a900301edd0"
+  "phases/10-llms-from-scratch/25-speculative-decoding/docs/en.md": "dba09da1fd8d377afcef9e7197e9c80cfcf8bcef10ab9de547905a900301edd0",
+  "phases/10-llms-from-scratch/34-gradient-checkpointing/docs/en.md": "efc28421256a26be194a1965242bb8413888167b4bcfbfdb9daa3e541368d9f8"
 }
