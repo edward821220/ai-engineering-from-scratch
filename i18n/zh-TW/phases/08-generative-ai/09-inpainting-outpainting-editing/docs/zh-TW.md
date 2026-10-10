@@ -25,7 +25,7 @@
 
 ### 單純做法（naive），以及為什麼是錯的
 
-帶著遮罩跑標準的文字生影像。每個取樣（sampling）步驟，用前向擴散過的乾淨影像，換掉帶噪潛在表示（latent）裡沒被遮罩的區域。它會動……但很差。邊界瑕疵會滲入生成結果，因為模型不知道遮罩區域裡有什麼。
+帶著遮罩跑標準的文字生影像。每個取樣（sampling）步驟，用前向擴散（forward diffusion）過的乾淨影像，換掉帶噪潛在表示（latent）裡沒被遮罩的區域。它會動……但很差。邊界瑕疵會滲入生成結果，因為模型不知道遮罩區域裡有什麼。
 
 ### 正當的修補模型
 
@@ -35,7 +35,7 @@
 input = concat([ noisy_latent (4ch), encoded_image (4ch), mask (1ch) ], dim=channel)
 ```
 
-多出來的通道，是 VAE 編碼過的來源影像，再加一個單通道遮罩。訓練時隨機遮住影像的一些區域，模型只對遮罩區域去噪，未遮罩區域作為乾淨的條件訊號。推論（inference）時，模型看得到遮罩周圍是什麼，補生成結果會與周圍內容連貫。
+多出來的通道，是 VAE 編碼過的來源影像，再加一個單通道遮罩。訓練時隨機遮住影像的一些區域，模型只對遮罩區域去噪，未遮罩區域作為乾淨的條件訊號（conditioning signal）。推論（inference）時，模型看得到遮罩周圍是什麼，補生成結果會與周圍內容連貫。
 
 SD-Inpaint、SDXL-Inpaint、Flux-Fill 都用這種 9 通道，或類似的輸入。Diffusers 有 `StableDiffusionInpaintPipeline`、`FluxFillPipeline`。
 
@@ -45,7 +45,7 @@ SD-Inpaint、SDXL-Inpaint、Flux-Fill 都用這種 9 通道，或類似的輸入
 
 - `t/T = 0.3` → 幾乎和來源一樣，只有小的風格變化
 - `t/T = 0.6` → 中等編輯，粗結構還在
-- `t/T = 0.9` → 幾乎從噪聲生成，來源幾乎沒保住
+- `t/T = 0.9` → 幾乎從雜訊生成，來源幾乎沒保住
 
 ### InstructPix2Pix（Brooks 等人，2023）
 
@@ -53,7 +53,7 @@ SD-Inpaint、SDXL-Inpaint、Flux-Fill 都用這種 9 通道，或類似的輸入
 
 ### RePaint（Lugmayr 等人，2022）
 
-留一個標準的無條件擴散模型。每個反向步驟重新取樣——偶爾跳回雜訊程度更高的狀態再生成。避開邊界假影。沒有訓練好的修補模型時用這個。
+留一個標準的無條件擴散模型。每個反向步驟重新取樣——偶爾跳回雜訊程度更高的狀態再生成。避開邊界假影（boundary artifacts）。沒有訓練好的修補模型時用這個。
 
 ```figure
 inpaint-mask-reinject
@@ -74,9 +74,9 @@ def sample_data(rng):
 
 ### 步驟 2：在全部 5 維上訓練去噪器
 
-標準 DDPM。網路（network）對 5 維的帶噪輸入，輸出 5 維的噪聲預測。
+標準 DDPM。網路（network）對 5 維的帶噪輸入，輸出 5 維的雜訊預測。
 
-### 步驟 3：推論時，推論時執行帶遮罩的反向過程
+### 步驟 3：推論時，推論時執行帶遮罩的反向過程（reverse process）
 
 ```python
 def inpaint_step(x_t, mask, clean_image, alpha_bars, t, rng):
@@ -96,7 +96,7 @@ def inpaint_step(x_t, mask, clean_image, alpha_bars, t, rng):
 
 ## 容易踩的坑
 
-- **接縫。** 單純做法會留下看得到的邊界，因為梯度（gradient）資訊穿不過遮罩。修法：把遮罩膨脹 8 到 16 個像素，或用正當的修補模型。
+- **接縫。** 單純做法會留下看得到的邊界，因為梯度（gradient）資訊穿不過遮罩。修法：把遮罩膨脹（mask dilation）8 到 16 個像素，或用正當的修補模型。
 - **遮罩外漏。** 條件影像裡沒遮住的區域如果品質差或很吵，會污染遮罩裡的生成。稍微去噪或模糊。
 - **CFG 和遮罩大小會交互。** 小遮罩配高 CFG，等於一塊飽和的補丁。小編輯把 CFG 降下來。
 - **SDEdit 的忠實度斷崖。** 從 `t/T = 0.5` 走到 `t/T = 0.6`，主體身份可能就沒了。要掃描，並留下檢查點。
@@ -119,7 +119,7 @@ SAM（Meta 的 Segment Anything，2023）加擴散修補，是 2026 年的去背
 
 ## Ship It｜交付成果
 
-存成 `outputs/skill-editing-pipeline.md`。這個 skill 吃原圖、編輯描述、可選的遮罩或 SAM prompt，輸出：遮罩怎麼產生、基底模型、CFG 尺度（影像加文字）、SDEdit 的 t 或修補模式，以及品檢清單。
+存成 `outputs/skill-editing-pipeline.md`。這個 skill 吃原圖、編輯描述、可選的遮罩或 SAM prompt，輸出：遮罩怎麼產生、基模型、CFG 尺度（影像加文字）、SDEdit 的 t 或修補模式，以及品檢清單。
 
 ## Exercises｜練習
 
@@ -134,7 +134,7 @@ SAM（Meta 的 Segment Anything，2023）加擴散修補，是 2026 年的去背
 | 修補 | 「把洞填上」 | 在遮罩裡重新生成；外面的像素留著。 |
 | 外補 | 「把畫布延伸」 | 在畫布外面重新生成；裡面留著。 |
 | 9 通道 U-Net | 「正當的修補模型」 | 輸入是 `noisy \| encoded-source \| mask` 的 U-Net。 |
-| SDEdit | 「帶噪聲程度的圖生圖」 | 加噪到時間 `t`，再用新 prompt 去噪。 |
+| SDEdit | 「帶雜訊程度的圖生圖」 | 加噪到時間 `t`，再用新 prompt 去噪。 |
 | InstructPix2Pix | 「只用文字的編輯」 | 在（影像、指令、輸出）三元組上 fine-tune 過的擴散。 |
 | RePaint | 「不用重訓」 | 反向過程中定期再加噪，減少接縫。 |
 | SAM | 「Segment Anything」 | 用點選或方框產生遮罩；和修補搭配。 |
@@ -146,8 +146,8 @@ SAM（Meta 的 Segment Anything，2023）加擴散修補，是 2026 年的去背
 
 - **慢的是 SAM-H。** 1024² 的 SAM-H 約 200 ms；SAM-ViT-B 約 40 ms，品質只掉一點。SAM 2（影片）多了時間軸的開銷；單張影像編輯不要用它。
 - **能略過 VAE 編碼就跳過。** `pipe.image_processor.preprocess(img)` 把影像編碼成潛在表示。如果上一次生成的潛在表示還在——迭代編輯的介面通常留著——用 `latents=...` 直接傳，跳過一次 VAE 編碼。
-- **遮罩膨脹也影響吞吐量。** 遮罩小，表示 U-Net 前向大多是浪費的，沒遮住的像素反正會被夾住。`diffusers` 的 `StableDiffusionInpaintPipeline` 無論如何都跑完整個 U-Net；只有 9 通道的正當修補變體才利用遮罩區域的運算。
-- **Flux-Kontext 是 2025 的答案。** 對 `(source_image, instruction)` 做一次前向——沒有分開的遮罩，也沒有 SDEdit 的噪聲掃描。在 H100 上單次編輯約 1.5 秒。架構上的教訓：把合併處理階段。
+- **遮罩膨脹也影響吞吐量。** 遮罩小，表示 U-Net 前向傳遞大多是浪費的，沒遮住的像素反正會被夾住。`diffusers` 的 `StableDiffusionInpaintPipeline` 無論如何都跑完整個 U-Net；只有 9 通道的正當修補變體才利用遮罩區域的運算。
+- **Flux-Kontext 是 2025 的答案。** 對 `(source_image, instruction)` 做一次前向傳遞——沒有分開的遮罩，也沒有 SDEdit 的雜訊掃描。在 H100 上單次編輯約 1.5 秒。架構上的教訓：把合併處理階段。
 
 ## Further Reading｜延伸閱讀
 
