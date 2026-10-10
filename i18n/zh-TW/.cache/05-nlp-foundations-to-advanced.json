@@ -1,5 +1,6 @@
 {
   "phases/05-nlp-foundations-to-advanced/01-text-processing/docs/en.md": "d7070af33a9656a02ce6dcf42966d6c8c401035df0f8fa244ec37c12ca4d210b",
   "phases/05-nlp-foundations-to-advanced/02-bag-of-words-tfidf/docs/en.md": "12f1e26f69e32a9e97f45a82965c3647563f7e135a6010534a843ea7da2273e9",
-  "phases/05-nlp-foundations-to-advanced/03-word-embeddings-word2vec/docs/en.md": "566500e6c43ebc3624a117e76843be1100be7951ac7780c37f15241299846b27"
+  "phases/05-nlp-foundations-to-advanced/03-word-embeddings-word2vec/docs/en.md": "566500e6c43ebc3624a117e76843be1100be7951ac7780c37f15241299846b27",
+  "phases/05-nlp-foundations-to-advanced/04-glove-fasttext-subword/docs/en.md": "b92cf9d14b8729b4a378b0b4f468f4d957f6600c15d876b091d8dec54d8d3e47"
 }
