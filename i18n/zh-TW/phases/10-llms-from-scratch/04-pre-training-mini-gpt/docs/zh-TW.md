@@ -1,6 +1,6 @@
 # 預訓練迷你 GPT（1.24 億參數）
 
-> GPT-2 Small 擁有 1.24 億個參數。那是 12 個 transformer 層、12 個注意力頭，以及 768 維的 embedding。你可以在單張 GPU 上花幾個小時從零訓練它。大多數人從未這麼做過，他們只使用預訓練的 checkpoint。但如果你不曾親手訓練過一個，你就無法真正理解你在其上打造產品的模型內部究竟發生了什麼。
+> GPT-2 Small 擁有 1.24 億個參數。那是 12 個 transformer 層、12 個注意力頭，以及 768 維的 embedding。你可以在單張 GPU 上花幾個小時從零訓練它。大多數人從未這麼做過，他們只使用預訓練的 checkpoint。但如果你不曾親手訓練過一個，你就無法真正理解你在其上打造產品的模型（model）內部究竟發生了什麼。
 
 **Type:** Build
 **Languages:** Python (with numpy)
@@ -143,7 +143,7 @@ graph LR
 
 除以 sqrt(d_k)——即 sqrt(64) = 8——是一種縮放操作。如果沒有它，高維向量的內積會變得非常大，導致 softmax 被推入梯度幾乎為零的飽和區域。這是原始「Attention Is All You Need」論文中的關鍵洞見之一。
 
-### KV Cache：為什麼推論能如此迅速
+### KV Cache：為什麼推論（inference）能如此迅速
 
 訓練期間，你會一次處理整個序列。但在推論期間，你是一次生成一個 token。若不進行最佳化，生成第 N 個 token 就必須為之前所有 N-1 個 token 重新計算注意力。這使得每個生成的 token 需耗費 O(N^2) 的代價，整個長度為 N 的序列總計需 O(N^3)。
 
