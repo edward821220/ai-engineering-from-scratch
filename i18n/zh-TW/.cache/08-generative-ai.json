@@ -12,5 +12,6 @@
   "phases/08-generative-ai/11-audio-generation/docs/en.md": "8eb8b1cc04a9cd18df5b8465e85762b5c975bcaf3167e2f092e2e45c71901ecf",
   "phases/08-generative-ai/12-3d-generation/docs/en.md": "e349a73dbf2f3d8d579824472bb587e724df7f3b99ae97886e56a0642f58eb41",
   "phases/08-generative-ai/13-flow-matching-rectified-flows/docs/en.md": "3b092712de5baa4726f5b090215c3d6e259e1858c7dcc512cc0bc81fea3a8a60",
-  "phases/08-generative-ai/14-evaluation-fid-clip-score/docs/en.md": "4d3065d894662f8b621270106203c8f7a16d990c47fee5cba6ed66ee6b9c97ea"
+  "phases/08-generative-ai/14-evaluation-fid-clip-score/docs/en.md": "4d3065d894662f8b621270106203c8f7a16d990c47fee5cba6ed66ee6b9c97ea",
+  "phases/08-generative-ai/19-visual-autoregressive-var/docs/en.md": "e7444b2327b8996ed0a0a266833e7ae86822f1add71474db7e045a6194011eb2"
 }
