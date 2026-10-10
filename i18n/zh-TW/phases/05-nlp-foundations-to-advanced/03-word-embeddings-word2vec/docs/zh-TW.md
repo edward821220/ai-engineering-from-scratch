@@ -201,7 +201,7 @@ print(model.wv.most_similar("cat", topn=3))
 實際應用時，你幾乎不會自己訓練 Word2Vec。你下載預訓練向量。
 
 - **GloVe** — Stanford 的共現矩陣分解。50、100、200、300 維的預訓練向量版本。一般涵蓋不錯。第 04 課專門講 GloVe。
-- **fastText** — Facebook 把 Word2Vec 擴充成對字元 n-gram 做 embedding。用subword composition處理詞彙表外（out-of-vocabulary，OOV）的詞。第 04 課。
+- **fastText** — Facebook 把 Word2Vec 擴充成對字元 n-gram 做 embedding。用子詞組合（subword composition）處理詞彙表外（out-of-vocabulary，OOV）的詞。第 04 課。
 - **Google News 上預訓練的 Word2Vec** — 300 維、300 萬詞的詞彙表，2013 年發表。到現在每天仍有人下載。
 
 ### Word2Vec 在 2026 年什麼時候仍然贏
@@ -217,7 +217,7 @@ print(model.wv.most_similar("cat", topn=3))
 
 contextual embedding（ELMo、BERT，以及之後每個 transformer）解決了這件事：依周圍脈絡，為這個詞的每次出現產出不同向量。那就是從 Word2Vec 跳到 BERT：從 static embedding 到 contextual embedding。第 7 階段講 transformer 那一半。
 
-另一個失敗是詞彙表外（out-of-vocabulary，OOV）。如果訓練資料沒有 `Zoomer-approved`，Word2Vec 就沒看過。沒有退路。fastText 用subword composition修這件事（第 04 課）。
+另一個失敗是詞彙表外（out-of-vocabulary，OOV）。如果訓練資料沒有 `Zoomer-approved`，Word2Vec 就沒看過。沒有退路。fastText 用子詞組合修這件事（第 04 課）。
 
 ## Ship It｜交付成果
 
