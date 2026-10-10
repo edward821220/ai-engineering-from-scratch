@@ -1,6 +1,6 @@
 # 超參數調校（hyperparameter tuning）
 
-> 超參數（hyperparameter）是訓練開始前你要轉動的旋鈕。轉得好不好，就是平庸模型（model）與出色模型（model）的差別。
+> 超參數（hyperparameter）是訓練（training）開始前你要轉動的旋鈕。轉得好不好，就是平庸模型（model）與出色模型（model）的差別。
 
 **Type:** Build
 **Language:** Python
@@ -11,7 +11,7 @@
 
 - 從頭實作網格搜尋（grid search）、隨機搜尋（random search）與貝氏最佳化（Bayesian optimization），並比較它們的樣本效率（sample efficiency）
 - 說明為什麼當大多數超參數的有效維度（effective dimensionality）很低時，隨機搜尋勝過網格搜尋
-- 用代理模型（model）（surrogate model）與獲得函數（acquisition function）建立貝氏最佳化迴圈來引導搜尋
+- 用代理模型（surrogate model）與獲得函數（acquisition function）建立貝氏最佳化迴圈來引導搜尋
 - 設計一套超參數調校策略，用正確的交叉驗證（cross-validation）避免對驗證集（validation set）過度擬合（overfitting）
 
 ## The Problem｜問題
@@ -127,7 +127,7 @@ Hyperband 特別有效。它讓 81 個組態各跑 1 個 epoch，留下前三分
 | 步進衰減（step decay） | 每 N 個 epoch 乘上 0.1 | 經典 CNN 訓練 |
 | 餘弦退火（cosine annealing） | lr * 0.5 * (1 + cos(pi * t / T)) | 現今常用的預設選擇 |
 | 預熱（warmup）＋衰減 | 先線性上升再餘弦衰減 | Transformer |
-| 一循環（one-cycle） | 一個循環內先升後降 | 快速收斂 |
+| 一循環（one-cycle） | 一個循環內先升後降 | 快速收斂（convergence） |
 | 高原期（plateau）降速 | 指標（metric）停滯時按比例降低 | 安全的預設 |
 
 ### 超參數重要性
