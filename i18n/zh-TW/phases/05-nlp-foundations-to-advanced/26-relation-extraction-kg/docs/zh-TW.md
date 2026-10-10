@@ -1,6 +1,6 @@
 # 關係抽取與知識圖譜建構
 
-> NER 找到實體。實體連結把它們錨定。關係抽取找出它們之間的邊。知識圖譜是節點、邊，和它們的出處（provenance）加總。
+> NER 找到實體。實體連結把它們錨定。關係抽取找出它們之間的邊。知識圖譜是節點、邊，和它們的出處（provenance）彙整。
 
 **Type:** Build
 **Languages:** Python
@@ -16,7 +16,7 @@
 - `(Tim Cook, start_date, 2011)`
 - `(Apple, type, Organization)`
 
-關係抽取（RE）把自由文本變成結構化三元組 `(subject, relation, object)`。在語料庫（corpus）上加總，你就有一張知識圖譜（knowledge graph）。再加總、再查詢，你就有給 RAG、分析或法規稽核用的推理底層。
+關係抽取（relation extraction，RE）把自由文本變成結構化三元組 `(subject, relation, object)`。在語料庫（corpus）上彙整，你就有一張知識圖譜（knowledge graph）。再彙整、再查詢，你就有給 RAG、分析或法規稽核用的推理底層。
 
 2026 年的問題：大型語言模型抽關係抽得很起勁。太起勁。它們會幻覺（hallucination）出來源文本不支持的三元組。沒有出處，你分不出真的三元組和說得通的虛構。2026 年的答案是 AEVS 式的錨定再驗證管線（pipeline）。
 
@@ -28,7 +28,7 @@
 
 **三種抽取做法。**
 
-1. **規則／模式式。** Hearst 模式：「X such as Y」→ `(Y, isA, X)`。再加上手寫的正規表示式（regex）。脆、準、說得清楚。
+1. **規則／模式式。** Hearst 模式：「X such as Y」→ `(Y, isA, X)`。再加上手寫的正規表示式（regex）。脆弱、精確且可解釋。
 2. **監督式分類器（classifier）。** 給定句子裡的兩個實體提及，從固定集合預測關係。在 TACRED、ACE、KBP 上訓練。2015 到 2022 的標準。
 3. **生成式 LLM。** prompt 模型吐出三元組。開箱就能用。需要出處，不然會幻覺出看起來說得通的垃圾。
 
@@ -46,7 +46,7 @@
 - **封閉本體。** 固定屬性清單（例如 Wikidata 的 1.1 萬個以上屬性）。可預期。可查詢。很難編造。
 - **開放資訊抽取。** 任何動詞片語都能當關係。召回率（recall）高。精確率（precision）低。查詢很亂。
 
-正式環境（production）的知識圖譜通常混用：開放資訊抽取出來發現，再把關係標準化到封閉本體上，才併進主圖。
+正式環境（production）的知識圖譜通常混用：先用開放資訊抽取探索關係，再將其標準化到封閉本體，再把關係標準化到封閉本體上，才併進主圖。
 
 ```figure
 relation-triples
@@ -65,7 +65,7 @@ PATTERNS = [
 ]
 ```
 
-完整的玩具抽取器見 `code/main.py`。Hearst 模式仍在領域管線裡交付，因為可以除錯。
+完整的玩具抽取器見 `code/main.py`。Hearst 模式仍用於特定領域的正式管線，因為可以除錯。
 
 ### 步驟 2：監督式關係分類
 
@@ -81,7 +81,7 @@ output = model.generate(**encoded, max_length=200)
 triples = tok.batch_decode(output, skip_special_tokens=False)
 ```
 
-REBEL 是 seq2seq 關係抽取器：文本進去，三元組出來，已經是 Wikidata 屬性 id。在遠距監督資料上 fine-tune。標準的開放權重基準模型（baseline）。
+REBEL 是 seq2seq 關係抽取器：文本進去，三元組出來，已經是 Wikidata 屬性 id。在遠距監督（distant supervision）資料上 fine-tune。標準的開放權重基準模型（baseline）。
 
 ### 步驟 3：帶錨定的 LLM prompt 抽取
 
@@ -146,7 +146,7 @@ print(neighbors("Tim Cook", relation="P108"))    # -> [(P108, Apple)]
 - **實體標準化。** 「Apple Inc」和「Apple」必須解析到同一個節點。先做實體連結（第 25 課）。
 - **幻覺三元組。** LLM 吐出文本不支持的三元組。強制做 span 驗證。
 - **關係標準化漂移。** 開放資訊抽取的關係不一致（「was born in」「came from」「is a native of」）。不併成標準 id，圖就查不了。
-- **時間錯誤。** 「Tim Cook is CEO of Apple」——現在為真，2005 年為假。很多關係有時間界。用限定詞（Wikidata 的 `P580` 開始時間、`P582` 結束時間）。
+- **時間錯誤。** 「Tim Cook is CEO of Apple」——現在為真，2005 年為假。許多關係只在特定時間範圍內成立。用限定詞（Wikidata 的 `P580` 開始時間、`P582` 結束時間）。
 - **領域不合。** REBEL 在 Wikipedia 上訓練。法律、醫學、科學文本常常需要領域 fine-tune 的關係抽取模型。
 
 ## Use It｜實際應用

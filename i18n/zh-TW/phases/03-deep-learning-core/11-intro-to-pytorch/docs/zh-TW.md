@@ -10,19 +10,19 @@
 ## Learning Objectives｜學習目標
 
 - 用 PyTorch 的 nn.Module、nn.Sequential 和 autograd（自動微分）建立並訓練神經網路（neural network）
-- 使用 PyTorch 張量（tensor）、GPU 加速，以及標準訓練迴圈：zero_grad、forward、loss、backward、step
+- 使用 PyTorch 張量（tensor）、GPU 加速，以及標準訓練迴圈（training loop）：zero_grad、forward、loss、backward、step
 - 把你從頭做的迷你框架零件，換成 PyTorch 的對應物
 - 在同一個任務上剖析並比較純 Python 框架和 PyTorch 的訓練速度
 
 ## The Problem｜問題
 
-你已經有一個能動的迷你框架。Linear 層、ReLU、dropout、批次正規化（batch normalization）、Adam、DataLoader、訓練迴圈。它用純 Python，在圓形分類問題上訓練一個 4 層網路。
+你已經有一個能動的迷你框架。Linear 層、ReLU、dropout、批次正規化（batch normalization）、Adam、DataLoader、訓練迴圈（training loop）。它用純 Python，在圓形分類問題上訓練一個 4 層網路。
 
 在同一個問題上，它也比 PyTorch 慢 500 倍。
 
 你的迷你框架一次處理一個樣本（sample），用的是一層層的 Python 迴圈。PyTorch 把同樣的運算派給最佳化過的 C++/CUDA 核心，在 GPU 上跑。在單張 NVIDIA A100 上，PyTorch 用 ResNet-50（2560 萬個參數）在 ImageNet（128 萬張影像）上訓練大約 6 小時。同樣的任務，你的框架大約要 3,000 小時，前提是它沒有先把記憶體（memory）用完。
 
-速度不是唯一的差距。你的框架沒有 GPU 支援。沒有自動微分，每個模組的 backward() 都是你手寫的。沒有序列化。沒有分散式訓練。沒有混合精度（mixed precision）。沒有 print 以外的辦法可以看梯度（gradient）怎麼流。
+速度不是唯一的差距。你的框架沒有 GPU 支援。沒有自動微分，每個模組的 backward() 都是你手寫的。沒有序列化（serialization）。沒有分散式訓練。沒有混合精度（mixed precision）。沒有 print 以外的辦法可以看梯度（gradient）怎麼流。
 
 PyTorch 把這些缺口都補上了。而且它維持的心智模型，就是你已經做過的那一套：Module、forward()、parameters()、backward()、optimizer.step()。概念一對一搬過去。語法幾乎一樣。差別是 PyTorch 在你從頭設計的同一個介面後面，包了十年的系統工程。
 
@@ -100,7 +100,7 @@ graph LR
     mul --> |"grad"| w
 ```
 
-和你的框架關鍵的差別是：PyTorch 用的是以磁帶為基礎的自動微分。前向傳遞時，每個運算都附加到一條「磁帶」上。呼叫 `.backward()` 會把磁帶倒著重播。
+和你的框架關鍵的差別是：PyTorch 用的是以運算記錄帶為基礎的自動微分。前向傳遞時，每個運算都附加到一條「運算記錄帶」上。呼叫 `.backward()` 會把運算記錄帶倒著重播。
 
 ```python
 x = torch.randn(3, requires_grad=True)
@@ -118,7 +118,7 @@ print(x.grad)  # dz/dx = 2x + 3
 
 ### nn.Module
 
-`nn.Module` 是 PyTorch 裡每個神經網路零件的基底類別。你在第 10 課已經做過這個抽象。PyTorch 的版本加上自動的參數（parameter）註冊、遞迴找出子模組、裝置管理，以及 state dict 序列化。
+`nn.Module` 是 PyTorch 裡每個神經網路零件的基底類別。你在第 10 課已經做過這個抽象。PyTorch 的版本加上自動的參數（parameter）註冊、遞迴找出子模組、裝置管理，以及 state dict 序列化（serialization）。
 
 ```python
 import torch.nn as nn
@@ -177,9 +177,9 @@ PyTorch 把你做過的東西都做成可以上正式環境的版本。
 | AdamW(params, lr, weight_decay) | transformer、fine-tuning | 1e-4--1e-3 |
 | LBFGS(params) | 小規模、二階 | 1.0 |
 
-### 訓練迴圈
+### 訓練迴圈（training loop）
 
-每個 PyTorch 訓練迴圈都是同樣的 5 步。你在第 10 課已經知道了。
+每個 PyTorch 訓練迴圈（training loop）都是同樣的 5 步。你在第 10 課已經知道了。
 
 ```mermaid
 sequenceDiagram
@@ -272,7 +272,7 @@ for inputs, targets in loader:
 
 | 特性 | 迷你框架（第 10 課） | PyTorch | JAX |
 |---------|---------------------|---------|-----|
-| 自動微分 | 手動 backward() | 以磁帶為基礎的 autograd | 函數式變換 |
+| 自動微分 | 手動 backward() | 以運算記錄帶為基礎的 autograd | 函數式變換 |
 | 執行方式 | 立即執行，Python 迴圈 | 立即執行，C++ 核心 | 追蹤後 JIT 編譯 |
 | GPU 支援 | 無 | 有（CUDA、ROCm、MPS） | 有（CUDA、TPU） |
 | 速度（MNIST MLP） | 每個 epoch 約 300 秒 | 每個 epoch 約 0.5 秒 | 每個 epoch 約 0.3 秒 |
@@ -358,7 +358,7 @@ class MNISTModel(nn.Module):
 
 參數數量：784*256 + 256 + 256*128 + 128 + 128*10 + 10 = 235,146。以現在的標準來看很小。GPT-2 small 有 1.24 億。這個幾秒就訓完。
 
-### 步驟 3：訓練迴圈
+### 步驟 3：訓練迴圈（training loop）
 
 標準的前向、損失、反向、更新模式。
 
@@ -505,7 +505,7 @@ PyTorch 內建 15 種以上的排程器：StepLR、ExponentialLR、CosineAnneali
 
 1. **加上批次正規化。** 在每個線性層後面、活化函數前面插入 `nn.BatchNorm1d`。和只有 dropout 的版本比較測試準確率和訓練速度。批次正規化應該能在更少的 epoch 裡達到 98% 以上。
 2. **實作學習率尋找器。** 用指數增加的學習率訓練一個 epoch，從 1e-7 到 1.0。畫出損失對學習率。最好的學習率就在損失開始爬升之前。用它為 MNIST 模型挑一個更好的學習率。
-3. **用混合精度搬到 GPU。** 在訓練迴圈加上 `torch.amp.autocast` 和 `GradScaler`。在 GPU 上量有混合精度和沒有混合精度的吞吐量，單位是每秒樣本數。在 A100 上，預期大約 2 倍加速。
+3. **用混合精度搬到 GPU。** 在訓練迴圈（training loop）加上 `torch.amp.autocast` 和 `GradScaler`。在 GPU 上量有混合精度和沒有混合精度的吞吐量，單位是每秒樣本數。在 A100 上，預期大約 2 倍加速。
 4. **做一個自訂 Dataset。** 下載 Fashion-MNIST，格式和 MNIST 相同，但內容是衣服。實作 `FashionMNISTDataset(Dataset)` 類別，含 `__getitem__` 和 `__len__`。用同一個 MLP 訓練並比較準確率。Fashion-MNIST 比較難，預期大約 88%，對上大約 98%。
 5. **把 Adam 換成 SGD 加動量（momentum）。** 用 `SGD(params, lr=0.01, momentum=0.9)` 訓練。比較收斂（convergence）曲線。再加上 `CosineAnnealingLR` 排程器，看 SGD 能不能在第 10 個 epoch 追上 Adam。
 
@@ -514,9 +514,9 @@ PyTorch 內建 15 種以上的排程器：StepLR、ExponentialLR、CosineAnneali
 | 術語 | 常見說法 | 實際意義 |
 |------|----------------|----------------------|
 | 張量 | 「多維陣列」 | 帶型別、知道自己在哪個裝置上的陣列，每個運算都內建自動微分 |
-| Autograd | 「自動的反向傳播（backpropagation）」 | 以磁帶為基礎的系統。前向傳遞時記下運算，再倒著重播，算出精確梯度 |
+| Autograd | 「自動的反向傳播（backpropagation）」 | 以運算記錄帶為基礎的系統。前向傳遞時記下運算，再倒著重播，算出精確梯度 |
 | nn.Module | 「一層」 | 任何可微分計算區塊的基底類別。它註冊參數、支援巢狀，並處理訓練和評估模式 |
-| state_dict | 「模型權重」 | 一個 OrderedDict，把參數名稱對到張量。這是訓練好的模型可攜、可序列化的表示 |
+| state_dict | 「模型權重」 | 一個 OrderedDict，把參數名稱對到張量。這是訓練好的模型可攜、可序列化（serialization）的表示 |
 | .backward() | 「算梯度」 | 把計算圖倒著走，為每個 requires_grad=True 的葉張量計算並累積梯度 |
 | .to(device) | 「移到 GPU」 | 遞迴把所有參數和緩衝區轉到指定裝置，可以是 CPU、CUDA 或 MPS |
 | DataLoader | 「資料管線」 | 一個迭代器，從 Dataset 分批、洗牌，並可以選擇平行載入資料 |

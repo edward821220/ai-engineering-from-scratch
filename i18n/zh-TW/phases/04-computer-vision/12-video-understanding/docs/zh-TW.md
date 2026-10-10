@@ -1,6 +1,6 @@
 # 影片理解（video understanding）：時間建模
 
-> 一段影片是一串影像，加上把它們接起來的物理。每個影片模型不是把時間當成多出來的一軸（3D 卷積（convolution）），就是當成一段要去注意的序列（transformer），或是先抽出特徵（feature）再池化（2D 加池化）。
+> 一段影片是一串影像，加上連結這些影格的物理規律。每個影片模型不是把時間當成多出來的一軸（3D 卷積（convolution）），就是當成一段要去注意的序列（transformer），或是先抽出特徵（feature）再池化（2D 加池化）。
 
 **Type:** Learn + Build
 **Languages:** Python
@@ -11,7 +11,7 @@
 
 - 分辨三種主要的影片建模做法（2D 加池化、3D 卷積、時空 transformer），並預估它們的成本和準確率（accuracy）怎麼換
 - 用 PyTorch 實作影格（frame）抽樣、時間池化，以及一個 2D 加池化的基準（baseline）分類器
-- 說明為什麼 I3D 把 3D 核「膨脹」之後，能從 ImageNet 權重（weight）遷移得很好，以及分解式的 (2+1)D 卷積哪裡不一樣
+- 說明為什麼 I3D 把 3D 核「膨脹（inflation）」之後，能從 ImageNet 權重（weight）遷移得很好，以及分解式的 (2+1)D 卷積哪裡不一樣
 - 讀標準的動作辨識資料集（dataset）和指標（metric）：Kinetics-400/600、UCF101、Something-Something V2；片段層級和影片層級的 top-1 準確率
 
 ## The Problem｜問題
@@ -62,12 +62,12 @@ flowchart LR
 
 把 2D 的 (H, W) 核換成 3D 的 (T, H, W) 核。網路同時在空間和時間上做卷積。早期這一族：C3D、I3D、SlowFast。
 
-I3D 的手法：拿一個預訓練的 2D ImageNet 模型，把每個 2D 核沿著新的時間軸複製，把核「膨脹」開來。3x3 的 2D 卷積變成 3x3x3 的 3D 卷積。3D 模型因此有很強的預訓練權重，不用從零訓練。
+I3D 的手法：拿一個預訓練的 2D ImageNet 模型，把每個 2D 核沿著新的時間軸複製，把核「膨脹（inflation）」開來。3x3 的 2D 卷積變成 3x3x3 的 3D 卷積。3D 模型因此有很強的預訓練權重，不用從零訓練。
 
 好處：
 
 - 直接建模運動。
-- I3D 的膨脹白送你遷移學習。
+- I3D 的膨脹（inflation）白送你遷移學習。
 
 壞處：
 
@@ -89,7 +89,7 @@ I3D 的手法：拿一個預訓練的 2D ImageNet 模型，把每個 2D 核沿�
 好處：
 
 - 每個主要基準上的準確率都是目前最好。
-- 可以從影像 transformer（ViT）用小塊膨脹遷移過來。
+- 可以從影像 transformer（ViT）用小塊膨脹（inflation）遷移過來。
 - 用稀疏注意力可以吃長上下文（long context）的影片。
 
 壞處：
@@ -188,7 +188,7 @@ print(f"params: {sum(p.numel() for p in model.parameters()):,}")
 
 1100 萬個參數，ImageNet 預訓練，一格一格跑，平均，再分類。外觀很重的任務上，這個基準常常離像樣的 3D 模型只有 5 到 10 個百分點，有時還更好，因為它重用了更強的 ImageNet 骨幹（backbone）。
 
-### 步驟 3：I3D 風格的膨脹 3D 卷積
+### 步驟 3：I3D 風格的膨脹（inflation） 3D 卷積
 
 把一個 2D 卷積變成 3D 卷積：沿新的時間軸重複權重。
 
@@ -261,7 +261,7 @@ print(f"(2+1)D output: {tuple(c(x).shape)}")
 
 1. **（簡單）** 粗算 FramePool 在 T=8 時的 FLOPs，對上 I3D 風格、T=8 的 3D ResNet。說明為什麼 2D 加池化便宜 3 到 5 倍。
 2. **（中等）** 做一個合成影片資料集：球往隨機方向移動，標籤是運動方向（「左到右」「右到左」「往斜上」）。用 FramePool 訓練。顯示它的準確率接近亂猜，證明光靠外觀不夠做運動任務。
-3. **（困難）** 把 ResNet-18 裡每個 Conv2d 換成 `Conv2Plus1D`，做出 R(2+1)D-18。第一個卷積的權重，從 ImageNet 預訓練的 ResNet-18 膨脹過來。在練習 2 的運動資料集上訓練，並贏過 FramePool。
+3. **（困難）** 把 ResNet-18 裡每個 Conv2d 換成 `Conv2Plus1D`，做出 R(2+1)D-18。第一個卷積的權重，從 ImageNet 預訓練的 ResNet-18 膨脹（inflation）過來。在練習 2 的運動資料集上訓練，並贏過 FramePool。
 
 ## Key Terms｜關鍵術語
 
@@ -269,7 +269,7 @@ print(f"(2+1)D output: {tuple(c(x).shape)}")
 |------|----------------|----------------------|
 | 2D 加池化 | 「一格一個分類器」 | 每個抽到的影格跑 2D CNN，把特徵沿時間平均池化，再分類 |
 | 3D 卷積 | 「時空核」 | 在 (T, H, W) 上卷積的核。天生能建模運動 |
-| 膨脹 | 「把 2D 權重抬成 3D」 | 用 2D 卷積的權重沿新時間軸重複，初始化 3D 卷積，再除以 kernel_T，保住活化值的尺度 |
+| 膨脹（inflation） | 「把 2D 權重抬成 3D」 | 用 2D 卷積的權重沿新時間軸重複，初始化 3D 卷積，再除以 kernel_T，保住活化值的尺度 |
 | (2+1)D | 「分解的卷積」 | 把 3D 拆成 2D 空間加 1D 時間。參數較少，中間多一次非線性 |
 | 分開的注意力 | 「先時間再空間」 | transformer 區塊每一層兩次注意力：一次是同一影格的 token，一次是同一位置的 token |
 | 片段 | 「T 格的視窗」 | 抽出來的 T 個影格子序列。影片模型一次吃進去的單位 |
@@ -278,7 +278,7 @@ print(f"(2+1)D output: {tuple(c(x).shape)}")
 
 ## Further Reading｜延伸閱讀
 
-- [I3D: Quo Vadis, Action Recognition (Carreira & Zisserman, 2017)](https://arxiv.org/abs/1705.07750) ——提出膨脹，以及 Kinetics 資料集
+- [I3D: Quo Vadis, Action Recognition (Carreira & Zisserman, 2017)](https://arxiv.org/abs/1705.07750) ——提出膨脹（inflation），以及 Kinetics 資料集
 - [R(2+1)D: A Closer Look at Spatiotemporal Convolutions (Tran et al., 2018)](https://arxiv.org/abs/1711.11248) ——分解卷積。到現在仍是強的基準
 - [TimeSformer: Is Space-Time Attention All You Need? (Bertasius et al., 2021)](https://arxiv.org/abs/2102.05095) ——第一個夠強的影片 transformer
 - [VideoMAE (Tong et al., 2022)](https://arxiv.org/abs/2203.12602) ——影片的遮罩自編碼器預訓練。目前主流的預訓練做法

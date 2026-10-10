@@ -9,16 +9,16 @@
 
 ## Learning Objectives｜學習目標
 
-- 使用管線（pipe）、重新導向（redirect）和 `grep`，在命令列（command line）篩選並處理訓練日誌
+- 使用管線（pipe）、重新導向（redirect）和 `grep`，在命令列（command line）篩選並處理訓練（training）日誌
 - 建立可持久保存、包含多個窗格（pane）的 tmux 工作階段（session），同時進行訓練與 GPU 監控
 - 使用 `htop`、`nvtop` 和 `nvidia-smi` 監控系統與 GPU 資源
 - 使用 SSH、`scp` 和 `rsync` 在本機與遠端機器間傳輸檔案
 
 ## The Problem｜問題
 
-你在終端機裡花的時間會比在任何編輯器裡都多。訓練作業（training run）、GPU 監控、追蹤日誌、遠端 SSH 工作階段、環境管理——每個 AI 工作流程都會碰到 shell。你在這裡慢，到處都慢。
+你在終端機裡花的時間會比在任何編輯器裡都多。訓練作業（training run）、GPU 監控、追蹤日誌、遠端 SSH 工作階段、環境管理——每個 AI 工作流程都離不開 shell。你在這裡慢，到處都慢。
 
-本課只講 AI 工作真正用得上的終端機技能。不講 Unix 歷史，不深究 Bash 腳本，只講你需要的東西。
+本課只講 AI 工作真正用得上的終端機技能。不講 Unix 歷史，不深究 Bash 程式，只講你需要的東西。
 
 ## The Concept｜核心概念
 
@@ -107,7 +107,7 @@ python train.py > train_full.log 2>&1
 | `2>&1` | 把標準錯誤送到與標準輸出相同的地方 |
 | `\|` | 把一個指令的標準輸出，當作下一個指令的標準輸入（stdin） |
 
-### 步驟 3：背景行程
+### 步驟 3：背景行程（process）
 
 訓練動輒數小時，你不會想讓終端機一直開著。
 
@@ -136,7 +136,7 @@ kill $(pgrep -f "train.py")
 | 方式 | 關閉終端機後仍存活？ | 可重新連接？ |
 |--------|-------------------------|---------------|
 | `command &` | 否 | 否 |
-| `nohup command &` | 是 | 否（查看日誌檔） |
+| `nohup command &` | 是 | 否（查看日誌檔（log file）） |
 | `screen` / `tmux` | 是 | 是 |
 
 凡是超過幾分鐘的任務，就用 tmux。
@@ -322,7 +322,7 @@ env | grep -i torch
 | 工具 | 使用時機 |
 |------|----------------|
 | tmux | 每次訓練作業（第 3 階段起） |
-| `tail -f` + `grep` | 監控訓練日誌 |
+| `tail -f` + `grep` | 監控訓練（training）日誌 |
 | `nohup` / `&` | 快速的背景任務 |
 | `htop` / `nvtop` | 訓練變慢、OOM 錯誤時除錯 |
 | SSH + `rsync` | 在雲端 GPU 上工作 |
@@ -333,7 +333,7 @@ env | grep -i torch
 
 1. 安裝 tmux，建立一個含三個窗格的工作階段：一個跑 `htop`、一個跑 `watch -n1 date`、一個跑 Python 程式檔案。分離後再重新連接。
 2. 把 `code/shell_aliases.sh` 裡的別名加進你的 shell 設定檔，並用 `source ~/.zshrc`（或 `~/.bashrc`）重新載入。
-3. 用 `for i in $(seq 1 100); do echo "epoch $i loss: $(echo "scale=4; 1/$i" | bc)"; sleep 0.1; done > fake_train.log` 建立一份假訓練日誌，再用 `grep`、`tail` 和 `awk` 只擷取 loss 值。
+3. 用 `for i in $(seq 1 100); do echo "epoch $i loss: $(echo "scale=4; 1/$i" | bc)"; sleep 0.1; done > fake_train.log` 建立一份假訓練（training）日誌，再用 `grep`、`tail` 和 `awk` 只擷取 loss 值。
 4. 為一台你有權限存取的伺服器設定一個 SSH config 項目（或用 `localhost` 練習語法）。
 
 ## Key Terms｜關鍵術語

@@ -9,7 +9,7 @@
 
 ## The Problem｜問題
 
-Whisper 由 OpenAI 在 2022 年 9 月發布，是第一個當成商品交付的 ASR：貼上音訊就拿到文字，99 種語言，對雜訊穩，筆電跑得動。到 2024 年，OpenAI 已經交付 Large-v3 和 Turbo。到 2026 年，從 podcast 轉錄到語音助理到 YouTube 字幕，Whisper 是預設基準模型（baseline）。
+Whisper 由 OpenAI 在 2022 年 9 月發布，是第一個能像一般商品般使用的 ASR 模型：貼上音訊就拿到文字，99 種語言，對雜訊穩，筆電跑得動。到 2024 年，OpenAI 已經交付 Large-v3 和 Turbo。到 2026 年，從 podcast 轉錄到語音助理到 YouTube 字幕，Whisper 是預設基準模型（baseline）。
 
 但 Whisper 不能永遠當黑盒。領域偏移會把它打垮：技術行話、說話人口音、專有名詞、短片段、靜音。你需要知道：
 
@@ -24,7 +24,7 @@ Whisper 由 OpenAI 在 2022 年 9 月發布，是第一個當成商品交付的 
 **架構。** 標準的 transformer 編碼器–解碼器。
 
 - 輸入：30 秒的對數 mel 頻譜圖，80 個 mel，10 毫秒 hop，得到 3000 框。較短的片段補零，較長的切塊。
-- 編碼器：卷積降取樣（步幅 2）加 `N` 個 transformer 區塊。Large-v3 是 32 層、1280 維、20 頭。
+- 編碼器：卷積降採樣（步幅 2）加 `N` 個 transformer 區塊。Large-v3 是 32 層、1280 維、20 頭。
 - 解碼器：`N` 個 transformer 區塊，帶因果自注意力，以及對編碼器輸出的交叉注意力。大小和編碼器相同。
 - 輸出：51,865 個 token 詞彙上的 BPE token。
 
@@ -42,7 +42,7 @@ Large-v3 有 15.5 億參數（parameter）。Turbo 的解碼器從 32 層改成 
 
 一個模型能做很多任務，靠的就是這個 prompt。把 `<|en|>` 改成 `<|fr|>`，它就轉錄法文。
 
-**30 秒視窗。** 一切都釘在 30 秒。較長的片段要切塊。較短的要填充。視窗原生不能串流。這就是 WhisperX、Whisper-Streaming、faster-whisper 存在的原因。
+**30 秒視窗。** 輸入長度固定為 30 秒。較長的片段要切塊。較短的要填充。視窗原生不能串流。這就是 WhisperX、Whisper-Streaming、faster-whisper 存在的原因。
 
 **對數 mel 正規化。** `(log_mel - mean) / std`，統計量來自 Whisper 自己的訓練語料。你一定要用 Whisper 的前處理（`whisper.audio.log_mel_spectrogram`），不要用 `librosa.feature.melspectrogram`。
 
@@ -179,7 +179,7 @@ with torch.inference_mode():
 | 時間戳 token | 時間對齊 | 每 0.02 秒的偏移是 5.1 萬詞彙裡的一個特殊 token。 |
 | Turbo | 快的變體 | 4 層解碼器，快 8 倍，WER 退步不到 1%。 |
 | WhisperX | 長音訊的包裝 | VAD 加 Whisper 加 wav2vec 對齊加說話人分離。 |
-| LoRA fine-tune | 高效率調校 | 在注意力上加低秩轉接器。大約訓練 0.3% 的參數。 |
+| LoRA fine-tune | 高效率調校 | 在注意力上加低秩適配器。大約訓練 0.3% 的參數。 |
 | 幻覺 | 安靜的失敗 | Whisper 從雜訊或靜音產出流利英文。 |
 
 ## Further Reading｜延伸閱讀

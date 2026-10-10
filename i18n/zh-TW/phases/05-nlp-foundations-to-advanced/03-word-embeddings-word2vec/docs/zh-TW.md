@@ -198,9 +198,9 @@ print(model.wv["cat"])
 print(model.wv.most_similar("cat", topn=3))
 ```
 
-真正做事時，你幾乎不會自己訓練 Word2Vec。你下載預訓練向量。
+實際應用時，你幾乎不會自己訓練 Word2Vec。你下載預訓練向量。
 
-- **GloVe** — Stanford 的共現矩陣分解。50、100、200、300 維的檢查點。一般涵蓋不錯。第 04 課專門講 GloVe。
+- **GloVe** — Stanford 的共現矩陣分解。50、100、200、300 維的預訓練向量版本。一般涵蓋不錯。第 04 課專門講 GloVe。
 - **fastText** — Facebook 把 Word2Vec 擴充成對字元 n-gram 做 embedding。用子詞組合處理詞彙表外的詞。第 04 課。
 - **Google News 上預訓練的 Word2Vec** — 300 維、300 萬詞的詞彙表，2013 年發表。到現在每天仍有人下載。
 

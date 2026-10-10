@@ -9,9 +9,9 @@
 
 ## Learning Objectives｜學習目標
 
-- 建立具備逐元素（element-wise）運算、矩陣乘法（matrix multiplication）、轉置（transpose）、行列式（determinant）和反矩陣（inverse）的 Matrix 類別
+- 建立具備逐元素（element-wise）運算、矩陣乘法（matrix multiplication）、轉置（transpose）、行列式（determinant）和反矩陣（inverse）的 Matrix 類別（class）
 - 區分逐元素乘法與矩陣乘法，並說明各自適用的時機
-- 只用從零打造的 Matrix 類別，實作單一個密集層（dense layer）：`relu(W @ x + b)`
+- 只用從零打造的 Matrix 類別（class），實作單一個密集層（dense layer）：`relu(W @ x + b)`
 - 說明廣播（broadcasting）規則，以及神經網路框架中偏置相加的運作方式
 
 ## The Problem｜問題
@@ -54,7 +54,7 @@ A = | 1  2  3 |     -- 2x3 matrix (2 rows, 3 columns)
 
 ### 為什麼形狀很重要
 
-矩陣乘法有一條嚴格規則：`(m x n) @ (n x p) = (m x p)`。內側維度必須相同。
+矩陣乘法有一條嚴格規則：`(m x n) @ (n x p) = (m x p)`。內側維度（dimension）必須相同。
 
 ```
 (128 x 784) @ (784 x 1) = (128 x 1)
@@ -79,7 +79,7 @@ Inner dimensions: 784 = 784  -- valid
 
 ### 逐元素乘法 vs 矩陣乘法
 
-這個區別常常讓初學者踩坑。
+這個區別常常常讓初學者搞混。
 
 逐元素乘法：對相同位置的元素相乘。兩個矩陣必須是相同形狀。
 
@@ -88,7 +88,7 @@ Inner dimensions: 784 = 784  -- valid
 | 3  4 | * | 7  8 | = | 21 32 |
 ```
 
-矩陣乘法：列與欄的內積（dot product）。內側維度必須相同。
+矩陣乘法：列與欄的內積（dot product）。內側維度（dimension）必須相同。
 
 ```
 | 1  2 |   | 5  6 |   | 1*5+2*7  1*6+2*8 |   | 19  22 |
@@ -146,7 +146,7 @@ class Vector:
         return sum(x ** 2 for x in self.data) ** 0.5
 ```
 
-### 步驟 2：含核心運算的 Matrix 類別
+### 步驟 2：含核心運算的 Matrix 類別（class）
 
 ```python
 class Matrix:
@@ -315,15 +315,15 @@ NumPy 會自動把一維的偏置廣播到兩列上。每個神經網路框架�
 
 本課產出一份透過幾何直覺教矩陣運算的 prompt。見 `outputs/prompt-matrix-operations.md`。
 
-這裡建立的 Matrix 類別，是我們在第 3 階段第 10 課打造迷你神經網路框架的基礎。
+這裡建立的 Matrix 類別（class），是我們在第 3 階段第 10 課打造迷你神經網路框架的基礎。
 
 ## Exercises｜練習
 
 1. **驗證反矩陣。** 計算 `A @ A.inverse_2x2()`，確認得到單位矩陣。用三個不同的 2x2 矩陣試試看。行列式為零時會發生什麼事？
 
-2. **實作 3x3 反矩陣。** 用伴隨矩陣法（adjugate method）擴充 Matrix 類別，計算 3x3 矩陣的反矩陣。對照 NumPy 的 `np.linalg.inv` 驗證。
+2. **實作 3x3 反矩陣。** 用伴隨矩陣法（adjugate method）擴充 Matrix 類別（class），計算 3x3 矩陣的反矩陣。對照 NumPy 的 `np.linalg.inv` 驗證。
 
-3. **打造一個兩層網路。** 只用你的 Matrix 類別（不用 NumPy），建立一個兩層神經網路：輸入（3）-> 隱藏層（4）-> 輸出（2）。隨機初始化權重，跑一次前向傳遞，驗證所有形狀正確。
+3. **打造一個兩層網路。** 只用你的 Matrix 類別（class）（不用 NumPy），建立一個兩層神經網路：輸入（3）-> 隱藏層（4）-> 輸出（2）。隨機初始化權重，跑一次前向傳遞，驗證所有形狀正確。
 
 ## Key Terms｜關鍵術語
 

@@ -1,4 +1,4 @@
-# 神經音訊編解碼器：EnCodec、SNAC、Mimi、DAC，以及語意和聲學的分開
+# 神經音訊編解碼器：EnCodec、SNAC、Mimi、DAC，以及語意與聲學的分離
 
 > 2026 年的音訊生成幾乎全是 token。EnCodec、SNAC、Mimi、DAC 把連續波形變成離散序列，讓 transformer 能預測。語意 token 對上聲學 token 的分開，第一本碼本是語意、其餘是聲學，對音訊來說是 Transformer 之後最重要的架構轉變。
 

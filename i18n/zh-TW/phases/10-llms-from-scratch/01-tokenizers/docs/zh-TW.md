@@ -1,6 +1,6 @@
 # Tokenizers：BPE、WordPiece、SentencePiece
 
-> 你的 LLM 讀不懂英文。它讀的是整數。Tokenizer 決定了這些整數是乘載著意義，還是平白浪費容量。
+> 你的 LLM 讀不懂英文。它讀的是整數。Tokenizer 決定了這些整數是承載意義，還是平白浪費容量。
 
 **Type:** Build
 **Languages:** Python
@@ -10,8 +10,8 @@
 ## Learning Objectives｜學習目標
 
 - 從零實作 BPE、WordPiece 與 Unigram tokenization 演算法，並比較它們的合併策略
-- 解釋詞彙表大小如何影響模型效率：太小會產生過長的序列，太大則會浪費 embedding 參數
-- 分析不同語言與程式碼中的 tokenization 瑕疵，識別特定 tokenizer 在何處崩潰
+- 解釋詞彙表大小如何影響模型效率：太小會產生過長的序列，太大則會浪費 embedding 參數（parameter）
+- 分析不同語言與程式碼中的 tokenization 瑕疵，識別特定 tokenizer 在哪些情況下失效
 - 使用 tiktoken 與 sentencepiece 函式庫對文字進行 tokenization，並檢視產生的 token ID
 
 ## The Problem｜問題
@@ -22,7 +22,7 @@
 
 如果這一步做錯了，你的模型就會浪費容量，用多個 token 來編碼常見字詞。「unfortunately」會變成四個 token 而不是一個。對於大量包含多音節字詞的文字，你的 128K 脈絡視窗（context window）直接縮水了 75%。如果這一步做對了，同一個脈絡視窗就能容納兩倍的語意內涵。「這個模型能妥善處理程式碼」與「這個模型被 Python 卡死」之間的差別，往往就取決於 tokenizer 當初是如何訓練的。
 
-你對 GPT-4 或 Claude 發出的每一次 API 呼叫，都是按 token 計費的。你的模型每生成一個 token，都需要耗費運算資源。表示輸出所需的 token 越少，端到端的推論速度就越快。Tokenization 不只是前處理，它是架構本身的一部分。
+你對 GPT-4 或 Claude 發出的每一次 API 呼叫，都是按 token 計費的。你的模型每生成一個 token，都需要耗費運算資源。表示輸出所需的 token 越少，端到端的推論（inference）速度就越快。Tokenization 不只是前處理，它是架構本身的一部分。
 
 ## The Concept｜核心概念
 
@@ -52,9 +52,9 @@ graph TD
 
 ### BPE：Byte Pair Encoding
 
-BPE 是一種貪婪壓縮演算法，後來被重新挪用在 tokenization 上。其核心概念簡單到能寫在一張索引卡上：
+BPE 是一種貪婪壓縮演算法，後來後來改用於 tokenization。其核心概念簡單到能寫在一張索引卡上：
 
-從個別字元開始。統計訓練語料庫中每一對相鄰的配對。將出現頻率最高的那一對合併為一個新的 token。重複這個步驟，直到達到你的目標詞彙表大小為止。
+從個別字元開始。統計訓練語料庫（training corpus）中每一對相鄰的配對。將出現頻率最高的那一對合併為一個新的 token。重複這個步驟，直到達到你的目標詞彙表大小為止。
 
 ```figure
 tokenizer-bpe
@@ -106,7 +106,7 @@ Step 4 -- Merge (wes,t) -> "west":
 ...continue until target vocab size reached.
 ```
 
-這張合併表就是 tokenizer 本身。要對新文字進行編碼時，只需按照學習時的順序套用各項合併。訓練語料庫決定了存在哪些合併，而這個選擇將永久形塑模型所看見的內容。
+這張合併表就是 tokenizer 本身。要對新文字進行編碼時，只需按照學習時的順序套用各項合併。訓練語料庫（training corpus）決定了存在哪些合併，而這個選擇將永久形塑模型所看見的內容。
 
 ```mermaid
 graph LR
@@ -181,7 +181,7 @@ graph LR
     end
 ```
 
-具體數字來看：對於具有 4,096 維 embedding 的 128K 詞彙表，光是 embedding 矩陣本身就有 128,000 x 4,096 = 5.24 億個參數。對於 32K 詞彙表，則是 1.31 億個參數。單純因為 tokenizer 的選擇，就帶來了 4 億個參數的差異。
+具體數字來看：對於具有 4,096 維 embedding 的 128K 詞彙表，光是 embedding 矩陣本身就有 128,000 x 4,096 = 5.24 億個參數（parameter）。對於 32K 詞彙表，則是 1.31 億個參數（parameter）。單純因為 tokenizer 的選擇，就帶來了 4 億個參數（parameter）的差異。
 
 但較大的詞彙表能更積極地壓縮文字。同一段英文，在 32K 詞彙表下需要 100 個 token，在 128K 詞彙表下可能只需要 70 個 token。這意味著在生成過程中前向傳遞次數減少了 30%。對於每秒處理數百萬次請求的線上服務模型而言，這直接降低了運算成本。
 
@@ -317,7 +317,7 @@ for sentence in test_sentences:
     print(f"  Roundtrip: {'PASS' if decoded == sentence else 'FAIL'}")
 ```
 
-壓縮比告訴你 tokenizer 的效能如何。0.50 的壓縮比意味著 tokenizer 將文字壓縮為原始位元組數量一半的 token。數值越低越好。在訓練語料庫上，壓縮比會相當不錯。但在分布外（out-of-distribution）的文字上，例如「unhappiness」（並未出現在語料庫中），壓縮比會變差——tokenizer 會退回使用字元層級來編碼未曾見過的模式。
+壓縮比告訴你 tokenizer 的效能如何。0.50 的壓縮比意味著 tokenizer 將文字壓縮為原始位元組數量一半的 token。數值越低越好。在訓練語料庫（training corpus）上，壓縮比會相當不錯。但在分布外（out-of-distribution）的文字上，例如「unhappiness」（並未出現在語料庫中），壓縮比會變差——tokenizer 會退回使用字元層級來編碼未曾見過的模式。
 
 ### 步驟 4：與 tiktoken 進行比較
 
@@ -468,7 +468,7 @@ Llama 3 的 12.8 萬詞彙表壓縮非英語文字的效果明顯優於 GPT-2 �
 | 位元組層級 BPE | 「GPT 的 tokenizer」 | 在原始位元組（0-255）而非 Unicode 字元上操作的 BPE，確保對任何輸入都不會產生未知 token |
 | 合併表 | 「tokenizer 的檔案」 | 訓練過程中學習到的配對合併有序清單——這就是 tokenizer 本身，且順序至關重要 |
 | 預先 tokenization | 「依空格切分」 | 在子詞 tokenization 之前套用的規則：依空白切分、數字分離、標點符號處理 |
-| 壓縮比 | 「tokenizer 有多高效率」 | 產生的 token 數除以輸入位元組數——數值越低代表壓縮率越好，推論速度越快 |
+| 壓縮比 | 「tokenizer 有多高效率」 | 產生的 token 數除以輸入位元組數——數值越低代表壓縮率越好，推論（inference）速度越快 |
 
 ## Further Reading｜延伸閱讀
 

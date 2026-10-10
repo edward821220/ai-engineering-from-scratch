@@ -20,7 +20,7 @@
 
 2026 年每一個目前最好的文字到影像模型都已經離開它。Stable Diffusion 3、FLUX、SD4、Z-Image、Qwen-Image、Hunyuan-Image，都不用 U-Net。它們用擴散 transformer（DiT）。SD3 和 FLUX 還把 DDPM 的雜訊排程換成整流流，把從雜訊到資料的路徑拉直，再配合一致性或蒸餾變體，推論（inference）可以是 1 到 4 步。
 
-這個轉變要緊，因為它讓以擴散為基礎的影像生成變得可控、prompt 更準（SD3 和 SD4 解決了文字渲染），而且快到能進正式環境。懂 DiT 加整流流，就是懂 2026 年的生成影像堆疊。
+這個轉變要緊，因為它讓以擴散為基礎的影像生成變得可控、更能準確遵循 prompt（SD3 和 SD4 解決了文字渲染），而且快到能進正式環境。懂 DiT 加整流流，就是懂 2026 年的生成影像堆疊。
 
 ## The Concept｜核心概念
 
@@ -53,9 +53,9 @@ flowchart LR
 - **FLUX**（Black Forest Labs，2024）。前 N 個區塊像 SD3 那樣雙流。後面的區塊把兩邊接起來、共享權重（單流），好在更深的時候仍有效率。
 - **Z-Image**（2025）。高效率的單流 DiT，60 億參數，挑戰「不惜代價放大」。
 
-### 一段話講完整流流
+### 用一段話說明整流流
 
-DDPM 把前向過程定義成一條愈來愈吵的 SDE，`x_t` 被破壞得愈來愈厲害。學來的反向是第二條 SDE，用 1000 個小步來解。
+DDPM 把前向過程定義成雜訊逐漸增強的 SDE，`x_t` 被破壞得愈來愈厲害。學來的反向是第二條 SDE，用 1000 個小步來解。
 
 整流流定義資料和純雜訊之間的**直線**內插（interpolation）：
 
@@ -86,7 +86,7 @@ SD3 和 FLUX 對 prompt 的推理比 SD1.5 好那麼多，文字編碼器是很�
 
 ### 無分類器引導仍然成立
 
-整流流改的是抽樣器，不是條件。無分類器引導（訓練時以 10% 的機率丟掉文字，推論時把有條件和無條件的預測混在一起）在整流流上一樣。大多數 2026 年的模型用引導尺度 3.5 到 5。比 SD1.5 的 7.5 低，因為整流流模型預設就更緊地跟著 prompt。
+整流流改的是抽樣器，不是條件。無分類器引導（訓練時以 10% 的機率丟掉文字，推論時把有條件和無條件的預測混在一起）在整流流上一樣。大多數 2026 年的模型用引導尺度 3.5 到 5。比 SD1.5 的 7.5 低，因為整流流模型預設就預設就更能遵循 prompt。
 
 ### Consistency、Turbo、Schnell、LCM
 
@@ -112,7 +112,7 @@ SD3 和 FLUX 對 prompt 的推理比 SD1.5 好那麼多，文字編碼器是很�
 | Hunyuan-Image-3.0 | 約 800 億 | DiT | 研究用 |
 | SD4 Turbo | 30 億 | DiT 加蒸餾 | SAI 商業 |
 
-2026 年開放原始碼的預設是 FLUX.1-schnell。效率領先的是 Z-Image。目前品質的尖端是 FLUX.2 和 SD4。
+2026 年開放原始碼的預設是 FLUX.1-schnell。效率領先的是 Z-Image。目前品質表現領先的是 FLUX.2 和 SD4 FLUX.2 和 SD4。
 
 ### 為什麼這次轉向要緊
 
@@ -286,7 +286,7 @@ def synthetic_blobs(num=200, size=16, seed=0):
 
 ## Use It｜實際應用
 
-要用 FLUX、SD3、Z-Image 真的生成影像，`diffusers` 用同一套 API 把每一個都提供了：
+要用 FLUX、SD3、Z-Image 真的生成影像，`diffusers` 以統一的 API 支援這些模型：
 
 ```python
 from diffusers import FluxPipeline, StableDiffusion3Pipeline

@@ -1,6 +1,6 @@
 # 近端政策（Proximal Policy Optimization，PPO）
 
-> A2C 每次更新後就把那次展開丟掉。PPO 把政策梯度包進截斷的重要性比率，同一批資料可以做 10 個以上的 epoch，政策也不會炸開。Schulman 等人（2017）。到 2026 年，它仍是預設的政策梯度演算法。
+> A2C 每次更新後就把那次展開丟掉。PPO 把政策梯度包進截斷的重要性比率，同一批資料可以做 10 個以上的 epoch，避免策略大幅偏移。Schulman 等人（2017）。到 2026 年，它仍是預設的政策梯度演算法。
 
 **Type:** Build
 **Languages:** Python

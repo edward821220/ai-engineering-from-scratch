@@ -96,7 +96,7 @@ sequenceDiagram
 | OpenAI (GPT-5, o4) | `tools` | `tool_calls[].function` | 支援（每輪可多個） | `tool_choice="required"` |
 | Anthropic (Claude 4.6/4.7) | `tools` | `content[].type="tool_use"` | 支援（多個區塊） | `tool_choice={"type":"any"}` |
 | Google (Gemini 3) | `function_declarations` | `functionCall` | 支援 | `function_calling_config` |
-| 開源權重模型 (Llama 4, Qwen3, DeepSeek-V3) | Llama 4 原生支援 `tools`；其他採 Hermes 或 ChatML | 格式各異 | 視模型而定 | 基於 Prompt 或特定 `tool_choice` |
+| 開放權重模型 (Llama 4, Qwen3, DeepSeek-V3) | Llama 4 原生支援 `tools`；其他採 Hermes 或 ChatML | 格式各異 | 視模型而定 | 基於 Prompt 或特定 `tool_choice` |
 
 至 2026 年，三大封閉式廠商已高度收斂於近乎相同的 JSON-Schema 格式。Llama 4 提供了與 OpenAI 原生相容的 `tools` 欄位。開源 fine-tuned 模型仍有歧異——NousResearch 的 Hermes 格式是第三方調校中最普遍的規範。對於需要在多主機間共享的通用工具，建議優先採用 MCP（Phase 11 · 14）而非行內寫死的函式呼叫——因為其伺服器端實作對所有平台完全通用。
 
@@ -137,7 +137,7 @@ GPT-4o 與 Claude 能在單一回應輪次中同時呼叫多個函式。當使�
 
 函式呼叫是你能賦予 LLM 的能力中，最具安全風險的雙面刃。由模型自主決定執行內容：如果你的工具庫包含資料庫查詢，模型負責構造 SQL；如果包含終端機指令，模型負責撰寫 Shell script。
 
-**鐵律 1：絕不要將模型生成的 SQL 直接送入資料庫執行。** 模型隨時可能構造出 DROP TABLE、UNION 注入，或一次撈取數百萬筆個資的惡意查詢。永遠實施參數化查詢，永遠進行嚴格輸入驗證，並永遠限制在唯讀操作的白名單內。
+**鐵律 1：絕不要將模型生成的 SQL 直接送入資料庫執行。** 模型隨時可能構造出 DROP TABLE、UNION 注入，或一次撈取數百萬筆個資的惡意查詢。永遠實施參數化查詢，永遠進行嚴格輸入驗證，並永遠限制在使用允許操作的白名單內。
 
 **鐵律 2：嚴格白名單函式清單。** 模型僅能呼叫你顯式註冊的函式，絕不要實作「依名稱動態呼叫任意內部函式」的通用後門工具。即便你有 50 個內部函式，也僅能對模型暴露該業務場景所需的 5 個。
 

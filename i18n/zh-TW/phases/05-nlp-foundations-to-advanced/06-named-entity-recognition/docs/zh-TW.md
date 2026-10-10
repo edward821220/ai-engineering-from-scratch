@@ -225,7 +225,7 @@ iPhone               ORG
 US                   GPE
 ```
 
-注意 `iPhone` 被標成 `ORG` 而不是 `PRODUCT`——spaCy 的小模型對產品實體涵蓋很弱。大模型（`en_core_web_lg`）好一些。transformer 模型（`en_core_web_trf`）更好。
+注意 `iPhone` 被標成 `ORG` 而不是 `PRODUCT`——spaCy 的小模型對產品實體的辨識涵蓋率不佳。大模型（`en_core_web_lg`）好一些。transformer 模型（`en_core_web_trf`）更好。
 
 Hugging Face 上以 BERT 為基礎的命名實體辨識：
 
@@ -247,7 +247,7 @@ print(ner("Apple sued Google over its iPhone in the US."))
 
 ### 以 LLM 做的命名實體辨識（2026 年的選項）
 
-零樣本（zero-shot）和少樣本（few-shot）的 LLM 命名實體辨識，現在在很多領域和 fine-tune 過的模型不相上下，標註資料稀少時更是好上非常多。
+零樣本（zero-shot）和少樣本（few-shot）的 LLM 命名實體辨識，現在在很多領域和 fine-tune 過的模型不相上下，標註資料稀少時，表現往往更好。
 
 - **零樣本 prompting。** 給 LLM 一份實體類型清單和一個範例綱要。要求 JSON 輸出。開箱就用；在新領域上準確率中等。
 - **ZeroTuneBio 風格的 prompting。** 把任務拆成抽出候選、解釋意思、判斷、再檢查。多階段 prompt（不是 one-shot）在生物醫學命名實體辨識上把準確率拉高不少。同一套模式適用法律、金融和科學領域。
@@ -270,7 +270,7 @@ print(ner("Apple sued Google over its iPhone in the US."))
 - **領域偏移。** 在 CoNLL 上訓練的命名實體辨識，放到法律合約上，表現比一份專名表還差。在你的領域上 fine-tune。
 - **巢狀實體。** 「Bank of America Tower」同時是 ORG 和 FACILITY。標準 BIO 無法表示重疊片段。你需要巢狀命名實體辨識（多輪或基於片段的模型）。
 - **很長的實體。** 「United States Federal Deposit Insurance Corporation.」token 級模型有時會把它拆開。用 `aggregation_strategy` 或事後處理。
-- **稀疏類型。** 醫學命名實體辨識的標記像 DRUG_BRAND、ADVERSE_EVENT、DOSE。通用模型完全沒概念。那裡的起點是 Scispacy 和 BioBERT。
+- **低頻實體類別。** 醫學命名實體辨識的標記像 DRUG_BRAND、ADVERSE_EVENT、DOSE。通用模型完全沒概念。那裡的起點是 Scispacy 和 BioBERT。
 
 ## Ship It｜交付成果
 

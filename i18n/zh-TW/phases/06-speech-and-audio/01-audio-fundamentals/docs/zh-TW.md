@@ -1,6 +1,6 @@
 # 音訊基礎：波形、取樣、傅立葉轉換
 
-> 波形是原始訊號。頻譜圖是表示法。Mel 特徵（feature）是對機器學習友善的形式。每一條現代 ASR 和 TTS 管線（pipeline）都走這座梯子，第一階是懂取樣和傅立葉。
+> 波形是原始訊號。頻譜圖是表示法。Mel 特徵（feature）是對機器學習友善的形式。每一條現代 ASR 和 TTS 管線（pipeline）都走這座梯子，第一階是先搞懂取樣與傅立葉轉換。
 
 **Type:** Learn
 **Languages:** Python
@@ -9,7 +9,7 @@
 
 ## The Problem｜問題
 
-麥克風產出壓力對時間的訊號。神經網路吃的是張量。中間有一疊慣例，違反了就會出安靜的 bug：模型訓練看起來正常，但 WER 變成兩倍；或 TTS 交付時帶嘶聲；或聲音仿製系統把麥克風背下來，而不是說話的人。
+麥克風產出壓力對時間的訊號。神經網路吃的是張量。中間有一疊慣例，違反了就會產生不易察覺的 bug：模型訓練看起來正常，但 WER 變成兩倍；或 TTS 交付時帶嘶聲；或聲音仿製系統把麥克風背下來，而不是說話的人。
 
 語音系統的每個 bug 都追得到這三個問題之一：
 
@@ -36,15 +36,15 @@
 | 44.1 kHz | CD 音訊、音樂。 |
 | 48 kHz | 電影、專業音訊、高傳真 TTS（VALL-E 2、NaturalSpeech 3）。 |
 
-**奈奎斯特–香農。** 取樣率 `sr` 可以沒有歧義地表示到 `sr/2` 的頻率。`sr/2` 這條邊界是*奈奎斯特頻率*。高於奈奎斯特的能量會*混疊*，折進較低的頻率，把訊號弄壞。降取樣之前一定要先低通濾波。
+**奈奎斯特–香農。** 取樣率 `sr` 可明確表示至 `sr/2` 的頻率。`sr/2` 這條邊界是*奈奎斯特頻率*。高於奈奎斯特的能量會*混疊*，折進較低的頻率，把訊號弄壞。降採樣之前一定要先低通濾波。
 
 **位元深度。** 16 位元 PCM（有號 int16，範圍 ±32,767）是通用的交換格式。音樂用 24 位元，內部 DSP 用 32 位元浮點。`soundfile` 這類函式庫讀的是 int16，露出來的是 `[-1, 1]` 的 float32 陣列。
 
-**傅立葉轉換。** 任何有限訊號都是不同頻率正弦的和。離散傅立葉轉換（DFT）對 `N` 個樣本算出 `N` 個複係數，每個頻率箱一個。`bin k` 對到頻率 `k · sr / N` Hz。幅度是那個頻率的振幅，角度是相位。
+**傅立葉轉換。** 任何有限訊號都是不同頻率正弦的和。離散傅立葉轉換（DFT）對 `N` 個樣本算出 `N` 個複係數，每個頻率槽一個。`bin k` 對到頻率 `k · sr / N` Hz。幅度是那個頻率的振幅，角度是相位。
 
-**FFT。** 快速傅立葉轉換：當 `N` 是 2 的冪，DFT 的 `O(N log N)` 演算法（algorithm）。每個音訊函式庫底下都用 FFT。16 kHz 的 1024 點 FFT 給出 512 個可用頻率箱，涵蓋 0 到 8 kHz，解析度 15.6 Hz。
+**FFT。** 快速傅立葉轉換：當 `N` 是 2 的冪，DFT 的 `O(N log N)` 演算法（algorithm）。每個音訊函式庫底下都用 FFT。16 kHz 的 1024 點 FFT 給出 512 個可用頻率槽，涵蓋 0 到 8 kHz，解析度 15.6 Hz。
 
-**切音框加視窗。** 我們不會對整段做 FFT。把它切成重疊的*音框*（frame），通常 25 毫秒、hop 10 毫秒。每一框乘上視窗函數（window），Hann 或 Hamming，消掉邊緣不連續，再對每一框做 FFT。這就是短時傅立葉轉換（STFT）。第 02 課從這裡接下去。
+**切音框加視窗。** 我們不會對整段做 FFT。把它切成重疊的*音框*（frame），通常 25 毫秒、hop 10 毫秒。每一框乘上窗函數（window），Hann 或 Hamming，消掉邊緣不連續，再對每一框做 FFT。這就是短時傅立葉轉換（STFT）。第 02 課從這裡接下去。
 
 ```figure
 mel-scale
@@ -118,7 +118,7 @@ def dft(x):
 
 1. **簡單。** 在 16 kHz 合成 1 秒的 220 Hz 加 440 Hz 加 880 Hz。跑 DFT。確認預期的箱上有三個峰。
 2. **中等。** 用 48 kHz 錄 3 秒自己的聲音 WAV。用 `torchaudio.transforms.Resample`（帶抗混疊）降到 16 kHz，再用單純抽取（每三個樣本取一個）降到 16 kHz。兩邊都做 FFT。混疊出現在哪？
-3. **困難。** 只用 `math` 和第 3 步的 DFT，從零做 STFT。音框大小 400、hop 160、Hann 視窗。用 `matplotlib.pyplot.imshow` 畫幅度。這就是第 02 課的頻譜圖。
+3. **困難。** 只用 `math` 和第 3 步的 DFT，從零做 STFT。音框大小 400、hop 160、Hann 窗。用 `matplotlib.pyplot.imshow` 畫幅度。這就是第 02 課的頻譜圖。
 
 ## Key Terms｜關鍵術語
 
@@ -129,7 +129,7 @@ def dft(x):
 | 位元深度 | 每個樣本的解析度 | `int16` 是 65,536 階。`float32` 在 `[-1, 1]` 裡是 24 位元精度。 |
 | DFT | 序列的傅立葉轉換 | `N` 個樣本 → `N` 個複數頻率係數。 |
 | FFT | 快速的 DFT | `O(N log N)` 演算法，需要 `N` 為 2 的冪。 |
-| 頻率箱 | 頻率欄 | `k · sr / N` Hz。解析度是 `sr / N`。 |
+| 頻率槽 | 頻率欄 | `k · sr / N` Hz。解析度是 `sr / N`。 |
 | STFT | 頻譜圖底下的東西 | 沿時間做切音框、加視窗的 FFT。 |
 | 混疊 | 奇怪的頻率鬼影 | 高於奈奎斯特的能量，鏡射到較低的箱。 |
 
@@ -139,4 +139,4 @@ def dft(x):
 - [Smith — The Scientist and Engineer's Guide to Digital Signal Processing](https://www.dspguide.com/ch8.htm) ——免費、標準的 DSP 教科書。
 - [librosa docs — audio primer](https://librosa.org/doc/latest/auto_tutorials/index.html) ——帶程式的實作導覽。
 - [Heinrich Kuttruff — Room Acoustics (6th ed.)](https://www.taylorfrancis.com/books/mono/10.1201/9781315372150/room-acoustics-heinrich-kuttruff) ——為什麼真實世界的音訊不是乾淨正弦的參考。
-- [Steve Eddins — FFT Interpretation notebook](https://blogs.mathworks.com/steve/2020/03/30/fft-spectrum-and-spectral-densities/) ——十分鐘把頻率箱的直覺講清楚。
+- [Steve Eddins — FFT Interpretation notebook](https://blogs.mathworks.com/steve/2020/03/30/fft-spectrum-and-spectral-densities/) ——十分鐘把頻率槽的直覺講清楚。

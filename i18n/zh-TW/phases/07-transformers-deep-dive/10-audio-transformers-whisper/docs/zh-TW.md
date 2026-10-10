@@ -1,6 +1,6 @@
 # 音訊 Transformer——Whisper 架構
 
-> 音訊是頻率對時間的一張影像。Whisper 是一個吃 mel 頻譜、再把話講回來的 ViT。
+> 音訊是頻率對時間的一張影像。Whisper 是以梅爾頻譜圖為輸入並產生語音的 ViT。
 
 **Type:** Learn
 **Languages:** Python
@@ -25,7 +25,7 @@ Whisper 下了三個賭注：
 
 ### 步驟 1——重取樣加開窗
 
-音訊 16 kHz。裁或補到 30 秒。算對數 mel 頻譜：80 個 mel 頻帶、10 毫秒步幅（stride）→ 約 3000 個音框（frame）× 80 個特徵。這就是 Whisper 看到的「輸入影像」。
+音訊 16 kHz。裁或補到 30 秒。算對數 mel 頻譜：80 個梅爾頻率槽、10 毫秒跳躍長度（stride）→ 約 3000 個音框（frame）× 80 個特徵。這就是 Whisper 看到的「輸入影像」。
 
 ### 步驟 2——卷積的莖
 

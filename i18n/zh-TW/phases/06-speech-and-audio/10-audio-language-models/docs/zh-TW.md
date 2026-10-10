@@ -1,6 +1,6 @@
 # 音訊語言模型：Qwen2.5-Omni、Audio Flamingo、GPT-4o Audio
 
-> 2026 年的音訊語言模型，在語音、環境聲、音樂上推理。Qwen2.5-Omni-7B 在 MMAU-Pro 上和 GPT-4o Audio 打平。Audio Flamingo Next 在 LongAudioBench 上超過 Gemini 2.5 Pro。開放和封閉的差距基本上合上了。多音訊任務除外，那裡大家都接近亂猜。
+> 2026 年的音訊語言模型，在語音、環境聲、音樂上推理。Qwen2.5-Omni-7B 在 MMAU-Pro 上和 GPT-4o Audio 打平。Audio Flamingo Next 在 LongAudioBench 上超過 Gemini 2.5 Pro。開放和封閉的開放模型與封閉模型的差距幾乎消失。多音訊任務除外，那裡大家都接近亂猜。
 
 **Type:** Learn
 **Languages:** Python
@@ -11,7 +11,7 @@
 
 你有 5 秒音訊：狗叫，有人喊「stop!」，然後靜音。有用的問題跨好幾個軸：
 
-- **轉錄。** 「說了什麼？」這是 ASR 的地盤。
+- **轉錄。** 「說了什麼？」這屬於 ASR 的範疇。
 - **語意推理。** 「這個人有沒有危險？」要把狗叫、喊聲、靜音合在一起懂。
 - **音樂推理。** 「旋律是哪些樂器在演奏？」
 - **長音訊檢索。** 「這堂 90 分鐘的課，講師在哪裡解釋梯度下降法？」

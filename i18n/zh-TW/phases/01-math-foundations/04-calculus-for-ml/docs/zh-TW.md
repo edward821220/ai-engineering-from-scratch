@@ -11,7 +11,7 @@
 
 - 為常見的 ML 函數（x^2、sigmoid、cross-entropy）計算數值微分（numerical derivative）與解析導數（analytical derivative）
 - 從零實作梯度下降法（gradient descent），在 1D 和 2D 中最小化損失函數
-- 推導線性迴歸（linear regression）模型的梯度，並透過手動權重更新來訓練它
+- 推導線性迴歸（linear regression）模型的梯度，並透過手動權重更新（weight update）來訓練它
 - 說明海森矩陣（Hessian）、泰勒級數（Taylor series）近似，以及它們與最佳化方法的關係
 
 ## The Problem｜問題
@@ -301,7 +301,7 @@ a 到 b 之間機率密度曲線下的面積，就是落在該區間的機率。
 ```
 E[f(X)] = integral of f(x) * p(x) dx
 ```
-在資料分布上的期望損失就是一個積分；訓練最小化的是它的經驗（empirical）近似。
+在資料分布（data distribution）上的期望損失就是一個積分；訓練最小化的是它的經驗（empirical）近似。
 
 **KL 散度（KL divergence）。** 衡量兩個分布差多少：
 ```
@@ -319,13 +319,13 @@ p(w | data) = p(data | w) * p(w) / integral of p(data | w) * p(w) dw
 |-----------------|----------------------|
 | 曲線下面積 | 從密度函數算機率 |
 | 期望值 | 損失函數、風險最小化 |
-| KL 散度 | VAE、策略最佳化、蒸餾 |
+| KL 散度 | VAE、策略最佳化（policy optimization）、蒸餾 |
 | 正規化 | 貝氏後驗、softmax 分母 |
 | 邊際概似 | 模型比較、證據下界（ELBO） |
 
 ### 計算圖中的多變數連鎖律
 
-連鎖律不只適用於排成一直線的純量函數。在神經網路中，變數會分岔又匯合。以下是導數如何流過一個簡單的前向傳遞：
+連鎖律不只適用於排成一直線的純量函數。在神經網路中，變數會分岔又匯合。以下是導數如何流過一個簡單的前向傳遞（forward pass）：
 
 ```mermaid
 graph LR
@@ -370,7 +370,7 @@ graph RL
 
 ```mermaid
 graph LR
-    subgraph Forward["前向傳遞"]
+    subgraph Forward["前向傳遞（forward pass）"]
         I["input"] --> W1["W1"] --> R["relu"] --> W2["W2"] --> S["softmax"] --> L["loss"]
     end
 ```
@@ -382,11 +382,11 @@ graph RL
     end
 ```
 
-每個權重更新：
+每個權重更新（weight update）：
 - `W1 = W1 - lr * dL/dW1`
 - `W2 = W2 - lr * dL/dW2`
 
-前向傳遞算出預測和損失；反向傳遞算出損失對每個權重的梯度；然後每個權重往下坡走一小步。重複數百萬步——這就是深度學習。
+前向傳遞（forward pass）算出預測和損失；反向傳遞算出損失對每個權重的梯度；然後每個權重往下坡走一小步。重複數百萬步——這就是深度學習。
 
 ```figure
 derivative-tangent
@@ -569,7 +569,7 @@ print(f"\nLearned: y = {w:.2f}x + {b:.2f}")
 print(f"Actual:  y = 2x + 1")
 ```
 
-每個基於梯度的訓練迴圈都遵循這個模式：預測、計算損失、計算梯度、更新權重。
+每個基於梯度的訓練迴圈（training loop）都遵循這個模式：預測、計算損失、計算梯度、更新權重。
 
 ## Use It｜實際應用
 

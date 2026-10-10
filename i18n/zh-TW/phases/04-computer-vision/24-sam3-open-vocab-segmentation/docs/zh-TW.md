@@ -1,6 +1,6 @@
 # SAM 3 與開放詞彙分割（open-vocabulary segmentation）
 
-> 給模型一段文字 prompt 和一張影像，每個相符物件的遮罩就出來。SAM 3 一次前向就完成。
+> 給模型一段文字 prompt 和一張影像，每個相符物件的遮罩就出來。SAM 3 一次前向傳遞（forward pass）就完成。
 
 **Type:** Use + Build
 **Languages:** Python
@@ -9,8 +9,8 @@
 
 ## Learning Objectives｜學習目標
 
-- 分辨 SAM（只有視覺 prompt）、Grounded SAM／SAM 2（偵測器加 SAM），以及 SAM 3（用可下 prompt 的概念分割，原生接受文字 prompt）
-- 說明 SAM 3 的架構：共享骨幹（backbone）、影像偵測器、以記憶為基礎的影片追蹤器、存在頭，以及偵測器和追蹤器分開的設計
+- 分辨 SAM（只有視覺 prompt）、Grounded SAM／SAM 2（偵測器加 SAM），以及 SAM 3（用可接受 prompt 的 的概念分割，原生接受文字 prompt）
+- 說明 SAM 3 的架構：共享骨幹（backbone）、影像偵測器、以記憶為基礎的影片追蹤器、概念存在性預測頭，以及偵測器和追蹤器分開的設計
 - 用 Hugging Face 的 `transformers` 整合，做文字 prompt 的偵測、分割和影片追蹤
 - 依延遲、概念複雜度和部署目標，在 SAM 3、Grounded SAM 2、YOLO-World、SAM-MI 之間挑
 
@@ -18,9 +18,9 @@
 
 2023 年的 SAM 只吃視覺 prompt：你點一個點，或畫一個框，它回一張遮罩。要「這張照片裡所有的橘子」，得先用偵測器（Grounding DINO）產框，再讓 SAM 逐個分割。Grounded SAM 把這做成一條管線（pipeline），但它是兩個凍結模型的串接，誤差一定會累積。
 
-SAM 3（Meta，2025 年 11 月，ICLR 2026）把這段串接收掉。它接受短的名詞片語，或一張影像範例當 prompt，一次前向就回所有相符的遮罩和實例 ID。這就是**可下 prompt 的概念分割（Promptable Concept Segmentation，PCS）**。再加上 2026 年 3 月的 Object Multiplex 更新（SAM 3.1），它能有效率地在影片裡追蹤同一個概念的多個實例。
+SAM 3（Meta，2025 年 11 月，ICLR 2026）把這段串接收掉。它接受短的名詞片語，或一張影像範例當 prompt，一次前向傳遞（forward pass）就回所有相符的遮罩和實例 ID。這就是**可接受 prompt 的 的概念分割（Promptable Concept Segmentation，PCS）**。再加上 2026 年 3 月的 Object Multiplex 更新（SAM 3.1），它能有效率地在影片裡追蹤同一個概念的多個實例。
 
-這一課講的是這個結構上的轉變。2D 分割、偵測，以及文字和影像的對齊，收進同一個模型。正式環境要問的不再是「我該串哪幾段管線」，而是「哪個可下 prompt 的模型能從頭到尾處理我的用途」。
+這一課講的是這個結構上的轉變。2D 分割、偵測，以及文字與影像定位（text-image grounding），收進同一個模型。正式環境要問的不再是「我該串哪幾段管線」，而是「哪個可接受 prompt 的 的模型能從頭到尾處理我的用途」。
 
 ## The Concept｜核心概念
 
@@ -40,7 +40,7 @@ flowchart LR
     subgraph SAM3["SAM 3（2025）"]
         C1["文字或影像範例"] --> C2["共享骨幹"]
         C3["影像"] --> C2
-        C2 --> C4["影像偵測器 + 記憶追蹤器<br/>+ 存在頭"]
+        C2 --> C4["影像偵測器 + 記憶追蹤器<br/>+ 概念存在性預測頭"]
         C4 --> C5["所有相符的遮罩<br/>+ 實例 ID"]
     end
 
@@ -49,7 +49,7 @@ flowchart LR
     style SAM3 fill:#dcfce7,stroke:#16a34a
 ```
 
-### 可下 prompt 的概念分割
+### 可接受 prompt 的 的概念分割
 
 「概念 prompt」是短的名詞片語（`"yellow school bus"`、`"striped red umbrella"`、`"hand holding a mug"`），或一張影像範例。模型回影像裡每個相符實例的分割遮罩，每個相符各有一個不重複的實例 ID。
 
@@ -62,7 +62,7 @@ flowchart LR
 ### 架構上的關鍵零件
 
 - **共享骨幹**。一顆 ViT 處理影像。偵測頭和以記憶為基礎的追蹤器都從它讀特徵。
-- **存在頭**。預測這個概念到底在不在影像裡。把「在不在」和「在哪裡」拆開。減少根本不在的概念上的偽陽性。
+- **概念存在性預測頭**。預測這個概念到底在不在影像裡。把「在不在」和「在哪裡」拆開。減少根本不在的概念上的偽陽性。
 - **偵測器和追蹤器分開**。影像層級的偵測和影片層級的追蹤各有自己的頭，所以不會互相干擾。
 - **記憶庫**。存每個實例跨影格的特徵，供影片追蹤用（和 SAM 2 同一個機制）。
 
@@ -79,7 +79,7 @@ SAM 3 在**400 萬個不重複的概念**上訓練。資料引擎一輪一輪標
 - 你需要換上某個特定的開放詞彙偵測器（DINO-X、Florence-2）。
 - SAM 3 的授權（在 Hugging Face 上要申請）擋路。
 - 你需要的偵測器閾值控制，比 SAM 3 對外開放的更多。
-- 要對偵測器元件做研究或消融。
+- 要對偵測器元件做研究或元件移除實驗。
 
 模組化管線仍有位置。大多數正式環境的工作，SAM 3 是比較直接的答案。
 
@@ -112,7 +112,7 @@ cv3-open-vocab
 
 ### 步驟 1：組 prompt
 
-寫一個幫手，把使用者的句子轉成一串 SAM 3 概念 prompt。這是「使用者打了什麼」和「模型吃進去什麼」的邊界。
+寫一個幫手，把使用者的句子轉成一串 SAM 3 概念 prompt。這是「使用者打了什麼」和「模型接收什麼」的邊界。
 
 ```python
 def split_concepts(sentence):
@@ -129,7 +129,7 @@ def split_concepts(sentence):
 print(split_concepts("cats, dogs and balloons"))
 ```
 
-SAM 3 一次前向接受一個概念。多概念查詢就用迴圈或批次。
+SAM 3 一次前向傳遞（forward pass）接受一個概念。多概念查詢就用迴圈或批次。
 
 ### 步驟 2：後處理幫手
 
@@ -162,7 +162,7 @@ def rle_encode(binary_mask):
     return ";".join(f"{v}x{c}" for v, c in runs)
 ```
 
-即使有很多高解析度遮罩，RLE 仍讓回應本體保持小。SAM 2、SAM 3、Grounded SAM 2 都能用同一種格式。
+即使有很多高解析度遮罩，RLE 仍讓讓回應資料保持精簡。SAM 2、SAM 3、Grounded SAM 2 都能用同一種格式。
 
 ### 步驟 3：統一的開放詞彙分割介面
 
@@ -234,7 +234,7 @@ scores = outputs.scores
 
 一個誠實的比較：在真實管線裡，把 Grounded SAM 2 換成 SAM 3 會怎樣？
 
-- 延遲：SAM 3 少一次前向（沒有分開的偵測器），但模型本身更重。通常差不多打平，或是稍微快一點。
+- 延遲：SAM 3 少一次前向傳遞（forward pass）（沒有分開的偵測器），但模型本身更重。通常差不多打平，或是稍微快一點。
 - 準度：少見或組合起來的概念（「條紋紅傘」）上，SAM 3 好非常多。常見的單詞概念差不多。
 - 彈性：Grounded SAM 2 讓你把偵測器換掉（DINO-X、Florence-2、Grounding DINO 1.5）。SAM 3 是一整塊。
 
@@ -278,9 +278,9 @@ results = model(image_path, prompts="yellow school bus")
 | 術語 | 常見說法 | 實際意義 |
 |------|----------------|----------------------|
 | 開放詞彙分割 | 「用文字來分割」 | 為自然語言描述的物件產出遮罩，而不是固定的標籤集合 |
-| PCS | 「可下 prompt 的概念分割」 | SAM 3 的核心任務。給名詞片語或影像範例，分割所有相符的實例 |
+| PCS | 「可接受 prompt 的 的概念分割」 | SAM 3 的核心任務。給名詞片語或影像範例，分割所有相符的實例 |
 | 概念 prompt | 「文字輸入」 | 短的名詞片語或影像範例。不是完整句子 |
-| 存在頭 | 「它在這裡嗎？」 | SAM 3 的模組。在定位（localisation）之前，先決定這個概念在不在影像裡 |
+| 概念存在性預測頭 | 「它在這裡嗎？」 | SAM 3 的模組。在定位（localisation）之前，先決定這個概念在不在影像裡 |
 | SA-CO | 「SAM 3 的基準」 | 27 萬個概念的開放詞彙分割基準。是先前開放詞彙基準的 50 倍 |
 | Object Multiplex | 「SAM 3.1 的更新」 | 共享記憶的多物件追蹤。一次快速追蹤許多實例 |
 | Grounded SAM 2 | 「模組化管線」 | 偵測器加 SAM 2 的串接。需要換偵測器時仍然有用 |

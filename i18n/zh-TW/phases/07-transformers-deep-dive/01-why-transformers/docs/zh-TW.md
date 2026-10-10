@@ -1,6 +1,6 @@
 # 為什麼是 Transformer——RNN 的問題
 
-> RNN 一次處理一個 token。Transformer 一次處理全部 token。2017 年之後，深度學習裡每一條縮放曲線都被這一個架構賭注改寫。
+> RNN 一次處理一個 token。Transformer 一次處理全部 token。2017 年之後，深度學習裡每一條縮放曲線都被這一個架構選擇改寫。
 
 **Type:** Learn
 **Languages:** Python

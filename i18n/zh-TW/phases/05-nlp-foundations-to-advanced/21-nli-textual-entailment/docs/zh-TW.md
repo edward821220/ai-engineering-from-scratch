@@ -19,7 +19,7 @@
 
 - **幻覺檢查：** `t` 是來源文件，`h` 是摘要裡的主張。不是蘊涵，就是幻覺。
 - **有依據的問答：** `t` 是檢索到的段落，`h` 是生成的答案。不是蘊涵，就是捏造。
-- **零樣本（zero-shot）分類：** `t` 是文件，`h` 是說成話的標籤（「This is about sports」）。蘊涵就是預測的標籤。
+- **零樣本（zero-shot）分類：** `t` 是文件，`h` 是轉述成自然語句的標籤（「This is about sports」）。蘊涵就是預測的標籤。
 
 一個任務，三種正式環境用途。所以每個 RAG 評估框架裡，都藏著一個 NLI 模型。
 
@@ -71,7 +71,7 @@ print(result)
 #  {'label': 'contradiction', 'score': 0.01}]
 ```
 
-正式環境的 NLI，`facebook/bart-large-mnli` 和 `MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli` 是開放的預設。DeBERTa-v3 在排行榜上居前。
+正式環境的 NLI，`facebook/bart-large-mnli` 和 `MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli` 是常用開源預設模型。DeBERTa-v3 在排行榜上居前。
 
 ### 步驟 2：零樣本分類
 
@@ -98,7 +98,7 @@ def is_faithful(answer, context, threshold=0.5):
     return entail["score"] > threshold
 ```
 
-這是 RAGAS 忠實度的核心。把生成的答案拆成原子主張。每個主張對上檢索到的脈絡。報告被蘊涵的比例。
+這是 RAGAS 忠實度的核心。把生成的答案拆成原子主張。逐一檢查每項主張是否受到檢索脈絡蘊涵。報告被蘊涵的比例。
 
 ### 步驟 4：手寫的 NLI 分類器（classifier，概念用）
 
@@ -125,7 +125,7 @@ def is_faithful(answer, context, threshold=0.5):
 | 多語 | `MoritzLaurer/multilingual-MiniLMv2-L6-mnli-xnli` |
 | RAG 裡的幻覺偵測 | RAGAS／DeepEval 裡的 NLI 層 |
 
-2026 年的後設模式：NLI 是文字理解的膠帶。每當你需要「A 支撐 B 嗎？」或「A 矛盾 B 嗎？」——先伸手拿 NLI，再去多叫一次 LLM。
+2026 年的後設模式：NLI 是文字理解的萬用補強工具。每當你需要「A 支撐 B 嗎？」或「A 矛盾 B 嗎？」——先伸手拿 NLI，再去多叫一次 LLM。
 
 ## Ship It｜交付成果
 
@@ -153,9 +153,9 @@ Refuse to ship zero-shot classification without a 100-example labeled sanity che
 
 ## Exercises｜練習
 
-1. **簡單。** 在 20 個手寫的（前提、假設、標籤）三元組上跑 `facebook/bart-large-mnli`，三種都要涵蓋。量準確率。再加對抗的「子序列捷徑」陷阱（「I did not eat the cake」對上「I ate the cake」），看它會不會壞。
+1. **簡單。** 在 20 個手寫的（前提、假設、標籤）三元組上跑 `facebook/bart-large-mnli`，三種都要涵蓋。量準確率。再加對抗的「子序列捷徑」陷阱（「I did not eat the cake」對上「I ate the cake」），觀察模型是否因此失效。
 2. **中等。** 在 100 則 AG News 標題上，比較零樣本模板 `"This text is about {label}"`、`"The topic is {label}"` 和 `"{label}"`。報告準確率相差多少。
-3. **困難。** 做一個 RAG 忠實度檢查器：原子主張分解，加上每個主張的 NLI。在 50 個有黃金脈絡的 RAG 生成答案上評估。對上手寫標籤，量偽陽性（false positive）和偽陰性（false negative）比率。
+3. **困難。** 做一個 RAG 忠實度檢查器：原子主張分解，加上每個主張的 NLI。在 50 個有人工標註參考脈絡的 RAG 生成答案上評估。對上手寫標籤，量偽陽性（false positive）和偽陰性（false negative）比率。
 
 ## Key Terms｜關鍵術語
 

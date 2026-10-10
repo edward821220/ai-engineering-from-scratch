@@ -20,7 +20,7 @@ NeRF 把場景存在 MLP 的權重（weight）裡。每個渲染出來的像素�
 
 3D 高斯濺射（Kerbl、Kopanas、Leimkühler、Drettakis，SIGGRAPH 2023）把這些都換掉了。場景是一組顯式的 3D 高斯。渲染是 GPU 光柵化，每秒 100 影格以上。訓練只要幾分鐘。編輯是直接的：平移一部分高斯，椅子就搬走了。到 2026 年，Khronos Group 已核定高斯濺射的 glTF 擴充，OpenUSD 26.03 帶了高斯濺射的 schema，Zillow 和 Apartments.com 用它們渲染不動產，大多數新的 3D 重建論文都是核心 3DGS 想法的變體。
 
-心智模型很簡單。數學裡活動的部分夠多，所以大多數介紹從光柵化開始，把投影和球諧跳過去。本課把整件事做出來。先做 2D，再延伸到 3D。
+心智模型很簡單。數學涉及的細節很多，所以大多數介紹從光柵化開始，把投影和球諧跳過去。本課把整件事做出來。先做 2D，再延伸到 3D。
 
 ## The Concept｜核心概念
 
@@ -36,7 +36,7 @@ opacity          alpha      (1,)    post-sigmoid opacity [0, 1]
 SH coefficients  c_lm       (3 * (L+1)^2,)   view-dependent colour
 ```
 
-旋轉加尺度做出一個 3x3 的共變異數（covariance）：`Sigma = R S S^T R^T`。那就是這個高斯在 3D 裡的形狀。球諧讓顏色隨觀看方向改變，鏡面高光、微微的光澤、依視角的光暈，都不用為每個視角存一張紋理。球諧 3 階時，每個顏色通道 16 個係數，光是顏色，每個高斯就有 48 個浮點數。
+旋轉加尺度做出一個 3×3 共變異數矩陣（covariance matrix）（covariance）：`Sigma = R S S^T R^T`。那就是這個高斯在 3D 裡的形狀。球諧讓顏色隨觀看方向改變，鏡面高光、微微的光澤、依視角的光暈，都不用為每個視角存一張紋理。球諧 3 階時，每個顏色通道 16 個係數，光是顏色，每個高斯就有 48 個浮點數。
 
 一個場景通常有 100 萬到 500 萬個高斯。每個大約存 60 個浮點數（3 + 4 + 3 + 1 + 48，再加上其他）。500 萬個高斯的場景是 240 MB。比帶逐點紋理的對等點雲小得多，也比在高解析度下重渲的 NeRF MLP 權重小一個數量級。
 
@@ -59,7 +59,7 @@ flowchart LR
 
 ### 投影那一步
 
-世界座標在 `mu`、3D 共變異數是 `Sigma` 的高斯，投影成螢幕位置 `mu'`、2D 共變異數 `Sigma'` 的 2D 高斯：
+具有世界座標位置 `mu` 和 3D 共變異數 `Sigma` 的高斯，投影成螢幕位置 `mu'`、2D 共變異數 `Sigma'` 的 2D 高斯：
 
 ```
 mu' = project(mu)
@@ -87,7 +87,7 @@ c_i = eval_SH(SH_i, view_direction)    view-dependent colour
 
 ### 為什麼這可以微分
 
-每一步，投影、分到小塊、alpha 合成、球諧求值，對高斯參數都可微。給一張標準結果影像，算渲染像素的損失，對光柵器做反向傳播，用梯度下降法更新全部的 `(mu, q, s, alpha, c_lm)`。大約 3 萬次迭代之後，高斯找到對的位置、尺度和顏色。
+每一步，投影、分到小塊、alpha 合成、球諧求值，對高斯參數都可微。給定一張真實影像，算渲染像素的損失，對光柵器做反向傳播，用梯度下降法更新全部的 `(mu, q, s, alpha, c_lm)`。大約 3 萬次迭代之後，高斯找到對的位置、尺度和顏色。
 
 ### 緻密化和剪枝
 
@@ -116,7 +116,7 @@ c_i = eval_SH(SH_i, view_direction)    view-dependent colour
 
 ### 4D 和生成式變體
 
-- **4D 高斯濺射**。高斯是時間的函數。用來做體積影片（2026 年的 Superman、A$AP Rocky 的 "Helicopter"）。
+- **4D 高斯濺射**。高斯是時間的函數。用於體積式影片（2026 年的 Superman、A$AP Rocky 的 "Helicopter"）。
 - **生成式 splat**。文字到 splat 的模型（World Labs 的 Marble）會把整個場景憑空生出來。
 - **3D Gaussian Unscented Transform**。NVIDIA NuRec 給自駕模擬用的變體。
 
@@ -261,7 +261,7 @@ for step in range(200):
         print(f"step {step:3d}  mse {loss.item():.4f}")
 ```
 
-200 步裡，64 個高斯落進那兩個形狀。整個想法就是這樣：對顯式的幾何基元做梯度下降法。
+200 步裡，64 個高斯逐漸排列成那兩個形狀。整個想法就是這樣：對顯式的幾何基元做梯度下降法。
 
 ### 步驟 5：從 2D 到 3D
 

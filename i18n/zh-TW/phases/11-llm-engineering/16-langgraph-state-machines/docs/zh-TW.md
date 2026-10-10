@@ -1,6 +1,6 @@
 # Agent 狀態機——圖、節點與檢查點（Agent State Machines — Graphs, Nodes, Checkpoints）
 
-> 純手寫的 ReAct 迴圈本質上就是一個 `while True`。而將同一個迴圈以顯式的圖（Graph）形式表達，它就進化成了可設定檢查點（checkpoint）、隨時中斷、支援多路分岔與時光旅行的專業狀態機。Agent 的核心能力並未改變，改變的是包覆在它外層的調度框架。
+> 純手寫的 ReAct 迴圈本質上就是一個 `while True`。而將同一個迴圈以顯式的圖（Graph）形式表達，它就進化成了可設定檢查點（checkpoint）、隨時中斷、支援多路分岔與時光旅行的本課採用的心智模型，直接取自官方文件。Agent 的核心能力並未改變，改變的是包覆在它外層的調度框架。
 
 **Type:** Build
 **Languages:** Python
@@ -22,7 +22,7 @@
 一個 `StateGraph` 由三大核心要素構成：
 
 1. **狀態（State）**：在圖中流轉的型別化字典（TypedDict 或 Pydantic 模型）。每個節點接收全量狀態並回傳局部增量更新，LangGraph 依據各欄位設定的**歸約器（Reducer）**進行合併——例如針對需要累積保留的訊息清單使用 `operator.add`，其餘欄位預設為覆寫。
-2. **節點（Nodes）**：簽署為 `state -> partial_state` 的 Python 函式。每個節點代表一個離散的執行步驟：「呼叫模型」、「執行工具」、「產生摘要」。
+2. **節點（Nodes）**：函式簽章為 `state -> partial_state` 的 Python 函式。每個節點代表一個離散的執行步驟：「呼叫模型」、「執行工具」、「產生摘要」。
 3. **邊（Edges）**：節點之間的流轉轉移。靜態邊直接指向固定目標；條件邊則接受一個路由函式 `state -> next_node_name`，使計算圖能根據模型的輸出動態分岔。
 
 你編譯該計算圖。Compile 動作鎖定圖的拓撲結構、掛載檢查點儲存器（Checkpointer，對正式環境至關重要），並回傳一個可執行的 Runnable 實體。你在呼叫時傳入初始狀態與一個專屬的 `thread_id`。執行的每一個步驟，皆會自動持久化儲存一筆以 `(thread_id, checkpoint_id)` 為鍵值的檢查點快照。
@@ -149,7 +149,7 @@ for event in app.stream(None, target, stream_mode="values"):
     pass  # replay from that point forward
 ```
 
-傳入 `None` 作為輸入會精準從給定的歷史檢查點重放；傳入具體數值則會在該檢查點狀態上附加增量後再接續重跑。這讓你能極速重現某次糟糕的 Agent 執行歷程，而完全無需重新執行整場完整對話。
+傳入 `None` 作為輸入會精準從給定的歷史檢查點重放；傳入一個值則會在該檢查點狀態上附加增量後再接續重跑。這讓你能極速重現某次糟糕的 Agent 執行歷程，而完全無需重新執行整場完整對話。
 
 ### 步驟 5：在正式環境中替換檢查點儲存庫
 

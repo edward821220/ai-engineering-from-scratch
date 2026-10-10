@@ -61,7 +61,7 @@ P(A|B) = P(B|A) * P(A) / P(B)
 | P(A) | 先驗（prior） | 看到任何證據之前，你對 A 的信念 |
 | P(B) | 證據（evidence） | 在所有可能性之下看到 B 的總機率 |
 
-證據項 P(B) 扮演正規化因子。你可以用全機率法則（law of total probability）展開它：
+證據項 P(B) 是正規化因子。你可以用全機率法則（law of total probability）展開它：
 
 ```
 P(B) = P(B|A) * P(A) + P(B|not A) * P(not A)
@@ -69,7 +69,7 @@ P(B) = P(B|A) * P(A) + P(B|not A) * P(not A)
 
 ### 醫學檢驗範例
 
-某疾病每 10,000 人中有 1 人得病。檢驗準確率 99%（能抓到 99% 的病人，有 1% 的機率對健康者誤報）。
+某疾病每 10,000 人中有 1 人得病。檢驗準確率 99%（能檢出 99% 的患者，有 1% 的機率對健康者誤報）。
 
 ```
 P(sick)          = 0.0001     (prior: disease is rare)
@@ -111,7 +111,7 @@ P(spam|"lottery") = 0.05 * 0.3 / 0.0157
 
 ### 單純貝氏：獨立性假設
 
-單純貝氏把這個做法延伸到多個特徵，假設在給定類別下所有特徵條件獨立：
+單純貝氏把這個做法延伸到多個特徵（feature），假設在給定類別下所有特徵（feature）條件獨立：
 
 ```
 P(class | feature_1, feature_2, ..., feature_n)
@@ -254,7 +254,7 @@ class NaiveBayes:
         return best_class
 ```
 
-對數機率防止下溢位。把很多小機率相乘會產生小到浮點數表示不了的數字；把對數機率相加既數值穩定、數學上也等價。
+對數機率防止下溢位。把很多小機率相乘會產生小到浮點數（floating point）表示不了的數字；把對數機率相加既數值穩定、數學上也等價。
 
 ### 步驟 3：用垃圾郵件資料訓練
 
@@ -333,11 +333,11 @@ for msg, pred in zip(test_messages, predictions):
     print(f"  '{msg}' -> {pred}")
 ```
 
-同一個演算法。CountVectorizer 處理 tokenization和詞彙表建立；MultinomialNB 內部處理平滑和對數機率。你的從零版本用 40 行做了同樣的事。
+同一個演算法。CountVectorizer 處理 tokenization 和詞彙表建立；MultinomialNB 內部處理平滑和對數機率。你的從零版本用 40 行做了同樣的事。
 
 ## Ship It｜交付成果
 
-這裡打造的 NaiveBayes 類別展示了完整管線：tokenization、拉普拉斯平滑的機率估計、對數空間預測。`code/bayes.py` 的程式碼只靠 Python 標準函式庫就能端到端執行。
+這裡打造的 NaiveBayes 類別展示了完整管線（pipeline）：tokenization、拉普拉斯平滑的機率估計、對數空間預測。`code/bayes.py` 的程式碼只靠 Python 標準函式庫就能端到端執行。
 
 ### 共軛先驗
 
@@ -345,12 +345,12 @@ for msg, pred in zip(test_messages, predictions):
 
 | 概似 | 共軛先驗 | 後驗 | 範例 |
 |-----------|----------------|-----------|---------|
-| 伯努利 | Beta(a, b) | Beta(a + successes, b + failures) | 硬幣偏差估計 |
+| 伯努利 | Beta(a, b) | Beta(a + successes, b + failures) | 硬幣正面機率估計 |
 | 常態（已知變異數） | Normal(mu_0, sigma_0) | Normal(weighted mean, smaller variance) | 感測器校準 |
 | 卜瓦松 | Gamma(a, b) | Gamma(a + sum of counts, b + n) | 為到達率建模 |
 | 多項 | Dirichlet(alpha) | Dirichlet(alpha + counts) | 主題建模、語言模型 |
 
-為什麼這重要：沒有共軛先驗，你得用蒙地卡羅取樣或變分推論來逼近後驗；有了共軛先驗，你只要更新兩個數字。
+為什麼這重要：沒有共軛先驗，你得用蒙地卡羅取樣或變分推論（variational inference）來逼近後驗；有了共軛先驗，你只要更新兩個數字。
 
 Beta 分布是實務上最常見的共軛先驗。Beta(a, b) 代表你對一個機率參數的信念。平均數是 a/(a+b)；a+b 越大，分布越集中（越自信）。
 
@@ -400,7 +400,7 @@ graph LR
 
 觀察順序無所謂：Beta(1,1) 一次更新全部 12 正面、8 反面得到 Beta(13, 9)——結果相同。循序更新和批次更新在數學上等價，但循序更新讓你每一步都能做決策，不必儲存原始資料。
 
-這是正式環境 ML 系統線上學習的基礎。bandit 的湯普森取樣（Thompson sampling）、增量推薦系統和串流異常偵測用的都是這個模式。
+這是正式環境 ML 系統線上學習的基礎。bandit 的湯普森取樣（Thompson sampling）、增量推薦系統和串流（streaming）異常偵測用的都是這個模式。
 
 ### 與 A/B 測試的連結
 
@@ -447,7 +447,7 @@ A/B 測試就是喬裝的貝氏推論。
 
 2. **平滑的影響。** 用平滑值 0.01、0.1、1.0、10.0 跑垃圾郵件分類器。排名最高的詞機率如何變化？當 smoothing=0 且某個詞只出現在 ham 時會發生什麼？
 
-3. **加特徵。** 擴充 NaiveBayes 類別，在詞計數之外也使用訊息長度（短／長）作為特徵。從訓練資料估計 P(short|spam) 和 P(short|ham)，把它併進預測分數。
+3. **加特徵（feature）。** 擴充 NaiveBayes 類別，在詞計數之外也使用訊息長度（短／長）作為特徵（feature）。從訓練資料估計 P(short|spam) 和 P(short|ham)，把它併進預測分數。
 
 4. **手算 MAP。** 給定觀測資料（10 次丟硬幣出現 7 正面），用 Beta(2,2) 先驗計算偏差的 MAP 估計，並與 MLE 估計（7/10）比較。
 
@@ -459,8 +459,8 @@ A/B 測試就是喬裝的貝氏推論。
 | 概似（likelihood） | 「資料配得多好」 | P(evidence\|hypothesis)。在特定假設下觀測資料有多可能。 |
 | 後驗（posterior） | 「我更新後的信念」 | P(hypothesis\|evidence)。先驗乘以概似，再正規化。 |
 | 證據（evidence） | 「正規化常數」 | 跨所有假設的 P(data)。確保後驗加總為 1。 |
-| 單純貝氏（Naive Bayes） | 「那個簡單的文字分類器」 | 假設給定類別下各特徵獨立的分類器。儘管假設是錯的，效果依然很好。 |
-| 拉普拉斯平滑（Laplace smoothing） | 「加一平滑」 | 給每個特徵加上一個小計數，防止未見資料產生零機率。 |
+| 單純貝氏（Naive Bayes） | 「那個簡單的文字分類器」 | 假設給定類別下各特徵（feature）獨立的分類器。儘管假設是錯的，效果依然很好。 |
+| 拉普拉斯平滑（Laplace smoothing） | 「加一平滑」 | 給每個特徵（feature）加上一個小計數，防止未見資料產生零機率。 |
 | MLE | 「直接用頻率」 | 選擇最大化 P(data\|parameters) 的參數。沒有先驗，小資料時可能過度擬合。 |
 | MAP | 「帶先驗的 MLE」 | 選擇最大化 P(data\|parameters) * P(parameters) 的參數。等價於正則化的 MLE。 |
 | 對數機率（log-probability） | 「在對數空間做」 | 用 log(P) 取代 P，避免許多小數相乘時的浮點下溢位。 |

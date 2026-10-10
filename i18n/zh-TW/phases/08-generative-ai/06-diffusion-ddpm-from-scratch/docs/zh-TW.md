@@ -1,6 +1,6 @@
 # 擴散模型——從零做 DDPM
 
-> Ho、Jain、Abbeel（2020）給了這個領域一套戒不掉的配方。用一千個小步驟的噪聲把資料毀掉。訓練一個神經網路（neural network）去預測噪聲。推論（inference）時把過程倒過來。今天每個主流的影像、影片、3D、音樂模型都跑在這個迴圈上，上面可能再加流匹配（flow matching）或一致性（consistency）手法。
+> Ho、Jain、Abbeel（2020）給了這個領域一套廣泛採用的配方。用一千個小步驟的噪聲把資料毀掉。訓練一個神經網路（neural network）去預測噪聲。推論（inference）時把過程倒過來。今天每個主流的影像、影片、3D、音樂模型都跑在這個迴圈上，上面可能再加流匹配（flow matching）或一致性（consistency）手法。
 
 **Type:** Build
 **Languages:** Python
@@ -11,13 +11,13 @@
 
 你要一個 `p_data(x)` 的取樣器（sampler）。GAN 玩一場常常發散的極小極大（minimax）賽局。VAE 從高斯解碼器吐出糊掉的樣本。你真正要的訓練目標是：(a) 單一、穩定的損失（loss），沒有鞍點、沒有極小極大，(b) `log p(x)` 的一個下界，所以你有概似（likelihood），(c) 樣本品質對得上目前最強。
 
-Sohl-Dickstein 等人（2015）有理論答案：定義一條馬可夫鏈（Markov chain）`q(x_t | x_{t-1})`，逐步加上高斯噪聲，再訓練一條反向鏈 `p_θ(x_{t-1} | x_t)` 來去噪。Ho、Jain、Abbeel（2020）指出損失可以簡化成一行——預測噪聲——並把數學收拾乾淨。2020 年這還只是新鮮事。2021 年它做出當時最強的樣本。2022 年它變成 Stable Diffusion。2026 年它是底層。
+Sohl-Dickstein 等人（2015）有理論答案：定義一條馬可夫鏈（Markov chain）`q(x_t | x_{t-1})`，逐步加上高斯雜訊，再訓練一條反向鏈 `p_θ(x_{t-1} | x_t)` 來去噪。Ho、Jain、Abbeel（2020）指出損失可以簡化成一行——預測噪聲——並把數學收拾乾淨。2020 年這還只是新鮮事。2021 年它做出當時最強的樣本。2022 年它變成 Stable Diffusion。2026 年它是底層。
 
 ## The Concept｜核心概念
 
 ![DDPM: forward noise, reverse denoise](../assets/ddpm.svg)
 
-**前向過程 `q`。** 在 `T` 個小步驟裡加高斯噪聲。閉式之所以讓數學算得出來，是因為累積那一步也是高斯：
+**前向過程 `q`。** 在 `T` 個小步驟裡加高斯雜訊。閉式之所以讓數學算得出來，是因為累積那一步也是高斯：
 
 ```
 q(x_t | x_0) = N( sqrt(α̅_t) · x_0,  (1 - α̅_t) · I )

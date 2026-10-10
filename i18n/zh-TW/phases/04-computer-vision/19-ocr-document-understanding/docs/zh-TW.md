@@ -9,8 +9,8 @@
 
 ## Learning Objectives｜學習目標
 
-- 把古典 OCR 管線走一遍（偵測、辨識、版面），以及現代的端到端替代（Donut、Qwen-VL-OCR）
-- 實作 CTC（連線時序分類，Connectionist Temporal Classification）損失（loss），用來訓練序列到序列的 OCR
+- 把傳統 OCR 管線走一遍（偵測、辨識、版面），以及現代的端到端替代（Donut、Qwen-VL-OCR）
+- 實作 CTC（連結主義時序分類（Connectionist Temporal Classification，CTC），Connectionist Temporal Classification）損失（loss），用來訓練序列到序列的 OCR
 - 用 PaddleOCR 或 EasyOCR 做正式環境的文件解析，不用自己訓練
 - 分辨 OCR、版面解析、文件理解，並依任務挑對的工具
 
@@ -78,7 +78,7 @@ CTC 是 CRNN 在 2015 年訓得動的原因，也是 2026 年大多數正式環�
 ### 評估指標（metric）
 
 - **字元錯誤率，CER**。Levenshtein 距離除以參考長度。越低越好。正式環境的目標：乾淨掃描低於 2%。
-- **詞錯誤率，WER**。同一件事，改在詞的層級。
+- **詞錯誤率，WER**。計算方式相同，但以詞為單位。
 - **結構化欄位的 F1**。給鍵值任務用。量 `{invoice_total: 42.50}` 有沒有正確出現。
 - **JSON 上的編輯距離**。給端到端文件解析用。Donut 論文提出正規化（normalization）後的樹編輯距離。
 
@@ -251,10 +251,10 @@ model = VisionEncoderDecoderModel.from_pretrained("naver-clova-ix/donut-base-fin
 |------|----------------|----------------------|
 | OCR | 「從像素拿文字」 | 把影像區域變成字元序列 |
 | CTC | 「不用對齊的損失」 | 訓練序列模型時不用每個時間步的標籤。把所有對齊加總 |
-| CRNN | 「古典 OCR 模型」 | 卷積（convolution）特徵萃取器加 BiLSTM 加 CTC。2015 的基準（baseline），正式環境仍在用 |
+| CRNN | 「傳統 OCR 模型」 | 卷積（convolution）特徵萃取器加 BiLSTM 加 CTC。2015 的基準（baseline），正式環境仍在用 |
 | Donut | 「端到端 OCR」 | ViT 編碼器加文字解碼器。直接從影像吐出 JSON |
 | 版面解析 | 「找出區域」 | 偵測並標出文件裡的標題、表格、圖、段落 |
-| 閱讀順序 | 「文字序列」 | 把辨識出的區域排成句子。拉丁文字很直接，混排就不直接 |
+| 閱讀順序 | 「文字序列」 | 把辨識出的區域排成句子。拉丁文字的閱讀順序較簡單，混合版面則複雜得多 |
 | CER / WER | 「錯誤率」 | 字元或詞的粒度上，Levenshtein 距離除以參考長度 |
 | VLM-OCR | 「會讀的 LLM」 | 為 OCR 任務訓練過、或用 prompt 來做的視覺語言模型。複雜文件上目前最好 |
 

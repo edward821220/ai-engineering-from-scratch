@@ -1,6 +1,6 @@
 # 專家混合（Mixture of Experts，MoE）
 
-> 稠密的 700 億 transformer，每個 token 都用到每一個參數。6710 億的 MoE 每個 token 只用到 370 億，而且每個評測都打贏它。稀疏（sparsity）是這十年最重要的縮放想法。
+> 稠密的 700 億 transformer，每個 token 都用到每一個參數。6710 億的 MoE 每個 token 只用到 370 億，而且在所有效能基準測試中都勝過它。稀疏（sparsity）是這十年最重要的縮放想法。
 
 **Type:** Build
 **Languages:** Python

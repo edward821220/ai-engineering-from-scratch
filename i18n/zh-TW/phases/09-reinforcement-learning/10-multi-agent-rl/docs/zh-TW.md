@@ -1,6 +1,6 @@
 # 多 agent 強化學習（multi-agent RL）
 
-> 單 agent 的 RL 假設環境是平穩的。把兩個正在學習的 agent 放進同一個世界，這個假設就破了：每個 agent 都是對方環境的一部分，而且兩邊都在變。多 agent RL 是一套技巧，讓馬可夫假設不再成立時，學習還能收斂。
+> 單 agent 的 RL 假設環境是平穩的。把兩個正在學習的 agent 放進同一個世界，這個此假設不再成立：每個 agent 都是對方環境的一部分，而且兩邊都在變。多 agent RL 是一套技巧，讓馬可夫假設不再成立時，學習還能收斂。
 
 **Type:** Build
 **Languages:** Python
@@ -11,7 +11,7 @@
 
 機器人學著在房間裡走，是單 agent 的 RL 問題。一支足球隊不是。AlphaStar 對上 StarCraft 的對手不是。一群出價 agent 的市場不是。兩輛車在四向停車的路口協商誰先走，也不是。很多真實世界的多對多問題都不是。
 
-在每個多 agent 設定裡，從任何一個 agent 來看，其他 agent *就是*環境的一部分。他們學習、改變行為，環境就變成非平穩的。馬可夫性質——「下一個狀態只依賴現在的狀態和我的動作」——被打破，因為下一個狀態也依賴*其他* agent 選了什麼，而他們的政策是移動靶。
+在每個多 agent 設定裡，從任何一個 agent 來看，其他 agent *就是*環境的一部分。他們學習、改變行為，環境就變成非定態的。馬可夫性質——「下一個狀態只依賴現在的狀態和我的動作」——被打破，因為下一個狀態也依賴*其他* agent 選了什麼，而他們的政策是移動靶。
 
 這打破表格式收斂證明（Q-learning 的保證假設環境平穩）。單純的深度 RL 也破：agent 互相追著打轉，永遠收斂不到穩定政策。你需要多 agent 專用的技術：集中訓練／分散執行、反事實基準、聯賽對戰、自我對弈。
 
@@ -25,7 +25,7 @@
 
 **核心難題：**
 
-- **非平穩。** 從 agent `i` 的角度看，`P(s' | s, a_i)` 依賴正在改變的 `π_{-i}`。
+- **非定態。** 從 agent `i` 的角度看，`P(s' | s, a_i)` 依賴正在改變的 `π_{-i}`。
 - **功勞分配。** 報酬是共享的，是哪個 agent 造成的？
 - **探索的協調。** agent 必須探索互補的策略，不要重複探索同一個狀態。
 - **可擴展性。** 聯合動作空間隨 `n` 指數長大。
@@ -110,7 +110,7 @@ def independent_q(env, episodes, alpha, gamma, epsilon):
 
 ## 容易踩的坑
 
-- **非平穩的重放。** 獨立 agent 的經驗重放比單 agent 更糟，因為舊轉移是現在已經過時的對手產生的。修法：重新標註，或依新近程度加權。
+- **非定態的重放。** 獨立 agent 的經驗重放比單 agent 更糟，因為舊轉移是現在已經過時的對手產生的。修法：重新標註，或依新近程度加權。
 - **功勞分配含糊。** 長回合之後才給共享報酬，說不清哪個 agent 有貢獻。修法：反事實基準（COMA），或依 agent 塑形報酬。
 - **政策漂移／互相追。** 每個 agent 的最佳回應都跟著對方的更新在變。修法：集中式評論者、放慢學習率，或一次只凍住一個。
 - **用協調來獎勵操弄。** agent 找出設計者沒料到的協同漏洞。拍賣 agent 收斂到出價零。修法：小心設計報酬，加上行為約束。
@@ -185,5 +185,5 @@ Refuse independent Q-learning on tightly-coupled cooperative tasks. Refuse to re
 - [Yu et al. (2022). The Surprising Effectiveness of PPO in Cooperative Multi-Agent Games (MAPPO)](https://arxiv.org/abs/2103.01955) ——PPO 在 MARL 上強得意外。
 - [Vinyals et al. (2019). Grandmaster level in StarCraft II using multi-agent reinforcement learning (AlphaStar)](https://www.nature.com/articles/s41586-019-1724-z) ——大規模的聯賽對戰。
 - [Silver et al. (2017). Mastering the game of Go without human knowledge (AlphaGo Zero)](https://www.nature.com/articles/nature24270) ——零和遊戲裡的純自我對弈。
-- [Sutton & Barto (2018). Ch. 15 — Neuroscience & Ch. 17 — Frontiers](http://incompleteideas.net/book/RLbook2020.pdf) ——教科書對多 agent 設定和非平穩問題的短處理；CTDE 就是為了解它。
+- [Sutton & Barto (2018). Ch. 15 — Neuroscience & Ch. 17 — Frontiers](http://incompleteideas.net/book/RLbook2020.pdf) ——教科書對多 agent 設定和非定態問題的短處理；CTDE 就是為了解它。
 - [Zhang, Yang & Başar (2021). Multi-Agent Reinforcement Learning: A Selective Overview](https://arxiv.org/abs/1911.10635) ——涵蓋合作、競爭、混合 MARL 和收斂結果的綜述。

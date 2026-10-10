@@ -1,6 +1,6 @@
 # LLM 評估——RAGAS、DeepEval、G-Eval
 
-> 完全相符和 F1 抓不到語意等價。人工審查擴不了規模。LLM 當評審是正式環境（production）的答案——校準夠了，那個數字才信得過。
+> 完全相符和 F1 抓不到語意等價。人工審查無法因應如此大的評估規模。LLM 當評審是正式環境（production）的答案——校準夠了，那個數字才信得過。
 
 **Type:** Build
 **Languages:** Python
@@ -17,7 +17,7 @@
 
 2026 年有三個框架在處理這件事。
 
-- **RAGAS。** Retrieval-Augmented Generation ASsessment。四個 RAG 指標：忠實度（faithfulness）、答案相關性、脈絡精確率（precision）、脈絡召回率（recall）。後端是 NLI 加 LLM 評審。有研究撐著，很輕。
+- **RAGAS。** Retrieval-Augmented Generation ASsessment。四個 RAG 指標：忠實度（faithfulness）、答案相關性、脈絡精確率（precision）、脈絡召回率（recall）。後端是 NLI 加 LLM 評審。有研究支持，且輕量。
 - **DeepEval。** 給 LLM 用的 Pytest。G-Eval、任務完成、幻覺（hallucination）、偏差（bias）指標。原生就進 CI/CD。
 - **G-Eval。** 一個方法（也是 DeepEval 的一個指標）：LLM 當評審，帶逐步推理（chain-of-thought）、自訂準則、0 到 1 的分數。
 
@@ -172,8 +172,8 @@ def test_rag_system():
 - **沒有校準。** 和人類標籤相關只有 0.3 的評審是雜訊。交付前必須跑一輪校準。
 - **自我評估。** 用同一個 LLM 又生成又評審，會把分數灌高 10% 到 20%。評審用不同的模型家族。
 - **成對評審的位置偏差。** 評審偏好先出現的那個選項。永遠把順序打亂，兩邊都跑。
-- **原始加總藏起失敗。** 平均 0.85 常常藏起 5% 的災難性失敗。永遠看最底下的分位數。
-- **黃金資料集（dataset）腐壞。** 沒有版本、隨時間漂移的評估集，會弄壞縱向比較。每次變更都給資料集貼上標籤。
+- **整體平均分數會掩蓋失敗案例。** 平均 0.85 常常藏起 5% 的災難性失敗。永遠看最低分位數。
+- **評估資料集逐漸失效。** 沒有版本、隨時間漂移的評估集，會弄壞縱向比較。每次變更都給資料集貼上標籤。
 - **LLM 成本。** 規模一大，評審呼叫就主導成本。用達到校準閾值（threshold）的最便宜模型。GPT-4o-mini、Claude Haiku、Mistral-small。
 
 ## Use It｜實際應用

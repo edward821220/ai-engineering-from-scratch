@@ -1,6 +1,6 @@
 # 結構化輸出與約束解碼（constrained decoding）
 
-> 向 LLM 要 JSON。大多時候會拿到 JSON。在正式環境（production）裡，「大多」才是問題。約束解碼在抽樣（sampling）之前改 logit（logit），把「大多」變成「總是」。
+> 向 LLM 要 JSON。大多時候會拿到 JSON。在正式環境（production）裡，「大多」才是問題。約束解碼在取樣（sampling）之前改 logit（logit），把「大多」變成「總是」。
 
 **Type:** Build
 **Languages:** Python
@@ -25,18 +25,18 @@
 
 ![Constrained decoding masking invalid tokens at each step](../assets/constrained-decoding.svg)
 
-**約束解碼怎麼運作。** 每個生成步驟，LLM 在整個詞彙表（vocabulary）（大約 10 萬個 token）上產出一個 logit 向量。一個 *logit 處理器* 坐在模型和抽樣器之間。它依目標文法裡的當前位置——JSON Schema、正規表示式（regex）、上下文無關文法（context-free grammar）——算出哪些 token 合法，再把所有不合法 token 的 logit 設成負無窮。剩下的 logit 做 softmax，機率質量只落在合法的延續上。
+**約束解碼怎麼運作。** 每個生成步驟，LLM 在整個詞彙表（vocabulary）（大約 10 萬個 token）上產出一個 logit 向量。一個 *logit 處理器* 坐在模型和取樣器之間。它依目標文法裡的當前位置——JSON Schema、正規表示式（regex）、上下文無關文法（context-free grammar）——算出哪些 token 合法，再把所有不合法 token 的 logit 設成負無窮。剩下的 logit 做 softmax，機率質量只落在合法的延續上。
 
 2026 年的實作：
 
 - **Outlines。** 把 JSON Schema 或正規表示式編成有限狀態機（finite-state machine）。每個 token 用 O(1) 查下一個合法 token。基於有限狀態機，所以遞迴 schema 需要攤平。
 - **XGrammar／llguidance。** 上下文無關文法引擎。處理遞迴的 JSON Schema。解碼額外開銷近乎零。OpenAI 在 2025 年的結構化輸出實作裡點名了 llguidance。
 - **vLLM 引導解碼。** 內建 `guided_json`、`guided_regex`、`guided_choice`、`guided_grammar`，後端是 Outlines、XGrammar 或 lm-format-enforcer。
-- **Instructor。** 基於 Pydantic、包住任何 LLM 的包裝。驗證失敗就重試。跨供應商，但不改 logit——它靠重試，加上知道結構化輸出的 prompt。
+- **Instructor。** 以 Pydantic 為基礎，為各種 LLM 提供包裝層。驗證失敗就重試。跨供應商，但不改 logit——它靠重試，加上知道結構化輸出的 prompt。
 
 ### 反直覺的結果
 
-約束解碼常常比不受約束的生成*更快*。兩個原因。第一，它縮小下一個 token 的搜尋空間。第二，聰明的實作對被迫的 token 整個跳過生成（像 `{"name": "` 這種鷹架——每個位元組（byte）都已確定）。
+約束解碼常常比不受約束的生成*更快*。兩個原因。第一，它縮小下一個 token 的搜尋空間。第二，聰明的實作對被迫的 token 整個跳過生成（像 `{"name": "` 這類固定格式片段——每個位元組（byte）都已確定）。
 
 ### 會讓你付代價的那個坑
 
@@ -168,7 +168,7 @@ print(response.output_parsed)
 | 情況 | 選擇 |
 |-----------|------|
 | OpenAI／Anthropic／Google 模型，簡單 schema | 廠商原生的結構化輸出 |
-| 任何供應商、Pydantic 工作流、忍受得了重試 | Instructor |
+| 任何供應商、Pydantic 工作流、可接受重試造成的延遲與成本 | Instructor |
 | 本地模型、需要 100% 合法、平坦 schema | Outlines（有限狀態機） |
 | 本地模型、遞迴 schema | XGrammar 或 llguidance |
 | 自己架的推論（inference）伺服器 | vLLM 引導解碼 |

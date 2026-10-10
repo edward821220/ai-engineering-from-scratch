@@ -93,7 +93,7 @@ LoRA:     W_q + alpha * (A @ B)   where A : (d_in, r), B : (r, d_out)
 r is typically 4-32.
 ```
 
-幾乎每個社群 fine-tune 都用 LoRA 散布。CivitAI 和 Hugging Face 上有幾百萬個。
+幾乎每個社群 fine-tune 都用 LoRA 分散式。CivitAI 和 Hugging Face 上有幾百萬個。
 
 ### 你會看到的排程器
 

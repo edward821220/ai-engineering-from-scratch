@@ -10,17 +10,17 @@
 ## Learning Objectives｜學習目標
 
 - 使用定義、二階導數判別法（second derivative test）和海森矩陣判別法（Hessian test）檢驗函數是否為凸函數（convex function）
-- 實作牛頓法（Newton's method），並與梯度下降法（gradient descent）比較其二次收斂（quadratic convergence）
+- 實作牛頓法（Newton's method），並與梯度下降法（gradient descent）比較其二次收斂（quadratic convergence）（quadratic convergence）
 - 使用拉格朗日乘數（Lagrange multiplier）求解受限最佳化（constrained optimization）問題，並解讀 KKT 條件（Karush-Kuhn-Tucker conditions）
 - 說明神經網路的損失地景（loss landscape）為何是非凸（non-convex），以及隨機梯度下降法（SGD）仍能找到好解的原因
 
 ## The Problem｜問題
 
-第 08 課教過你梯度下降法、動量（momentum）和 Adam。這些最佳化器會沿著任何曲面往下走，但它們不提供任何保證。在非凸地景（non-convex landscape）上使用梯度下降法，可能會掉進不好的局部最小值（local minimum）、卡在鞍點（saddle point），或永遠來回震盪。你還是照用，因為神經網路是非凸的，而且沒有其他選擇。
+第 08 課教過你梯度下降法、動量（momentum）和 Adam。這些最佳化器會沿著任何曲面往下走，但它們不提供任何保證。在非凸地景（non-convex landscape）上使用梯度下降法，可能會掉進不好的局部最小值（local minimum）（local minimum）、卡在鞍點（saddle point），或永遠來回震盪。你還是照用，因為神經網路是非凸的，而且沒有其他選擇。
 
-不過，機器學習中有許多問題是凸的：線性迴歸（linear regression）、邏輯斯迴歸（logistic regression）、支援向量機（support vector machine，SVM）、LASSO、嶺迴歸（ridge regression）。對這些問題，有更有力的方法：具備數學保證的最佳化。一個凸問題只有一個谷底。任何沿著下降方向前進的演算法都會到達全域最小值（global minimum）。不必多次重新啟動，不必安排學習率排程（learning rate schedule），也不用祈禱。
+不過，機器學習中有許多問題是凸的：線性迴歸（linear regression）、邏輯斯迴歸（logistic regression）、支援向量機（support vector machine，SVM）、LASSO、嶺迴歸（ridge regression）。對這些問題，有更有力的方法：具備數學保證的最佳化。一個凸問題只有一個谷底。任何沿著下降方向前進的演算法都會到達全域最小值（global minimum）。不必多次重新啟動，不必安排學習率排程（learning rate schedule）（learning rate schedule），也不用祈禱。
 
-了解凸性（convexity）有三個好處。第一，它能告訴你問題是容易的（凸）還是困難的（非凸）。第二，它讓你能在凸問題上使用牛頓法等更快的工具。第三，它能解釋機器學習中反覆出現的概念：正則化（regularization）其實是限制條件（constraint）、SVM 中的對偶性（duality），以及深度學習如何在違反凸性所有良好性質的情況下仍能運作。
+了解凸性（convexity）有三個好處。第一，它能告訴你問題是容易的（凸）還是困難的（非凸）。第二，它讓你能在凸問題上使用牛頓法等更快的工具。第三，它能解釋機器學習中反覆出現的概念：正則化（regularization）其實是限制條件（constraint）、SVM 中的對偶性（duality），以及深度學習如何即使不具備凸性帶來的良好性質，深度學習仍能運作。
 
 ## The Concept｜核心概念
 
@@ -61,7 +61,7 @@ f(tx + (1-t)y) <= t*f(x) + (1-t)*f(y)
 |---|---|---|
 | **線段判別** | 圖形上任意兩點之間的線段都在曲線**上方或與曲線重合** | 某些點之間的線段會**落到曲線下方** |
 | **形狀** | 單一碗狀／谷狀，向上彎曲 | 曲率混雜，具有多個峰與谷 |
-| **局部最小值** | 每個局部最小值都是全域最小值 | 可能存在高低不同的多個局部最小值 |
+| **局部最小值（local minimum）** | 每個局部最小值（local minimum）都是全域最小值 | 可能存在高低不同的多個局部最小值（local minimum） |
 
 常見的凸函數：
 - f(x) = x^2（拋物線）
@@ -89,9 +89,9 @@ f(tx + (1-t)y) <= t*f(x) + (1-t)*f(y)
 
 凸最佳化（convex optimization）的核心定理：
 
-**對凸函數而言，每個局部最小值都是全域最小值。**
+**對凸函數而言，每個局部最小值（local minimum）都是全域最小值。**
 
-因此梯度下降法不會陷入困境。沿著任何下降路徑前進，都會到達相同答案。演算法保證會收斂到最佳解。
+因此梯度下降法不會卡在次佳的局部解。沿著任何下降路徑前進，都會到達相同答案。演算法保證會收斂到最佳解。
 
 ```mermaid
 graph LR
@@ -108,7 +108,7 @@ graph LR
 
 帶來的好處：
 - 不需要隨機重新啟動
-- 不需要複雜的學習率排程
+- 不需要複雜的學習率排程（learning rate schedule）
 - 可以證明收斂性（收斂速度取決於函數性質）
 - 解是唯一的（平坦區域除外）
 
@@ -185,7 +185,7 @@ graph TD
 ```
 
 優點：
-- 接近最小值時呈二次收斂（每一步的誤差都會平方）
+- 接近最小值時呈二次收斂（quadratic convergence）（每一步的誤差都會平方）
 - 不必調整學習率
 - 尺度不變（scale-invariant），無論如何參數化問題都能運作
 
@@ -344,20 +344,20 @@ Replace x_i^T x_j with K(x_i, x_j) to get the kernel trick.
 
 神經網路的損失函數極度非凸。依照所有古典判準，最佳化它們應該會失敗；但隨機梯度下降法能可靠地找到好解。以下有幾個原因。
 
-**多數局部最小值已經夠好。** 在高維空間中，梯度為零的隨機臨界點幾乎全是鞍點，而不是局部最小值。少數存在的局部最小值，其損失值通常接近全域最小值。在有數百萬維的參數空間中，陷入極差局部最小值的機率非常低。
+**多數局部最小值（local minimum）已經夠好。** 在高維空間中，梯度為零的隨機臨界點幾乎全是鞍點，而不是局部最小值（local minimum）。少數存在的局部最小值（local minimum），其損失值通常接近全域最小值。在有數百萬維的參數空間中，陷入極差局部最小值（local minimum）的機率非常低。
 
-**真正的障礙是鞍點，而非局部最小值。** 在具有 n 個參數的函數中，鞍點沿著某些方向曲率為正，另一些方向曲率為負。對高維空間中的隨機臨界點（critical point）而言，n 個特徵值全為正（即局部最小值）的機率約為 2^(-n)。幾乎所有臨界點都是鞍點。隨機梯度下降法的雜訊有助於逃離鞍點。
+**真正的障礙是鞍點，而非局部最小值（local minimum）。** 在含有 n 個參數的函數中，鞍點沿著某些方向曲率為正，另一些方向曲率為負。對高維空間中的隨機臨界點（critical point）而言，n 個特徵值全為正（即局部最小值（local minimum））的機率約為 2^(-n)。幾乎所有臨界點都是鞍點。隨機梯度下降法的雜訊有助於逃離鞍點。
 
-**過度參數化（overparameterization）會使地景變平滑。** 參數數量多於訓練樣本的網路，其損失地景更平滑、連通性更高。更寬的網路中，糟糕局部最小值更少。這違反直覺，但有實證支持。
+**過度參數化（overparameterization）會使地景變平滑。** 參數數量多於訓練樣本的網路，其損失地景更平滑、連通性更高。更寬的網路中，糟糕局部最小值（local minimum）更少。這違反直覺，但有實證支持。
 
 **損失地景的結構：**
 
 | 性質 | 低維空間 | 高維空間 |
 |---|---|---|
 | **地景** | 許多彼此孤立的峰與谷 | 平滑連通的谷地 |
-| **最小值** | 許多孤立的局部最小值 | 糟糕的局部最小值少；多數解接近最佳解 |
+| **最小值** | 許多孤立的局部最小值（local minimum） | 糟糕的局部最小值（local minimum）少；多數解接近最佳解 |
 | **尋找路徑** | 難以找到全域最小值 | 許多路徑都能找到好解 |
-| **臨界點** | 局部最小值與鞍點混雜 | 幾乎全是鞍點，而非局部最小值 |
+| **臨界點** | 局部最小值（local minimum）與鞍點混雜 | 幾乎全是鞍點，而非局部最小值（local minimum） |
 
 **隨機雜訊（stochastic noise）會形成隱式正則化（implicit regularization）。** 小批次隨機梯度下降法會加入雜訊，避免停在尖銳極小值（sharp minimum）。尖銳極小值容易過度擬合（overfitting）；平坦極小值（flat minimum）則有較好的泛化能力（generalization）。雜訊會讓最佳化過程偏向損失地景較平坦的區域。
 
@@ -490,8 +490,8 @@ def quadratic_hessian(x):
 對非凸問題（神經網路）：
 - 使用一階方法（SGD、Adam）
 - 接受解會受初始化和隨機性影響
-- 將過度參數化、雜訊和學習率排程視為隱式正則化
-- 不要浪費時間尋找全域最小值；好的局部最小值就足夠
+- 將過度參數化、雜訊和學習率排程（learning rate schedule）視為隱式正則化
+- 不要浪費時間尋找全域最小值；好的局部最小值（local minimum）就足夠
 
 ```python
 from scipy.optimize import minimize
@@ -532,20 +532,20 @@ print(f"Support vectors: {svm.n_support_}")
 |------|---------------|
 | 凸集合（convex set） | 集合中任意兩點之間的線段都落在集合內。 |
 | 凸函數（convex function） | 函數圖形上任意兩點之間的線段都在圖形上方或與圖形重合。等價地說，海森矩陣在所有位置都半正定。 |
-| 局部最小值（local minimum） | 比周圍所有點都低的點。對凸函數而言，每個局部最小值都是全域最小值。 |
+| 局部最小值（local minimum）（local minimum） | 比周圍所有點都低的點。對凸函數而言，每個局部最小值（local minimum）都是全域最小值。 |
 | 全域最小值（global minimum） | 函數在整個定義域中的最低點。 |
 | 海森矩陣（Hessian matrix） | 所有二階偏導數構成的矩陣，能表示曲率資訊。 |
 | 半正定（positive semidefinite） | 所有特徵值都非負的矩陣，是「二階導數 >= 0」的多維延伸。 |
 | 條件數（condition number） | 海森矩陣最大與最小特徵值的比值。條件數高會形成狹長谷地，讓梯度下降法變慢。 |
-| 牛頓法（Newton's method） | 使用反海森矩陣決定更新方向與步長的二階最佳化器，接近最小值時呈二次收斂。 |
+| 牛頓法（Newton's method） | 使用反海森矩陣決定更新方向與步長的二階最佳化器，接近最小值時呈二次收斂（quadratic convergence）。 |
 | 拉格朗日乘數（Lagrange multiplier） | 引入此變數，將受限最佳化問題轉成無約束問題。 |
 | KKT 條件（KKT conditions） | 不等式限制下最適解的必要條件，是拉格朗日乘數法的推廣。 |
 | 互補鬆弛條件（complementary slackness） | 在解處，限制條件要麼生效，要麼其乘數為零；兩者不會同時非零。 |
 | 對偶性（duality） | 每個受限問題都有搭配的對偶問題。對凸問題而言，兩者的最佳值相同。 |
 | 強對偶性（strong duality） | 原始問題與對偶問題的最佳值相等。對滿足 Slater 條件（Slater's condition）的凸問題成立。 |
 | L-BFGS | 近似二階方法，以最近 m 次梯度差分取代完整海森矩陣。 |
-| 鞍點（saddle point） | 梯度為零，沿某些方向是局部最小值、沿另一些方向是局部最大值的點。 |
-| 過度參數化（overparameterization） | 使用比訓練樣本更多的參數，能平滑損失地景並減少糟糕的局部最小值。 |
+| 鞍點（saddle point） | 梯度為零，沿某些方向是局部最小值（local minimum）、沿另一些方向是局部最大值的點。 |
+| 過度參數化（overparameterization） | 使用比訓練樣本更多的參數，能平滑損失地景並減少糟糕的局部最小值（local minimum）。 |
 
 ## Further Reading｜延伸閱讀
 

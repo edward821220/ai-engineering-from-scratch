@@ -9,7 +9,7 @@
 
 ## The Problem｜問題
 
-2026 年，5 秒音訊就夠在消費級 GPU 上做出任何人聲音的高品質仿製。ElevenLabs、F5-TTS、OpenVoice v2、VoiceBox 都交付零樣本或少樣本仿製。這項技術是恩惠（無障礙 TTS、配音、輔助聲音），也是武器（詐騙電話、政治深偽、智慧財產竊取）。
+2026 年，5 秒音訊就夠用消費級 GPU 高品質仿製任何人的聲音。ElevenLabs、F5-TTS、OpenVoice v2、VoiceBox 都交付零樣本或少樣本仿製。這項技術是恩惠（無障礙 TTS、配音、輔助聲音），也是武器（詐騙電話、政治深偽、智慧財產竊取）。
 
 兩個緊鄰的任務：
 
@@ -32,7 +32,7 @@
 
 **聲音轉換（VC）。** 兩個家族：
 
-- **辨識再合成。** 跑類似 ASR 的模型，抽出內容表示（例如軟音素後驗、PPG），再用目標說話人 embedding 重新合成。對語言和口音穩。KNN-VC（2023）、Diff-HierVC（2023）用這個。
+- **辨識再合成。** 跑類似 ASR 的模型，抽出內容表示（例如軟音素後驗、PPG），再用目標說話人 embedding 重新合成。不易受語言和口音影響。KNN-VC（2023）、Diff-HierVC（2023）用這個。
 - **解開。** 訓練一個自編碼器，在瓶頸的潛在空間把內容、說話人、韻律分開。推論時把說話人 embedding 換掉。品質較低，但比較快。AutoVC（2019）、VITS-VC 變體用這個。
 
 **以神經編解碼器為基礎的仿製（2024 年之後）。** VALL-E、VALL-E 2、NaturalSpeech 3、VoiceBox 把音訊當成 SoundStream／EnCodec 的離散 token，在編解碼器 token 上訓練大型自迴歸或流匹配模型。短 prompt 上的品質和 ElevenLabs 打得平。

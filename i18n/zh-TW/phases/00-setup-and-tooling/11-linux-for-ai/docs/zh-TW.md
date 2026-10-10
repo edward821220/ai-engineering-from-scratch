@@ -12,15 +12,15 @@
 - 在命令列上瀏覽 Linux 檔案系統（filesystem），並執行基本的檔案操作
 - 使用 `chmod` 和 `chown` 管理檔案權限（file permission），解決「Permission denied」錯誤
 - 使用 `apt` 安裝系統套件（system package），並把一台全新的 GPU 機器設定成可做 AI 工作
-- 辨識 macOS 與 Linux 之間容易讓遠端工作的開發者踩到的差異
+- 辨識 macOS 與 Linux 之間辨識在遠端機器開發時常見的 macOS 與 Linux 差異
 
 ## The Problem｜問題
 
-你在 macOS 或 Windows 上開發。但只要用 SSH 連上雲端 GPU 機器、租用 Lambda 執行個體，或開一台 EC2 機器，你就會落在 Ubuntu 裡。終端機是你唯一的介面——沒有 Finder、沒有檔案總管、沒有 GUI。如果你不會在命令列上瀏覽檔案系統、安裝套件、管理行程（process），就只能一邊付著閒置 GPU 的錢，一邊搜尋「Linux 怎麼解壓縮檔案」。
+你在 macOS 或 Windows 上開發。但只要用 SSH 連上雲端 GPU 機器、租用 Lambda 執行個體，或開一台 EC2 機器，你就會進入 Ubuntu 環境。終端機是你唯一的介面——沒有 Finder、沒有檔案總管、沒有 GUI。如果你不會在命令列上瀏覽檔案系統、安裝套件、管理行程（process），就只能一邊支付 GPU 閒置期間的費用，一邊搜尋「Linux 怎麼解壓縮檔案」。
 
 這是一份生存指南，只講在遠端 Linux 機器上做 AI 工作需要的東西，不多不少。
 
-## 檔案系統配置
+## 檔案系統目錄結構
 
 Linux 把所有東西都組織在單一根目錄 `/` 之下。沒有 `C:\`，也沒有 `/Volumes`。你實際會用到的目錄：
 
@@ -167,7 +167,7 @@ kill -9 12345               # Force kill (use when graceful doesn't work)
 nvidia-smi                  # GPU processes and memory usage
 ```
 
-systemd 管理服務（service；背景常駐程式 daemon）。你跑推論伺服器時會用到：
+systemd 管理服務（service；背景常駐程式 daemon）。你跑推論（inference）伺服器時會用到：
 
 ```bash
 sudo systemctl start nginx          # Start a service
@@ -260,13 +260,13 @@ wsl --install -d Ubuntu-24.04
 sudo apt update && sudo apt upgrade -y
 ```
 
-WSL2 跑的是真正的 Linux 核心，本課所有內容都能在其中使用。從 WSL 內部看，你的 Windows 檔案位於 `/mnt/c/Users/YourName/`。
+WSL2 跑的是真正的 Linux 核心（kernel），本課所有內容都能在其中使用。從 WSL 內部看，你的 Windows 檔案位於 `/mnt/c/Users/YourName/`。
 
-在 Windows 端安裝 NVIDIA 驅動程式後，GPU 直通（GPU passthrough）就能運作。請安裝 Windows 版 NVIDIA 驅動程式（不是 Linux 版），WSL2 內就能使用 CUDA。
+在 Windows 端安裝 NVIDIA 驅動程式（driver）後，GPU 直通（GPU passthrough）就能運作。請安裝 Windows 版 NVIDIA 驅動程式（driver）（不是 Linux 版），WSL2 內就能使用 CUDA。
 
 ## 注意事項：從 macOS 到 Linux
 
-如果你習慣 macOS，以下幾點會讓你踩坑：
+如果你習慣 macOS，以下幾點會讓你踩雷：
 
 | macOS | Linux | 說明 |
 |-------|-------|-------|
@@ -276,7 +276,7 @@ WSL2 跑的是真正的 Linux 核心，本課所有內容都能在其中使用�
 | `~/.zshrc` | `~/.bashrc` | macOS 預設使用 zsh；多數 Linux 伺服器使用 bash。 |
 | `/opt/homebrew/` | `/usr/bin/`、`/usr/local/bin/` | 執行檔放的位置不同。 |
 | `sed -i '' 's/a/b/' file` | `sed -i 's/a/b/' file` | macOS 的 sed 需要在 `-i` 後加空字串；Linux 不用。 |
-| 不區分大小寫的檔案系統 | 區分大小寫的檔案系統 | 在 Linux 上，`Model.py` 和 `model.py` 是兩個不同的檔案。 |
+| 不區分大小寫（case-sensitive）的檔案系統 | 區分大小寫（case-sensitive）的檔案系統 | 在 Linux 上，`Model.py` 和 `model.py` 是兩個不同的檔案。 |
 | 換行符號 `\n` | 換行符號 `\n` | 相同。但 Windows 使用 `\r\n`，會讓 bash 程式檔案壞掉。用 `dos2unix` 修復。 |
 
 ## 速查卡
@@ -300,8 +300,8 @@ s0-process-fork
 
 ## Exercises｜練習
 
-1. SSH 進任一台 Linux 機器（或打開 WSL2），切換到你的家目錄。建立一個專案資料夾，在裡面用 `touch` 建三個空檔案，再用 `ls -la` 列出來。
+1. SSH 進任一台 Linux 機器（或打開 WSL2），切換到你的家目錄。建立一個專案（project）資料夾，在裡面用 `touch` 建三個空檔案，再用 `ls -la` 列出來。
 2. 用 apt 安裝 `htop`，執行它，找出哪個行程用了最多記憶體。
 3. 開一個 tmux 工作階段，在裡面執行 `sleep 300`，然後分離、列出工作階段、再重新連接。
-4. 用 `df -h` 查看可用磁碟空間，再用 `du -sh ~/.cache/*` 找出快取裡什麼東西在佔空間。
+4. 用 `df -h` 查看可用磁碟空間，再用 `du -sh ~/.cache/*` 找出快取（cache）裡什麼東西在佔空間。
 5. 用 `scp` 把一個檔案從本機傳到遠端機器，再用 `rsync` 做同樣的傳輸，比較兩者的體驗。

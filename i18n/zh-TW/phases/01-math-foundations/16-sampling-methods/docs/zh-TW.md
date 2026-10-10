@@ -10,9 +10,9 @@
 ## Learning Objectives｜學習目標
 
 - 只用均勻亂數（uniform random numbers），從零實作反函數取樣（inverse CDF／inverse transform sampling）、拒絕取樣（rejection sampling）和重要性取樣（importance sampling）
-- 為語言模型（language model）token 生成實作溫度取樣（temperature sampling）、top-k 取樣（top-k sampling）和 top-p（核取樣，nucleus sampling）
-- 說明重參數化技巧（reparameterization trick）以及它如何讓變分自編碼器（variational autoencoder，VAE）透過取樣進行反向傳播（backpropagation）
-- 執行 Metropolis-Hastings MCMC，從未正規化的目標分布取樣
+- 為語言模型（language model）token 生成實作溫度取樣（temperature sampling）（temperature sampling）、top-k 取樣（top-k sampling）和 top-p（核取樣，nucleus sampling）
+- 說明重參數化技巧（reparameterization trick）以及它如何讓變分自編碼器（variational autoencoder，VAE）讓梯度透過取樣步驟反向傳播（backpropagation）
+- 執行 Metropolis-Hastings MCMC，從未正規化的目標分布（target distribution）取樣
 
 ## The Problem｜問題
 
@@ -20,7 +20,7 @@
 
 如果它總是選機率最高的 token，每次回應都會一模一樣。結果固定、毫無變化。如果完全隨機地選，輸出就會是一堆亂碼。答案介於這兩個極端之間，而控制這個範圍的機制就是抽樣。
 
-抽樣不只用於文字生成。強化學習（reinforcement learning）會透過抽樣軌跡（trajectory）估計策略梯度（policy gradient）。變分自編碼器會從學得的分布中抽樣，並透過隨機性反向傳播，藉此學習潛在表徵（latent representation）。擴散模型（diffusion model）會抽樣產生影像所需的雜訊，再逐步去除雜訊。蒙地卡羅（Monte Carlo）方法會估計沒有封閉解的積分。馬可夫鏈蒙地卡羅（Markov chain Monte Carlo，MCMC）演算法則會探索無法逐一列舉的高維後驗分布（posterior distribution）。
+抽樣不只用於文字生成。強化學習（reinforcement learning）會透過抽樣軌跡（trajectory）估計策略梯度（policy gradient）（policy gradient）。變分自編碼器會從學得的分布中抽樣，並透過隨機性反向傳播，藉此學習潛在表徵（latent representation）。擴散模型（diffusion model）會抽樣產生影像所需的雜訊，再逐步去除雜訊。蒙地卡羅（Monte Carlo）方法會估計沒有封閉解的積分。馬可夫鏈蒙地卡羅（Markov chain Monte Carlo，MCMC）演算法則會探索無法逐一列舉的高維後驗分布（posterior distribution）。
 
 每個生成式 AI 系統都是抽樣系統。抽樣策略會決定輸出的品質、多樣性和可控性。本課會從零打造各種主要抽樣方法，從均勻亂數開始，一路介紹到推動現代大型語言模型（large language model，LLM）和生成模型的技術。
 
@@ -38,7 +38,7 @@
 
 **探索。** MCMC 演算法會探索貝氏推論中的後驗分布。演化策略會抽樣產生參數擾動。湯普森取樣（Thompson sampling）會在 bandit 中平衡探索與利用。
 
-核心挑戰是：你只能直接從簡單分布（均勻分布（uniform distribution）、常態分布（normal distribution））取樣。其他情況下，你需要一種方法，將簡單分布的樣本變換成目標分布（target distribution）的樣本。
+核心挑戰是：你只能直接從簡單分布（均勻分布（uniform distribution）、常態分布（normal distribution））取樣。其他情況下，你需要一種方法，將簡單分布的樣本變換成目標分布（target distribution）（target distribution）的樣本。
 
 ### 均勻隨機抽樣
 
@@ -72,7 +72,7 @@ Properties:
   F maps the real line to [0, 1]
 ```
 
-CDF 反函數（inverse CDF）會把機率映射回數值。如果 U ~ Uniform(0, 1)，那麼 X = F_inverse(U) 就會符合目標分布。
+CDF 反函數（inverse CDF）會把機率映射回數值。如果 U ~ Uniform(0, 1)，那麼 X = F_inverse(U) 就會符合目標分布（target distribution）。
 
 ```
 Algorithm:
@@ -128,7 +128,7 @@ Acceptance rate = 1/M
 
 ### 重要性取樣
 
-有時候你不需要從目標分布 p(x) 取樣；你需要的是估計 p(x) 下的期望值（expectation），而你手上只有來自另一個分布 q(x) 的樣本。
+有時候你不需要從目標分布（target distribution） p(x) 取樣；你需要的是估計 p(x) 下的期望值（expectation），而你手上只有來自另一個分布 q(x) 的樣本。
 
 ```
 Goal: estimate E_p[f(x)] = integral of f(x) * p(x) dx
@@ -186,7 +186,7 @@ Variance of the estimator = Var(f(X)) / N
 
 ### 馬可夫鏈蒙地卡羅（MCMC）：Metropolis-Hastings
 
-MCMC 會建立一條馬可夫鏈（Markov chain），使其平穩分布（stationary distribution）為目標分布 p(x)。經過足夠多步後，鏈中的樣本就會近似來自 p(x)。
+MCMC 會建立一條馬可夫鏈（Markov chain），使其平穩分布（stationary distribution）（stationary distribution）為目標分布（target distribution） p(x)。經過足夠多步後，鏈中的樣本就會近似來自 p(x)。
 
 ```
 Target: p(x)  (known up to a normalizing constant)
@@ -207,7 +207,7 @@ Metropolis-Hastings algorithm:
 
 若使用對稱提議分布（q(x'|x) = q(x|x')），比率會簡化成 p(x')/p(x)。這就是原始的 Metropolis 演算法。
 
-**原理。** 接受規則確保細緻平衡（detailed balance）：處於 x 並移動到 x' 的機率，等於處於 x' 並移動到 x 的機率。細緻平衡表示 p(x) 是該鏈的平穩分布。
+**原理。** 接受規則確保細緻平衡（detailed balance）：處於 x 並移動到 x' 的機率，等於處於 x' 並移動到 x 的機率。細緻平衡表示 p(x) 是該鏈的平穩分布（stationary distribution）。
 
 **實務考量：**
 - 暖身期（burn-in）：捨棄鏈尚未達到平衡前的早期樣本
@@ -239,7 +239,7 @@ Gibbs 取樣要求你能從每個條件分布 p(x_i | x_{-i}) 取樣。許多模
 
 **限制。** 當變數高度相關時，Gibbs 取樣的混合速度會很慢，因為一次只更新一個變數，無法沿著分布的對角方向大幅移動。
 
-### 大型語言模型的溫度取樣
+### 大型語言模型的溫度取樣（temperature sampling）
 
 語言模型會為詞彙表中每個 token 輸出一個 logit z_1, ..., z_V。Softmax 會將這些 logits 轉成機率。溫度會在 softmax 前重新縮放 logits：
 
@@ -262,7 +262,7 @@ T > 1.0: flattens the distribution (less confident, more diverse)
 - T = 1.0-1.5：適合創意寫作和腦力激盪
 - T > 1.5：輸出會愈來愈隨機，通常不實用
 
-溫度不會改變哪些 token 有可能出現，只會改變分配給各 token 的機率質量。
+溫度不會改變哪些 token 有可能出現，只會改變分配給各 token 的機率質量（probability mass）。
 
 ### Top-k 取樣
 
@@ -532,7 +532,7 @@ def gibbs_sampling_2d(conditional_x_given_y, conditional_y_given_x, x0, y0, n_sa
     return samples
 ```
 
-### 步驟 7：溫度取樣
+### 步驟 7：溫度取樣（temperature sampling）
 
 ```python
 def softmax(logits):
@@ -658,12 +658,12 @@ print(f"Sampled token index: {token}")
 |---|---|---|
 | 抽樣（sampling） |「抽取隨機值」| 根據機率分布產生數值，是所有生成式 AI 背後的機制。 |
 | 均勻分布（uniform distribution） |「每個結果機率相同」| [a, b] 中每個數值的機率密度都是 1/(b-a)，是所有抽樣方法的起點。 |
-| CDF 反函數（inverse CDF） |「機率變換」| F_inverse(U) 會將均勻分布樣本變換為 CDF 已知的目標分布樣本，精確且有效率。 |
-| 拒絕取樣（rejection sampling） |「提議後接受或拒絕」| 從簡單的提議分布取樣，依目標分布與提議分布的比率決定接受機率。精確，但會浪費樣本。 |
+| CDF 反函數（inverse CDF） |「機率變換」| F_inverse(U) 會將均勻分布樣本變換為 CDF 已知的目標分布（target distribution）樣本，精確且有效率。 |
+| 拒絕取樣（rejection sampling） |「提議後接受或拒絕」| 從簡單的提議分布取樣，依目標分布（target distribution）與提議分布的比率決定接受機率。精確，但會浪費樣本。 |
 | 重要性取樣（importance sampling） |「重新加權樣本」| 使用 q(x) 的樣本，透過 p(x)/q(x) 為每個樣本加權，估計 p(x) 下的期望值，是強化學習 PPO 的核心方法。 |
 | 蒙地卡羅（Monte Carlo） |「隨機樣本取平均」| 將積分近似為樣本平均；誤差為 O(1/sqrt(N))，與維度無關。 |
-| MCMC |「會收斂的隨機漫步」| 建立平穩分布為目標分布的馬可夫鏈；Metropolis-Hastings 是基礎演算法。 |
-| Metropolis-Hastings |「向上就接受，向下有時也接受」| 提議移動，並依密度比率決定是否接受；細緻平衡確保鏈收斂到目標分布。 |
+| MCMC |「會收斂的隨機漫步」| 建立平穩分布（stationary distribution）為目標分布（target distribution）的馬可夫鏈；Metropolis-Hastings 是基礎演算法。 |
+| Metropolis-Hastings |「向上就接受，向下有時也接受」| 提議移動，並依密度比率決定是否接受；細緻平衡確保鏈收斂到目標分布（target distribution）。 |
 | Gibbs 取樣（Gibbs sampling） |「一次更新一個變數」| 固定其他變數，從該變數的條件分布更新它；接受率為 100%。 |
 | 溫度（temperature） |「控制信心的旋鈕」| 在 softmax 前將 logits 除以 T；T < 1 會使分布更尖銳（信心更高），T > 1 則會使分布更平坦（多樣性更高）。 |
 | top-k 取樣（top-k sampling） |「保留最好的 k 個」| 除最高機率的 k 個 token 外，將其他機率設為零，再重新正規化並取樣。候選集合大小固定。 |
@@ -671,8 +671,8 @@ print(f"Sampled token index: {token}")
 | 重參數化技巧（reparameterization trick） |「把隨機性移到外部」| 將 z 寫成 mu + sigma * epsilon，其中 epsilon ~ N(0,1)，讓取樣過程可微分，是訓練 VAE 的關鍵。 |
 | Gumbel-Softmax |「軟式類別取樣」| 使用 Gumbel 雜訊和帶溫度的 softmax，對類別取樣提供可微分近似。 |
 | 分層抽樣（stratified sampling） |「強制涵蓋各區域」| 將樣本空間分層，再從每層抽樣；變異數一定低於或等於一般蒙地卡羅方法。 |
-| 暖身期（burn-in） |「熱身階段」| MCMC 鏈達到平穩分布前捨棄的初始樣本。 |
-| 細緻平衡（detailed balance） |「可逆條件」| p(x) * T(x->y) = p(y) * T(y->x)，是 p 成為馬可夫鏈平穩分布的充分條件。 |
+| 暖身期（burn-in） |「熱身階段」| MCMC 鏈達到平穩分布（stationary distribution）前捨棄的初始樣本。 |
+| 細緻平衡（detailed balance） |「可逆條件」| p(x) * T(x->y) = p(y) * T(y->x)，是 p 成為馬可夫鏈平穩分布（stationary distribution）的充分條件。 |
 | 擴散取樣（diffusion sampling） |「反覆去除雜訊」| 從雜訊開始，透過學得的去雜訊步驟生成資料；每一步都是條件取樣。 |
 
 ## Further Reading｜延伸閱讀

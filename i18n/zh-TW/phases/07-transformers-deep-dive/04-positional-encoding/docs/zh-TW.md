@@ -1,6 +1,6 @@
 # 位置編碼——正弦、RoPE、ALiBi
 
-> 注意力對排列不變。「The cat sat on the mat」和「mat the on sat cat the」沒有位置訊號時，會得到同一個輸出。三個演算法（algorithm）修這個——各自對「位置」是什麼下不同的賭注。
+> 注意力具有排列不變性。「The cat sat on the mat」和「mat the on sat cat the」沒有位置訊號時，會得到同一個輸出。三個演算法（algorithm）修這個——各自對「位置」是什麼下不同的賭注。
 
 **Type:** Build
 **Languages:** Python
@@ -16,7 +16,7 @@
 修法是想辦法把位置注入 embedding。三個時代的答案：
 
 1. **絕對正弦**（Vaswani 2017）。把位置的 `sin/cos` 加到 embedding 上。簡單、不用學習、訓練長度之外外推很差。
-2. **RoPE——旋轉位置 embedding**（Su 2021）。把 Q 和 K 向量轉一個和位置成正比的角度。在內積（dot product）裡直接編碼*相對*位置。2026 年的主流。
+2. **RoPE（Rotary Position Embedding）**（Su 2021）。把 Q 和 K 向量轉一個和位置成正比的角度。在內積（dot product）裡直接編碼*相對*位置。2026 年的主流。
 3. **ALiBi——帶線性偏置（bias）的注意力**（Press 2022）。完全跳過 embedding；依距離，給注意力分數加上每個頭的線性懲罰。長度外推非常好。
 
 到 2026 年，前沿的開放模型基本上都用 RoPE：Llama 2/3/4、Qwen 2/3、Mistral、Mixtral、DeepSeek-V3、Kimi。少數長脈絡模型用 ALiBi 或它的現代變體。絕對正弦是歷史。

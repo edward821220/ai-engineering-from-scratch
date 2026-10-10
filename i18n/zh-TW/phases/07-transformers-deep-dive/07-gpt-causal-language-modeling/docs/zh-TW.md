@@ -1,6 +1,6 @@
 # GPT——因果語言模型（causal language modeling）
 
-> BERT 看兩邊。GPT 只看過去。那個三角形遮罩，是現代 AI 裡後果最大的單一行程式碼。
+> BERT 看兩邊。GPT 只看過去。那個三角形遮罩，是現代 AI 裡影響最深遠的一行程式碼。
 
 **Type:** Build
 **Languages:** Python

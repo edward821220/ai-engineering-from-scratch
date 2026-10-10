@@ -1,6 +1,6 @@
 # 推測解碼（speculative decoding）——草稿、驗證、再來
 
-> 自迴歸（autoregressive）解碼是序列的。每個 token 等前一個。推測解碼把這條鏈拆開：便宜模型起草 N 個 token，貴的模型一次前向驗證全部 N 個。草稿對的時候，你付一次大的前向，換 N 次生成。
+> 自迴歸（autoregressive）解碼是序列的。每個 token 都得等待前一個 token。推測解碼把這條鏈拆開：便宜模型起草 N 個 token，貴的模型一次前向驗證全部 N 個。草稿對的時候，你付一次大的前向，換 N 次生成。
 
 **Type:** Build
 **Languages:** Python

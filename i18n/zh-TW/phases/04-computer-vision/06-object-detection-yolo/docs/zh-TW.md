@@ -12,7 +12,7 @@
 - 說明格子加錨框（anchor box）的設計如何把偵測變成密集預測，並說出輸出張量裡每個數字是什麼
 - 計算框與框之間的 IoU，並從零實作非極大值抑制
 - 在預訓練骨幹（backbone）上做一個最小的 YOLO 風格偵測頭，包含分類、物件性（objectness）和框迴歸損失
-- 讀一列偵測指標，precision@0.5、召回率（recall）、mAP@0.5、mAP@0.5:0.95，並決定下一步該轉哪顆旋鈕
+- 讀一列偵測指標，precision@0.5、召回率（recall）、mAP@0.5、mAP@0.5:0.95，並決定下一步該調整哪個參數
 
 ## The Problem｜問題
 
@@ -279,7 +279,7 @@ def assign_targets(boxes_xyxy, classes, anchors, stride, grid_size, num_classes)
     return target, has_obj
 ```
 
-錨框選擇是「和真實框的形狀 IoU 最好的那個」，一個便宜的代理，和 YOLOv2、v3 的指派一致。v5 之後用更精細的策略，任務對齊匹配、動態 k，把同一個想法再修細。
+錨框選擇是「和真實框的形狀 IoU 最好的那個」，成本低的近似指標，和 YOLOv2、v3 的指派一致。v5 之後用更精細的策略，任務對齊匹配、動態 k，把同一個想法再修細。
 
 ### 步驟 6：三個損失
 

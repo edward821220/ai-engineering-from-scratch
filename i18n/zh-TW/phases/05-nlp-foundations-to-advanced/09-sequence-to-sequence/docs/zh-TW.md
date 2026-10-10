@@ -101,7 +101,7 @@ def train_batch(encoder, decoder, src, tgt, bos_id, optimizer, teacher_forcing_r
     return loss.item() / tgt_len
 ```
 
-兩個旋鈕值得點名。`ignore_index=0` 跳過填充 token 的損失。`teacher_forcing_ratio` 是每一步用真 token、而不是模型預測的機率。從 1.0 開始（完全 teacher forcing），訓練過程中退火降到約 0.5，把暴露偏差的落差收起來。
+兩個旋鈕值得點名。`ignore_index=0` 跳過填充 token 的損失。`teacher_forcing_ratio` 是每一步用真 token、而不是模型預測的機率。從 1.0 開始（完全 teacher forcing），訓練過程中退火降到約 0.5，縮小暴露偏差造成的落差。
 
 ### 步驟 4：推論迴圈（貪婪）
 
@@ -122,7 +122,7 @@ def greedy_decode(encoder, decoder, src, bos_id, eos_id, max_len=50):
     return torch.cat(output_ids, dim=1)
 ```
 
-貪婪解碼每一步挑機率最高的 token。它會走偏：一旦選定一個 token，就不能收回。**集束搜尋**把前 `k` 條部分序列留著，最後挑分數最高的完整那條。集束寬度 3 到 5 是標準。
+貪婪解碼（greedy decoding）每一步挑機率最高的 token。它會走偏：一旦選定一個 token，就不能收回。**集束搜尋**把前 `k` 條部分序列留著，最後挑分數最高的完整那條。集束寬度 3 到 5 是標準。
 
 ### 步驟 5：把瓶頸示範出來
 
@@ -205,7 +205,7 @@ Refuse to recommend training a seq2seq from scratch for under a million parallel
 | 編碼器 | 輸入 RNN | 讀來源。產出每一步的隱藏狀態，以及最後的脈絡向量。 |
 | 解碼器 | 輸出 RNN | 用脈絡向量初始化。一次生成一個目標 token。 |
 | 脈絡向量 | 那份摘要 | 編碼器最後的隱藏狀態。大小固定。注意力要解決的瓶頸。 |
-| Teacher forcing | 用真的 token | 訓練時餵前一個位置的標準結果 token。讓學習穩得住。 |
+| Teacher forcing | 用真的 token | 訓練時餵前一個位置的真實 token。讓學習穩得住。 |
 | 暴露偏差 | 訓練和測試的落差 | 在真 token 上訓練的模型，從沒練習過從自己的錯誤恢復。 |
 | 集束搜尋 | 更好的解碼 | 每一步留下前 k 條部分序列，而不是貪婪地選定。 |
 

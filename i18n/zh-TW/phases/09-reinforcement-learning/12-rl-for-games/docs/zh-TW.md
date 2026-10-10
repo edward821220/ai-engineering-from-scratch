@@ -1,6 +1,6 @@
 # 遊戲上的強化學習——AlphaZero、MuZero，與語言模型推理的時代
 
-> 1992：TD-Gammon 用純 TD，在西洋雙陸棋上打贏人類冠軍。2016：AlphaGo 打贏李世乭。2017：AlphaZero 從零開始，在西洋棋、將棋、圍棋上壓過。2024：DeepSeek-R1 證明同一份配方——把 PPO 換成 GRPO——在推理上會動。遊戲是這個階段每一次突破的基準（benchmark）。
+> 1992：TD-Gammon 用純 TD，在西洋雙陸棋上打贏人類冠軍。2016：AlphaGo 打贏李世乭。2017：AlphaZero 從零開始，在西洋棋、將棋、圍棋上勝過。2024：DeepSeek-R1 證明同一份配方——把 PPO 換成 GRPO——在推理上會動。遊戲是這個階段每一次突破的基準（benchmark）。
 
 **Type:** Build
 **Languages:** Python

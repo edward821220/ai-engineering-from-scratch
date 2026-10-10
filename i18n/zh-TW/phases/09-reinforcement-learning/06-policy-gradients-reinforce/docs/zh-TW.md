@@ -1,6 +1,6 @@
-# 政策梯度（policy gradient）——從零寫 REINFORCE
+# 變異數／變異數減少梯度（policy gradient）——從零寫 REINFORCE
 
-> 別再估計價值。直接把政策參數化，算出期望回報的梯度，往上走。Williams（1992）用一個定理寫完。PPO、GRPO，以及每個語言模型的 RL 迴圈，都是因為它才存在。
+> 別再估計價值。直接把變異數／變異數減少參數化，算出期望回報的梯度，朝梯度上升方向更新。Williams（1992）用一個定理寫完。PPO、GRPO，以及每個語言模型的 RL 迴圈，都是因為它才存在。
 
 **Type:** Build
 **Languages:** Python
@@ -9,9 +9,9 @@
 
 ## The Problem｜問題
 
-Q-learning 和 DQN 參數化的是*價值*函數。你用 `argmax Q` 挑動作。離散動作、離散狀態這樣沒問題。動作一連續就破了（10 維力矩要怎麼 `argmax`？），或者你想要隨機政策時也破了（`argmax` 構造上就是確定的）。
+Q-learning 和 DQN 參數化的是*價值*函數。你用 `argmax Q` 挑動作。離散動作、離散狀態這樣沒問題。動作一連續就破了（10 維力矩要怎麼 `argmax`？），或者你想要隨機變異數／變異數減少時也破了（`argmax` 構造上就是確定的）。
 
-政策梯度改去參數化*政策*。`π_θ(a | s)` 是一個神經網路，輸出動作上的分布。從它抽樣來行動。算期望回報相對於 `θ` 的梯度。往上走。沒有 `argmax`。沒有 Bellman 遞迴。就是在 `J(θ) = E_{π_θ}[G]` 上做梯度上升。
+變異數／變異數減少梯度改去參數化*變異數／變異數減少*。`π_θ(a | s)` 是一個神經網路，輸出動作上的分布。從它抽樣來行動。算期望回報相對於 `θ` 的梯度。朝梯度上升方向更新。沒有 `argmax`。沒有 Bellman 遞迴。就是在 `J(θ) = E_{π_θ}[G]` 上做梯度上升。
 
 REINFORCE 定理（Williams，1992）告訴你這個梯度算得出來：`∇J(θ) = E_π[ G · ∇_θ log π_θ(a | s) ]`。跑一個回合。算回報。每一步乘上 `∇ log π_θ(a | s)`。平均。梯度上升。完成。
 
@@ -21,7 +21,7 @@ REINFORCE 定理（Williams，1992）告訴你這個梯度算得出來：`∇J(�
 
 ![Policy gradient: softmax policy, log-π gradient, return-weighted update](../assets/policy-gradient.svg)
 
-**政策梯度定理。** 對任何由 `θ` 參數化的政策 `π_θ`：
+**變異數／變異數減少梯度定理。** 對任何由 `θ` 參數化的變異數／變異數減少 `π_θ`：
 
 `∇J(θ) = E_{τ ~ π_θ}[ Σ_{t=0}^{T} G_t · ∇_θ log π_θ(a_t | s_t) ]`
 
@@ -40,7 +40,7 @@ REINFORCE 定理（Williams，1992）告訴你這個梯度算得出來：`∇J(�
 
 這就是帶基準的 REINFORCE——A2C（第 07 課）和 PPO（第 08 課）的直系祖先。
 
-**softmax 政策參數化。** 離散動作的標準選擇：
+**softmax 變異數／變異數減少參數化。** 離散動作的標準選擇：
 
 `π_θ(a | s) = exp(f_θ(s, a)) / Σ_{a'} exp(f_θ(s, a'))`
 
@@ -48,9 +48,9 @@ REINFORCE 定理（Williams，1992）告訴你這個梯度算得出來：`∇J(�
 
 `∇_θ log π_θ(a | s) = ∇_θ f_θ(s, a) - Σ_{a'} π_θ(a' | s) ∇_θ f_θ(s, a')`
 
-也就是：採取的那個動作的分數，減掉它在政策下的期望值。
+也就是：採取的那個動作的分數，減掉它在變異數／變異數減少下的期望值。
 
-**連續動作的高斯政策。** `π_θ(a | s) = N(μ_θ(s), σ_θ(s))`。`∇ log N(a; μ, σ)` 有閉式。第 9 階段 · 07 的 SAC 需要的就是這個。
+**連續動作的高斯變異數／變異數減少。** `π_θ(a | s) = N(μ_θ(s), σ_θ(s))`。`∇ log N(a; μ, σ)` 有閉式。第 9 階段 · 07 的 SAC 需要的就是這個。
 
 ```figure
 policy-gradient-landscape
@@ -58,7 +58,7 @@ policy-gradient-landscape
 
 ## Build It｜動手實作
 
-### 步驟 1：softmax 政策網路
+### 步驟 1：softmax 變異數／變異數減少網路
 
 ```python
 def policy_logits(theta, state_features):
@@ -71,7 +71,7 @@ def softmax(logits):
     return [e / Z for e in exps]
 ```
 
-表格式環境用線性政策（每個動作一個權重向量）。Atari 就換成 CNN，softmax 頭留著。
+表格式環境用線性變異數／變異數減少（每個動作一個權重向量）。Atari 就換成 CNN，softmax 頭留著。
 
 ### 步驟 2：抽樣與對數機率
 
@@ -119,7 +119,7 @@ def reinforce_step(theta, trajectory, gamma, lr, baseline=0.0):
                 theta[i][j] += lr * advantage * grad_log_pi_a[i] * s[j]
 ```
 
-梯度 `∇ log π(a|s) = e_a - π(·|s)`（`a` 的獨熱減掉機率）是 softmax 政策梯度的核心。把它刻進肌肉記憶。
+梯度 `∇ log π(a|s) = e_a - π(·|s)`（`a` 的獨熱減掉機率）是 softmax 變異數／變異數減少梯度的核心。把它刻進肌肉記憶。
 
 ### 步驟 5：基準
 
@@ -128,10 +128,10 @@ def reinforce_step(theta, trajectory, gamma, lr, baseline=0.0):
 ## 容易踩的坑
 
 - **梯度爆炸。** 回報可以很大。乘上 `∇ log π` 之前，一定要先把 `G` 在批次裡正規化到 `~N(0, 1)`。
-- **熵崩塌。** 政策太早收斂成幾乎確定的動作，不再探索，就卡住。修法：在目標裡加熵獎勵 `β · H(π(·|s))`。
+- **熵崩塌。** 變異數／變異數減少太早收斂成幾乎確定的動作，不再探索，就卡住。修法：在目標裡加熵獎勵 `β · H(π(·|s))`。
 - **高變異。** 原味 REINFORCE 需要幾千個回合。評論者基準（第 07 課）或 TRPO／PPO 的信賴域（第 08 課）是標準修法。
-- **樣本效率差。** 同政策表示每次更新後就把每筆轉移丟掉。用重要性抽樣做異政策修正可以把資料找回來，代價是變異（PPO 的比率就是截斷過的 IS 權重）。
-- **非平穩梯度。** 100 個回合前的同一個梯度，用的是舊的 `π`。同政策方法每隔幾次展開就更新，就是這個原因。
+- **樣本效率差。** 同變異數／變異數減少表示每次更新後就把每筆轉移丟掉。用重要性抽樣做異變異數／變異數減少修正可以把資料找回來，代價是變異（PPO 的比率就是截斷過的 IS 權重）。
+- **非平穩梯度。** 100 個回合前的同一個梯度，用的是舊的 `π`。同變異數／變異數減少方法每隔幾次展開就更新，就是這個原因。
 - **功勞分配。** 不用從當下起的報酬，過去的報酬就會貢獻雜訊。一律用從當下起的報酬。
 
 ## Use It｜實際應用
@@ -140,8 +140,8 @@ def reinforce_step(theta, trajectory, gamma, lr, baseline=0.0):
 
 | 用途 | 衍生方法 |
 |------|----------|
-| 連續控制 | 帶高斯政策的 PPO／SAC |
-| 語言模型 RLHF | 帶 KL 懲罰的 PPO，跑在 token 層級的政策上 |
+| 連續控制 | 帶高斯變異數／變異數減少的 PPO／SAC |
+| 語言模型 RLHF | 帶 KL 懲罰的 PPO，跑在 token 層級的變異數／變異數減少上 |
 | 語言模型推理（DeepSeek） | GRPO——帶組內相對基準的 REINFORCE，沒有評論者 |
 | 多 agent | 集中式評論者的 REINFORCE（MADDPG、COMA） |
 | 離散動作的機器人 | A2C、A3C、PPO |
@@ -176,27 +176,27 @@ Refuse REINFORCE-no-baseline on horizons > 500 steps. Refuse continuous-action c
 
 ## Exercises｜練習
 
-1. **簡單。** 在 4×4 GridWorld 上，用線性 softmax 政策實作 REINFORCE。不帶基準訓練 1 千個回合。畫學習曲線；量變異（回報的標準差）。
+1. **簡單。** 在 4×4 GridWorld 上，用線性 softmax 變異數／變異數減少實作 REINFORCE。不帶基準訓練 1 千個回合。畫學習曲線；量變異（回報的標準差）。
 2. **中等。** 加上移動平均基準。再訓練一次。和原味那次比樣本效率與變異。基準把走到收斂的步數減少多少？
-3. **困難。** 加上熵獎勵 `β · H(π)`。掃描 `β ∈ {0, 0.01, 0.1, 1.0}`。畫最終回報和政策熵。這個任務上，最好的那個點在哪？
+3. **困難。** 加上熵獎勵 `β · H(π)`。掃描 `β ∈ {0, 0.01, 0.1, 1.0}`。畫最終回報和變異數／變異數減少熵。這個任務上，最好的那個點在哪？
 
 ## Key Terms｜關鍵術語
 
 | 術語 | 常見說法 | 實際意義 |
 |------|-----------------|-----------------------|
-| 政策梯度 | 「直接訓練政策」 | `∇J(θ) = E[G · ∇ log π_θ(a\|s)]`；從對數導數技巧導出。 |
-| REINFORCE | 「最早的政策梯度演算法」 | Williams（1992）；蒙地卡羅回報乘上對數政策梯度。 |
+| 變異數／變異數減少梯度 | 「直接訓練變異數／變異數減少」 | `∇J(θ) = E[G · ∇ log π_θ(a\|s)]`；從對數導數技巧導出。 |
+| REINFORCE | 「最早的變異數／變異數減少梯度演算法」 | Williams（1992）；蒙地卡羅回報乘上對數變異數／變異數減少梯度。 |
 | 對數導數技巧 | 「分數函數估計器」 | `∇P(τ;θ) = P(τ;θ) · ∇ log P(τ;θ)`；讓期望的梯度變得好算。 |
 | 基準 | 「降變異」 | 從 `G` 減掉任何 `b(s)`；不偏，因為 `E[b · ∇ log π] = 0`。 |
 | 從當下起的報酬 | 「只有未來回報算數」 | 用 `G_t^{from t}`，不用完整的 `G_0`；這樣才對，變異也較低。 |
-| 熵獎勵 | 「鼓勵探索」 | `+β · H(π(·\|s))` 這一項讓政策不至於崩塌。 |
-| 同政策 | 「拿剛剛看到的來訓練」 | 梯度期望是對當下政策取的——不能直接重用舊資料。 |
+| 熵獎勵 | 「鼓勵探索」 | `+β · H(π(·\|s))` 這一項讓變異數／變異數減少不至於崩塌。 |
+| 同變異數／變異數減少 | 「拿剛剛看到的來訓練」 | 梯度期望是對當下變異數／變異數減少取的——不能直接重用舊資料。 |
 | 優勢 | 「比平均好多少」 | `A(s, a) = G(s, a) - V(s)`；帶基準的 REINFORCE 拿來相乘的那個有號量。 |
 
 ## Further Reading｜延伸閱讀
 
 - [Williams (1992). Simple Statistical Gradient-Following Algorithms for Connectionist Reinforcement Learning](https://link.springer.com/article/10.1007/BF00992696) ——REINFORCE 的原始論文。
-- [Sutton et al. (2000). Policy Gradient Methods for Reinforcement Learning with Function Approximation](https://papers.nips.cc/paper_files/paper/1999/hash/464d828b85b0bed98e80ade0a5c43b0f-Abstract.html) ——帶函數近似的現代政策梯度定理。
+- [Sutton et al. (2000). Policy Gradient Methods for Reinforcement Learning with Function Approximation](https://papers.nips.cc/paper_files/paper/1999/hash/464d828b85b0bed98e80ade0a5c43b0f-Abstract.html) ——帶函數近似的現代變異數／變異數減少梯度定理。
 - [Sutton & Barto (2018). Ch. 13 — Policy Gradient Methods](http://incompleteideas.net/book/RLbook2020.pdf) ——教科書的講法。
 - [OpenAI Spinning Up — VPG / REINFORCE](https://spinningup.openai.com/en/latest/algorithms/vpg.html) ——講得很清楚的教學，附 PyTorch 程式。
 - [Peters & Schaal (2008). Reinforcement Learning of Motor Skills with Policy Gradients](https://homes.cs.washington.edu/~todorov/courses/amath579/reading/PolicyGradient.pdf) ——降變異，以及把 REINFORCE 接到信賴域家族（TRPO、PPO）的自然梯度觀點。

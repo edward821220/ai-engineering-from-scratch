@@ -1,6 +1,6 @@
 # 動態規劃（dynamic programming）——政策迭代（policy iteration）與價值迭代（value iteration）
 
-> 動態規劃是強化學習裡的作弊。轉移函數（transition function）和報酬函數（reward function）你已經知道，只要把 Bellman 方程式迭代到 `V` 或 `π` 不再動。它是每個抽樣式方法都想逼近的基準（benchmark）。
+> 動態規劃是強化學習中的作弊模式。轉移函數（transition function）和報酬函數（reward function）你已經知道，只要把 Bellman 方程式迭代到 `V` 或 `π` 不再動。它是每個抽樣式方法都想逼近的基準（benchmark）。
 
 **Type:** Build
 **Languages:** Python

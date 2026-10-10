@@ -173,20 +173,20 @@ print(tfidf.toarray().round(3))
 ### TF-IDF 什麼時候仍然贏（截至 2026 年）
 
 - 垃圾郵件偵測、主題標註、日誌異常標記。要緊的是詞在不在；語意的細緻差別不要緊。
-- 資料少的區間（幾百筆標好的例子）。TF-IDF 加上邏輯斯迴歸（logistic regression）沒有預訓練成本。
+- 資料量較少的情境（幾百筆標好的例子）。TF-IDF 加上邏輯斯迴歸（logistic regression）沒有預訓練成本。
 - 延遲要緊的地方。TF-IDF 加線性模型，微秒就回答。把一份文件送進 transformer 做 embedding，要 10 到 100 毫秒。
-- 必須解釋自己預測的系統。檢查分類器的係數。正向最高的那些詞就是理由。
+- 必須解釋自己預測的系統。檢查分類器的係數。係數最高的正向詞就是模型做出該預測的依據。
 
 ### TF-IDF 什麼時候失敗
 
-語意盲目的失敗。看這兩份文件：
+語意理解不足的問題。看這兩份文件：
 
 - 「The movie was not good at all.」
 - 「The movie was excellent.」
 
 一份是負評。一份是正評。它們的 TF-IDF 重疊正好是 `{the, movie, was}`。詞袋分類器必須記住：`not` 出現在 `good` 附近會把標籤（label）翻過來。資料夠多時它學得會，但永遠不像懂句法的模型那樣順。
 
-另一種失敗：推論（inference）時碰到詞彙表外的詞。在 IMDb 評論上訓練的詞袋模型，如果 `Zoomer-approved` 這個 token 訓練時沒出現過，就不知道怎麼辦。子詞 embedding（第 04 課）處理得了。TF-IDF 不行。
+另一種失敗：推論（inference）時碰到詞彙表外詞（out-of-vocabulary word）。在 IMDb 評論上訓練的詞袋模型，如果 `Zoomer-approved` 這個 token 訓練時沒出現過，就不知道怎麼辦。子詞 embedding（subword embedding）（第 04 課）處理得了。TF-IDF 不行。
 
 ### 混合：用 TF-IDF 加權的 embedding
 

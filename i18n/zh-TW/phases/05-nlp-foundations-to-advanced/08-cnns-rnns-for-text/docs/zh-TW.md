@@ -181,7 +181,7 @@ Refuse to recommend fine-tuning a transformer when data is under ~500 labeled ex
 
 1. **簡單。** 在一份三類的玩具資料集（dataset）上訓練 TextCNN（資料你自己編）。驗證濾波器寬度 (2, 3, 4) 的平均 F1 贏過單一寬度 (3)。
 2. **中等。** 為 LSTM 分類器實作最大池化、平均池化，以及最後狀態池化。在一份小資料集上比較；寫下哪一種池化贏，並假設為什麼。
-3. **困難。** 做一個 BiLSTM-CRF 的命名實體辨識標記器（把第 06 課和這一課合起來）。在 CoNLL-2003 上訓練。和第 06 課只有 CRF 的基準模型比，也和 BERT fine-tune 比。回報訓練時間、記憶體（memory）和 F1。
+3. **困難。** 做一個 BiLSTM-CRF 的命名實體辨識標註器（把第 06 課和這一課合起來）。在 CoNLL-2003 上訓練。和第 06 課只有 CRF 的基準模型比，也和 BERT fine-tune 比。回報訓練時間、記憶體（memory）和 F1。
 
 ## Key Terms｜關鍵術語
 

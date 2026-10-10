@@ -25,7 +25,7 @@
 
 猜測次數不是冷知識。它們是文本的無損再編碼：把次數序列交給第二個、一模一樣的猜測者，他們能重建每個字母，因為每個位置他們都知道哪些猜測排在前面。能用更少符號再編碼的訊息，每個符號攜帶的資訊較少，所以猜測次數的統計給英文的熵（entropy）一個上限。
 
-Shannon 在 1951 年跑了這個，得到一個至今仍主導這個領域的數字。27 個符號的字母表（26 個字母加空白）每個字母最多能帶 `log2(27) ≈ 4.75` 位元。有 100 個字母脈絡的人類猜測者，落在每個字母 0.6 到 1.3 位元。英文大約有四分之三是被迫的走法。模型必須學的結構，在任何模型學得會之前就量過了。
+Shannon 在 1951 年跑了這個，得到一個至今仍主導這個領域的數字。27 個符號的字母表（26 個字母加空白）每個字母最多能帶 `log2(27) ≈ 4.75` 位元。有 100 個字母脈絡的人類猜測者，落在每個字母 0.6 到 1.3 位元。英文中字母約有四分之三可由脈絡大致預測。模型必須學的結構，在任何模型學得會之前就量過了。
 
 此後每個語言模型都是這個遊戲的機械玩家，這一課的每個評估數字都是這個遊戲的分數：
 
@@ -58,7 +58,7 @@ P(w | context) = count(context, w) / count(context)
 
 Kneser-Ney 的洞見很深。「San Francisco」是常見的二元組。一元的「Francisco」大多出現在「San」之後。單純的絕對折扣會給「Francisco」很高的一元機率（因為計數高）。Kneser-Ney 注意到「Francisco」只出現在一種脈絡，於是把延續機率調低。結果：一個以「Francisco」結尾的新二元組，得到該有的低機率。
 
-**評估：困惑度。** 留出測試集上，每個詞平均負對數概似（likelihood）的指數。越低越好。困惑度 100 表示模型和在 100 個詞裡均勻挑一樣困惑。
+**評估：困惑度。** 留出測試集上，每個詞平均負對數概似（negative log-likelihood）的指數。越低越好。困惑度 100 表示模型和在 100 個詞裡均勻挑一樣困惑。
 
 ```text
 perplexity = exp(- (1/N) * Σ log P(w_i | context_i))
@@ -152,9 +152,9 @@ def kneser_ney_bigram_model(corpus_tokens, discount=0.75):
     return prob
 ```
 
-三個活動零件。`continuation_prob` 捕捉「這個詞出現在多少種不同脈絡？」（Kneser-Ney 的創新）。`lambda_prev` 是折扣釋放出的質量，用來加權後退。最終機率是折扣後的主項，加上加權的延續項。
+三個關鍵組成部分。`continuation_prob` 捕捉「這個詞出現在多少種不同脈絡？」（Kneser-Ney 的創新）。`lambda_prev` 是折扣釋放出的質量，用來加權後退。最終機率是折扣後的主項，加上加權的延續項。
 
-### 步驟 4：用抽樣生成文字
+### 步驟 4：用取樣生成文字
 
 ```python
 import random
@@ -178,7 +178,7 @@ def generate(prob_fn, vocab, prefix, max_len=30, seed=0):
     return tokens
 ```
 
-依機率抽樣（sampling）。每個種子的輸出都不同。要像集束搜尋（beam search）的輸出，每步取 argmax（貪婪），再加一個小的隨機旋鈕（溫度，temperature）。
+依機率取樣（sampling）。每個種子的輸出都不同。要像集束搜尋（beam search）的輸出，每步取 argmax（貪婪），再加一個小的隨機旋鈕（溫度，temperature）。
 
 ### 步驟 5：困惑度
 
@@ -202,7 +202,7 @@ def perplexity(prob_fn, sentences):
 
 ## Use It｜實際應用
 
-- **古典 NLP 教學。** 你能碰到的、對平滑、最大概似（maximum likelihood，MLE）和困惑度最清楚的接觸。
+- **古典 NLP 教學。** 你能碰到的、對平滑、最大概似（maximum likelihood，MLE）和困惑度最清楚的入門教材。
 - **KenLM。** 正式環境（production）的 n-gram 函式庫（library）。在延遲（latency）要緊的語音和機器翻譯系統裡當重打分器。
 - **裝置上的自動完成。** 鍵盤裡的三元模型。現在還是。
 - **基準模型（baseline）。** 在宣布神經語言模型好之前，永遠先算 n-gram 語言模型的困惑度。若你的 transformer 沒有大幅贏過 KN，就有地方不對。

@@ -1,6 +1,6 @@
 # 機器學習管線（ML pipeline）
 
-> 模型不是產品，管線（pipeline）才是。管線涵蓋從原始資料到已部署的預測（deployed prediction）之間的一切，而且每一步都必須可重現（reproducible）。
+> 模型不是產品，管線（pipeline）才是。管線涵蓋從原始資料到從原始資料到部署後產生的預測（deployed prediction）之間的一切，而且每一步都必須可重現（reproducible）。
 
 **Type:** Build
 **Language:** Python
@@ -9,7 +9,7 @@
 
 ## Learning Objectives｜學習目標
 
-- 從頭打造一條機器學習管線，把補值（imputation）、縮放、編碼與模型訓練串成單一可重現的物件
+- 從頭打造一條機器學習管線，把補值（imputation）、縮放、編碼與模型訓練（model training）串成單一可重現的物件
 - 識別資料洩漏（data leakage）情境，並說明管線只在訓練資料（training data）上擬合 transformer，藉此防止洩漏
 - 建構 ColumnTransformer，對數值特徵（numeric feature）與類別特徵（categorical feature）套用不同的前處理（preprocessing）
 - 實作管線序列化（serialization），並展示同一個已擬合管線在訓練與正式環境（production）產生相同結果
@@ -18,7 +18,7 @@
 
 你有一個 notebook：載入資料、用中位數（median）填缺失值（missing value）、縮放特徵（feature）、訓練模型、印出準確率（accuracy）。能跑，你交付了。
 
-一個月後，有人重新訓練模型，卻得到不同的結果。中位數是在包含測試資料（test data）的完整資料集（dataset）上算的（資料洩漏）。縮放參數沒有儲存，所以推論（inference）用了不同的統計量。特徵工程（feature engineering）程式碼在訓練與服務（serving）之間複製貼上，兩份後來分歧了。某個類別欄位（categorical column）在正式環境出現了編碼器（encoder）從未見過的新值。
+一個月後，有人重新訓練模型，卻得到不同的結果。中位數是在包含測試資料（test data）的完整資料集（dataset）上算的（資料洩漏）。縮放參數沒有儲存，所以推論（inference）用了不同的統計量。特徵工程（feature engineering）程式碼在訓練與服務（serving）之間複製貼上，兩份程式碼後來不再一致。某個類別欄位（categorical column）在正式環境出現了編碼器（encoder）從未見過的新值。
 
 這些都不是假設情境——它們是機器學習系統在正式環境失敗最常見的原因。管線把每個轉換步驟封裝成單一、有序、可重現的物件，一次解決所有問題。
 
@@ -173,7 +173,7 @@ wandb.log({"accuracy": accuracy})
 
 做完實驗追蹤，還要管理模型版本：哪個模型在正式環境？哪個在預備環境（staging）？上週的是哪個？
 
-MLflow 的 Model Registry（模型登錄）提供：
+MLflow 的 Model Registry（模型登錄（model registry））提供：
 - **版本追蹤：** 每個儲存的模型都有版本號
 - **階段轉換：** 「Staging」、「Production」、「Archived」
 - **核准流程（approval workflow）：** 模型必須明確晉升（promote）至正式環境
@@ -344,16 +344,16 @@ class PipelineFromScratch:
 | 資料洩漏 | 「測試資訊漏進訓練」 | 用訓練集以外的資訊建立模型，讓表現估計值偏高 |
 | ColumnTransformer | 「每欄各自前處理」 | 對不同欄位子集套用不同管線，再合併結果 |
 | 實驗追蹤 | 「記錄你的執行」 | 記錄每次訓練作業（training run）的參數、指標、產物與程式碼版本 |
-| MLflow | 「追蹤並部署模型」 | 開源的實驗追蹤、模型登錄與部署平台 |
+| MLflow | 「追蹤並部署模型」 | 開源的實驗追蹤、模型登錄（model registry）與部署平台 |
 | DVC | 「資料版 Git」 | 大型資料檔的版本控制系統：git 存雜湊、資料存遠端 |
-| 模型登錄 | 「模型版本目錄」 | 以階段標籤（staging、production、archived）追蹤模型版本的系統 |
+| 模型登錄（model registry） | 「模型版本目錄」 | 以階段標籤（staging、production、archived）追蹤模型版本的系統 |
 | 訓練／服務落差 | 「notebook 裡明明是好的」 | 訓練與推論時資料處理方式不一致，造成靜默錯誤 |
 | 可重現性（reproducibility） | 「同一份程式碼、同一個結果」 | 用相同程式碼、資料與設定得到相同結果的能力 |
 
 ## Further Reading｜延伸閱讀
 
 - [scikit-learn Pipeline 文件](https://scikit-learn.org/stable/modules/compose.html)——官方管線參考
-- [MLflow 文件](https://mlflow.org/docs/latest/index.html)——實驗追蹤與模型登錄
+- [MLflow 文件](https://mlflow.org/docs/latest/index.html)——實驗追蹤與模型登錄（model registry）
 - [DVC 文件](https://dvc.org/doc)——資料版本管理
 - [Sculley et al., Hidden Technical Debt in Machine Learning Systems (2015)](https://papers.nips.cc/paper/2015/hash/86df7dcfd896fcaf2674f757a2463eba-Abstract.html)——談機器學習系統複雜度的開山之作
 - [Google ML Best Practices: Rules of ML](https://developers.google.com/machine-learning/guides/rules-of-ml)——實務上的正式環境 ML 建議

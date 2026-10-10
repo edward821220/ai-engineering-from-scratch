@@ -29,7 +29,7 @@
 **提及的類型。**
 
 - **命名實體。** 「Tim Cook」
-- **名詞性。** 「the CEO」、「the company」
+- **名詞性提及。** 「the CEO」、「the company」
 - **代名詞。** 「he」、「she」、「they」、「it」
 - **同位語。** 「Tim Cook, Apple's CEO,」
 
@@ -39,7 +39,7 @@
 2. **提及配對分類器（classifier）。** 對每一對提及 (m_i, m_j)，預測它們是否共指。用傳遞閉包分群。2016 年以前的標準。
 3. **提及排序。** 為每個提及把候選先行語（antecedent）排序（包括「沒有先行語」）。取最高的。
 4. **基於 span 的端到端（Lee 等人，2017）。** transformer 編碼器。枚舉長度上限以內的所有候選 span。預測提及分數。為每個 span 預測先行語機率。貪婪地分群。現代的預設。
-5. **生成式（2024 以後）。** prompt 一個 LLM：「List every pronoun in this text and its antecedent.」。簡單情況很好，長文件和罕見所指會掙扎。
+5. **生成式（2024 以後）。** prompt 一個 LLM：「List every pronoun in this text and its antecedent.」。簡單案例表現良好，但處理長文件和罕見所指時仍有困難。
 
 **評估指標。** 五個標準指標（MUC、B³、CEAF、BLANC、LEA），因為沒有單一指標抓得住分群品質。前三個的平均報成 CoNLL F1。2026 年在 CoNLL-2012 上的前沿：約 83 F1。
 
@@ -102,7 +102,7 @@ Cluster them by what they refer to. Output JSON:
 
 ## 坑
 
-- **單例爆炸。** 有些系統把每個提及都報成自己的群集。B³ 寬鬆。MUC 會罰。三個指標都要看。
+- **單一提及群集過多。** 有些系統把每個提及都報成自己的群集。B³ 寬鬆。MUC 會罰。三個指標都要看。
 - **長脈絡裡的代名詞。** 超過 2,000 個 token 的文件，F1 掉大約 15 分。切塊要小心。
 - **性別假設。** 寫死的性別規則在非二元所指、組織、動物上會壞。用學來的模型，或中性的打分。
 - **長文件上的 LLM 漂移。** 單一次 API 呼叫無法可靠地把 50 段以上的提及分群。用滑動視窗再合併。
@@ -147,7 +147,7 @@ Refuse LLM-only coref for documents over 2,000 tokens without sliding-window mer
 
 ## Exercises｜練習
 
-1. **簡單。** 在 5 段手寫段落上跑 `code/main.py` 裡的規則式解析器。對上標準結果（ground truth）量提及連結的準確率（accuracy）。
+1. **簡單。** 在 5 段手寫段落上跑 `code/main.py` 裡的規則式解析器。對上真實標註資料（ground truth）量提及連結的準確率（accuracy）。
 2. **中等。** 在一篇新聞上用預訓練的神經共指模型。把群集和你自己的人工標註比。它在哪裡失敗？
 3. **困難。** 做一條共指增強的 NER 管線：先 NER，再用共指群集合併。在 100 篇文章上，量相對只有 NER 的實體覆蓋改善。
 

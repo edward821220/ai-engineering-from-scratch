@@ -26,7 +26,7 @@
 
 Llama 3 405B 是在 16,384 張 NVIDIA H100 GPU 上訓練完成的。The training run cost an estimated $100 million in compute. DeepSeek V3 trained a comparable model for roughly $5.6 million（估計約 1 億美元對比約 560 萬美元），全靠巧妙的架構設計（混合專家 MoE，意味著每個 token 僅啟動一小部分參數）與極致的訓練效率。
 
-本課涵蓋實現大規模訓練的四種策略：資料平行（data parallelism）、張量平行（tensor parallelism）、管線平行（pipeline parallelism）以及全分片資料平行（fully sharded data parallelism）。你將在純 Python 中模擬這每一種策略，在接觸複雜的分散式訓練框架之前徹底掌握其底層機制。
+本課涵蓋實現大規模訓練的四種策略：資料平行（data parallelism）、張量平行（tensor parallelism）、管線平行（pipeline parallelism）以及全分片資料平行（fully sharded data parallelism）。你將在純 Python 中模擬這每一種策略，在接觸複雜的分散式訓練框架之前了解各策略的運作機制。
 
 ## The Concept｜核心概念
 
@@ -43,7 +43,7 @@ Llama 3 405B 是在 16,384 張 NVIDIA H100 GPU 上訓練完成的。The training
 
 「Adam 狀態」這一欄才是真正的記憶體殺手。Adam 為每個參數維護一個滑動平均（m）與一個滑動變異數（v），兩者皆以 FP32 存放。對於一個 70B 模型，那就是 70B x 4 位元組 x 2 = 560GB。光是最佳化器本身就需要七張 A100。
 
-單張 H100 只有 80GB。Llama 3 405B 至少需要 61 張 H100 才能裝得下權重、最佳化器與梯度。加上活化值後，數字還會進一步暴增。Meta 使用 16,384 張 GPU 並非炫耀，而是迫不得已。
+單張 H100 只有 80GB。Llama 3 405B 至少需要 61 張 H100 才能裝得下權重、最佳化器與梯度。加上活化值後，數字還會進一步暴增。Meta 使用 16,384 張 GPU 不是因為想用，而是因為不得不用。
 
 ### 資料平行（Data Parallelism）
 
@@ -311,7 +311,7 @@ def simulate_tensor_parallelism(input_data, weight_matrix, num_gpus):
 
 ### 步驟 3：模擬管線平行
 
-跨虛擬 GPU 拆分模型的層級。展示初期階段閒置而後期階段正在計算的氣泡問題。
+跨虛擬 GPU 拆分模型的層級。展示前段階段閒置、後段階段仍在計算的氣泡問題。
 
 ```python
 def simulate_pipeline_parallelism(num_layers, num_stages, num_microbatches):
@@ -558,7 +558,7 @@ def run_all_demos():
 | ZeRO | 「DeepSpeed 版本的 FSDP」 | Zero Redundancy Optimizer，具備 3 個階段：分片最佳化器（階段 1）、+ 梯度（階段 2）、+ 參數（階段 3） |
 | All-reduce | 「跨 GPU 取平均」 | 集合通訊操作，每張 GPU 最終獲得所有 GPU 輸入的加總（或平均值）——通常以 ring all-reduce 實作 |
 | All-gather | 「從所有 GPU 收集」 | 集合通訊操作，每張 GPU 最終獲得所有 GPU 資料的串接結果——在 FSDP 中用於重建完整參數 |
-| Reduce-scatter | 「規約並分散」 | 集合通訊操作，對資料進行規約（求和）並將不同區塊分散給不同 GPU——在 FSDP 中用於梯度分片 |
+| Reduce-scatter | 「規約並分散」 | 集合通訊操作，對資料進行歸約（求和）並將不同區塊分散給不同 GPU——在 FSDP 中用於梯度分片 |
 | 混合精度（Mixed precision） | 「用半精度訓練」 | 前向／反向使用 FP16/BF16，最佳化器狀態使用 FP32——節省約 25% 記憶體而非 50%，因為最佳化器佔據主導 |
 | 管線氣泡（Pipeline bubble） | 「管線中的閒置時間」 | GPU 等待來自前一階段資料的閒置時間比例——可透過使用更多微批次來降低 |
 

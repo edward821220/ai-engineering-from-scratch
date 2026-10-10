@@ -1,6 +1,6 @@
 # 流匹配與整流流
 
-> 擴散模型要走 20 到 50 個取樣步，因為它們從雜訊走到資料的路徑是彎的。流匹配（flow matching，Lipman et al.，2023）和整流流（rectified flow，Liu et al.，2022）訓練的是直線。路徑越直，步數越少，推論（inference）越快。Stable Diffusion 3、Flux.1、AudioCraft 2 都在 2024 改成流匹配。
+> 擴散模型要走 20 到 50 個取樣步，因為它們從雜訊走到資料的路徑是彎的。流匹配（flow matching，Lipman et al.，2023）和整流流（rectified flow，Liu et al.，2022）訓練模型學得直線路徑。路徑越直，步數越少，推論（inference）越快。Stable Diffusion 3、Flux.1、AudioCraft 2 都在 2024 改成流匹配。
 
 **Type:** Build
 **Languages:** Python

@@ -55,7 +55,7 @@ graph LR
 ops:byte ratio = FLOPs per token / bytes read from memory
 ```
 
-在批次為 4,096 token 的 prefill 期間，載入每個權重複本約執行 4,096 次乘累加運算。該比率很高——處於算力受限（compute-bound）。在批次為 1 的 decode 期間，載入每個權重僅執行約 1 次運算。該比率極低——處於記憶體受限（memory-bound）。
+在批次為 4,096 token 的 prefill 期間，每載入一個權重約執行 4,096 次乘累加運算。該比率很高——處於算力受限（compute-bound）。在批次為 1 的 decode 期間，載入每個權重僅執行約 1 次運算。該比率極低——處於記憶體受限（memory-bound）。
 
 核心洞見在於：*decode 之所以受到記憶體頻寬限制，是因為你讀取了整個模型僅為了產出一個 token*。以下介紹的每項最佳化，不是減少你所讀取的資料量，就是增加每次讀取所能處理的 token 批次，或者徹底避免重複讀取。
 
@@ -191,7 +191,7 @@ graph LR
 
 前綴快取儲存了常見前綴的 KV 快取，並跨請求重複使用。當帶有已知前綴的新請求到達時，系統直接引用已快取的 KV，只需為獨特的後綴部分計算 KV。
 
-對於一個所有請求共享的 2,000 token system prompt，前綴快取為每個請求省去了約 400 毫秒的 prefill。在每秒 100 個請求下，這每秒能省下 40 秒的 GPU 運算時間——相當於直接省下一整張高階 GPU 的負載。
+對於一個所有請求共享的 2,000 token system prompt，前綴快取為每個請求省去了約 400 毫秒的 prefill。在每秒 100 個請求下，這每秒能省下 40 秒的 GPU 運算時間——每秒省下相當於 40 秒 GPU 運算的工作量。
 
 SGLang 的 RadixAttention 利用基數樹（radix tree / trie）以 token 內容為索引實作前綴快取。任何匹配既有前綴的請求都能免費取得 KV 快取。該架構支援部分匹配——若你與快取條目共享 2,000 個前綴 token 中的 1,500 個，你就能直接重複使用這 1,500 個，只需為剩下的 500 個重新計算。
 
@@ -202,12 +202,12 @@ SGLang 的 RadixAttention 利用基數樹（radix tree / trie）以 token 內容
 | 引擎 | 核心創新 | 最佳適用場景 |
 |--------|---------------|----------|
 | vLLM | PagedAttention、連續批次處理 | 通用模型服務、最高的相容性與生態整合 |
-| SGLang | RadixAttention（前綴快取）、結構化生成 | 多回合對話機器人、受限解碼與工具呼叫 |
+| SGLang | RadixAttention（前綴快取）、結構化生成 | 多回合對話機器人、約束解碼與工具呼叫 |
 | TensorRT-LLM | NVIDIA 核心融合、原生 FP8 量化 | 在 NVIDIA 硬體上榨乾單卡極致吞吐量 |
 
 **vLLM** 是預設的首選起點。它支援最廣泛的模型架構，可在任何 GPU 廠商（NVIDIA、AMD、Intel）上執行，並透過 PagedAttention + 連續批次處理提供強勁吞吐量。其相容於 OpenAI 的 API 介面意味著能無縫抽換既有程式碼。
 
-**SGLang** 建立在與 vLLM 相同的基礎之上，但加入了用於前綴快取的 RadixAttention 以及用於結構化 LLM 程式的領域特定語言。如果你的工作負載涉及多回合對話、工具使用或受限解碼（JSON 輸出、正規表示式引導生成），SGLang 透過前綴重複使用往往能比 vLLM 快上 2 到 5 倍。
+**SGLang** 建立在與 vLLM 相同的基礎之上，但加入了用於前綴快取的 RadixAttention 以及用於結構化 LLM 程式的領域特定語言。如果你的工作負載涉及多回合對話、工具使用或約束解碼（JSON 輸出、正規表示式引導生成），SGLang 透過前綴重複使用往往能比 vLLM 快上 2 到 5 倍。
 
 **TensorRT-LLM** 將模型編譯為經過深度最佳化的 NVIDIA GPU 核心。它能融合各項操作（將注意力 + 線性層 + 活化函數融合至單一核心）、在 H100 GPU 上運用原生 FP8，並與 NVIDIA Triton Inference Server 整合。它在 NVIDIA 硬體上具備最高的單卡極致效能，但設定較為複雜且僅限 NVIDIA 平台。
 

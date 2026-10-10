@@ -11,12 +11,12 @@
 
 - 描述三種常見的平行 LLM 拓撲架構（投票、子任務、Hogwild!），並指出每種架構各自鎖定的問題領域
 - 陳述 Hogwild! 的核心配置：多個 worker、單一共享 KV 快取，以及透過自我 prompt 實現的湧現式協調
-- 根據 worker 數量 `N`、任務級可平行化比例 `p` 以及協調開銷 `c`，計算 Hogwild! 的時鐘時間加速比
+- 根據 worker 數量 `N`、任務級可平行化比例 `p` 以及協調開銷 `c`，計算 Hogwild! 的實際耗時加速比
 - 在玩具問題上實作雙 worker 的 Hogwild! 模擬器，並觀察任務分工的湧現過程
 
 ## The Problem｜問題
 
-現代 LLM 解決複雜難題仰賴於產出冗長的思維鏈——動輒包含 5,000 個 token 的逐步推導極為常見，在深奧數學問題上甚至高達數萬個 token。在 70B 模型以每秒 35 個 token 的 decode 速度下，50,000 個 token 意味著需要 24 分鐘。這使即時互動完全淪為空談。
+現代 LLM 解決複雜難題仰賴於產出冗長的思維鏈——動輒包含 5,000 個 token 的逐步推導極為常見，在深奧數學問題上甚至高達數萬個 token。在 70B 模型以每秒 35 個 token 的解碼速度（decode speed）下，50,000 個 token 意味著需要 24 分鐘。模型仍不適合即時互動。
 
 推測解碼（第 10 階段第 15 課）透過在單一序列內部進行平行化，能為你帶來 3 到 5 倍的加速。但在此之外，自回歸解碼嚴格的循序依賴性是一道無法踰越的硬天花板：每個新 token 都嚴格依賴於之前的所有 token。
 
@@ -38,7 +38,7 @@ Hogwild! 推論採取了截然不同的進路。N 個 worker 共同共享單一�
 
 ### 協作行為為何能夠湧現
 
-所有 worker 共享同一份 prompt。通常類似於：「你是共同解決此問題的 N 個實例之一。每個實例皆能讀取共享記憶體，並看見其他實例寫下的內容。請避免重複勞動。」Prompt 加上共享快取就已足夠。推理模型在閱讀快取後，會注意到問題的哪些部分已經被嘗試解答過，並自發（雖然並非絕對，但頻率極高）轉向未探索的子問題。
+所有 worker 共享同一份 prompt。通常類似於：「你是共同解決此問題的 N 個實例之一。每個實例皆能讀取共享記憶體，並看見其他實例寫下的內容。請避免重複勞動。」Prompt 加上共享快取就已足夠。推理模型在閱讀快取後，會注意到問題的哪些部分已經被嘗試解答過，並自發（通常會……，但並非每次都會）轉向未探索的子問題。
 
 Hogwild! 論文（Rodionov 等人，2025 年）記錄了諸多令人驚嘆的現象：
 
@@ -59,7 +59,7 @@ Hogwild! 論文（Rodionov 等人，2025 年）記錄了諸多令人驚嘆的現
 
 若在學習得來的絕對位置編碼模型中，Hogwild! 在每次並行寫入時都必須使快取失效。而 RoPE 讓共享快取能夠保持高度穩定。
 
-### 時鐘時間算式
+### 實際耗時算式
 
 令 `T_serial` 為單一 worker 獨立解題所需的時間。令 `p` 為任務層級的可平行化比例。令 `c` 為每步的協調開銷（讀取擴展後的快取、判斷接下來該寫什麼）。
 
@@ -90,11 +90,11 @@ N 個 worker 在無協調開銷下的 Hogwild! 時間：`T_serial * ((1 - p) + p
 - 短互動對話：協調開銷佔據主導。
 - 本質上不可平行的任務（單一線性推導、單一編譯流程）：N=1 就是上限。
 - 非推理模型：完全無法湧現出協調行為。
-- 跨節點分散式部署：共享快取需要極高速的跨 worker 同步，節點內頻寬充足，但跨節點會演變成延遲災難。
+- 跨節點分散式部署：共享快取需要極高速的跨 worker 同步，節點內同步可行，但跨節點會演變成延遲災難。
 
 ### 實驗現況
 
-截至 2026 年 4 月，Hogwild! 仍是一項擁有開源 PyTorch 實作的前沿研究方法，尚未被商業正式環境廣泛採用。存在三大阻礙：
+截至 2026 年 4 月，Hogwild! 仍是一項擁有開源 PyTorch 實作的前沿研究方法，尚未被商業正式環境廣泛採用。需要不少系統工程工作：
 
 1. 跨並行行程的共享 KV 快取記憶體管理具備極高的系統工程門檻。
 2. 湧現式協調高度依賴於具體任務，基準測試評估體系仍在建立中。
@@ -117,7 +117,7 @@ continuous-batching
 模擬器在固定的步驟預算下執行，並回報：
 
 - 產出的工作 token 總數。
-- 總時鐘時間（worker 步驟數）。
+- 總實際耗時（worker 步驟數）。
 - 相對於單一 worker 的實質加速比。
 - 每個 token 由哪個 worker 寫入的追蹤記錄。
 
@@ -152,7 +152,7 @@ continuous-batching
 務實的評估路徑：
 
 1. 分析你的推理任務負載，測量其中有多大比例屬於探索性 token（多路策略、案例枚舉、搜尋驗證）而非嚴格線性推導。
-2. 若探索性佔比顯著，啟動雙 worker 的 Hogwild! 實驗，測量時鐘時間改善幅度。
+2. 若探索性佔比顯著，啟動雙 worker 的 Hogwild! 實驗，測量實際耗時改善幅度。
 3. 若改善幅度低於 1.3 倍，說明已落入協調主導的劣勢區間，應退回單 worker。
 4. 若改善幅度超過 1.5 倍，可推進至 N=4 並重新測量；邊際效益遞減通常在 N=4 到 8 之間出現。
 
@@ -160,11 +160,11 @@ continuous-batching
 
 ## Ship It｜交付成果
 
-本課產出 `outputs/skill-parallel-inference-router.md`。給定推理工作負載規格（token 預算、任務可平行度特徵、模型家族、部署硬體），它能在投票集成、思維樹、多代理、Hogwild! 與推測解碼策略之間做出最適路由決策。
+本課產出 `outputs/skill-parallel-inference-router.md`。給定推理工作負載規格（token 預算、任務可平行度特徵、模型家族、部署硬體），它能在投票集成、思維樹、多 agent、Hogwild! 與推測解碼策略之間做出最適路由決策。
 
 ## Exercises｜練習
 
-1. 以預設設定執行 `code/main.py`。確認在相同的時鐘時間內，N=2 的 Hogwild! 配置產出的工作 token 數量顯著高於 N=1 基準線。
+1. 以預設設定執行 `code/main.py`。確認在相同的實際耗時內，N=2 的 Hogwild! 配置產出的工作 token 數量多於 N=1 基準線。
 
 2. 調降協調啟發式的權重（設定 `coordination_weight=0.1`）並重新執行。展示加速比如何崩潰，並解釋背後原因：當無法有效協調時，workers 會相互重複勞動。
 
@@ -182,7 +182,7 @@ continuous-batching
 | 共享 KV 快取（Shared KV cache） | 「協調的中介平台」 | 所有 worker 共同讀寫的單一增長 KV 緩衝區；使 token 在各 worker 間立即可見 |
 | 湧現式協調（Emergent coordination） | 「不需要專案訓練」 | 具備強大推理能力的 LLM 在無任何 fine-tuning 或顯式協議下，自主閱讀共享快取並分工解題 |
 | 協調開銷（c） | 「花在重新辨識方向上的 token」 | 每個 worker 讀取擴展後的快取並決策下一步所需的 token 代價；相對於總 decode 時間必須維持極小 |
-| 可平行化比例（p） | 「能平行跑的部分」 | 任務層級的固有可平行度：總工作量中非嚴格線性依賴的比例 |
+| 可平行化比例（p） | 「能平行跑的部分」 | 任務層級的固有可平行度：總工作量中總工作量中可平行處理的比例 |
 | RoPE 賦能 Hogwild! | 「旋轉位置具備平移不變性」 | 由於位置純粹編碼為旋轉角度，寫入共享快取不需要為先前 token 重新計算鍵值 |
 | 投票集成（Voting ensemble） | 「跑 N 次採多數決」 | 最簡單的平行推論拓撲；適合分類任務，不適合長篇連續推理 |
 | 思維樹（Tree of thought） | 「分岔與剪枝」 | 同時探索多條推理路徑並進行剪枝的策略；依賴顯式的協調演算法邏輯 |
@@ -195,4 +195,4 @@ continuous-batching
 - [Su et al. — RoFormer: Enhanced Transformer with Rotary Position Embedding (arXiv:2104.09864)](https://arxiv.org/abs/2104.09864) ——賦予共享快取推論工程可行性的 RoPE 經典論文
 - [Yao et al. — Tree of Thoughts: Deliberate Problem Solving with Large Language Models (arXiv:2305.10601)](https://arxiv.org/abs/2305.10601) ——與 Hogwild! 彼此正交的思維樹推理策略
 - [Leviathan et al. — Fast Inference from Transformers via Speculative Decoding (arXiv:2211.17192)](https://arxiv.org/abs/2211.17192) ——與 Hogwild! 完美複合增效的序列內推測解碼奠基之作
-- [Hogwild! reference PyTorch implementation](https://github.com/eqimp/hogwild_llm) ——該論文實驗的官方唯一真實開源程式碼庫
+- [Hogwild! reference PyTorch implementation](https://github.com/eqimp/hogwild_llm) ——該論文實驗的論文實驗的參考實作

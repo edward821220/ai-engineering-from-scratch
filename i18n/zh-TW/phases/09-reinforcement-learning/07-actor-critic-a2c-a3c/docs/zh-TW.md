@@ -1,6 +1,6 @@
 # Actor-Critic——A2C 與 A3C
 
-> REINFORCE 很吵。加上一個學 `V̂(s)` 的評論者，從回報裡減掉它，就得到期望相同、變異低很多的優勢。這就是 actor-critic。A2C 同步跑；A3C 跨執行緒跑。兩者是每個現代深度 RL 方法的心智模型。
+> REINFORCE 的估計變異數很大。加上一個學 `V̂(s)` 的評論者，從回報裡減掉它，就得到期望相同、變異低很多的優勢。這就是 actor-critic。A2C 同步跑；A3C 跨執行緒跑。兩者是每個現代深度 RL 方法的心智模型。
 
 **Type:** Build
 **Languages:** Python
@@ -9,13 +9,13 @@
 
 ## The Problem｜問題
 
-原味 REINFORCE 能動，但變異糟透了。蒙地卡羅回報 `G_t` 在回合之間可以差到 10 倍。把這個雜訊乘上 `∇ log π` 再平均，得到的梯度估計器要幾千個回合，才能把政策推進一段距離；那段距離，少得多的 DQN 更新就走得到。
+原味 REINFORCE 能動，但變異糟透了。蒙地卡羅回報 `G_t` 在回合之間可以差到 10 倍。把這個雜訊乘上 `∇ log π` 再平均，得到的梯度估計器要幾千個回合，才能把策略推進一段距離；那段距離，少得多的 DQN 更新就走得到。
 
 變異來自用原始回報。如果你減掉基準 `b(s_t)`——任何狀態的函數，包含學出來的價值——期望不變，變異下降。最好算得出來的基準是 `V̂(s_t)`。現在乘上 `∇ log π` 的那個量是*優勢*：
 
 `A(s, a) = G - V̂(s)`
 
-動作如果產生高於平均的回報就是好的；低於平均就是壞的。帶著學出來的評論者的 REINFORCE，就是 *actor-critic*。評論者給行動者一個低變異的老師。2015 年之後每個深度政策方法都是這個（A2C、A3C、PPO、SAC、IMPALA）。
+動作如果產生高於平均的回報就是好的；低於平均就是壞的。帶著學出來的評論者的 REINFORCE，就是 *actor-critic*。評論者給行動者一個低變異的老師。2015 年之後每個深度策略方法都是這個（A2C、A3C、PPO、SAC、IMPALA）。
 
 ## The Concept｜核心概念
 
@@ -23,7 +23,7 @@
 
 **兩個網路，一個共享的損失：**
 
-- **行動者（actor）** `π_θ(a | s)`：政策。抽樣來行動。用政策梯度訓練。
+- **行動者（actor）** `π_θ(a | s)`：策略。抽樣來行動。用策略梯度訓練。
 - **評論者（critic）** `V_φ(s)`：估計從該狀態起的期望回報。訓練來最小化 `(V_φ(s) - target)²`。
 
 **優勢。** 兩種標準形式：
@@ -51,7 +51,7 @@
 
 `L(θ, φ) = -E[ A_t · log π_θ(a_t | s_t) ]  +  c_v · E[(V_φ(s_t) - G_t)²]  -  c_e · E[H(π_θ(·|s_t))]`
 
-三項：政策梯度損失、價值回歸、熵獎勵。`c_v ~ 0.5`、`c_e ~ 0.01` 是標準起點。
+三項：策略梯度損失、價值回歸、熵獎勵。`c_v ~ 0.5`、`c_e ~ 0.01` 是標準起點。
 
 ```figure
 actor-critic
@@ -110,7 +110,7 @@ for step_i, (x, a, _r, probs) in enumerate(traj):
             theta[i][j] += lr_a * adv * grad_logpi * x[j]
 ```
 
-同政策，每次更新一次展開，行動者和評論者各有學習率。
+同策略，每次更新一次展開，行動者和評論者各有學習率。
 
 ### 步驟 4：平行化（A3C 對上 A2C）
 
@@ -121,11 +121,11 @@ for step_i, (x, a, _r, probs) in enumerate(traj):
 
 ## 容易踩的坑
 
-- **評論者還沒準，就開行動者梯度。** 評論者如果是隨機的，基準沒有資訊，你就是在純雜訊上訓練。先把評論者暖機幾百步，再開政策梯度，或把行動者的學習率放慢。
+- **評論者還沒準，就開行動者梯度。** 評論者如果是隨機的，基準沒有資訊，你就是在純雜訊上訓練。先把評論者暖機幾百步，再開策略梯度，或把行動者的學習率放慢。
 - **優勢正規化。** 每個批次把優勢正規化成零均值、單位標準差。幾乎不花成本，訓練卻穩定非常多。
 - **共享主幹。** 影像輸入時，行動者和評論者共用特徵抽取器。頭分開。共享特徵同時靠兩種損失來學。
-- **同政策契約。** A2C 的資料正好只用一次更新。再用，梯度就有偏（PPO 加的就是重要性抽樣修正）。
-- **熵崩塌。** 沒有 `c_e > 0`，政策在幾百次更新內就變得幾乎確定，不再探索。
+- **同策略契約。** A2C 的資料正好只用一次更新。再用，梯度就有偏（PPO 加的就是重要性抽樣修正）。
+- **熵崩塌。** 沒有 `c_e > 0`，策略在幾百次更新內就變得幾乎確定，不再探索。
 - **報酬尺度。** 優勢的大小跟報酬尺度走。把報酬正規化（例如除以移動標準差），不同任務的梯度大小才一致。
 
 ## Use It｜實際應用
@@ -135,8 +135,8 @@ for step_i, (x, a, _r, probs) in enumerate(traj):
 | 方法 | 和 A2C 的關係 |
 |------|---------------|
 | PPO | A2C + 截斷的重要性比率，好做多輪更新 |
-| IMPALA | A3C + V-trace 異政策修正 |
-| SAC（第 9 階段 · 07） | 帶軟價值評論者的異政策 A2C（下一課） |
+| IMPALA | A3C + V-trace 異策略修正 |
+| SAC（第 9 階段 · 07） | 帶軟價值評論者的異策略 A2C（下一課） |
 | GRPO（第 9 階段 · 12） | 沒有評論者的 A2C——組內相對優勢 |
 | DPO | 把 A2C 化成偏好排序損失，不用抽樣 |
 | AlphaStar／OpenAI Five | 帶聯賽訓練和模仿預訓練的 A2C |
@@ -178,7 +178,7 @@ Refuse single-worker A2C on environments with horizon > 1000 (too on-policy, too
 
 | 術語 | 常見說法 | 實際意義 |
 |------|-----------------|-----------------------|
-| 行動者 | 「政策網路」 | `π_θ(a\|s)`，用政策梯度更新。 |
+| 行動者 | 「策略網路」 | `π_θ(a\|s)`，用策略梯度更新。 |
 | 評論者 | 「價值網路」 | `V_φ(s)`，用 MSE 回歸到回報或 TD 目標來更新。 |
 | 優勢 | 「比平均好多少」 | `A(s, a) = Q(s, a) - V(s)`，或它的估計。拿來乘 `∇ log π`。 |
 | TD 殘差 | 「δ」 | `δ_t = r + γ V(s') - V(s)`；一步優勢估計。 |
@@ -192,6 +192,6 @@ Refuse single-worker A2C on environments with horizon > 1000 (too on-policy, too
 - [Mnih et al. (2016). Asynchronous Methods for Deep Reinforcement Learning](https://arxiv.org/abs/1602.01783) ——A3C，原始的非同步 actor-critic 論文。
 - [Schulman et al. (2016). High-Dimensional Continuous Control Using Generalized Advantage Estimation](https://arxiv.org/abs/1506.02438) ——GAE。
 - [Sutton & Barto (2018). Ch. 13 — Actor-Critic Methods](http://incompleteideas.net/book/RLbook2020.pdf) ——基礎；評論者是神經網路時，搭配第 9 章的函數近似一起看。
-- [Espeholt et al. (2018). IMPALA](https://arxiv.org/abs/1802.01561) ——可擴展的分散式 actor-critic，帶 V-trace 異政策修正。
+- [Espeholt et al. (2018). IMPALA](https://arxiv.org/abs/1802.01561) ——可擴展的分散式 actor-critic，帶 V-trace 異策略修正。
 - [OpenAI Baselines / Stable-Baselines3](https://stable-baselines3.readthedocs.io/) ——值得一讀的上線級 A2C／PPO 實作。
 - [Konda & Tsitsiklis (2000). Actor-Critic Algorithms](https://papers.nips.cc/paper/1786-actor-critic-algorithms) ——雙時間尺度 actor-critic 分解的基礎收斂結果。

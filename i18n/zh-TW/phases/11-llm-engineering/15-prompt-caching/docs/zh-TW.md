@@ -224,7 +224,7 @@ Refuse to ship a cache plan that places a dynamic field above the breakpoint. Re
 | `cache_control` | 「Anthropic 的快取標記」 | 內容區塊的專屬屬性，宣告「在此之前的所有內容皆可快取」；格式為 `{"type": "ephemeral"}` |
 | 快取寫入（Cache write） | 「支付寫入溢價」 | 首個用於建立並填入快取空間的請求；在 Anthropic 上約收取 1.25 倍輸入費率，在 OpenAI 上免費 |
 | 快取讀取（Cache read） | 「享受折扣」 | 後續完全匹配該前綴的請求；收取 10%（Anthropic）、50%（OpenAI）、約 25%（Gemini）的優惠費率 |
-| TTL | 「快取能活多久」 | 快取在伺服器端保持熱備的有效秒數；Anthropic 預設 5 分鐘（可延長至 1 小時），OpenAI 盡力而為約 1 小時，Gemini 由使用者自訂 |
+| TTL | 「快取能活多久」 | 快取快取保持有效的秒數；Anthropic 預設 5 分鐘（可延長至 1 小時），OpenAI 盡力而為約 1 小時，Gemini 由使用者自訂 |
 | 延長 TTL（Extended TTL） | 「Anthropic 的 1 小時快取」 | 宣告為 `{"type": "ephemeral", "ttl": "1h"}`；需支付 2 倍寫入溢價，但在批次處理中極具性價比 |
 | 前綴匹配（Prefix match） | 「為什麼我快取沒命中」 | 快取僅在前綴完全吻合時生效；從起始位置到中斷點之間，只要有任何一個 token 不一致即宣告未命中 |
 | 脈絡快取（Context caching, Gemini） | 「Google 的顯式快取」 | Google 旗下具名且依儲存容量計費的快取物件；最適合大型語料庫跨數天的高頻重複使用 |

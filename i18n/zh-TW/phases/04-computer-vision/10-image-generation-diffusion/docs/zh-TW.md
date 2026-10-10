@@ -34,7 +34,7 @@ q(x_t | x_{t-1}) = N(x_t; sqrt(1 - beta_t) * x_{t-1},  beta_t * I)
 
 `beta_t` 是一條很小的變異數（variance）排程，通常在 T=1000 步裡從 0.0001 線性走到 0.02。每一步都把訊號稍微縮小，再灌進新的雜訊。
 
-### 閉式的一步跳
+### 閉式解的一步更新
 
 一步一步加雜訊是一條馬可夫鏈（Markov chain），但式子可以折成一步：你可以一步就從 `x_0` 抽出 `x_t`。
 
@@ -301,7 +301,7 @@ scheduler = DDPMScheduler(num_train_timesteps=1000)
 本課會產出：
 
 - `outputs/prompt-diffusion-sampler-picker.md`：一份 prompt，依品質目標、延遲預算和條件類型，在 DDPM、DDIM、DPM-Solver、Euler 之間挑一個
-- `outputs/skill-noise-schedule-designer.md`：一項技能，依 T 和目標破壞程度，產出線性、餘弦或 sigmoid 的 beta 排程，再加上訊號對雜訊比隨時間的診斷圖
+- `outputs/skill-noise-schedule-designer.md`：一項技能，依 T 和目標破壞程度，產出線性、餘弦或 sigmoid 的 beta 排程，再加上訊噪比（signal-to-noise ratio）隨時間的診斷圖
 
 ## Exercises｜練習
 
@@ -319,7 +319,7 @@ scheduler = DDPMScheduler(num_train_timesteps=1000)
 | beta 排程 | 「雜訊的量」 | 長度 T 的一串小變異數，定義每一步灌進多少雜訊 |
 | alpha_bar_t | 「累積保留係數」 | 到時間 t 為止，(1 - beta_s) 的乘積。t 越大，剩下的訊號越少 |
 | DDPM 抽樣器 | 「祖先抽樣，隨機」 | 從條件高斯抽出每個 x_{t-1}。1000 步 |
-| DDIM 抽樣器 | 「確定、很快」 | 把抽樣改寫成確定的 ODE。20 到 100 步，品質接近 |
+| DDIM 抽樣器 | 「確定、很快」 | 把抽樣改寫成確定性 ODE。20 到 100 步，品質接近 |
 | 時間條件 | 「告訴模型現在是哪個 t」 | 把 t 的正弦 embedding 灌進 U-Net，讓它知道雜訊有多大 |
 
 ## Further Reading｜延伸閱讀

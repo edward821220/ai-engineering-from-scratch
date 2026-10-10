@@ -1,6 +1,6 @@
 # 文字轉語音（TTS）：從 Tacotron 到 F5 與 Kokoro
 
-> ASR 把語音倒成文字。TTS 把文字倒成語音。2026 年的堆疊是三塊：文字到 token，token 到 mel，mel 到波形。每一塊都有一個筆電放得下的預設模型。
+> ASR 將語音轉成文字。TTS 把文字倒成語音。2026 年的堆疊是三塊：文字到 token，token 到 mel，mel 到波形。每一塊都有一個筆電放得下的預設模型。
 
 **Type:** Build
 **Languages:** Python
@@ -49,7 +49,7 @@
 
 ### 評估
 
-- **MOS（平均意見分數，Mean Opinion Score）。** 1 到 5 分，群眾來源。仍然是黃金標準。慢得痛苦。
+- **MOS（平均意見分數，Mean Opinion Score）。** 1 到 5 分，由群眾評分。仍然是黃金標準。慢得痛苦。
 - **CMOS（比較式 MOS）。** A 對 B 的偏好。每次標註的信賴區間更緊。
 - **UTMOS、DNSMOS。** 無參考的神經 MOS 預測器。排行榜用。
 - **CER（字元錯誤率），經由 ASR。** 把 TTS 輸出丟進 Whisper，對輸入文字算 CER。可懂度的代理。
@@ -59,7 +59,7 @@ LibriTTS test-clean 上 2026 年的數字：
 
 | 模型 | UTMOS | CER（經由 Whisper） | 大小 |
 |-------|-------|-------------------|------|
-| 標準結果 | 4.08 | 1.2% | — |
+| 真實音訊 | 4.08 | 1.2% | — |
 | F5-TTS | 3.95 | 2.1% | 3.35 億 |
 | XTTS v2 | 3.81 | 3.5% | 4.7 億 |
 | VITS | 3.62 | 3.1% | 2500 萬 |
@@ -151,7 +151,7 @@ soundfile.write("out.wav", wav, 24000)
 ## Pitfalls｜容易踩的坑
 
 - **沒有文字正規化器。** 「Dr. Smith」要念成 Doctor 還是 Drive？「2026」是 twenty twenty six 還是 two zero two six？在音素化之前先正規化。
-- **詞彙外的專有名詞。** 「Ghumare」要念成 ghyu-mair 嗎？為未知 token 交付一個退路的字素到音素模型。
+- **詞彙外的專有名詞。** 「Ghumare」要念成 ghyu-mair 嗎？為未知 token 準備字素轉音素模型作為備援。
 - **削波。** 聲碼器輸出很少削波，但推論時 mel 縮放不合，可能衝過 ±1.0。一定要 `np.clip(wav, -1, 1)`。
 - **取樣率不合。** Kokoro 輸出 24 kHz。下游管線期望 16 kHz，就要重取樣，否則會混疊。
 

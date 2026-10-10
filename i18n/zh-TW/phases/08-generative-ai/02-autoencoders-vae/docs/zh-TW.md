@@ -1,6 +1,6 @@
 # 自編碼器與變分自編碼器（VAE）
 
-> 普通自編碼器先壓縮再重建。它在背。它不會生成。加一個手法——逼編碼看起來像高斯——你就得到一個取樣器。那一個手法，把 `z = μ + σ·ε` 重新參數化（reparameterization），就是為什麼你 2026 年用的每個潛在擴散（latent diffusion）和流匹配（flow matching）影像模型，輸入端都有一個 VAE。
+> 普通自編碼器先壓縮再重建。它只會記住訓練資料。它不會生成。加一個手法——逼編碼看起來像高斯——你就得到一個取樣器。那一個手法，把 `z = μ + σ·ε` 重新參數化（reparameterization），就是為什麼你 2026 年用的每個潛在擴散（latent diffusion）和流匹配（flow matching）影像模型，輸入端都有一個 VAE。
 
 **Type:** Build
 **Languages:** Python

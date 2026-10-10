@@ -1,6 +1,6 @@
 # 關鍵點偵測（keypoint detection）與姿態估計（pose estimation）
 
-> 一個姿態是一組有順序的關鍵點（keypoint）。關鍵點偵測器是一個熱圖（heatmap）迴歸器。其餘都是細節。
+> 一個姿態是一組有順序的關鍵點（keypoint）。關鍵點偵測器是一個熱圖（heatmap）迴歸器。其餘都是資料整理。
 
 **Type:** Build
 **Languages:** Python
@@ -16,7 +16,7 @@
 
 ## The Problem｜問題
 
-關鍵點任務藏在很多名字底下：人體姿態（17 個身體關節）、人臉標誌點（68 或 478 點）、手（21 點）、動物姿態、機器人物件姿態、醫學解剖標誌。每一個結構都一樣：在物件上偵測 K 個離散點，輸出它們的 (x, y) 座標。
+關鍵點任務藏在很多名字底下：人體姿態（17 個身體關節）、人臉標誌點（68 或 478 點）、手（21 點）、動物姿態、機器人物件姿態、醫學解剖標誌。每種任務遵循相同的結構：在物件上偵測 K 個離散點，輸出它們的 (x, y) 座標。
 
 姿態估計是動作捕捉、健身 App、運動分析、手勢控制、動畫、AR 試穿、機器人抓取的基礎。2D 已經成熟。3D 姿態，從單一相機估計關節在世界座標裡的位置，是目前研究的前線。
 
@@ -73,7 +73,7 @@ For each connection (limb):
   Higher integral = stronger match
 ```
 
-漂亮，而且能放大到任意人數，不用依人裁切。
+方法簡潔，而且可擴展到任意人數到任意人數，不用依人裁切。
 
 ### COCO 關鍵點
 
@@ -81,11 +81,11 @@ For each connection (limb):
 
 ### 2D 對 3D
 
-- **2D 姿態**。影像座標。正式環境的品質已經解掉（MediaPipe、HRNet、ViTPose）。
+- **2D 姿態**。影像座標。2D 姿態估計已達正式環境可用的品質（MediaPipe、HRNet、ViTPose）。
 - **3D 姿態**。世界座標或相機座標。研究仍在做。常見做法：
-  - 用一個小 MLP 把 2D 預測抬到 3D（VideoPose3D）。
+  - 用一個小 MLP 將 2D 預測提升為 3D 姿態（VideoPose3D）。
   - 從影像直接迴歸 3D（PyMAF、MHFormer）。
-  - 多視角架設（CMU Panoptic）拿標準結果。
+  - 多視角架設（CMU Panoptic）取得真實標註資料。
 
 ```figure
 cv3-pose-heatmap
@@ -109,7 +109,7 @@ print(f"peak: {hm.max():.3f} at ({hm.argmax() % 64}, {hm.argmax() // 64})")
 
 每個關鍵點一張熱圖，沿通道軸堆起來，就是完整的目標張量（tensor）。
 
-### 步驟 2：很小的關鍵點頭
+### 步驟 2：很小的關鍵點預測頭
 
 U-Net 風格的模型，輸出 K 個熱圖通道（channel）。
 
@@ -172,7 +172,7 @@ def make_synthetic_sample(size=64):
     return img, hms, kps
 ```
 
-小到一個小模型一分鐘就學得會。
+簡單到小型模型約一分鐘就能學會。
 
 ### 步驟 5：訓練
 

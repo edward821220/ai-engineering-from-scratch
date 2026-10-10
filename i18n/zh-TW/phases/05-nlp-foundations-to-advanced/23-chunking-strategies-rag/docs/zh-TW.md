@@ -27,7 +27,7 @@
 
 **固定切塊。** 每 N 個字元或 token 切一次。最簡單的基準模型（baseline）。會從句子中間切開。壓縮好，連貫差。
 
-**遞迴。** LangChain 的 `RecursiveCharacterTextSplitter`。先試 `\n\n`，再 `\n`，再 `.`，再空白。退回得很乾淨。2026 年的預設。
+**遞迴。** LangChain 的 `RecursiveCharacterTextSplitter`。先試 `\n\n`，再 `\n`，再 `.`，再空白。可順利退回較低層級的分隔符。2026 年的預設。
 
 **語意。** 把每個句子做成 embedding。算相鄰句子的餘弦（cosine）相似度。相似度掉到閾值（threshold）以下就切開。保住主題連貫。較慢；有時產出小到 40 個 token 的碎片，傷檢索。
 
@@ -35,7 +35,7 @@
 
 **父文件。** 檢索用小的子區塊，脈絡用較大的父區塊，兩者都存。用子區塊檢索，回傳父區塊。退化得很溫和：子區塊再差，回傳的父區塊仍然合理。
 
-**延遲切塊（2024）。** 先在 token 層級把整份文件做成 embedding，再把 token embedding 聚成區塊 embedding。保住跨區塊的脈絡。搭配長脈絡 embedding 模型（BGE-M3、Jina v3）能用。計算量更高。
+**後置切塊（2024）。** 先在 token 層級把整份文件做成 embedding，再把 token embedding 聚成區塊 embedding。保住跨區塊的脈絡。搭配長脈絡 embedding 模型（BGE-M3、Jina v3）能用。計算量更高。
 
 **脈絡化檢索（Anthropic，2024）。** 在每個區塊前面加上 LLM 生成的、說明它在文件裡位置的摘要（「This chunk is section 3.2 of the termination clauses...」）。在 Anthropic 自己的評測裡，檢索改善 35% 到 50%。建索引很貴。
 
@@ -200,7 +200,7 @@ def recall_at_k(queries, corpus_chunks, encoder, k=5):
 | 第一次做、語料庫未知 | 遞迴，512 個 token，不重疊 |
 | 事實型問答 | 遞迴，256 到 512 個 token |
 | 分析／多跳 | 遞迴，512 到 1024 個 token，加父文件 |
-| 交叉引用很多（合約、論文） | 延遲切塊或脈絡化檢索 |
+| 交叉引用很多（合約、論文） | 後置切塊或脈絡化檢索 |
 | 對話語料庫 | 以輪次為區塊，加上說話者後設資料（metadata） |
 | 短話語（推文、評論） | 一份文件就是一個區塊 |
 
@@ -245,7 +245,7 @@ Refuse any chunking strategy without min/max chunk size enforcement. Refuse over
 | 重疊 | 安全邊際 | 相鄰區塊共享的 N 個 token；在 2026 年的評測裡常常沒用。 |
 | 語意切塊 | 聰明的切塊 | 在相鄰句子的 embedding 相似度下跌處切開。 |
 | 父文件 | 兩層檢索 | 檢索小的子區塊，回傳較大的父區塊。 |
-| 延遲切塊 | 先做 embedding 再切塊 | 在 token 層級把整份文件做成 embedding，再聚成區塊向量。 |
+| 後置切塊 | 先做 embedding 再切塊 | 在 token 層級把整份文件做成 embedding，再聚成區塊向量。 |
 | 脈絡化檢索 | Anthropic 的那一招 | 建索引前，在每個區塊前面加上 LLM 生成的摘要。 |
 | 脈絡斷崖 | 2500 個 token 的牆 | RAG 裡大約 2500 個脈絡 token 時觀察到的品質下跌（2026 年 1 月）。 |
 
@@ -253,6 +253,6 @@ Refuse any chunking strategy without min/max chunk size enforcement. Refuse over
 
 - [Yepes et al. / LangChain — Recursive Character Splitting docs](https://python.langchain.com/docs/how_to/recursive_text_splitter/) ——正式環境（production）的預設。
 - [Vectara (2024, NAACL 2025). Chunking configurations analysis](https://arxiv.org/abs/2410.13070) ——切塊和 embedding 選擇一樣要緊。
-- [Jina AI — Late Chunking in Long-Context Embedding Models (2024)](https://jina.ai/news/late-chunking-in-long-context-embedding-models/) ——延遲切塊論文。
+- [Jina AI — Late Chunking in Long-Context Embedding Models (2024)](https://jina.ai/news/late-chunking-in-long-context-embedding-models/) ——後置切塊論文。
 - [Anthropic — Contextual Retrieval](https://www.anthropic.com/news/contextual-retrieval) ——用 LLM 生成的脈絡前綴，檢索改善 35% 到 50%。
 - [NVIDIA 2026 chunk-size benchmark — Premai summary](https://blog.premai.io/rag-chunking-strategies-the-2026-benchmark-guide/) ——依查詢類型的區塊大小。

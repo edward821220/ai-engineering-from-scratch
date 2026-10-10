@@ -1,6 +1,6 @@
 # 縮放定律（Scaling Laws）
 
-> 2020 年的 Kaplan 論文說：模型更大，損失（loss）更低。2022 年的 Hoffmann 論文說：你訓練得不夠。運算分進兩個桶——參數（parameter）和 token——怎麼分並不明顯。
+> 2020 年的 Kaplan 論文說：模型更大，損失（loss）更低。2022 年的 Hoffmann 論文說：你訓練得不夠。運算分成兩部分——參數（parameter）和 token——怎麼分並不明顯。
 
 **Type:** Learn
 **Languages:** Python

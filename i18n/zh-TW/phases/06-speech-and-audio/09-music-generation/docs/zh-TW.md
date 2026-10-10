@@ -13,7 +13,7 @@
 
 1. **器樂生成。** 「帶暖鍵盤的 lo-fi hip-hop 鼓」這類文字，到音訊。MusicGen、Stable Audio、AudioLDM。
 2. **歌曲生成（帶人聲和歌詞）。** 「下雨的德州夜晚，一首鄉村歌」，到完整的歌。Suno、Udio、YuE、ACE-Step。
-3. **有條件、可控制。** 把現有片段延長、重做橋段、換類型、分軌，或局部重畫。Udio 的局部重畫加分軌，是 2026 年要對上的功能。
+3. **有條件、可控制。** 把現有片段延長、重做橋段、換類型、分軌，或局部重畫。Udio 的局部重畫加分軌，是 2026 年值得對照的功能。
 
 ## The Concept｜核心概念
 
@@ -64,7 +64,7 @@ Meta 的 **MusicGen**（2023，MIT）和許多衍生：條件是文字或旋律 
 可以安全交付的模式：
 
 1. 只生成器樂（MusicGen、Stable Audio Open、MIT／CC0 輸出）。
-2. 用商業 API（Suno、Udio、ElevenLabs Music），每一代都有授權。
+2. 用商業 API（Suno、Udio、ElevenLabs Music），每次生成均附授權。
 3. 在自己擁有或已授權的曲庫上訓練（大多數企業最後走這條）。
 4. 給生成結果打浮水印，並寫上中繼資料。
 

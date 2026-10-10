@@ -13,7 +13,7 @@
 
 在 `d=8192, L=8192, B=1` 下，BF16 精度每層就需要 800 MB。一個 64 層的模型光是活化值就佔據 51 GB——這還是在乘上微批次大小之前、還沒算上注意力 softmax 中間值（每頭 `L^2`），以及還沒計入張量平行的局部複本之前。
 
-這是一張雙重帳單：BF16 權重加上最佳化器狀態或許能勉強塞進 80GB，但活化值會徹底將你推入記憶體崩潰（OOM）的深淵。梯度檢查點（Gradient checkpointing，亦稱活化值重算，activation recomputation）是標準解法。丟棄絕大多數活化值；在反向傳播期間重新執行前向傳遞以將它們即時算回。代價：額外的運算量（FLOPs）。收益：記憶體佔用依檢查點分段與總層數的比例大幅暴跌。
+這是一張雙重帳單：BF16 權重加上最佳化器狀態或許能勉強塞進 80GB，但活化值會徹底將你推入活化值會使記憶體需求超出上限。梯度檢查點（Gradient checkpointing，亦稱活化值重算，activation recomputation）是標準解法。丟棄絕大多數活化值；在反向傳播期間重新執行前向傳遞以將它們即時算回。代價：額外的運算量（FLOPs）。收益：記憶體佔用依檢查點分段與總層數的比例大幅暴跌。
 
 天真的檢查點做法每步會多耗費約 33% 的前向運算量。而精巧的做法——依據 Korthikanti 等人的「智慧選擇性檢查點」——能以低於 5% 的額外運算開銷換取 5 倍的記憶體節省。在 FP8 矩陣乘法、FSDP 卸載與專家平行 MoE 的時代，這至關重要：你既承擔不起記憶體爆炸，也承擔不起浪費運算資源。
 
@@ -28,7 +28,7 @@
 
 前向傳遞會自動在 autograd 計算圖中儲存這些數值。每個 `tensor.retain_grad()` 以及每個需要輸入以計算梯度的運算都會保留引用。
 
-### 天真全量檢查點
+### 簡單的全量檢查點做法
 
 將整個網路切分成 `N` 個分段。在前向傳遞期間，僅儲存每個分段的**輸入**。當反向傳播需要中間值時，重新執行該分段的前向傳遞將其實體化，隨後立即進行求導。
 
@@ -45,13 +45,13 @@
 
 選擇性檢查點保留儲存代價低廉的活化值（線性投影、殘差），僅針對代價高昂的活化值（注意力機制）進行重算。你只需支付極微小的額外運算量來重算，卻能省去 O(L^2) 的龐大記憶體。
 
-Megatron-Core 將此實作為「選擇性（selective）」活化值重算，被廣泛應用於 2024 年後的幾乎所有前沿訓練執行作業中。
+Megatron-Core 將此實作為「選擇性（selective）」活化值重算，被廣泛應用於 2024 年以來多數前沿訓練作業中。
 
 ### 活化值卸載（Offload）
 
 重算的替代方案：在前向傳遞與反向傳播之間，將活化值搬運至 CPU RAM。這需要依賴 PCIe 頻寬；當閒置頻寬的傳輸成本低於重新計算成本時極具優勢。實務上常見混合策略：一部分層級設置檢查點，另一部分層級進行卸載。
 
-FSDP2 將卸載列為一流通選項。當 GPU 受到記憶體極限瓶頸限制，但 CPU-GPU 資料傳輸仍有充裕餘裕時，卸載表現極為亮眼。
+FSDP2 將卸載列為完整支援選項。當 GPU 受到記憶體極限瓶頸限制，但 CPU-GPU 資料傳輸仍有充裕餘裕時，卸載表現極為亮眼。
 
 ### 重算成本模型
 
@@ -88,7 +88,7 @@ overhead_selective = (3 + 0.15) / 3 - 1 = 0.05 = 5%
 
 ### 何時不應設置檢查點
 
-- 管線平行階段中正在傳輸中最內層的層級（它們橫豎都必須立刻完成）。
+- 管線平行階段中管線階段中已在執行的最內層（這些運算本來就得完成）。
 - 第一層與最後一層（若它們佔據該階段的主導運算，在 Transformer 中較為少見）。
 - 已經採用 FlashAttention 的注意力核心——FlashAttention 本身就以極快速度重算了 softmax，外層再包一層檢查點帶來的增益微乎其微。
 
@@ -258,7 +258,7 @@ def should_recompute(layer_type, activation_bytes, recompute_flops_ratio):
 
 ## Use It｜實際應用
 
-- **torch.utils.checkpoint**：`from torch.utils.checkpoint import checkpoint`——PyTorch 中的權威包裝器。包裝一個函數；僅儲存輸入，在反向傳播時自動重算。
+- **torch.utils.checkpoint**：`from torch.utils.checkpoint import checkpoint`——PyTorch 中的PyTorch 的標準包裝器。包裝一個函數；僅儲存輸入，在反向傳播時自動重算。
 - **Megatron-Core 活化值重算**：支援 `selective`、`full` 與 `block` 模式。2024 年後尖端訓練的標配。
 - **FSDP2 卸載**：FSDP2 具備 `module.to_empty(device="cpu")` 與 `offload_policy`，將活化值分片搬運至 CPU 而非重算。
 - **DeepSpeed ZeRO-Offload**：為最佳化器狀態與活化值提供 CPU 卸載，與檢查點互為補充。
@@ -269,7 +269,7 @@ def should_recompute(layer_type, activation_bytes, recompute_flops_ratio):
 
 ## Exercises｜練習
 
-1. 驗證正確性。執行 `model_forward` + `model_backward`（全量活化值）對比 `model_forward_checkpointed` + `model_backward_checkpointed`（分段檢查點）。參數梯度的誤差必須在機器精度層級嚴格為零。
+1. 驗證正確性。執行 `model_forward` + `model_backward`（全量活化值）對比 `model_forward_checkpointed` + `model_backward_checkpointed`（分段檢查點）。參數梯度應在機器精度範圍內一致。
 
 2. 掃描分段大小 `k` 從 1 到 `L`。繪製 FLOPs 額外開銷與記憶體佔用曲線，找出整條曲線的轉折肘點（knee of the curve）。
 

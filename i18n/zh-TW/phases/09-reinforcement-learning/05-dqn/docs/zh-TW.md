@@ -1,6 +1,6 @@
 # 深度 Q 網路（Deep Q-Networks，DQN）
 
-> 2013 年：Mnih 用一個 Q-learning 網路直接吃原始像素，在七個 Atari 遊戲上勝過每個古典 RL agent。2015 年：擴到 49 個遊戲，發表在 Nature，點燃深度 RL 的時代。DQN 就是 Q-learning，加上三個讓函數近似（function approximation）穩定的技巧。
+> 2013 年：Mnih 用一個 Q-learning 網路直接以原始像素為輸入，在七個 Atari 遊戲上勝過每個古典 RL agent。2015 年：擴到 49 個遊戲，發表在 Nature，點燃深度 RL 的時代。DQN 就是 Q-learning，加上三個讓函數近似（function approximation）穩定的技巧。
 
 **Type:** Build
 **Languages:** Python

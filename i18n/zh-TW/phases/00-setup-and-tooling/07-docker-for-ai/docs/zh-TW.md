@@ -10,7 +10,7 @@
 ## Learning Objectives｜學習目標
 
 - 使用 Dockerfile 建置支援 GPU 的 Docker 映像（image），內含 CUDA、PyTorch 和 AI 函式庫
-- 將主機（host）目錄掛載為磁碟區（volume），讓模型、資料集和程式碼在容器重建後仍能保留
+- 將主機（host）目錄掛載為磁碟區（volume），讓模型、資料集和程式碼（code）在容器重建後仍能保留
 - 設定 NVIDIA Container Toolkit，讓容器內可使用 GPU
 - 使用 Docker Compose 編排（orchestrate）多服務 AI 應用程式，例如推論伺服器（inference server）和向量資料庫（vector database）
 
@@ -22,7 +22,7 @@ AI 專案常有棘手的相依套件（dependency）問題。常見的技術堆�
 
 ## The Concept｜核心概念
 
-Docker 會把程式碼、執行環境（runtime）、函式庫和系統工具包進一個隔離單位，稱為容器。你可以把容器想成輕量級虛擬機器（virtual machine），但它共用主機作業系統的核心（kernel），而不會另跑一套核心，所以幾秒就能啟動，不必等上幾分鐘。
+Docker 會把程式碼（code）、執行環境（runtime）、函式庫和系統工具包進一個隔離單位，稱為容器。你可以把容器想成輕量級虛擬機器（virtual machine），但它共用主機作業系統的核心（kernel），而不會另跑一套核心，所以幾秒就能啟動，不必等上幾分鐘。
 
 ```mermaid
 graph TD
@@ -33,15 +33,15 @@ graph TD
     end
 
     subgraph with_docker["使用 Docker——各處使用相同映像"]
-        B1["你的電腦<br/>Python 3.12 | CUDA 12.4<br/>PyTorch 2.3 | 你的程式碼"]
-        B2["同事的電腦<br/>Python 3.12 | CUDA 12.4<br/>PyTorch 2.3 | 你的程式碼"]
-        B3["伺服器<br/>Python 3.12 | CUDA 12.4<br/>PyTorch 2.3 | 你的程式碼"]
+        B1["你的電腦<br/>Python 3.12 | CUDA 12.4<br/>PyTorch 2.3 | 你的程式碼（code）"]
+        B2["同事的電腦<br/>Python 3.12 | CUDA 12.4<br/>PyTorch 2.3 | 你的程式碼（code）"]
+        B3["伺服器<br/>Python 3.12 | CUDA 12.4<br/>PyTorch 2.3 | 你的程式碼（code）"]
     end
 ```
 
 ### 為什麼 AI 專案比多數專案更需要 Docker
 
-1. **GPU 驅動程式（GPU drivers）很脆弱。** CUDA 12.4 程式碼無法在 CUDA 11.8 上執行。Docker 會把 CUDA 工具套件（CUDA toolkit）隔離在容器內，同時透過 NVIDIA Container Toolkit 共用主機的 GPU 驅動程式。
+1. **GPU 驅動程式（GPU drivers）很脆弱。** CUDA 12.4 程式碼（code）無法在 CUDA 11.8 上執行。Docker 會把 CUDA 工具套件（CUDA toolkit）隔離在容器內，同時透過 NVIDIA Container Toolkit 共用主機的 GPU 驅動程式。
 
 2. **模型權重（model weights）體積很大。** 一個有 7B 個參數（parameters）的模型，使用 fp16 時需要 14 GB。每次重建都重新下載模型並不實際。Docker 磁碟區可讓你掛載主機上的模型目錄。
 
@@ -360,7 +360,7 @@ docker logs -f <container_id>
 現在你有一套可重現的 AI 開發環境。接下來的課程可以這樣使用：
 
 - 使用 `docker compose up` 同時啟動開發環境和向量資料庫
-- 將程式碼、模型和資料掛載為磁碟區，避免重建容器時遺失
+- 將程式碼（code）、模型和資料掛載為磁碟區，避免重建容器時遺失
 - 課程需要新的 Python 套件時，將它加入 Dockerfile 後重新建置
 - 把 Dockerfile 分享給隊友，大家就能使用完全相同的環境
 
@@ -372,15 +372,15 @@ docker logs -f <container_id>
 
 1. 建置 Dockerfile，並在容器內執行 `python -c "import torch; print(torch.__version__)"`
 2. 啟動 docker-compose 堆疊，確認 AI 容器可透過 `http://qdrant:6333/collections` 存取 Qdrant
-3. 在 Dockerfile 加入 `flask`，重新建置，並在通訊埠（port）5000 啟動簡單的 API 伺服器；使用 `-p 5000:5000` 對應通訊埠
+3. 在 Dockerfile 加入 `flask`，重新建置，並在通訊埠（port）5000 啟動簡單的 API 伺服器（API server）；使用 `-p 5000:5000` 對應通訊埠
 4. 使用 `docker images` 測量映像大小。試著將基礎映像由 `devel` 改成 `runtime`，再比較大小
 
 ## Key Terms｜關鍵術語
 
 | 術語 | 常見說法 | 實際含義 |
 |------|----------------|----------------------|
-| 容器 | 「輕量虛擬機」 | 使用主機核心、擁有獨立檔案系統和網路的隔離程序 |
-| 映像層 | 「快取步驟」 | Dockerfile 的每個指令都會建立一層；未變動的層會被快取，讓重建速度更快 |
+| 容器 | 「輕量虛擬機」 | 使用主機核心、擁有獨立檔案系統和網路的隔離行程 |
+| 映像層（image layer）（image layer） | 「快取步驟」 | Dockerfile 的每個指令都會建立一層；未變動的層會被快取，讓重建速度更快 |
 | NVIDIA Container Toolkit | 「Docker 裡的 GPU」 | 透過 `--gpus` 旗標將主機 GPU 提供給容器的執行階段擴充元件 |
 | 磁碟區掛載 | 「共用資料夾」 | 將主機上的目錄掛載到容器內；容器停止後，變更仍會保留 |
 | 基礎映像 | 「起始點」 | Dockerfile 以 `FROM` 指定的映像，決定預先安裝哪些內容 |

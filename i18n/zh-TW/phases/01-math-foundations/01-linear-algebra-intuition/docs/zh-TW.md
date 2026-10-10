@@ -11,7 +11,7 @@
 
 - 從頭用 Python 實作向量（vector）和矩陣運算，包括加法、內積（dot product）與矩陣乘法（matrix multiply）
 - 從幾何角度說明內積、投影（projection）和 Gram-Schmidt 正交化過程（Gram-Schmidt process）的作用
-- 用列簡化法判斷一組向量是否線性獨立（linear independence），並求出矩陣秩（matrix rank）與基底（basis）
+- 用列簡化法判斷一組向量是否線性獨立（linear independence），並求出矩陣秩（matrix rank）與基底（basis）（basis）
 - 連結線性代數概念與 AI 應用：embedding、注意力分數（attention score）和 LoRA
 
 ## The Problem｜問題
@@ -30,13 +30,13 @@
 
 | x | y | 點 |
 |---|---|-------|
-| 3 | 2 | 這個向量從原點 (0,0) 指向平面上的 (3, 2) |
+| 3 | 2 | 這個向量從原點（origin） (0,0) 指向平面上的 (3, 2) |
 
 向量長度（magnitude）為 sqrt(3^2 + 2^2) = sqrt(13)，方向則是右上方。
 
 在 AI 中，向量幾乎可以表示任何事物：
 - 一個詞 → 由 768 個數字組成的向量（代表它在 embedding 空間中的「意義」）
-- 一張圖片 → 由數百萬個像素值組成的向量
+- 一張圖片 → 由數百萬個像素（pixel）值組成的向量
 - 一位使用者 → 由各種偏好組成的向量
 
 ### 矩陣是一種變換
@@ -85,7 +85,7 @@ Opposite direction:  a · b < 0  (dissimilar)
 
 一組向量若符合以下條件，就稱為線性獨立：其中沒有任何一個向量可以寫成其餘向量的線性組合（linear combination）。若 v1, v2, v3 線性獨立，它們就會張成（span）三維空間；若其中一個向量可由其餘向量組合而成，這組向量就只能張成一個平面。
 
-這對 AI 很重要：特徵矩陣（feature matrix）的各欄應該線性獨立。如果兩個特徵完全相關，也就是線性相依（linearly dependent），模型就無法區分它們各自的影響。這會造成迴歸中的多重共線性（multicollinearity），使權重矩陣（weight matrix）不穩定，輸入稍有變動，輸出就可能大幅波動。
+這對 AI 很重要：特徵矩陣（feature matrix）的各欄應該線性獨立。如果兩個特徵完全相關，也就是線性相依（linearly dependent），模型就無法區分它們各自的影響。這會造成迴歸（regression）中的多重共線性（multicollinearity），使權重矩陣（weight matrix）不穩定，輸入稍有變動，輸出就可能大幅波動。
 
 **具體例子：**
 
@@ -97,13 +97,13 @@ v3 = [2, 1, 0]   # v3 = 2*v1 + v2
 
 v1 和 v2 線性獨立——其中一個向量不是另一個向量的純量（scalar）倍數，也不能由另一個向量組合而成。但 v3 = 2*v1 + v2，因此集合 {v1, v2, v3} 是線性相依的。這三個向量都位於 xy 平面上；無論如何組合，都無法到達 [0, 0, 1]。雖然有三個向量，實際上只有兩個自由度。
 
-在資料集（dataset）中，若 feature_3 = 2*feature_1 + feature_2，加入 feature_3 並不會為模型帶來新資訊。更糟的是，這會使正規方程組（normal equations）的係數矩陣成為奇異矩陣（singular matrix），因此權重沒有唯一解。
+在資料集（dataset）中，若 feature_3 = 2*feature_1 + feature_2，加入 feature_3 並不會為模型帶來新資訊（information）。更糟的是，這會使正規方程組（normal equations）的係數矩陣成為奇異矩陣（singular matrix），因此權重沒有唯一解。
 
-### 基底與秩
+### 基底（basis）與秩
 
-基底是能張成整個空間的最小線性獨立向量組。基底向量的數量就是空間的維度（dimension）。
+基底（basis）是能張成整個空間的最小線性獨立向量組。基底（basis）向量的數量就是空間的維度（dimension）。
 
-三維空間的標準基底（standard basis）是 {[1,0,0], [0,1,0], [0,0,1]}。不過，三維空間中任意三個線性獨立的向量都能構成有效基底。選擇基底，就是選擇座標系統（coordinate system）。
+三維空間的標準基底（basis）（standard basis）是 {[1,0,0], [0,1,0], [0,0,1]}。不過，三維空間中任意三個線性獨立的向量都能構成有效基底（basis）。選擇基底（basis），就是選擇座標系統（coordinate system）。
 
 矩陣的秩等於線性獨立欄的數量，也等於線性獨立列的數量。若 rank < min(rows, cols)，矩陣即為秩不足（rank-deficient）。這代表：
 - 方程組有無限多個解（或無解）
@@ -115,7 +115,7 @@ v1 和 v2 線性獨立——其中一個向量不是另一個向量的純量（s
 | 滿秩（full rank；rank = min(m, n)） | 最大可能值 | 存在唯一的最小平方法解（least-squares solution）。模型的數值條件良好（well-conditioned）。 |
 | 秩不足（rank < min(m, n)） | 低於最大值 | 特徵有冗餘，因此權重有無限多種解；需要正則化（regularization）。 |
 | 秩為 1（rank 1） | 1 | 每一欄都是同一個向量的倍數，所有資料都落在一條直線上。 |
-| 接近秩不足（near rank-deficient），奇異值（singular values）很小 | 數值上偏低 | 矩陣條件不良（ill-conditioned），輸入只有微小雜訊，也可能造成輸出大幅變動。可使用 SVD 截斷（SVD truncation）或嶺迴歸（ridge regression）。 |
+| 接近秩不足（near rank-deficient），奇異值（singular values）很小 | 數值上偏低 | 矩陣條件不良（ill-conditioned），輸入只有微小雜訊，也可能造成輸出大幅變動。可使用 SVD 截斷（SVD truncation）或嶺迴歸（regression）（ridge regression）。 |
 
 ### 投影
 
@@ -128,7 +128,7 @@ proj_b(a) = (a dot b / b dot b) * b
 殘差（residual）(a - proj_b(a)) 垂直於 b。這種正交分解（orthogonal decomposition）是最小平方法擬合（least-squares fitting）的基礎。
 
 投影在 ML 中無所不在：
-- 線性迴歸（linear regression）會將觀測值投影到欄空間（column space），藉此最小化距離——解本身就是投影
+- 線性迴歸（regression）（linear regression）會將觀測值投影到欄空間（column space），藉此最小化距離——解本身就是投影
 - 主成分分析（PCA）會把資料投影到變異最大的方向上
 - transformer 的注意力機制會計算 query 在 key 上的投影
 
@@ -136,7 +136,7 @@ proj_b(a) = (a dot b / b dot b) * b
 graph LR
     subgraph Projection["向量 a 在向量 b 上的投影"]
         direction TB
-        O["原點"] --> |"b (direction)"| B["b"]
+        O["原點（origin）"] --> |"b (direction)"| B["b"]
         O --> |"a (original)"| A["a"]
         O --> |"proj_b(a)"| P["投影"]
         A -.-> |"residual (perpendicular)"| P
@@ -151,7 +151,7 @@ proj_b(a) = (3*1 + 4*0) / (1*1 + 0*0) * [1, 0] = 3 * [1, 0] = [3, 0]
 
 ### Gram-Schmidt 正交化過程
 
-這個過程會把任意一組線性獨立向量轉換成標準正交基底（orthonormal basis）。所謂標準正交（orthonormal），是指每個向量長度都是 1，而且任兩個向量互相垂直（orthogonal）。
+這個過程會把任意一組線性獨立向量轉換成標準正交基底（basis）（orthonormal basis）。所謂標準正交（orthonormal），是指每個向量長度都是 1，而且任兩個向量互相垂直（orthogonal）。
 
 演算法如下：
 1. 取第一個向量，將它正規化（normalize）
@@ -176,7 +176,7 @@ Output: u1, u2, u3, ... (orthonormal basis)
 QR 分解（QR decomposition）的內部運作方式就是如此：Q 是由標準正交欄組成的矩陣，R 則記錄投影係數。QR 分解可用於：
 - 求解線性方程組（linear system），且比高斯消去法（Gaussian elimination）穩定
 - 以 QR 演算法計算特徵值（eigenvalues）
-- 最小平方法迴歸（標準的數值方法）
+- 最小平方法迴歸（regression）（標準的數值方法）
 
 ```figure
 eigen-directions
@@ -433,16 +433,16 @@ print(f"d(dot)/dx = {x.grad}")
 | 矩陣乘法 | 每一層神經網路、每一種線性變換（linear transformation） |
 | 線性獨立 | 特徵選擇（feature selection）、避免多重共線性 |
 | 秩 | 判斷系統是否可解、LoRA（low-rank adaptation，低秩適配） |
-| 投影 | 線性迴歸（將資料投影到欄空間）、PCA |
+| 投影 | 線性迴歸（regression）（將資料投影到欄空間）、PCA |
 | Gram-Schmidt／QR | 數值求解器、特徵值計算 |
-| 標準正交基底 | 穩定的數值計算、白化轉換 |
+| 標準正交基底（basis） | 穩定的數值計算、白化轉換（whitening transform） |
 
 LoRA 值得特別一提：它會把權重更新（weight updates）分解成低秩矩陣，藉此 fine-tune 大型語言模型（large language model）。LoRA 不必更新一個 4096x4096 的權重矩陣（16M 個參數），而是改更新兩個矩陣，大小分別為 4096x16 和 16x4096（131K 個參數）。秩為 16 的限制代表 LoRA 假設權重更新只會落在完整 4096 維空間中的一個 16 維子空間（subspace）。這就是線性代數在實際解決問題。
 
 ## Exercises｜練習
 
 1. 實作 `Vector.angle_between(other)`，回傳兩個向量之間的角度（以度為單位）
-2. 建立一個 2D 縮放矩陣，讓 x 座標乘以 2、y 座標乘以 3，然後將它套用到向量 [1, 1]
+2. 建立一個 2D 縮放矩陣（scaling matrix），讓 x 座標乘以 2、y 座標乘以 3，然後將它套用到向量 [1, 1]
 3. 建立 5 個類似詞向量的隨機向量（維度為 50），找出餘弦相似度最高的兩個
 4. 確認 Gram-Schmidt 的輸出確實是標準正交的：檢查每一對向量的內積是否為 0，以及每個向量的長度是否為 1
 5. 建立一個秩為 2 的 3x3 矩陣。用 `rank()` 方法確認，再說明矩陣的欄向量張成什麼樣的幾何形體。
@@ -459,5 +459,5 @@ LoRA 值得特別一提：它會把權重更新（weight updates）分解成低�
 | 線性獨立 | 「彼此不重疊」 | 集合中的向量都無法由其餘向量組合而成 |
 | 矩陣秩 | 「有幾個維度」 | 矩陣中線性獨立欄（或列）的數量 |
 | 投影 | 「影子」 | 一個向量沿著另一個向量方向的分量 |
-| 基底 | 「座標軸」 | 能張成整個空間的最小線性獨立向量組 |
+| 基底（basis） | 「座標軸」 | 能張成整個空間的最小線性獨立向量組 |
 | 標準正交 | 「彼此垂直的單位向量」 | 向量彼此垂直，且每個向量的長度都是 1 |

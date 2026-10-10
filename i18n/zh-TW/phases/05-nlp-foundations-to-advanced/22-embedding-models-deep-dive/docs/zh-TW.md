@@ -29,11 +29,11 @@
 
 **稀疏 embedding。** SPLADE 風格。transformer 為詞彙表（vocabulary）裡每個 token 預測一個權重，再把大多數清成零。結果是大小為 |詞彙表| 的稀疏向量（sparse vector）。抓得到詞彙相符（像 BM25），但詞的權重是學出來的。關鍵字很多的查詢上很強。
 
-**多向量（延遲互動）。** ColBERTv2、Jina-ColBERT。每個 token 一個向量。用 MaxSim 打分：對每個查詢 token，找最相似的文件 token，再把分數加總。儲存和打分都更貴，但長查詢和領域語料庫上會贏。
+**多向量（晚期互動）。** ColBERTv2、Jina-ColBERT。每個 token 一個向量。用 MaxSim 打分：對每個查詢 token，找最相似的文件 token，再把分數加總。儲存和打分都更貴，但長查詢和領域語料庫上會贏。
 
 **BGE-M3：三種一次給。** 一個模型同時輸出稠密、稀疏、多向量表示。每一種可以獨立查詢；分數用加權總和融合。2026 年想從一個 checkpoint 得到彈性時的預設。
 
-**Matryoshka 表示學習。** 訓練得讓向量的前 N 維自己就是一個能用的 embedding。把 1,536 維截到 256 維，準確率（accuracy）大約少 1%，儲存省下 6 倍。OpenAI text-3、Cohere v4、Voyage-4、Jina v5、Gemini Embedding 2、Nomic v1.5 以後都支援。
+**Matryoshka 表示學習（Matryoshka Representation Learning）。** 訓練得讓向量的前 N 維自己就是一個能用的 embedding。把 1,536 維截到 256 維，準確率（accuracy）大約少 1%，儲存省下 6 倍。OpenAI text-3、Cohere v4、Voyage-4、Jina v5、Gemini Embedding 2、Nomic v1.5 以後都支援。
 
 ### MTEB 排行榜只說了一部分
 
@@ -88,7 +88,7 @@ emb_256 = truncate(emb, 256)
 emb_128 = truncate(emb, 128)
 ```
 
-截斷之後要重新正規化（normalization）。Nomic v1.5、OpenAI text-3、Voyage-4 訓練得讓前幾層這樣做幾乎無損。不是 Matryoshka 的模型（原本的 Sentence-BERT）一截斷就掉得很兇。
+截斷之後要重新正規化（normalization）。Nomic v1.5、OpenAI text-3、Voyage-4 訓練得讓在前幾個截斷層級幾乎不會損失品質。不是 Matryoshka 的模型（原本的 Sentence-BERT）一截斷就掉得很兇。
 
 ### 步驟 3：BGE-M3 的多功能
 
@@ -131,7 +131,7 @@ results = evaluation.run(encoder, output_folder="./mteb-results")
 
 在*有代表性*的子集上跑候選模型。不要只信排行榜名次——你的領域才要緊。
 
-### 步驟 5：從零手寫餘弦
+### 步驟 5：從零實作餘弦相似度
 
 見 `code/main.py`。平均過的雜湊技巧 embedding（只用標準函式庫，library）。打不過 transformer embedding，但露出形狀：tokenize → 向量 → 正規化 → 內積。
 
@@ -188,7 +188,7 @@ Refuse recommendations that truncate Matryoshka to <64 dims without domain valid
 
 1. **簡單。** 用 `bge-small-en-v1.5` 把 100 句編成全維（384），再編成 Matryoshka 128。量 10 個查詢上的 MRR 掉多少。
 2. **中等。** 在你領域的 500 段上比較 BGE-M3 的稠密、稀疏和 ColBERT。前 10 的召回率誰贏？RRF 融合有沒有贏過最好的單一模式？
-3. **困難。** 在你最主要的 2 個領域任務上，對三個候選模型跑 MTEB。報告 MTEB 分數、100 個查詢的批次（batch）上的 p99 延遲，以及每 100 萬次查詢的美元成本。挑帕累托意義上划算的那一個。
+3. **困難。** 在你最主要的 2 個領域任務上，對三個候選模型跑 MTEB。報告 MTEB 分數、100 個查詢的批次（batch）上的 p99 延遲，以及每 100 萬次查詢的美元成本。選出帕累托最佳解。
 
 ## Key Terms｜關鍵術語
 
@@ -208,5 +208,5 @@ Refuse recommendations that truncate Matryoshka to <64 dims without domain valid
 - [Muennighoff et al. (2022). MTEB: Massive Text Embedding Benchmark](https://arxiv.org/abs/2210.07316) ——排行榜論文。
 - [Chen et al. (2024). BGE-M3: Multi-lingual, Multi-functionality, Multi-granularity](https://arxiv.org/abs/2402.03216) ——三種模式合一的模型。
 - [Kusupati et al. (2022). Matryoshka Representation Learning](https://arxiv.org/abs/2205.13147) ——維度階梯的訓練目標。
-- [Santhanam et al. (2022). ColBERTv2: Effective and Efficient Retrieval via Lightweight Late Interaction](https://arxiv.org/abs/2112.01488) ——正式環境裡的延遲互動。
+- [Santhanam et al. (2022). ColBERTv2: Effective and Efficient Retrieval via Lightweight Late Interaction](https://arxiv.org/abs/2112.01488) ——正式環境裡的晚期互動。
 - [MTEB leaderboard on Hugging Face](https://huggingface.co/spaces/mteb/leaderboard) ——即時排名。

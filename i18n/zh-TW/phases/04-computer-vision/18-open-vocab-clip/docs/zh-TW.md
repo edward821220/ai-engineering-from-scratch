@@ -1,6 +1,6 @@
 # 開放詞彙視覺（open-vocabulary vision）：CLIP
 
-> 把影像編碼器（encoder）和文字編碼器一起訓練，讓對得上的（影像、說明文字）配對落在共享空間的同一點。整個手法就是這件事。
+> 把影像編碼器（encoder）和文字編碼器一起訓練，讓讓相符的影像與說明文字配對，在共享空間中落在同一點。訣竅就在於此。
 
 **Type:** Build + Use
 **Languages:** Python
@@ -82,11 +82,11 @@ y_ij = +1 if matching, -1 otherwise
 - **零樣本分類**。直接用。
 - **影像檢索**。所有影像先編碼一次，推論時再編碼查詢。
 - **文字條件的偵測**。Grounding DINO、OWL-ViT 把 CLIP 的文字塔包在偵測器外面。
-- **文字條件的分割**。CLIPSeg。SAM 經由 CLIP 吃文字 prompt。
+- **文字條件的分割**。CLIPSeg。SAM 透過 CLIP 接收文字 prompt。
 - **視覺語言模型**。LLaVA、Qwen-VL、InternVL 把 CLIP 家族的視覺編碼器接到 LLM。
 - **文字到影像生成**。Stable Diffusion、DALL-E 3 以 CLIP 的文字 embedding 為條件。
 
-一旦有了共享的 embedding 空間，每個視覺加語言的任務就變成算距離。
+一旦有了共享的 embedding 空間，每種結合視覺與語言的任務就變成算距離。
 
 ```figure
 clip-contrastive
@@ -211,10 +211,10 @@ SigLIP 較新，小規模訓得更好，新工作偏好它：`google/siglip-base
 | 術語 | 常見說法 | 實際意義 |
 |------|----------------|----------------------|
 | 雙塔 | 「雙編碼器」 | 分開的影像編碼器和文字編碼器，結尾是同一個維度的投影頭 |
-| 零樣本 | 「沒有針對任務的訓練」 | 推論時只靠文字描述的類別來分類。碰不到標籤 |
+| 零樣本 | 「沒有針對任務的訓練」 | 推論時只靠文字描述的類別來分類。不需使用標籤 |
 | 溫度／logit_scale | 「tau」 | 學來的純量，在 softmax 之前把相似度矩陣放大 |
 | prompt 模板 | 「A photo of a {}」 | 包在類別名稱外面的自然語言。把很多模板平均，零樣本準確率會上升 |
-| CLIP | 「影像加文字的模型」 | 2021 年 OpenAI 的模型。到 2026 年仍是這個領域的共通詞彙 |
+| CLIP | 「影像加文字的模型」 | 2021 年 OpenAI 的模型。到 2026 年仍是這個領域的到 2026 年仍是此領域的代表性模型 |
 | SigLIP | 「sigmoid 版 CLIP」 | 把 softmax 換成一對一對的 sigmoid。小批次訓得更好 |
 | OpenCLIP | 「開放的重現」 | 社群在 LAION 上訓練的 CLIP 變體。開放原始碼管線（pipeline）在正式環境的預設 |
 | VLM | 「視覺語言模型」 | CLIP 家族的編碼器加上一個 LLM，訓練來回答關於影像的問題 |

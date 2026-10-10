@@ -16,7 +16,7 @@
 儘管有 LLM，2026 年它仍然要緊：
 
 - 對合規敏感的領域（銀行、醫療、訂機票）要的是確定的槽位值，不是自由生成。
-- 會用工具的代理在呼叫 API 之前，仍然要先解析槽位。
+- 會使用工具的 agent在呼叫 API 之前，仍然要先解析槽位。
 - 多輪修正比看起來難：「actually no, make it Thursday.」
 
 現代管線（pipeline）：傳統 DST 概念，加上 LLM 抽取器，再加上結構化輸出的護欄。
@@ -38,7 +38,7 @@
 
 1. **規則式（槽位的 regex 加關鍵字）。** 窄領域的強基準模型（baseline）。可以除錯。
 2. **TripPy／BERT-DST。** 以 BERT 編碼、以複製為基礎的生成。LLM 之前的標準。
-3. **LDST（LLaMA 加 LoRA）。** 做過 instruction tuning 的 LLM，用領域–槽位的 prompting。在 MultiWOZ 2.4 上達到 ChatGPT 的水準。
+3. **LDST（LLaMA 加 LoRA）。** 做過 instruction tuning 的 LLM，用依領域與槽位設計 prompt。在 MultiWOZ 2.4 上達到 ChatGPT 的水準。
 4. **不靠本體（ontology-free，2024–26）。** 跳過綱要；直接生成槽位名稱和值。應付開放領域。
 5. **Prompt 加結構化輸出（2024–26）。** LLM 配 Pydantic 綱要，加上約束解碼（constrained decoding）。5 行程式碼，能上正式環境（production）。
 
@@ -58,7 +58,7 @@ n5-slot-tracker
 
 ### 步驟 1：規則式的槽位抽取
 
-見 `code/main.py`。regex 加同義詞字典，在窄領域蓋住 70% 的制式說法：
+見 `code/main.py`。regex 加同義詞字典，在窄領域可涵蓋窄領域中 70% 的常見固定表達：
 
 ```python
 CUISINE_SYNONYMS = {
@@ -74,7 +74,7 @@ def extract_cuisine(utterance):
     return None
 ```
 
-脆在制式詞彙之外。確定性的槽位確認行得通。
+超出標準詞彙範圍就容易失效；適合用於確定性高的槽位確認
 
 ### 步驟 2：狀態更新迴圈
 
@@ -131,7 +131,7 @@ def joint_goal_accuracy(predicted_states, gold_states):
     return correct / len(predicted_states)
 ```
 
-校準：系統在多少比例的輪次把所有槽位都做對？MultiWOZ 2.4 上，2026 年最好的系統是 80% 到 83%。你的領域內系統應該在你的窄詞彙上超過它，不然 LLM 基準模型會贏過你。
+計算／評估：系統有多少比例的輪次能讓所有槽位都正確？MultiWOZ 2.4 上，2026 年最好的系統是 80% 到 83%。你的領域內系統應該在你的窄詞彙上超過它，不然 LLM 基準模型會贏過你。
 
 ### 步驟 5：處理修正
 
@@ -147,10 +147,10 @@ def is_correction(utterance):
 
 ## 坑
 
-- **整段歷史重新生成的成本。** 每一輪都讓 LLM 重新生成狀態，總 token 是 O(n²)。把歷史設上限，或把較舊的輪次摘要掉。
+- **整段歷史重新生成的成本。** 每一輪都讓 LLM 重新生成狀態，總 token 是 O(n²)。把歷史設上限，或摘要較早的對話輪次。
 - **綱要漂移。** 事後加新槽位會弄壞舊的訓練資料。給綱要標版本。
 - **大小寫。** 「Italian」對「italian」對「ITALIAN」——到處都要正規化（normalize）。
-- **隱含繼承。** 使用者先前說過「for 4 people」，新的、換時間的請求不該清掉人數。永遠傳入完整歷史。
+- **槽位值延續。** 使用者先前說過「for 4 people」，新的、換時間的請求不該清掉人數。永遠傳入完整歷史。
 - **自由形式對封閉集合。** 名字、時間、地址要自由形式的槽位；菜系和地區是封閉的。綱要裡兩種都要。
 
 ## Use It｜實際應用

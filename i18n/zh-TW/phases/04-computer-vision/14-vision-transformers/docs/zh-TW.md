@@ -16,7 +16,7 @@
 
 ## The Problem｜問題
 
-有十年，卷積（convolution）幾乎就等於電腦視覺。CNN 有很強的歸納偏誤（inductive bias）：局部性、平移等變（translation equivariance）。沒有人以為這能換掉。然後 Dosovitskiy 等人（2020）顯示，把普通的 transformer 用在展平的影像小塊上，完全不用卷積那套，在夠大的規模就能打平或贏過最好的 CNN。
+有十年，卷積（convolution）幾乎就等於電腦視覺。CNN 有很強的歸納偏誤（inductive bias）：局部性、平移等變（translation equivariance）。當時沒有人認為這些歸納偏誤能被取代。然後 Dosovitskiy 等人（2020）顯示，把普通的 transformer 用在展平的影像小塊上，完全不用卷積那套，在夠大的規模就能打平或贏過最好的 CNN。
 
 但條件是「夠大的規模」。ViT 在 ImageNet-1k 上輸給 ResNet。先在 ImageNet-21k 或 JFT-300M 上預訓練，再在 ImageNet-1k 上 fine-tuning，就贏了。結論是 transformer 缺少有用的先驗，但資料夠多就能學到。後來的工作（DeiT、MAE、DINO）顯示，訓練配方對了，強的資料增強（augmentation）、自監督預訓練、蒸餾，小資料上 ViT 也訓得起來。
 
@@ -115,7 +115,7 @@ ViT-B/16 疊 12 個這樣的區塊，每個 12 個注意力頭，一共 8600 萬
 ### Swin 對 ConvNeXt
 
 - **Swin**（Liu 等人，2021）。以視窗為單位的注意力。每個區塊只在局部視窗裡注意。下一個區塊把視窗平移，讓資訊跨視窗混合。把 CNN 那種局部性先驗帶回來，注意力這個算子還留著。
-- **ConvNeXt**（Liu 等人，2022）。重新設計的 CNN，對齊 Swin 的架構選擇：深度卷積（depthwise convolution）、LayerNorm、GELU、倒轉的瓶頸。它顯示差距不在「注意力對卷積」，而在「現代訓練配方加架構」。
+- **ConvNeXt**（Liu 等人，2022）。重新設計的 CNN，對齊 Swin 的架構選擇：深度卷積（depthwise convolution）、LayerNorm、GELU、倒置瓶頸（inverted bottleneck）。它顯示差距不在「注意力對卷積」，而在「現代訓練配方加架構」。
 
 2026 年，ConvNeXt-V2 和 Swin-V2 都達到正式環境的水準。選哪個，看你的推論（inference）堆疊（ConvNeXt 編譯起來更適合邊緣），以及預訓練語料。
 

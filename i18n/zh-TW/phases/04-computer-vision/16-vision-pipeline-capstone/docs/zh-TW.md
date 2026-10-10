@@ -18,7 +18,7 @@
 
 單獨的視覺模型有用。視覺產品是把它們串成鏈。零售貨架盤點是偵測器，加上產品分類器，加上價格 OCR 管線。自駕是 2D 偵測器，加上 3D 偵測器，加上分割器，加上追蹤器，加上規劃器。醫療初篩是分割器，加上區域分類器，加上臨床人員的介面。
 
-把這些鏈串起來，才是機器學習原型和產品的差別。模型之間的每個介面都是新的 bug 位置。每次座標轉換、每次正規化（normalization）、每次遮罩縮放，都可能安靜失敗。管線有多強，取決於最弱的那個介面。
+把這些鏈串起來，才是機器學習原型和產品的差別。模型之間的每個介面都是新的 bug 位置。每次座標轉換、每次正規化（normalization）、每次遮罩縮放，都可能在沒有明顯錯誤訊息的情況下失敗。管線有多強，取決於最弱的那個介面。
 
 這堂總整課搭最小可用的管線：偵測、分類、結構化輸出、一層服務。第 4 階段的其他東西都能插進這個骨架：把 Mask R-CNN 換成 YOLOv8、加上 OCR 頭、加上分割支線、加上追蹤器。架構是穩的。零件可以換。
 
@@ -43,7 +43,7 @@ flowchart LR
     style SCHEMA fill:#dcfce7,stroke:#16a34a
 ```
 
-七個階段。兩個模型階段很貴。bug 住在另外五個階段。
+七個階段。兩個模型階段很貴。問題通常出在另外五個階段。
 
 ### 用 Pydantic 寫資料契約
 
@@ -89,7 +89,7 @@ PipelineResult(
 
 ### 批次
 
-正式環境的服務同時服務多個客戶。把多筆請求的偵測和分類做成批次，吞吐量會乘上去。代價是多等批次湊滿的延遲。典型做法：最多等 20 毫秒把請求收進來，一起處理，再把回應分回去。`torchserve` 和 `triton` 原生就做這件事。負載可預期的小服務，會自己寫一個微批次器。
+正式環境的服務同時服務多個客戶。把多筆請求的偵測和分類做成批次，吞吐量（throughput）會乘上去。代價是多等批次湊滿的延遲。典型做法：最多等 20 毫秒把請求收進來，一起處理，再把回應分回去。`torchserve` 和 `triton` 原生就做這件事。負載可預期的小服務，會自己寫一個微批次器。
 
 ```figure
 v4-vision-pipeline
@@ -310,7 +310,7 @@ CPU 上的典型輸出：前處理約 3 毫秒，偵測 300 到 500 毫秒，分
 
 ## Use It｜實際應用
 
-正式環境的樣板會收到同一種結構，再加：
+正式環境的範本大致採用相同架構，另外還會加入：：
 
 - **模型版本**。回應裡永遠記下模型名稱和權重（weight）雜湊。
 - **每筆請求的追蹤 ID**。每個階段的時間都記下來，慢的回應才能對上是哪一段。
@@ -325,13 +325,13 @@ CPU 上的典型輸出：前處理約 3 毫秒，偵測 300 到 500 毫秒，分
 本課會產出：
 
 - `outputs/prompt-vision-service-shape-reviewer.md`：一份 prompt，檢查視覺服務的程式有沒有違反契約或回應形狀，並指出第一個會壞掉的 bug
-- `outputs/skill-pipeline-budget-planner.md`：一項技能，依目標延遲和吞吐量，把時間預算分給每個階段，並標出哪一段會先超出預算
+- `outputs/skill-pipeline-budget-planner.md`：一項技能，依目標延遲和吞吐量（throughput），把時間預算分給每個階段，並標出哪一段會先超出預算
 
 ## Exercises｜練習
 
 1. **（簡單）** 用任何開放資料集的 10 張影像跑這條管線。回報每個階段的平均時間，以及每張影像偵測數量的分布。
 2. **（中等）** 給 `Detection` 加上遮罩輸出欄位，並編成 RLE。確認即使是 10 個物件的影像，JSON 仍低於 1MB。
-3. **（困難）** 在分類器前面加一個微批次器：最多等 10 毫秒把裁切收齊，一次 GPU 呼叫全部分類，再依請求回結果。量每秒 5 個並行請求時吞吐量增加多少，以及多出來的延遲。
+3. **（困難）** 在分類器前面加一個微批次器：最多等 10 毫秒把裁切收齊，一次 GPU 呼叫全部分類，再依請求回結果。量每秒 5 個並行請求時吞吐量（throughput）增加多少，以及多出來的延遲。
 
 ## Key Terms｜關鍵術語
 
@@ -351,4 +351,4 @@ CPU 上的典型輸出：前處理約 3 毫秒，偵測 300 到 500 毫秒，分
 - [Full Stack Deep Learning — Deploying Models](https://fullstackdeeplearning.com/course/2022/lecture-5-deployment/) ——正式環境機器學習部署的標準總覽
 - [BentoML docs](https://docs.bentoml.com) ——帶批次、版本和指標的服務框架
 - [torchserve docs](https://pytorch.org/serve/) ——PyTorch 官方的服務函式庫（library）
-- [NVIDIA Triton Inference Server](https://developer.nvidia.com/triton-inference-server) ——高吞吐量服務，含批次和多模型
+- [NVIDIA Triton Inference Server](https://developer.nvidia.com/triton-inference-server) ——高吞吐量（throughput）服務，含批次和多模型

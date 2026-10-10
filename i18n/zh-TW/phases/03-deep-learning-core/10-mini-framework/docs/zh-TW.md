@@ -20,7 +20,7 @@
 
 框架解決的就是這件事。PyTorch 給你 `nn.Module`、`nn.Sequential`、`optim.Adam`、`DataLoader`，以及把它們綁在一起的訓練迴圈模式。TensorFlow 給你 `keras.Layer`、`keras.Sequential`、`keras.optimizers.Adam`。這些不是魔法。它們是組織方式，讓你能定義、訓練、評估網路，不必每次把底層接線重做一次。
 
-你要用大約 500 行 Python 做同樣的東西。不用 numpy。沒有外部依賴。這個框架可以定義任何前饋（feedforward）網路，用 SGD 或 Adam 訓練，把資料分批，套上 dropout 和批次正規化（batch normalization），用任何活化函數，並排學習率（learning rate）。
+你要用大約 500 行 Python 做同樣的東西。不用 numpy。沒有外部依賴。這個框架可以定義任何前饋（feedforward）網路，用 SGD 或 Adam 訓練，把資料分批，套上 dropout 和批次正規化（batch normalization），用任何活化函數，排程學習率（learning rate）。
 
 做完之後，你會確切知道在 PyTorch 裡寫下 `model = nn.Sequential(...)` 時發生什麼。你會知道為什麼有 `model.train()` 和 `model.eval()`。你會知道為什麼 `optimizer.zero_grad()` 是獨立的一次呼叫。你會全部懂，因為全部是你做的。
 
@@ -50,7 +50,7 @@ Dropout 在訓練時隨機把神經元變成 0，評估時則原樣送出去。�
 
 ### DataLoader
 
-分批有兩個理由。第一，問題很大時，整個資料集（dataset）放不進記憶體（memory）。第二，小批次梯度下降法（mini-batch gradient descent）帶來的雜訊，有助於逃出局部極小值。DataLoader 把資料切成批次（batch），並且可以在每個 epoch（訓練週期）之間洗牌。
+分批有兩個理由。第一，問題很大時，整個資料集（dataset）放不進記憶體（memory）。第二，小批次梯度下降法（mini-batch gradient descent）帶來的雜訊，有助於逃出局部極小值（local minimum）。DataLoader 把資料切成批次（batch），並且可以在每個 epoch（訓練週期）之間洗牌。
 
 ### 框架架構
 

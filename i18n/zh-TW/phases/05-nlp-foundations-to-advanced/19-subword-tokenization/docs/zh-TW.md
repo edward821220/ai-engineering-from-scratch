@@ -1,6 +1,6 @@
 # 子詞 tokenization——位元組對編碼（byte-pair encoding，BPE）、WordPiece、Unigram、SentencePiece
 
-> 詞 tokenizer 會被沒看過的詞卡住。字元 tokenizer 把序列長度炸開。子詞 tokenizer 取中間。每個現代大型語言模型都靠其中一種交付。
+> 詞 tokenizer 會被沒看過的詞卡住。字元 tokenizer 把序列長度炸開。子詞 tokenizer 取中間。每個現代 LLM 都使用其中一種 tokenizer。
 
 **Type:** Learn
 **Languages:** Python
@@ -19,7 +19,7 @@
 
 ![BPE vs Unigram vs WordPiece, character-by-character](../assets/subword-tokenization.svg)
 
-**BPE。** 從字元層級的詞彙表開始。數每一對相鄰的。把最常出現的那一對合併成新 token。重複到目標詞彙表大小。主導的演算法：GPT-2/3/4、Llama、Gemma、Qwen2、Mistral。
+**BPE。** 從字元層級的詞彙表開始。統計每一組相鄰字元對的出現次數。把最常出現的那一對合併成新 token。重複到目標詞彙表大小。主導的演算法：GPT-2/3/4、Llama、Gemma、Qwen2、Mistral。
 
 **位元組層級 BPE。** 同一套演算法，但跑在原始位元組上（256 個基底 token），不是 Unicode 字元。保證零個 `[UNK]`——任何位元組序列都能編碼。GPT-2 用 50,257 個 token（256 個位元組 + 5 萬次合併 + 1 個特殊 token）。
 
@@ -31,9 +31,9 @@
 
 經驗法則：
 
-- **訓練新詞彙表：** SentencePiece（多語、不做前 tokenization）或 HF Tokenizers。
+- **訓練新詞彙表：** SentencePiece（多語、不需預先分詞）或 HF Tokenizers。
 - **對 GPT 詞彙表做快速推論：** tiktoken（cl100k_base、o200k_base）。
-- **兩者都要：** HF Tokenizers——一個函式庫，訓練加服務。
+- **兩者都要：** HF Tokenizers——同一個函式庫即可支援訓練與推論服務。
 
 ```figure
 bpe-merge

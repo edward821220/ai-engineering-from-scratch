@@ -1,6 +1,6 @@
 # 從零做自注意力（self-attention）
 
-> 注意力（attention）是一張查找表：每個詞都問「誰跟我有關？」——然後學會答案。
+> 注意力（attention）是一張查詢表：每個詞都問「誰跟我有關？」——然後學會答案。
 
 **Type:** Build
 **Languages:** Python

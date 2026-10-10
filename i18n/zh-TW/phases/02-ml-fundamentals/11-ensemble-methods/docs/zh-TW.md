@@ -16,7 +16,7 @@
 
 ## The Problem｜問題
 
-單一決策樹（decision tree）訓練快、好解讀，但會過度擬合（overfitting）。單一線性模型在複雜邊界上又會欠擬合（underfitting）。你可以花好幾天打造完美的模型架構——或者，你也可以把一堆不完美的模型組合起來，得到比其中任何一個都好的東西。
+單一決策樹（decision tree）訓練（training）快、好解讀，但會過度擬合（overfitting）。單一線性模型在複雜邊界上又會欠擬合（underfitting）。你可以花好幾天打造完美的模型架構——或者，你也可以把一堆不完美的模型組合起來，得到比其中任何一個都好的東西。
 
 集成方法做的就是這件事。它們是在表格資料（tabular data）上贏得 Kaggle 競賽最可靠的技術，驅動了大多數正式環境的機器學習（machine learning）系統，也把偏差－變異取捨（bias-variance tradeoff）具體展現出來：bagging 降變異，boosting 降偏差，stacking 學習在哪些輸入上該信任哪些模型。
 
@@ -24,28 +24,28 @@
 
 ### 為什麼集成有效
 
-假設你有 N 個各自獨立的分類器（classifier），每個的準確率都是 p > 0.5。多數決的準確率是：
+假設你有 N 個各自獨立的分類器（classifier）（classifier），每個的準確率都是 p > 0.5。多數決的準確率是：
 
 ```
 P(majority correct) = sum over k > N/2 of C(N,k) * p^k * (1-p)^(N-k)
 ```
 
-每個準確率都是 60% 的 21 個分類器，多數決的準確率約為 74%；有 101 個時，會升到 84%。當各模型犯的是不同的錯，錯誤會互相抵銷。
+每個準確率都是 60% 的 21 個分類器（classifier），多數決的準確率約為 74%；有 101 個時，會升到 84%。當各模型犯的是不同的錯，錯誤會互相抵銷。
 
 關鍵條件是**多樣性（diversity）**。如果所有模型都犯一樣的錯，組合起來一點用都沒有。集成之所以有效，是因為它透過以下方式產生多樣的模型：
 
-- 不同的訓練子集（bagging）
+- 不同的訓練（training）子集（bagging）
 - 不同的特徵（feature）子集——隨機森林（random forest）
 - 依序修正錯誤（boosting）
 - 不同的模型家族（stacking）
 
 ### Bagging（bootstrap 聚合；bootstrap aggregating）
 
-Bagging 讓每個模型在訓練資料（training data）的不同 bootstrap 樣本（bootstrap sample）上訓練，藉此製造多樣性。
+Bagging 讓每個模型在訓練（training）資料（training data）的不同 bootstrap 樣本（bootstrap sample）上訓練（training），藉此製造多樣性。
 
 ```mermaid
 flowchart TD
-    D[訓練資料] --> B1[Bootstrap 樣本 1]
+    D[訓練（training）資料] --> B1[Bootstrap 樣本 1]
     D --> B2[Bootstrap 樣本 2]
     D --> B3[Bootstrap 樣本 3]
     D --> BN[Bootstrap 樣本 N]
@@ -71,7 +71,7 @@ Bagging 降低變異而幾乎不增加偏差。每棵樹各自對自己的 boots
 
 ### Boosting（依序修正錯誤）
 
-Boosting 依序訓練模型。每個新模型都專注在前面模型答錯的樣本上。
+Boosting 依序訓練（training）模型。每個新模型都專注在前面模型答錯的樣本上。
 
 ```mermaid
 flowchart LR
@@ -82,10 +82,10 @@ flowchart LR
     M2 --> E2[找出錯誤]
     E2 --> W2[提高錯誤樣本的權重]
     W2 --> M3[模型 3]
-    M3 --> F[所有模型的加權總和（weighted sum）]
+    M3 --> F[所有模型的加權總和（weighted sum）（weighted sum）]
 ```
 
-Boosting 降低偏差：每個新模型都在修正目前為止的集成所產生的系統性誤差。最終預測是所有模型的加權總和，表現較好的模型權重較高。
+Boosting 降低偏差：每個新模型都在修正目前為止的目前集成的系統性誤差。最終預測是所有模型的加權總和（weighted sum），表現較好的模型權重較高。
 
 代價是：boosting 跑太多輪會過度擬合，因為它會一直去擬合愈來愈難的樣本，其中有些可能只是雜訊。
 
@@ -155,7 +155,7 @@ Stacking 把多個基模型（base model）的預測當成元學習器（meta-le
 
 ```mermaid
 flowchart TD
-    D[訓練資料] --> M1[模型 1：隨機森林]
+    D[訓練（training）資料] --> M1[模型 1：隨機森林]
     D --> M2[模型 2：SVM]
     D --> M3[模型 3：邏輯斯迴歸（logistic regression）]
 
@@ -170,9 +170,9 @@ flowchart TD
     META --> F[最終預測]
 ```
 
-元學習器會學到：在哪種輸入上該信任哪個基模型。如果隨機森林在某些區域比較強、SVM 在另一些區域比較強，元學習器就會學會對號入座。
+元學習器會學到：在哪種輸入上該信任哪個基模型。如果隨機森林在某些區域比較強、SVM 在另一些區域比較強，元學習器就會學會學會依輸入選擇合適的模型。
 
-為了避免資料洩漏（data leakage），基模型的預測必須在訓練集（training set）上以交叉驗證（cross-validation）產生。絕不能在訓練基模型的同一份資料上產生元特徵（meta-feature）。
+為了避免資料洩漏（data leakage），基模型的預測必須在訓練（training）集（training set）上以交叉驗證（cross-validation）產生。絕不能在訓練（training）基模型的同一份資料上產生元特徵（meta-feature）。
 
 ### 投票
 
@@ -300,7 +300,7 @@ class GradientBoostingScratch:
 |--------|---------|----------|---------------|
 | Bagging／隨機森林 | 變異 | 雜訊多、特徵多的資料 | 對偏差沒有幫助 |
 | AdaBoost | 偏差 | 乾淨資料、簡單基學習器 | 對離群值（outlier）與雜訊敏感 |
-| Gradient Boosting | 偏差 | 表格資料、競賽 | 訓練慢，不調校就容易過度擬合 |
+| Gradient Boosting | 偏差 | 表格資料、競賽 | 訓練（training）慢，不調校就容易過度擬合 |
 | XGBoost／LightGBM | 兩者 | 正式環境的表格資料 ML | 超參數（hyperparameter）很多 |
 | Stacking | 兩者 | 搶最後 1-2% 的準確率 | 複雜，元學習器有過度擬合風險 |
 | 投票 | 變異 | 快速組合多樣的模型 | 模型不多樣就沒用 |
@@ -322,9 +322,9 @@ class GradientBoostingScratch:
 
 ## Exercises｜練習
 
-1. 修改 AdaBoost 實作，在每一輪之後記錄訓練準確率。畫出準確率對弱學習器數量的圖。它什麼時候收斂（convergence）？
+1. 修改 AdaBoost 實作，在每一輪之後記錄訓練（training）準確率。畫出準確率對弱學習器數量的圖。它什麼時候收斂（convergence）？
 
-2. 在迴歸樹（regression tree）上加入隨機特徵子取樣，從頭實作一個隨機森林。用 `max_features=sqrt(n_features)` 訓練 100 棵樹並平均預測。與單棵樹比較變異降低的幅度。
+2. 在迴歸樹（regression tree）上加入隨機特徵子取樣，從頭實作一個隨機森林。用 `max_features=sqrt(n_features)` 訓練（training） 100 棵樹並平均預測。與單棵樹比較變異降低的幅度。
 
 3. 在 gradient boosting 實作中加入提前停止（early stopping）：每一輪後記錄驗證損失（validation loss），連續 10 輪沒有改善就停止。它實際需要多少棵樹？
 
@@ -336,8 +336,8 @@ class GradientBoostingScratch:
 
 | 術語 | 常見說法 | 實際意義 |
 |------|----------------|----------------------|
-| bagging | 「在隨機子集上訓練」 | bootstrap 聚合：在 bootstrap 樣本上訓練多個模型、平均預測以降低變異 |
-| boosting | 「專攻困難樣本」 | 依序訓練模型，每個模型修正目前為止集成所犯的錯誤，以降低偏差 |
+| bagging | 「在隨機子集上訓練（training）」 | bootstrap 聚合：在 bootstrap 樣本上訓練（training）多個模型、平均預測以降低變異 |
+| boosting | 「專攻困難樣本」 | 依序訓練（training）模型，每個模型修正目前為止集成所犯的錯誤，以降低偏差 |
 | AdaBoost | 「把資料重新加權」 | 透過樣本權重更新實現的 boosting；分錯的點在下一輪權重更高 |
 | gradient boosting | 「去擬合殘差」 | 讓每個新模型擬合損失函數負梯度的 boosting |
 | XGBoost | 「Kaggle 神器」 | 具備正則化、二階最佳化與系統層級加速技巧的 gradient boosting |

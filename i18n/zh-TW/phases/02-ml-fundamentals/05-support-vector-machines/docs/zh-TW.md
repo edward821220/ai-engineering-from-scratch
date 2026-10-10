@@ -20,7 +20,7 @@
 
 選擇間隔（margin）最大的那一條。間隔是決策邊界（decision boundary）到兩側最近資料點的距離。間隔越寬，分類器（classifier）越有把握，對未見資料的泛化（generalization）能力也越好。
 
-這個直覺引出了支援向量機（support vector machine，SVM）——這是機器學習（ML）中數學上最優雅的演算法之一。深度學習興起前，SVM 曾主導分類領域。如今，無論是小型資料集、高維資料，或需要具備明確原理、已為人熟知且有理論保證之模型的問題，SVM 都是最佳選擇。
+這個直覺引出了支援向量機（support vector machine，SVM）——這是機器學習（ML）中數學上最優雅的演算法（algorithm）之一。深度學習（deep learning）興起前，SVM 曾主導分類領域。如今，無論是小型資料集、高維資料，或需要具備明確原理、已為人熟知且有理論保證之模型的問題，SVM 都是最佳選擇。
 
 SVM 與第一階段直接相連：其最佳化是凸的（convex；第 18 課），間隔以範數（norm；第 14 課）衡量，而核技巧會利用內積（dot product）處理非線性決策邊界，無須真的在高維空間中計算。
 
@@ -186,7 +186,7 @@ graph LR
     A -->|"Kernel trick<br>K(x,z) = phi(x).phi(z)"| B
 ```
 
-核技巧能在不實際進入高維空間的情況下，計算其中的內積。對於 D 維空間中 d 次的多項式核，明確建立特徵空間需要 O(D^d) 個維度；但計算 K(x, z) 只需 O(D) 時間。
+核技巧能在不實際進入高維空間的情況下，計算其中的內積。在 D 維空間中，d 次多項式核的明確特徵空間……，明確建立特徵空間需要 O(D^d) 個維度；但計算 K(x, z) 只需 O(D) 時間。
 
 ### 支援向量迴歸（support vector regression，SVR）
 
@@ -201,11 +201,11 @@ subject to  y_i - (w^T x_i + b) <= epsilon + xi_i
 
 ε 參數（epsilon parameter）控制管狀區域的寬度。區域越寬，支援向量越少，擬合結果越平滑；區域越窄，支援向量越多，擬合也越貼近資料。
 
-### SVM 為何不敵深度學習（以及何時仍有優勢）
+### SVM 為何不敵深度學習（deep learning）（以及何時仍有優勢）
 
-從 1990 年代末期到 2010 年代初期，SVM 曾主導機器學習。深度學習後來超越 SVM，原因包括：
+從 1990 年代末期到 2010 年代初期，SVM 曾主導機器學習。深度學習（deep learning）後來超越 SVM，原因包括：
 
-| 面向 | SVM | 深度學習 |
+| 面向 | SVM | 深度學習（deep learning） |
 |--------|------|---------------|
 | 特徵工程（feature engineering） | 需要人工設計 | 能自行學習特徵 |
 | 可擴充性（scalability） | 核方法需 O(n^2) 至 O(n^3) | 使用隨機梯度下降法（SGD）時每個 epoch 為 O(n) |
@@ -243,7 +243,7 @@ def hinge_loss(X, y, w, b):
 
 ### 步驟 2：以梯度下降法訓練線性 SVM
 
-最小化經正則化的合頁損失來訓練模型，不需要 QP 求解器。
+最小化經正則化的合頁損失來訓練模型，不需要 QP 求解器（solver）。
 
 ```python
 class LinearSVM:
@@ -371,6 +371,6 @@ clf = Pipeline([
 
 - [Vapnik: The Nature of Statistical Learning Theory (1995)](https://link.springer.com/book/10.1007/978-1-4757-3264-1)——SVM 與統計學習的奠基著作
 - [Cortes & Vapnik: Support-vector networks (1995)](https://link.springer.com/article/10.1007/BF00994018)——SVM 的原始論文
-- [Platt: Sequential Minimal Optimization (1998)](https://www.microsoft.com/en-us/research/publication/sequential-minimal-optimization-a-fast-algorithm-for-training-support-vector-machines/)——讓 SVM 訓練變得實用的 SMO 演算法
+- [Platt: Sequential Minimal Optimization (1998)](https://www.microsoft.com/en-us/research/publication/sequential-minimal-optimization-a-fast-algorithm-for-training-support-vector-machines/)——讓 SVM 訓練變得實用的 SMO 演算法（algorithm）
 - [scikit-learn SVM documentation](https://scikit-learn.org/stable/modules/svm.html)——附有實作細節的實用指南
 - [LIBSVM: A Library for Support Vector Machines](https://www.csie.ntu.edu.tw/~cjlin/libsvm/)——大多數 SVM 實作背後的 C++ 函式庫

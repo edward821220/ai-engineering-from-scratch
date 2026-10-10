@@ -22,7 +22,7 @@
 
 傅立葉轉換會將資料從時域轉換到頻域（frequency domain），把訊號分解成不同頻率的正弦波。每個正弦波都有振幅（amplitude，代表強度）和相位（phase，代表它從哪裡開始）。傅立葉轉換會同時告訴你這兩者。
 
-這對 ML 很重要，因為頻域思維無所不在。卷積神經網路（convolutional neural networks，CNN）會執行卷積，而卷積在頻域中等同於乘法。Transformer 的位置編碼會使用頻率分解來表示位置。音訊模型（語音辨識、音樂生成）會以頻譜圖（spectrogram）——聲音的頻率表示法——作為運算對象。時間序列（time series）模型會尋找週期模式。理解傅立葉轉換，就能掌握處理這些問題所需的詞彙。
+這對 ML 很重要，因為頻域思維無所不在。卷積神經網路（convolutional neural networks，CNN）會執行卷積，而卷積在頻域中等同於乘法。Transformer 的位置編碼會使用頻率分解來表示位置。音訊模型（語音辨識、音樂生成）會以頻譜圖（spectrogram）——聲音的頻率表示法——以頻譜圖作為輸入表示。時間序列（time series）模型會尋找週期模式。理解傅立葉轉換，就能掌握處理這些問題所需的詞彙。
 
 ## The Concept｜核心概念
 
@@ -52,7 +52,7 @@ X[0] = sum_{n=0}^{N-1} x[n] * e^0 = sum of all samples
 
 **X[N/2]：奈奎斯特頻率（Nyquist frequency）。** 使用 N 個樣本能表示的最高頻率。超過此頻率就會產生混疊（aliasing）——高頻看起來會像低頻。
 
-**X[k]，其中 N/2 < k < N：負頻率。** 對於實值訊號（real-valued signals），X[N-k] = conj(X[k])，形成共軛對稱（conjugate symmetry）。負頻率與正頻率互為對稱。因此，有用的資訊只在前 N/2 + 1 個係數中。
+**X[k]，其中 N/2 < k < N：負頻率。** 對實值訊號而言（real-valued signals），X[N-k] = conj(X[k])，形成共軛對稱（conjugate symmetry）（conjugate symmetry）。負頻率與正頻率互為對稱。因此，有用的資訊只在前 N/2 + 1 個係數中。
 
 ### 反離散傅立葉轉換
 
@@ -170,7 +170,7 @@ graph LR
 
 ### 加窗
 
-DFT 假設訊號具有週期性——它會將 N 個樣本視為無限重複訊號的一個週期。如果訊號起點與終點的數值不同，邊界就會出現不連續，並產生虛假的高頻成分。這稱為頻譜洩漏（spectral leakage）。
+DFT 將訊號視為週期訊號——它會將 N 個樣本視為無限重複訊號的一個週期。如果訊號起點與終點的數值不同，邊界就會出現不連續，並產生虛假的高頻成分。這稱為頻譜洩漏（spectral leakage）。
 
 加窗（windowing）會在計算 DFT 前，讓訊號兩端逐漸衰減至零，以降低頻譜洩漏。
 
@@ -200,7 +200,7 @@ Hamming window: w[n] = 0.54 - 0.46 * cos(2*pi*n / (N-1))
 | 卷積（convolution） | x * h | X * H（逐點） |
 | 乘法 | x * h（逐點） | X * H（循環卷積，並乘上 1/N） |
 | 帕塞瓦爾定理（Parseval's theorem） | sum \|x[n]\|^2 | (1/N) * sum \|X[k]\|^2 |
-| 共軛對稱（實值輸入） | x[n] real | X[k] = conj(X[N-k]) |
+| 共軛對稱（conjugate symmetry）（實值輸入） | x[n] real | X[k] = conj(X[N-k]) |
 
 帕塞瓦爾定理指出，兩個領域的總能量相同。能量會在轉換過程中守恆（energy conservation）。
 
@@ -389,7 +389,7 @@ positive_freqs = freqs[:len(freqs)//2]
 positive_power = power[:len(power)//2]
 ```
 
-若要加窗或進行更進階的頻譜分析：
+若要加窗或做更進階的頻譜分析：
 
 ```python
 from scipy.signal import windows, stft
@@ -438,7 +438,7 @@ spectrogram = np.abs(Zxx) ** 2
 
 | 術語 | 定義 |
 |------|---------------|
-| DFT（Discrete Fourier Transform） | 將 N 個時域樣本轉換成 N 個頻域係數。每個係數都是訊號與該頻率複數正弦訊號（complex sinusoid）的相關值。 |
+| DFT（Discrete Fourier Transform） | 將 N 個時域樣本轉換成 N 個頻域係數。每個係數都是訊號與該頻率複數正弦訊號（complex sinusoid）（complex sinusoid）的相關值。 |
 | FFT（Fast Fourier Transform） | 以 O(N log N) 計算 DFT 的演算法。Cooley-Tukey 演算法會遞迴拆分偶數與奇數索引。 |
 | 反離散傅立葉轉換（Inverse DFT） | 從頻率係數重建時域訊號。公式與 DFT 相同，但指數符號相反，並乘上 1/N。 |
 | 頻率槽（frequency bin） | DFT 輸出中的每個索引 k 都代表頻率 k*fs/N Hz；「槽」是離散的頻率位置。 |

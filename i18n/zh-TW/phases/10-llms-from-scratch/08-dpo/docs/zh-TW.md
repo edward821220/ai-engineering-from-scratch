@@ -142,7 +142,7 @@ DPO 在訓練期間只需要在記憶體中保留兩個模型——當前模型�
 
 **複雜多目標獎勵訊號。** 當「更好」涉及多個維度（實用性、無害性、真實性）時，獎勵模型可以學習這種多目標權衡。DPO 將每組偏好配對視為二元訊號——一個好，一個差——無法對背後原因進行建模。
 
-**迭代式對齊。** RLHF 管線可以使用當前策略生成新回應，交由人類評分，並在線上迴圈中重新訓練獎勵模型。DPO 則運作於固定的偏好配對資料集上。Constitutional AI（Anthropic 的方法）大量運用了 RLHF 的這種迭代特性。
+**迭代式對齊。** RLHF 管線可以使用當前策略生成新回應，交由人類評分，並在持續迭代的迴圈中重新訓練獎勵模型。DPO 則運作於固定的偏好配對資料集上。Constitutional AI（Anthropic 的方法）大量運用了 RLHF 的這種迭代特性。
 
 ### DPO 之後：KTO、ORPO、SimPO
 
@@ -150,7 +150,7 @@ DPO 啟發了一系列簡化對齊方法。
 
 **KTO（Kahneman-Tversky Optimization，2024 年）：** 連配對都不需要。KTO 適用於非成對的回饋——只需將每個回應標記為「好」或「壞」，無需與替代選項進行比較。這大幅簡化了資料收集。與其展示兩個回應並詢問「哪一個更好？」，不如展示一個回應並詢問「這好嗎？」。其損失函數應用了展望理論中的損失趨避（loss aversion）：對壞回應的懲罰重於對好回應的獎勵。
 
-**ORPO（Odds Ratio Preference Optimization，2024 年）：** 將 SFT 與對齊整合至單一訓練步驟中。ORPO 不再分先做 SFT 再做 DPO，而是直接修改 SFT 損失以納入偏好訊號。其損失包含兩項：針對勝出回應的標準下一個 token 預測損失，加上一個擴大勝出與落敗回應機率差距的勝算比項。一個訓練迴圈搞定一切。
+**ORPO（Odds Ratio Preference Optimization，2024 年）：** 將 SFT 與對齊整合至單一訓練步驟中。ORPO ORPO 不必先做 SFT 再做 DPO，而是直接修改 SFT 損失以納入偏好訊號。其損失包含兩項：針對勝出回應的標準下一個 token 預測損失，加上一個擴大勝出與落敗回應機率差距的勝算比項。一個訓練迴圈搞定一切。
 
 **SimPO（Simple Preference Optimization，2024 年）：** 徹底移除了參考模型。SimPO 不再計算相對於凍結參考模型的對數機率比，而是直接使用以長度正規化後的回應平均對數機率作為隱式獎勵。這節省了記憶體（不需要參考模型）並簡化了訓練。長度正規化防止了模型盲目偏好較短的回應。
 
@@ -162,11 +162,11 @@ DPO 啟發了一系列簡化對齊方法。
 | ORPO | 2024 | 1 | 是 | 否 | 1 |
 | SimPO | 2024 | 1 | 是 | 否 | 1 |
 
-趨勢一目了然：每種新方法都在消除一層複雜度。RLHF 需要獎勵模型與 PPO，DPO 兩者皆除。KTO 移除了成對資料的需求。ORPO 移除了獨立的 SFT 階段。SimPO 移除了參考模型。「對齊稅（alignment tax）」——從基底模型走向對齊模型所需的算力與複雜度成本——正持續暴跌。
+趨勢一目了然：每種新方法都在消除一層複雜度。RLHF 需要獎勵模型與 PPO，DPO 兩者皆除。KTO 移除了成對資料的需求。ORPO 移除了獨立的 SFT 階段。SimPO 移除了參考模型。「對齊稅（alignment tax）」——從基模型走向對齊模型所需的算力與複雜度成本——持續降低。
 
 ### 真實世界部署
 
-**Zephyr-7B（HuggingFace，2023 年 10 月）：** Mistral 7B 基底，在 UltraChat（20 萬範例）上進行 SFT，隨後在 UltraFeedback（6 萬偏好配對）上執行 DPO。在 MT-Bench 上拿下 6.47 分——為當時 7B 模型的最高分。相比之下，Llama 2 Chat 70B 的得分為 6.86，意味著 Zephyr 僅透過 DPO 對齊就達到了參數量大其 10 倍模型 94% 以上的實力。
+**Zephyr-7B（HuggingFace，2023 年 10 月）：** Mistral 7B 基底，在 UltraChat（20 萬範例）上進行 SFT，隨後在 UltraFeedback（6 萬偏好配對）上執行 DPO。在 MT-Bench 上拿下 6.47 分——為當時 7B 模型的最高分。相比之下，Llama 2 Chat 70B 的得分為 6.86，意味著 Zephyr 僅透過 DPO 對齊就達到了參數量是其 10 倍的模型 94% 以上的實力。
 
 **Llama 3（Meta，2024 年 4 月）：** 在初期 RLHF 階段之後接續使用了 DPO。這種結合表明 DPO 與 RLHF 可以相輔相成——以 RLHF 進行廣泛對齊，以 DPO 進行針對性精煉。
 
@@ -180,7 +180,7 @@ dpo-loss
 
 ### 步驟 1：偏好資料集
 
-與 RLHF 相同的格式——（prompt，勝出，落敗）三元組。DPO 直接消耗此資料，不需要中介的獎勵模型。
+與 RLHF 相同的格式——（prompt，勝出，落敗）三元組。DPO 可直接使用這些資料，不需要中介的獎勵模型。
 
 ```python
 import numpy as np
@@ -307,7 +307,7 @@ def dpo_loss(policy_logprob_preferred, policy_logprob_rejected,
 
 `preferred_ratio` 與 `rejected_ratio` 是 DPO 推導中的對數機率比。當當前模型相較於參考模型賦予勝出回應更高的機率、賦予落敗回應更低的機率時，logit 為正且損失值很低。訓練訊號正是推動模型往這個方向演進。
 
-`implicit_preferred_reward` 與 `implicit_rejected_reward` 是 DPO 損失隱式賦予的獎勵。你可以將它們提取出來以驗證訓練是否發揮作用——勝出與落敗獎勵之間的邊界差距（margin）在訓練過程中應持續擴大。
+`implicit_preferred_reward` 與 `implicit_rejected_reward` 是 DPO 損失隱式賦予的獎勵。你可以將它們提取出來以驗證訓練是否發揮作用——勝出與落敗獎勵之間的分數間隔在訓練過程中應持續擴大。
 
 ### 步驟 4：DPO 訓練迴圈
 
@@ -395,7 +395,7 @@ def dpo_train(policy_model, reference_model, preference_data,
     return policy_model, losses, margins
 ```
 
-相較於 RLHF，這個訓練迴圈極其乾淨。針對每組偏好配對：計算四個對數機率（兩個模型、兩種回應），帶入 DPO 損失函數，計算梯度，更新策略。不需要生成步驟，不需要獎勵模型推論，不需要優勢估計，也不需要截斷操作。
+相較於 RLHF，這個訓練迴圈簡潔許多。針對每組偏好配對：計算四個對數機率（兩個模型、兩種回應），帶入 DPO 損失函數，計算梯度，更新策略。不需要生成步驟，不需要獎勵模型推論，不需要優勢估計，也不需要截斷操作。
 
 ### 步驟 5：比較 DPO 與 RLHF
 
@@ -454,7 +454,7 @@ def analyze_implicit_rewards(model, reference_model, preference_data, beta=0.1, 
 
 ### 步驟 6：Beta 敏感度分析
 
-beta 參數是 DPO 對應於 RLHF 中 KL 係數的等價物。它控制了模型能偏離參考模型多遠。本實驗展示其影響。
+DPO 的 beta 參數對應於 RLHF 的 KL 係數。它控制了模型能偏離參考模型多遠。本實驗展示其影響。
 
 ```python
 def beta_sensitivity_analysis(sft_model, preference_data, betas, max_seq_len=128):
@@ -632,7 +632,7 @@ if __name__ == "__main__":
 
 4. 實作迭代式 DPO。執行 DPO 訓練 3 個 epoch，接著從訓練好的模型生成新回應，並將它們與原始勝出回應組合成新的偏好配對，然後再次執行 DPO。進行兩輪此種「自我對弈」過程。比較第 1 輪與第 2 輪之後的偏好準確率，觀察迭代式精煉是否有助於提升效能。
 
-5. 比較不同的參考模型對 DPO 的影響。與其使用 SFT checkpoint 作為參考，不如嘗試：(a) 基底模型（SFT 之前）、(b) DPO 第 1 個 epoch 的 checkpoint、(c) 策略模型的指數移動平均（EMA）。報告哪種參考模型能產出最高的偏好準確率與最穩定的訓練曲線。
+5. 比較不同的參考模型對 DPO 的影響。與其使用 SFT checkpoint 作為參考，不如嘗試：(a) 基模型（SFT 之前）、(b) DPO 第 1 個 epoch 的 checkpoint、(c) 策略模型的指數移動平均（EMA）。報告哪種參考模型能產出最高的偏好準確率與最穩定的訓練曲線。
 
 ## Key Terms｜關鍵術語
 
@@ -646,7 +646,7 @@ if __name__ == "__main__":
 | KTO | 「沒有配對的 DPO」 | Kahneman-Tversky Optimization：適用於非成對的「好」或「壞」標籤，無需偏好配對 |
 | ORPO | 「一步到位對齊」 | Odds Ratio Preference Optimization：透過在 SFT 損失中加入偏好項，將 SFT 與對齊合併為單一訓練迴圈 |
 | SimPO | 「不需要參考模型」 | Simple Preference Optimization：使用長度正規化的平均對數機率作為隱式獎勵，徹底移除了參考模型 |
-| 對齊稅（Alignment tax） | 「讓模型安全的成本」 | 從基底模型走向對齊模型所需的額外運算、資料與複雜度開銷——DPO 大幅降低了這項成本 |
+| 對齊稅（Alignment tax） | 「讓模型安全的成本」 | 從基模型走向對齊模型所需的額外運算、資料與複雜度開銷——DPO 大幅降低了這項成本 |
 
 ## Further Reading｜延伸閱讀
 

@@ -83,13 +83,13 @@ EAGLE-1 的革新：
 - 草稿架構 = 單層 transformer 解碼器（而非獨立的小型模型）。
 - 輸出 = 每個深度 K = 4 到 8 個候選的樹，深度為 4 到 6。
 
-EAGLE-2（2024 年）引入了動態樹拓撲結構：在草稿不確定處拓寬樹的分岔，在充滿信心處保持狹窄，在不增加驗證成本的前提下顯著拉升了實質接受率 `α_effective`。
+EAGLE-2（2024 年）引入了動態樹拓撲結構：在草稿不確定處拓寬樹的分岔，在充滿信心處保持狹窄，在不增加驗證成本的前提下提高有效接受率 α_effective `α_effective`。
 
-EAGLE-3（Li 等人，2025 年，《EAGLE-3: Scaling up Inference Acceleration of Large Language Models via Training-Time Test》）移除了固定的頂層特徵依賴，改以「測試期模擬（training-time test）」損失進行訓練——草稿模型是在匹配目標模型測試期分布的輸出上受訓，而非教師強制（teacher forcing）的訓練分布。接受率從 0.75（EAGLE-2）躍升至 0.82（EAGLE-3），平均每次驗證產出的 token 數從 3.0 個提升至 4.5 個。
+EAGLE-3（Li 等人，2025 年，《EAGLE-3: Scaling up Inference Acceleration of Large Language Models via Training-Time Test》）移除了固定的頂層特徵依賴，改以「測試期模擬（test-time simulation）」損失進行訓練——草稿模型是在匹配目標模型測試期分布的輸出上受訓，而非教師強制（teacher forcing）的訓練分布。接受率從 0.75（EAGLE-2）躍升至 0.82（EAGLE-3），平均每次驗證產出的 token 數從 3.0 個提升至 4.5 個。
 
 ### 樹狀注意力驗證（Tree Attention Verification）
 
-當草稿模型輸出樹狀結構時，目標模型透過**樹狀注意力遮罩（tree attention mask）**在單次前向傳遞中驗證它——該因果遮罩編碼了樹的拓撲結構而非純線性鏈條。每個 token 僅關注其在樹中的祖先節點。驗證傳遞依然只需單次前向矩陣乘法，拓撲遮罩僅消耗微不足道的額外 KV 條目。
+當草稿模型輸出樹狀結構時，目標模型透過**樹狀注意力遮罩（tree attention mask）**在單次前向傳遞中驗證它——該因果遮罩編碼了樹的拓撲結構而非純線性鏈條。每個 token 僅關注其在樹中的祖先節點。驗證傳遞依然只需單次前向矩陣乘法，只增加少量 KV 條目。
 
 ```
         root
@@ -112,7 +112,7 @@ EAGLE-3（Li 等人，2025 年，《EAGLE-3: Scaling up Inference Acceleration o
 - 超高並行的批次服務——批次處理本身已填滿了 GPU 算力，沒有餘裕容納樹狀驗證。
 - 目標模型本身極小，草稿模型相形之下沒有明顯體積優勢。
 
-正式環境實測通常回報：對話任務取得 2 到 3 倍的時鐘時間加速，程式碼生成取得 3 到 5 倍加速，而高隨機創意寫作則近乎無提升。
+正式環境實測通常回報：對話任務取得 2 到 3 倍的實際耗時加速，程式碼生成取得 3 到 5 倍加速，而高隨機創意寫作則近乎無提升。
 
 ```figure
 speculative-decoding
@@ -162,7 +162,7 @@ def speculative_step(p_target, q_draft, K, temperature=1.0):
 
 ## Use It｜實際應用
 
-- **vLLM** 與 **SGLang** 原生支援一流通推測解碼。在 vLLM 中，向 `--speculative-config` 傳入包含 `method`、`model` 與 `num_speculative_tokens` 的 JSON 物件；EAGLE-3 設定為 `"method": "eagle3"`。
+- **vLLM** 與 **SGLang** 原生提供完整的推測解碼支援。在 vLLM 中，向 `--speculative-config` 傳入包含 `method`、`model` 與 `num_speculative_tokens` 的 JSON 物件；EAGLE-3 設定為 `"method": "eagle3"`。
 - **NVIDIA TensorRT-LLM** 原生支援 Medusa 與 EAGLE 樹。
 - **開源參考草稿模型**：`Qwen/Qwen3-0.6B`（為 Qwen3-32B 擔任草稿）、`meta-llama/Llama-3.2-1B-Instruct`（為 Llama 3.x 70B 擔任草稿）。
 - **Medusa 輸出頭**（Cai 等人，2024 年，《Medusa: Simple LLM Inference Acceleration Framework with Multiple Decoding Heads》）：不再使用獨立草稿模型，而是在目標模型本身加上 K 個平行預測頭。部署更簡便，接受率略低於 EAGLE。

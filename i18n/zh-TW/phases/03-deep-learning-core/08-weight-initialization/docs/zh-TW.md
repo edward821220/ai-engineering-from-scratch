@@ -117,13 +117,13 @@ flowchart TD
     subgraph "Xavier 初始化"
         X1["第 1 層<br/>Var = 2/(fan_in+fan_out)"] --> X2["第 2 層<br/>訊號穩定"]
         X2 --> X3["第 50 層<br/>訊號穩定"]
-        X3 --> XR["結果：配<br/>sigmoid/tanh 可以訓練"]
+        X3 --> XR["結果：可用 sigmoid/tanh 訓練"]
     end
 
     subgraph "Kaiming 初始化"
         K1["第 1 層<br/>Var = 2/fan_in"] --> K2["第 2 層<br/>訊號穩定"]
         K2 --> K3["第 50 層<br/>訊號穩定"]
-        K3 --> KR["結果：配<br/>ReLU/GELU 可以訓練"]
+        K3 --> KR["結果：可用 ReLU/GELU 訓練"]
     end
 ```
 

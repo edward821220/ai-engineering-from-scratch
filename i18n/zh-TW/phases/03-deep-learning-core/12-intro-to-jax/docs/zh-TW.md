@@ -10,7 +10,7 @@
 ## Learning Objectives｜學習目標
 
 - 用 JAX 的函數式 API 寫純函式神經網路（neural network）程式：jax.numpy、jax.grad、jax.jit、jax.vmap
-- 說明 PyTorch 的急切就地修改，和 JAX 的函數式編譯模型，關鍵設計差在哪
+- 說明 PyTorch 的立即執行（eager execution）就地修改，和 JAX 的函數式編譯模型，關鍵設計差在哪
 - 用 jit 編譯和 vmap 向量化（vectorization），讓訓練迴圈比單純的 Python 更快
 - 在 JAX 裡訓練一個簡單網路，並把明確的狀態管理和 PyTorch 的物件導向作法對照
 
@@ -18,7 +18,7 @@
 
 你知道怎麼在 PyTorch 裡建神經網路。你定義一個 `nn.Module`，呼叫 `.backward()`，再讓最佳化器（optimizer）走一步。它能動。好幾百萬人在用。
 
-但 PyTorch 的骨子裡有一個限制：它在 Python 裡急切地、一次一個地追蹤運算。每一次 `tensor + tensor` 都是一次獨立的核心啟動。每一步訓練都把同一段 Python 重新解讀一次。這在你要跨 2,048 個 TPU 訓練一個 5400 億參數（parameter）的模型（model）之前都還好。到了那個規模，額外開銷會把你拖垮。
+但 PyTorch 的骨子裡有一個限制：它在 Python 裡立即執行（eager execution）地、一次一個地追蹤運算。每一次 `tensor + tensor` 都是一次獨立的GPU kernel 啟動。每一步訓練都把同一段 Python 重新解讀一次。這在你要跨 2,048 個 TPU 訓練一個 5400 億參數（parameter）的模型（model）之前都還好。到了那個規模，額外開銷會把你拖垮。
 
 Google DeepMind 用 JAX 訓練 Gemini。Anthropic 用 JAX 訓練 Claude。這不是小規模的運算。它們是地球上最大規模的神經網路訓練。他們選 JAX，是因為它把訓練迴圈當成一個可以編譯的程式，而不是一連串 Python 呼叫。
 
@@ -55,7 +55,7 @@ c = jnp.dot(a, b)
 
 函式名稱相同。廣播（broadcasting）規則相同。切片的語意相同。但陣列放在 GPU/TPU 上，而且每個運算都能被編譯器追蹤。
 
-一個關鍵差別：JAX 陣列不可變。不能寫 `a[0] = 5`。要寫 `a = a.at[0].set(5)`。這會彆扭一個星期，然後就通了。不可變，才讓 `grad`、`jit` 和 `vmap` 這類變換可以組合。
+一個關鍵差別：JAX 陣列不可變。不能寫 `a[0] = 5`。要寫 `a = a.at[0].set(5)`。剛開始會覺得不太習慣，過一週左右就會上手。不可變，才讓 `grad`、`jit` 和 `vmap` 這類變換可以組合。
 
 ### jax.grad：函數式自動微分
 

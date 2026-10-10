@@ -1,6 +1,6 @@
 # ControlNet、LoRA 與條件
 
-> 只有文字，是很笨拙的控制信號。ControlNet 讓你複製一個預訓練的擴散模型，再用深度圖、姿勢骨架、塗鴉或邊緣影像來駕馭它。LoRA 讓你 fine-tune 一個 20 億參數（parameter）的模型，實際只訓練 1000 萬個參數。兩者合起來，把 Stable Diffusion 從玩具變成 2026 年每家代理商都在出貨的影像管線（pipeline）。
+> 只有文字，是不夠精確的控制訊號。ControlNet 讓你複製一個預訓練的擴散模型，再用深度圖、姿勢骨架、塗鴉或邊緣影像來駕馭它。LoRA 讓你 fine-tune 一個 20 億參數（parameter）的模型，實際只訓練 1000 萬個參數。兩者合起來，把 Stable Diffusion 從玩具變成 2026 年每家代理商都在出貨的影像管線（pipeline）。
 
 **Type:** Build
 **Languages:** Python

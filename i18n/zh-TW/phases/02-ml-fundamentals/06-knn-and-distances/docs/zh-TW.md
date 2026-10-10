@@ -1,6 +1,6 @@
 # K 最近鄰法與距離
 
-> 把所有資料都存起來，預測時看看鄰居就好。這是最簡單、也確實有效的演算法。
+> 把所有資料都存起來，預測時看看鄰居就好。這是最簡單、也確實有效的演算法（algorithm）。
 
 **Type:** Build
 **Language:** Python
@@ -22,7 +22,7 @@
 
 這聽起來簡單得不像真的有效，但 KNN 在許多問題上意外地有競爭力，特別是資料集規模小到中等時。深入理解 KNN，也能掌握幾個基本概念：距離度量的選擇（連結到第一階段第 14 課）、維度災難，以及惰性學習（lazy learning）和積極式學習（eager learning）的差異。
 
-KNN 也以不同名稱出現在現代 AI 的各個角落。向量資料庫（vector database）會在 embedding 向量上執行 KNN 搜尋；檢索增強生成（retrieval-augmented generation，RAG）會找出距離最近的 K 個文件片段；推薦系統（recommendation system）則會尋找相似的使用者或物品。演算法相同，差別在規模與資料結構。
+KNN 也以不同名稱出現在現代 AI 的各個角落。向量資料庫（vector database）會在 embedding 向量上執行 KNN 搜尋；檢索增強生成（retrieval-augmented generation，RAG）會找出距離最近的 K 個文件片段；推薦系統（recommendation system）則會尋找相似的使用者或物品。演算法（algorithm）相同，差別在規模與資料結構。
 
 ## The Concept｜核心概念
 
@@ -34,7 +34,7 @@ KNN 也以不同名稱出現在現代 AI 的各個角落。向量資料庫（vec
 2. 依距離排序
 3. 選出距離最近的 K 個資料點
 4. 分類時：由 K 個鄰居投票，以多數決（majority vote）決定類別
-5. 迴歸時：取 K 個鄰居的目標值平均數，或改用加權平均（weighted average）
+5. 迴歸時：取 K 個鄰居的目標值（target）平均數，或改用加權平均（weighted average）
 
 ```mermaid
 graph TD
@@ -48,7 +48,7 @@ graph TD
     A --> P
 ```
 
-整個演算法就是這樣：不必擬合模型，也不需要梯度下降法（gradient descent）或訓練週期（epoch）。
+整個演算法（algorithm）就是這樣：不必擬合模型，也不需要梯度下降法（gradient descent）或訓練週期（epoch）。
 
 ### 選擇 K 值
 
@@ -81,7 +81,7 @@ graph LR
 
 距離函數（distance function）決定什麼叫「接近」。不同的度量會選出不同鄰居，也會產生不同預測。
 
-**L2 距離（歐幾里得距離；Euclidean distance）** 是預設選擇，代表直線距離。
+**L2 距離（歐幾里得距離；Euclidean distance）** 是預設（default），代表直線距離。
 
 ```
 d(a, b) = sqrt(sum((a_i - b_i)^2))
@@ -115,7 +115,7 @@ p->inf: Chebyshev (max absolute difference)
 
 | 資料類型 | 最佳度量 | 原因 |
 |-----------|------------|-----|
-| 數值特徵，尺度相近 | L2（歐幾里得） | 預設選擇，適用於空間資料 |
+| 數值特徵，尺度相近 | L2（歐幾里得） | 預設（default），適用於空間資料 |
 | 數值特徵，含離群值 | L1（曼哈頓） | 較穩健，不會放大較大的差異 |
 | 文字 embedding | 餘弦距離 | 向量長度只是雜訊，方向才代表意義 |
 | 高維稀疏資料 | 餘弦距離或 L1 | L2 會受到維度災難影響 |
@@ -164,7 +164,7 @@ When all distances are nearly equal, "nearest" is meaningless.
 
 採暴力搜尋的 KNN 會計算查詢點到每個訓練資料點的距離，每次查詢的計算複雜度為 O(n * d)。對大型資料集來說，這太慢了。
 
-KD-tree 會沿著特徵軸遞迴切分空間。每一層都在某個維度上，以中位數值作為切分點。
+KD-tree 會沿著特徵軸遞迴切分空間。每一層都在某個維度上，以中位數（median）值作為切分點。
 
 ```mermaid
 graph TD
@@ -189,11 +189,11 @@ Ball tree 以巢狀超球面（hypersphere）而非軸對齊方框來切分資�
 - 能處理非軸對齊的結構
 - 包圍體越緊密，搜尋時就能跳過更多子樹
 
-KD-tree 和 Ball tree 都是精確演算法。若需要真正大規模的搜尋（數百萬個資料點、數百個維度），則會改用近似最近鄰（approximate nearest neighbor）方法，例如 HNSW、IVF 和乘積量化（product quantization）。第一階段第 14 課會介紹這些方法。
+KD-tree 和 Ball tree 都是精確演算法（algorithm）。若需要真正大規模的搜尋（數百萬個資料點、數百個維度），則會改用近似最近鄰（approximate nearest neighbor）方法，例如 HNSW、IVF 和乘積量化（product quantization）。第一階段第 14 課會介紹這些方法。
 
 ### 惰性學習與積極式學習
 
-KNN 是惰性學習器（lazy learner）：訓練時不做運算，所有工作都在預測時進行。多數其他演算法則是積極式學習器（eager learner），例如線性迴歸、SVM 和神經網路（neural network）；這些演算法會在訓練時執行大量運算以建立精簡模型，因此預測速度快。
+KNN 是惰性學習器（lazy learner）：訓練時不做運算，所有運算都留到預測時才做。多數其他演算法（algorithm）則是積極式學習器（eager learner），例如線性迴歸、SVM 和神經網路（neural network）；這些演算法（algorithm）會在訓練時執行大量運算以建立精簡模型，因此預測速度快。
 
 | 面向 | 惰性學習（KNN） | 積極式學習（SVM、神經網路） |
 |--------|------------|------------------------|
@@ -211,7 +211,7 @@ KNN 是惰性學習器（lazy learner）：訓練時不做運算，所有工作�
 
 ### KNN 迴歸（KNN regression）
 
-KNN 迴歸不採用多數決，而是將 K 個鄰居的目標值取平均。
+KNN 迴歸不採用多數決，而是將 K 個鄰居的目標值（target）取平均。
 
 ```
 prediction = (1/K) * sum(y_i for i in K nearest neighbors)
@@ -221,7 +221,7 @@ prediction = sum(w_i * y_i) / sum(w_i)
 where w_i = 1 / distance_i
 ```
 
-KNN 迴歸產生分段常數（piecewise-constant）預測；加權時則會得到分段平滑（piecewise-smooth）的預測。它無法外插（extrapolation）到訓練資料範圍以外。若訓練目標值都介於 0 到 100，KNN 絕不會預測出 200。
+KNN 迴歸產生分段常數（piecewise-constant）預測；加權時則會得到分段平滑（piecewise-smooth）的預測。它無法外插（extrapolation）到訓練資料範圍以外。若訓練目標值（target）都介於 0 到 100，KNN 絕不會預測出 200。
 
 ```figure
 knn-smoothness
@@ -281,7 +281,7 @@ class KNN:
 
 ### 步驟 3：建立 KD-tree 以加速搜尋
 
-從頭建立 KD-tree，依各維度的中位數遞迴切分空間。
+從頭建立 KD-tree，依各維度的中位數（median）遞迴切分空間。
 
 ```python
 class KDTree:
@@ -359,9 +359,9 @@ distances, indices = index.search(query_vectors, k=5)
 
 | 術語 | 實際意義 |
 |------|----------------------|
-| K 最近鄰法（K-nearest neighbors） | 非參數演算法（non-parametric algorithm），找出距離查詢點最近的 K 個訓練資料點，再據此預測 |
-| 惰性學習（lazy learning） | 訓練時不做運算，所有工作都在預測時進行。KNN 是典型例子 |
-| 積極式學習（eager learning） | 訓練時執行大量運算以建立精簡模型。多數機器學習演算法都屬於此類 |
+| K 最近鄰法（K-nearest neighbors） | 非參數演算法（algorithm）（non-parametric algorithm），找出距離查詢點最近的 K 個訓練資料點，再據此預測 |
+| 惰性學習（lazy learning） | 訓練時不做運算，所有運算都留到預測時才做。KNN 是典型例子 |
+| 積極式學習（eager learning） | 訓練時執行大量運算以建立精簡模型。多數機器學習演算法（algorithm）都屬於此類 |
 | 維度災難（curse of dimensionality） | 高維空間中的距離會趨於一致，鄰域也會擴大到涵蓋空間的大部分，使 KNN 難以奏效 |
 | KD-tree | 沿特徵軸遞迴切分空間的二元樹；在低維空間中，查詢時間為 O(log n) |
 | Ball tree | 由巢狀超球面構成的樹；在中等維度（最多約 50 維）下，比 KD-tree 更有效 |
@@ -369,7 +369,7 @@ distances, indices = index.search(query_vectors, k=5)
 | 特徵縮放（feature scaling） | 將特徵調整到可比較的數值範圍；KNN 等依賴距離的方法都需要特徵縮放 |
 | 多數決（majority vote） | 統計 K 個鄰居中各類別的數量，並以數量最多的類別作為分類結果 |
 | 暴力搜尋（brute force search） | 計算查詢點到每個訓練資料點的距離；每次查詢需 O(n*d)，結果精確，但 n 很大時速度較慢 |
-| 近似最近鄰（approximate nearest neighbor） | 使用 HNSW、LSH、IVF 等演算法近似搜尋最近鄰，速度遠快於精確搜尋 |
+| 近似最近鄰（approximate nearest neighbor） | 使用 HNSW、LSH、IVF 等演算法（algorithm）近似搜尋最近鄰，速度遠快於精確搜尋 |
 | Voronoi 圖（Voronoi diagram） | 將空間劃分為多個區域，每個區域內的點，離同一個訓練點都比離其他訓練點更近；K=1 的 KNN 會產生 Voronoi 邊界 |
 
 ## Further Reading｜延伸閱讀
@@ -377,5 +377,5 @@ distances, indices = index.search(query_vectors, k=5)
 - [Cover & Hart: Nearest Neighbor Pattern Classification (1967)](https://ieeexplore.ieee.org/document/1053964)——KNN 的奠基論文，證明其錯誤率至多為貝氏最優錯誤率的兩倍
 - [Friedman, Bentley, Finkel: An Algorithm for Finding Best Matches in Logarithmic Expected Time (1977)](https://dl.acm.org/doi/10.1145/355744.355745)——KD-tree 的原始論文
 - [Beyer et al.: When Is "Nearest Neighbor" Meaningful? (1999)](https://link.springer.com/chapter/10.1007/3-540-49257-7_15)——正式分析最近鄰搜尋中的維度災難
-- [scikit-learn Nearest Neighbors documentation](https://scikit-learn.org/stable/modules/neighbors.html)——說明演算法選擇的實用指南
+- [scikit-learn Nearest Neighbors documentation](https://scikit-learn.org/stable/modules/neighbors.html)——說明演算法（algorithm）選擇的實用指南
 - [FAISS: A Library for Efficient Similarity Search](https://github.com/facebookresearch/faiss)——Meta 提供、可支援十億規模近似最近鄰搜尋的函式庫

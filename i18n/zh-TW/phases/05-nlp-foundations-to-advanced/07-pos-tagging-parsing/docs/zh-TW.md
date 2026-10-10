@@ -52,7 +52,7 @@ dependency-arcs
 
 ### 步驟 1：最常見標記的基準模型
 
-最笨、但行得通的詞性標記器。每個詞預測它在訓練裡最常出現的標記。
+最笨、但行得通的詞性標註器。每個詞預測它在訓練裡最常出現的標記。
 
 ```python
 from collections import Counter, defaultdict
@@ -76,7 +76,7 @@ def predict_mft(tokens, word_best, default_tag):
 
 在 Brown 語料庫（corpus）上，這個基準模型大約 85% 準確率（accuracy）。不好，但它是下限：認真的模型不該掉到這下面。
 
-### 步驟 2：二元 n-gram 的 HMM 標記器
+### 步驟 2：二元 n-gram 的 HMM 標註器
 
 把序列的聯合機率建模成：
 
@@ -152,7 +152,7 @@ def viterbi(tokens, transitions, emissions, tags, vocab, alpha=0.01):
 
 Brown 上的二元 n-gram HMM 大約 93% 準確率。從 85% 跳到 93%，主要是轉移機率——模型學到 `DET NOUN` 常見、`NOUN DET` 稀有。
 
-### 步驟 3：為什麼現代標記器打得過這個
+### 步驟 3：為什麼現代標註器打得過這個
 
 轉移機率和發射機率都是局部的。它們抓不到 `saw` 在「I bought a saw」裡是名詞，在「I saw the movie.」裡是動詞。帶任意特徵（feature）的條件隨機場（conditional random field）大約 97%：詞尾、詞形、前後的詞、這個詞本身。BiLSTM-CRF 或 transformer 大約 98% 以上。
 

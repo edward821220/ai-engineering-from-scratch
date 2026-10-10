@@ -1,6 +1,6 @@
 # 影片生成
 
-> 影像是二維張量（tensor）。影片是三維張量。理論一樣；算力難上 10 到 100 倍。OpenAI 的 Sora（2024 年 2 月）證明這做得到。到了 2026 年，Veo 2、Kling 1.5、Runway Gen-3、Pika 2.0 與 WAN 2.2 都能從文字出貨 1080p 的生產級影片——而開放權重（open weights）這一套（CogVideoX、HunyuanVideo、Mochi-1、WAN 2.2）還落後 12 個月。
+> 影像是二維張量（tensor）。影片是三維張量。理論一樣；運算需求高出 10 到 100 倍。OpenAI 的 Sora（2024 年 2 月）證明這做得到。到了 2026 年，Veo 2、Kling 1.5、Runway Gen-3、Pika 2.0 與 WAN 2.2 都能從文字出貨 1080p 的生產級影片——而開放權重（open weights）這一套（CogVideoX、HunyuanVideo、Mochi-1、WAN 2.2）還落後 12 個月。
 
 **Type:** Build
 **Languages:** Python

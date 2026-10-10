@@ -1,6 +1,6 @@
 # 資訊檢索與搜尋
 
-> BM25 精準但脆。稠密檢索網撒得很寬，卻會漏掉關鍵字。混合是 2026 年的預設。其餘都是調校。
+> 精準但脆弱。稠密檢索網撒得很寬，卻會漏掉關鍵字。混合是 2026 年的預設。其餘都是調校。
 
 **Type:** Build
 **Languages:** Python
@@ -109,7 +109,7 @@ def dense_search(encoder, embeddings, query, top_k=10):
     return [(float(sims[i]), int(i)) for i in order]
 ```
 
-把 embedding 做 L2 正規化，內積（dot product）就等於餘弦（cosine）。`all-MiniLM-L6-v2` 是 384 維（dimension），快，對多數英文檢索夠強。多語用 `paraphrase-multilingual-MiniLM-L12-v2`。要最高準確率（accuracy），用 `bge-large-en-v1.5` 或 `e5-large-v2`。
+把 embedding 做 L2 正規化，內積（dot product）就等於餘弦相似度（cosine similarity）。`all-MiniLM-L6-v2` 是 384 維（dimension），快，對多數英文檢索夠強。多語用 `paraphrase-multilingual-MiniLM-L12-v2`。要最高準確率（accuracy），用 `bge-large-en-v1.5` 或 `e5-large-v2`。
 
 ### 步驟 3：倒數排名融合
 

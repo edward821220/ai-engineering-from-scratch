@@ -11,7 +11,7 @@
 
 Word2Vec 留下兩個還沒回答的問題。
 
-第一，有一條並行的研究直接分解共現矩陣（LSA、HAL），而不是逐筆做 skip-gram 更新。Word2Vec 的迭代做法是不是本質上更好，還是差別只是兩種方法處理計數方式造成的假象？**GloVe** 回答了：用一個挑過的損失函數（loss function）做矩陣分解，可以追平或超過 Word2Vec，而且訓練成本更低。
+第一，另有一支研究方向直接分解共現矩陣（LSA、HAL），而不是逐筆做 skip-gram 更新。Word2Vec 的迭代做法是不是本質上更好，還是差別只是兩種方法處理計數方式造成的假象？**GloVe** 回答了：用一個挑過的損失函數（loss function）做矩陣分解，可以追平或超過 Word2Vec，而且訓練成本更低。
 
 第二，兩種方法都沒有辦法處理沒看過的詞。`Zoomer-approved`、`dogecoin`、上週才造出來的專有名詞、稀有詞根的每一種屈折形式。**FastText** 用字元 n-gram 的 embedding 修了這件事：一個詞是它各部分的和，包含語素（morpheme），所以連詞彙表外（out-of-vocabulary）的詞也能得到一個說得通的向量。
 
@@ -25,7 +25,7 @@ Word2Vec 留下兩個還沒回答的問題。
 
 **FastText。** 一個詞是它的字元 n-gram 加上詞本身的和。`where` 變成 `<wh, whe, her, ere, re>, <where>`。詞向量是這些成分向量的和。訓練方式和 Word2Vec 一樣。好處：沒看過的詞（`whereupon`）能用已知的 n-gram 組出來。
 
-**BPE。** 從個別位元組（byte）或字元的詞彙表開始。數語料庫（corpus）裡每一對相鄰的配對。把最常出現的配對合併成一個新 token。重複 `k` 次。結果是 `k + 256` 個 token 的詞彙表：常見序列（`ing`、`tion`、`the`）是單一 token，稀有詞被拆成熟悉的片段。每個句子都能切成某個東西。
+**BPE。** 從個別位元組（byte）或字元的詞彙表開始。數語料庫（corpus）裡每一對相鄰的配對。把最常出現的配對合併成一個新 token。重複 `k` 次。結果是 `k + 256` 個 token 的詞彙表：常見序列（`ing`、`tion`、`the`）是單一 token，稀有詞被拆成熟悉的片段。每個句子都能切分成 token 序列。
 
 ```figure
 n5-subword-merge
@@ -207,7 +207,7 @@ print(tok.tokenize("unbelievably tokenized"))
 
 | 情況 | 選擇 |
 |-----------|------|
-| 預訓練的通用詞向量，不需要容忍 OOV | GloVe 300 維 |
+| 預訓練的通用詞向量，不必處理 OOV | GloVe 300 維 |
 | 預訓練的通用詞向量，必須處理拼錯、新造詞、構詞豐富的語言 | FastText |
 | 任何要送進 transformer 的東西（訓練或推論（inference）） | 模型一起交出來的那個 tokenizer。絕對不要換。 |
 | 從零訓練你自己的語言模型 | 先在你的語料庫上訓練 BPE 或 SentencePiece tokenizer |

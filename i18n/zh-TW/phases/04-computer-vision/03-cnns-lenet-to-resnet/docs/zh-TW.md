@@ -347,7 +347,7 @@ v16.eval()
 print(f"VGG-16   params: {sum(p.numel() for p in v16.parameters()):,}")
 ```
 
-ResNet-18 有 1170 萬個參數。VGG-16 有 1.38 億。ImageNet 的 top-1 準確率相近，69.8% 對 71.6%。殘差連接買到 12 倍的參數效率。所以 ResNet 變體從 2016 主導到 2021 年 ViT 出現，而且在算力是限制的真實部署裡仍然主導。
+ResNet-18 有 1170 萬個參數。VGG-16 有 1.38 億。ImageNet 的 top-1 準確率相近，69.8% 對 71.6%。殘差連接讓參數效率提高 12 倍。所以 ResNet 變體從 2016 主導到 2021 年 ViT 出現，而且在算力是限制的真實部署裡仍然主導。
 
 遷移學習（transfer learning）的配方永遠一樣：載入預訓練權重，凍結骨幹，換掉分類頭。
 
@@ -357,7 +357,7 @@ for p in r18.parameters():
 r18.fc = nn.Linear(r18.fc.in_features, 10)
 ```
 
-三行。你現在有一個 10 類別的 CIFAR 分類器，繼承了 ImageNet 已經付過代價的表示（representation）。
+三行。你現在有一個 10 類別的 CIFAR 分類器，繼承了 繼承 ImageNet 預訓練所學到的表示（representation）。
 
 ## Ship It｜交付成果
 

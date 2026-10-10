@@ -1,6 +1,6 @@
 # 完整的 Transformer——編碼器加解碼器
 
-> 注意力是主角。其他的——殘差、正規化、前饋、交叉注意力——是讓你把它疊深的鷹架。
+> 注意力是主角。其他的——殘差、正規化、前饋、交叉注意力——是讓你把它疊深的支架。
 
 **Type:** Build
 **Languages:** Python
@@ -55,7 +55,7 @@ x → LN → MHA(masked self) → + → LN → MHA(cross to encoder) → + → L
 
 ### Pre-norm 對 post-norm
 
-原始論文：`x + sublayer(LN(x))` 對 `LN(x + sublayer(x))`。Post-norm 大約在 2019 年失寵——沒有小心的暖機（warmup），很難訓練得很深。Pre-norm（子層*之前*先做 `LN`）是 2026 年的預設：Llama、Qwen、GPT-3 之後、Mistral 都用它。
+原始論文：`x + sublayer(LN(x))` 對 `LN(x + sublayer(x))`。Post-norm 大約在 2019 年失寵——沒有小心的預熱（warmup），很難訓練得很深。Pre-norm（子層*之前*先做 `LN`）是 2026 年的預設：Llama、Qwen、GPT-3 之後、Mistral 都用它。
 
 ### 2026 年現代化的區塊
 
@@ -158,7 +158,7 @@ HF 的 `transformers` 有乾淨的參考區塊，你該讀：`modeling_llama.py`
 |------|-----------------|-----------------------|
 | 區塊 | 「一個 transformer 層」 | 正規化加注意力加正規化加 FFN 的堆疊，用殘差連接包起來。 |
 | 殘差 | 「跳躍連接」 | 輸出 `x + f(x)`；讓梯度能流過深的堆疊。 |
-| Pre-norm | 「先正規化，不是之後」 | 現代做法：`x + sublayer(LN(x))`。不用暖機的花招也能訓練得更深。 |
+| Pre-norm | 「先正規化，不是之後」 | 現代做法：`x + sublayer(LN(x))`。不用預熱的花招也能訓練得更深。 |
 | RMSNorm | 「沒有平均數的 LayerNorm」 | 除以 RMS；少一次運算，經驗穩定性一樣。 |
 | SwiGLU | 「大家換過去的 FFN」 | `Swish(W1 x) ⊙ W3 x → W2`。在語言模型困惑度上打贏 ReLU／GELU。 |
 | 交叉注意力 | 「解碼器怎麼看見編碼器」 | MHA 的 Q 來自解碼器，K／V 來自編碼器輸出。 |

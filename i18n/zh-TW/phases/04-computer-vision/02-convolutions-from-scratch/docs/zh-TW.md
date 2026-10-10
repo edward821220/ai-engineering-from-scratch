@@ -10,8 +10,8 @@
 ## Learning Objectives｜學習目標
 
 - 只用 NumPy 從零實作二維卷積，包含巢狀迴圈版，以及向量化的 `im2col` 版
-- 對任意輸入尺寸、核大小、填充（padding）和步幅（stride），算出輸出的空間大小，並說明 `(H - K + 2P) / S + 1` 為什麼成立
-- 手設核，包括邊緣、模糊、銳化和 Sobel，並說明每一個為什麼產生那樣的活化模式
+- 對任意輸入尺寸、核大小（kernel size）、填充（padding）和步幅（stride），算出輸出的空間大小，並說明 `(H - K + 2P) / S + 1` 為什麼成立
+- 手動設計的卷積核，包括邊緣、模糊、銳化和 Sobel，並說明每一個為什麼產生那樣的活化模式
 - 把卷積疊成特徵抽取器，並把堆疊的深度連到感受野（receptive field）的大小
 
 ## The Problem｜問題
@@ -72,7 +72,7 @@ The kernel slides across every valid 3 x 3 window. Output Y is 3 x 3:
 
 ### 輸出大小的公式
 
-給定輸入的空間大小 `H`、核大小 `K`、填充 `P`、步幅 `S`：
+給定輸入的空間大小 `H`、核大小（kernel size） `K`、填充 `P`、步幅 `S`：
 
 ```
 H_out = floor( (H - K + 2P) / S ) + 1
@@ -263,7 +263,7 @@ print(y[0].round(1))
 
 ### 步驟 4：im2col
 
-把輸入裡每個核大小的視窗變成矩陣的一欄。`C_in=3, K=3` 時，每一欄是 27 個數字。
+把輸入裡每個核大小（kernel size）的視窗變成矩陣的一欄。`C_in=3, K=3` 時，每一欄是 27 個數字。
 
 ```python
 def im2col(x, kh, kw, stride=1, padding=0):

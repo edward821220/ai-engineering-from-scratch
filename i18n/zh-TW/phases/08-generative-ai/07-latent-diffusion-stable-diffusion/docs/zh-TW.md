@@ -1,6 +1,6 @@
 # 潛在擴散與 Stable Diffusion
 
-> 在 512×512 的影像上做像素空間擴散，運算成本高到離譜。Rombach 等人（2022）注意到，生成一張影像不需要全部 78.6 萬個維度（dimension）——你需要的是夠抓住語意結構的那些，其餘交給另外一個解碼器（decoder）。在 VAE 的潛在空間（latent）裡跑擴散。那一個想法就是 Stable Diffusion。
+> 在 512×512 的影像上做像素空間擴散，運算成本高到離譜。Rombach 等人（2022）注意到，生成一張影像不需要所有 78.6 萬個維度（dimension）——你需要的是夠抓住語意結構的那些，其餘交給另外一個解碼器（decoder）。在 VAE 的潛在空間（latent）裡跑擴散。那一個想法就是 Stable Diffusion。
 
 **Type:** Build
 **Languages:** Python

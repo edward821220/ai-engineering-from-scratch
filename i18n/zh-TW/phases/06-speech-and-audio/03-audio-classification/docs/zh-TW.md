@@ -1,6 +1,6 @@
 # 音訊分類：從 MFCC 上的 k-NN 到 AST 與 BEATs
 
-> 從「狗叫對上警笛」到「這是哪一種語言」，都是音訊分類。特徵是 mel。架構每十年換一次。評估仍然是 AUC、F1，以及每一類的召回。
+> 從「狗叫對上警笛」到「這是哪一種語言」，都是音訊分類。特徵是 mel。架構每十年換一次。評估仍然是 AUC、F1，以及每一類的召回率。
 
 **Type:** Build
 **Languages:** Python
@@ -11,7 +11,7 @@
 
 你拿到一段 10 秒的片段。你想知道：「這是什麼？」都市聲音（警笛、鑽孔、狗）、語音指令（yes／no／stop）、語言識別（en／es／ar）、說話人情緒（生氣／中性），或環境聲（室內／室外、嘈雜人聲）。這些都是*音訊分類*。2026 年的基準（baseline）架構已經成熟：對數 mel，到 CNN 或 transformer，再到 softmax。
 
-核心難點不是網路。是資料。音訊資料集的類別極不平衡，領域偏移很強（乾淨對上吵），標籤有雜訊（誰決定「都市嘈雜」對上「餐廳噪音」？）。問題的八成是整理、增強和評估，不是把 CNN 換成 transformer。
+核心難點不是網路。是資料。音訊資料集的類別極不平衡，領域偏移明顯（乾淨音訊與雜訊音訊），標籤有雜訊（誰決定「都市嘈雜」對上「餐廳噪音」？）。問題的八成是整理、增強和評估，不是把 CNN 換成 transformer。
 
 ## The Concept｜核心概念
 
@@ -38,8 +38,8 @@ ESC-50：50 類，每類 40 段，平衡，容易。UrbanSound8K：10 類，不�
 ### 評估
 
 - 互斥的多類（Speech Commands）：top-1 準度、top-5 準度。
-- 多標籤的多類（AudioSet、UrbanSound 風格）：平均精度均值（mAP）。
-- 嚴重不平衡：每一類的召回加巨觀 F1（macro-F1）。
+- 多標籤的多類（AudioSet、UrbanSound 風格）：平均精確率均值（mAP）。
+- 嚴重不平衡：每一類的召回率加巨觀 F1（macro-F1）。
 
 2026 年你該知道的數字：
 
@@ -78,7 +78,7 @@ def summarize(mfcc_frames):
     return mean + var
 ```
 
-簡單但強：沿時間的平均加變異，給 13 係數 MFCC 一個 26 維的固定 embedding。馬上跑完。晚到 2017 年，這還打贏 ESC-50 上當時最好的神經網路基準。
+簡單但強：沿時間的平均加變異，給 13 係數 MFCC 一個 26 維的固定 embedding。馬上跑完。直到 2017 年，這種方法在 ESC-50 上仍勝過當時最佳的神經網路基準，這還打贏 ESC-50 上當時最好的神經網路基準。
 
 ### 步驟 3：k-NN
 
@@ -117,7 +117,7 @@ class AudioCNN(nn.Module):
         return self.head(self.body(x).flatten(1))
 ```
 
-300 萬參數（parameter）。ESC-50 上一張 RTX 4090 大約 10 分鐘訓完。準度 80% 以上。
+300 萬參數（parameter）。ESC-50 上一張 RTX 4090 大約 10 分鐘訓完。準確率 80% 以上。
 
 ### 步驟 5：fine-tune 預訓練的音訊 transformer（這裡用 AST）
 
@@ -150,7 +150,7 @@ logits = model(**inputs).logits
 | 多標籤（AudioSet） | BEATs-iter3，BCE 損失加 mixup 加 SpecAugment |
 | 語言識別 | MMS-LID、SpeechBrain VoxLingua107 基準模型 |
 
-決策規則：**從凍結的骨幹開始，不要從全新的模型開始**。fine-tuning BEATs 的頭，幾小時就拿到目前最好的 95%，不用幾週。
+決策規則：**從凍結的骨幹開始，不要從全新的模型開始**。只要 fine-tune BEATs 的分類頭，幾小時內就能達到 SOTA 表現的 95%，不用幾週。
 
 ## Ship It｜交付成果
 
@@ -160,7 +160,7 @@ logits = model(**inputs).logits
 
 1. **簡單。** 跑 `code/main.py`。它在 4 類合成資料集（不同音高的純音）上訓練 k-NN MFCC 基準模型。回報混淆矩陣。
 2. **中等。** 把 `summarize` 換成［平均、變異、偏度、峰度］。在同一份合成資料集上，四階動差池化會不會贏過平均加變異？
-3. **困難。** 用 `torchaudio` 在 ESC-50 第 1 折上訓練 2D CNN。回報 5 折交叉驗證準度。加上 SpecAugment（時間遮罩 20、頻率遮罩 10），回報差多少。
+3. **困難。** 用 `torchaudio` 在 ESC-50 第 1 折上訓練 2D CNN。回報 5 折交叉驗證準確率。加上 SpecAugment（時間遮罩 20、頻率遮罩 10），回報差多少。
 
 ## Key Terms｜關鍵術語
 
@@ -172,7 +172,7 @@ logits = model(**inputs).logits
 | BEATs | 自監督音訊 | Microsoft 的模型。iter3 到 2026 年在 AudioSet 領先。 |
 | Mixup | 成對增強 | `x = λ·x1 + (1-λ)·x2; y = λ·y1 + (1-λ)·y2`。 |
 | SpecAugment | 以遮罩為基礎的增強 | 把頻譜圖上隨機的時間帶和頻率帶歸零。 |
-| mAP | 主要的多標籤指標 | 跨類別和閾值的平均精度均值。 |
+| mAP | 主要的多標籤指標 | 跨類別和閾值的平均精確率均值。 |
 
 ## Further Reading｜延伸閱讀
 

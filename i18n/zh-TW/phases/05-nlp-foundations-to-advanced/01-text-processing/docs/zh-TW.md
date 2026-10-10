@@ -132,7 +132,7 @@ def preprocess(text, pos_tagger=None):
     return {"tokens": tokens, "stems": stems, "lemmas": lemmas}
 ```
 
-缺的那一塊是詞性標記器。第 5 階段第 07 課（詞性標記）會做一個。現在先全部預設成 `NOUN`，並承認這個限制。
+缺的那一塊是詞性標註器。第 5 階段第 07 課（詞性標記）會做一個。現在先全部預設成 `NOUN`，並承認這個限制。
 
 ## Use It｜實際應用
 

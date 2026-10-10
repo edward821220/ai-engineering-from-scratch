@@ -18,7 +18,7 @@
 
 你已經知道向量（vector）與內積（dot product），也知道矩陣（matrix）會把輸入變成輸出。可是機器要怎麼學會該用哪一種變換？
 
-感知器回答了這件事。它是最簡單的學習機器：取幾個輸入，乘上權重，加上偏置，然後做二元判斷。接著再調整。就是這樣。至今做過的每一個神經網路，都是把這個想法一層層疊起來。
+感知器回答了這件事。它是最簡單的學習機器：取幾個輸入，乘上權重，加上偏置，然後做二元判斷。接著再調整。就是這樣。至今打造出來的每一個神經網路，都是把這個想法一層層疊起來。
 
 搞懂感知器，就是搞懂「學習」在程式裡的真正意思：調整數字，直到輸出符合現實。
 
@@ -84,7 +84,7 @@ For each training example (x, y_true):
 
 ### XOR 問題
 
-問題出在這裡。看看這些邏輯閘：
+問題出在這裡。看看這些邏輯閘（logic gate）（logic gate）：
 
 ```
 AND gate:           OR gate:            XOR gate:
@@ -149,7 +149,7 @@ class Perceptron:
         print(f"Did not converge after {epochs} epochs")
 ```
 
-### 步驟 2：用邏輯閘訓練
+### 步驟 2：用邏輯閘（logic gate）（logic gate）訓練
 
 ```python
 and_data = [
