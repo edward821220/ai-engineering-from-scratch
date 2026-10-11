@@ -1733,3 +1733,9 @@
 | open-weights | 開放權重 | 否 | | 權重可取得不等於開源授權；依所附授權條款描述。 |
 | ground-truth patch | 標準答案修補檔 | 否 | | SWE-bench 類基準的參照修補檔；與 ground truth（真實標籤）語境不同。 |
 | attestation | 認證 | 否 | | 供應鏈／發布流程的簽名證明文件；與 authentication（身分驗證）不同。 |
+| batch size | 批次大小 | 否 | 批數 | 訓練超參數，指單一批次的樣本數；「批次數量」易誤讀為批次的個數。 |
+| demographic parity | 人口統計均等 | 否 | | 公平性指標：各群體獲得正面結果的比率相等。 |
+| goal-directedness | 目標導向性 | 否 | | 謀劃行為三支柱之一；指有內在目標驅動，不等於 multi-step planning。 |
+| uplift | 提升幅 | 否 | | 行銷／成長情境的指標提升幅度；勿譯為「效率」。 |
+| retriever | 檢索器 | 否 | | RAG／搜尋管線中負責取回候選文件的元件。 |
+| detector | 偵測器 | 否 | | 偵測異常、越獄、訊號的元件；勿誤譯為「檢索器」（那是 retriever）。 |
