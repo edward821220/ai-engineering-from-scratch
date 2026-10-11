@@ -69,7 +69,7 @@ graph LR
     subgraph "列優先（C 順序）"
         R["a b c d e f<br/>步幅：(3, 1)"]
     end
-    subgraph "行優先（F 順序）"
+    subgraph "欄優先（F 順序）"
         C["a d b e c f<br/>步幅：(1, 2)"]
     end
 ```

@@ -26,7 +26,7 @@
 graph TD
     subgraph tmux["tmux 工作階段：訓練"]
         subgraph top["上排"]
-            P1["窗格 1：訓練作業<br/>python train.py<br/>訓練週期 12/100 ..."]
+            P1["窗格 1：訓練作業<br/>python train.py<br/>Epoch（訓練週期）12/100 ..."]
             P2["窗格 2：GPU 監控<br/>watch -n1 nvidia-smi<br/>GPU: 78% | 記憶體：14/24G"]
         end
         P3["窗格 3：日誌與實驗<br/>tail -f logs/train.log | grep loss"]

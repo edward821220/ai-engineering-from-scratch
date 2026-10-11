@@ -50,7 +50,7 @@ graph TD
     subgraph Stage2["階段 2：獎勵模型"]
         S --> |"Generate responses"| P["偏好配對\n(prompt, winner, loser)"]
         H["人工標註者"] --> P
-        P --> R["獎勵模型\nR(prompt, response) → 分數"]
+        P --> R["獎勵模型\nR(prompt, response) → score"]
     end
 
     subgraph Stage3["階段 3：PPO"]
