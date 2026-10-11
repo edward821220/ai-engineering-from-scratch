@@ -27,7 +27,7 @@ sequenceDiagram
     participant WD as 工作目錄（Working Directory）
     participant SA as 暫存區（Staging Area）
     participant LR as 本機儲存庫（Local Repo）
-    participant R as Remote（GitHub）
+    participant R as 遠端儲存庫（GitHub）
     WD->>SA: git add
     SA->>LR: git commit
     LR->>R: git push
