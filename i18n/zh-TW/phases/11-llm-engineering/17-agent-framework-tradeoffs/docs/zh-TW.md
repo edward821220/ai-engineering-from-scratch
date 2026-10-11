@@ -128,7 +128,7 @@ l5-framework-fit
 - [LangGraph documentation](https://langchain-ai.github.io/langgraph/) ——StateGraph、檢查點儲存器、中斷機制與時光旅行官方技術手冊
 - [CrewAI documentation](https://docs.crewai.com/) ——Crews、Flows、Agents、Tasks 與 Processes 使用指南
 - [AutoGen documentation](https://microsoft.github.io/autogen/) ——ConversableAgent、GroupChat、teams 與 tools 官方手冊
-- [Agno documentation](https://docs.agno.com/) ——Agent、Team、Workflow、儲存驅動與記憶體架構
+- [Agno documentation](https://docs.agno.com/) ——Agent、Team、Workflow、儲存與記憶
 - [Anthropic — Building effective agents (Dec 2024)](https://www.anthropic.com/research/building-effective-agents) ——框架無關的五大高階模式庫（Prompt 串接、路由、平行化、編排器—工作者、評估器—最佳化器）
 - [Yao et al., "ReAct: Synergizing Reasoning and Acting" (ICLR 2023)](https://arxiv.org/abs/2210.03629) ——各大框架外層包裝所共同依賴的 ReAct 迴圈論文
 - [Wu et al., "AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation" (2023)](https://arxiv.org/abs/2308.08155) ——AutoGen 的設計架構論文
