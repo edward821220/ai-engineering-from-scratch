@@ -61,7 +61,7 @@ INLINE_MATH = re.compile(r"(?<!\\)\$[^$\n]+?(?<!\\)\$")
 IMAGE = re.compile(r"!\[[^\]]*\]\([^)]+\)")
 LINK = re.compile(r"(?<!!)\[[^\]]+\]\([^)]+\)")   # [text](url) whole
 BOLD = re.compile(r"\*\*[^*\n]+\*\*|__[^_\n]+__")
-BARE_URL = re.compile(r"https?://[^\s)]+")        # do not eat a link's paren
+BARE_URL = re.compile(r"https?://[^\s)\x80-\U0010ffff]+")  # ASCII-only tail: stops at ')' and any non-ASCII char incl. full-width punctuation
 
 # Whole-document protection for the LLM path.
 PROTECT = [

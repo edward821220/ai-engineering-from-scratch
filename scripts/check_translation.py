@@ -361,10 +361,12 @@ def check_document(source: str, translation: str, *, glossary_text: str = "", le
 
     source_spans = Counter()
     target_spans = Counter()
+    source_prose: list[str] = []
     target_prose: list[str] = []
     for block in source_blocks:
         if block.kind in {"paragraph", "heading", "list_item", "blockquote", "table"}:
             source_spans.update(_protected_spans(block.raw))
+            source_prose.append(_prose(block))
     for block in target_blocks:
         if block.kind in {"paragraph", "heading", "list_item", "blockquote", "table"}:
             target_spans.update(_protected_spans(block.raw))
@@ -381,10 +383,39 @@ def check_document(source: str, translation: str, *, glossary_text: str = "", le
     for term in MAINLAND_TERMS:
         if term in prose:
             findings.append(f"{prefix}mainland wording: {term}")
+    source_prose_text = "\n".join(source_prose).lower()
     for english, variant in parse_glossary(glossary_text):
-        if variant and variant in prose:
+        if variant and variant in prose and not _variant_allowed(english, variant, source_prose_text):
             findings.append(f"{prefix}glossary forbidden variant for {english!r}: {variant}")
     return findings
+
+
+# A Chinese variant banned for a governed English term is still legitimate
+# when the source uses the term in a different technical sense (e.g. "branch"
+# of a oneOf schema vs a git branch). The variant stays forbidden only when at
+# least one source occurrence of the term sits within +-40 chars of the
+# governed-context regex below; if none match (or the term is absent), the
+# variant is exempt for that lesson. Add entries only after observing a real
+# false positive.
+FORBIDDEN_VARIANT_REQUIRED_CONTEXT = {
+    "branch": re.compile(
+        r"git|repo\b|checkout|merge|commit|pull request|\bpush\b|\bfork\b|rebase|HEAD",
+        re.I,
+    ),
+}
+
+
+def _variant_allowed(english: str, variant: str, source_prose_lower: str) -> bool:
+    term = english.lower()
+    if term not in source_prose_lower:
+        return True  # variant cannot mistranslate a term the source never uses
+    context = FORBIDDEN_VARIANT_REQUIRED_CONTEXT.get(term)
+    if context is None:
+        return False
+    return not any(
+        context.search(source_prose_lower[max(0, m.start() - 40): m.end() + 40])
+        for m in re.finditer(re.escape(term), source_prose_lower)
+    )
 
 
 def _phase_docs(source_root: Path):
