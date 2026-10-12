@@ -34,7 +34,7 @@ flowchart TD
   Cosine --> Apply
   Floor --> Apply
   Apply --> GradNorm[計算梯度 L2 範數]
-  GradNorm --> Log[步驟日誌列]
+  GradNorm --> Log[步驟紀錄列]
   Log --> Plot[文字圖表 + CSV]
 ```
 

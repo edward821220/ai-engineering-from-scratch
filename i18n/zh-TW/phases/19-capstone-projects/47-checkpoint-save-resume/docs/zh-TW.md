@@ -26,7 +26,7 @@ model checkpoint 應包含接續訓練所需的所有狀態：模型參數、最
 
 ```mermaid
 flowchart TD
-  ckpt[檢查點 payload] --> m[模型 state_dict]
+  ckpt[checkpoint payload] --> m[模型 state_dict]
   ckpt --> o[最佳化器 state_dict]
   ckpt --> s[排程器 state_dict]
   ckpt --> tr[訓練狀態：step、epoch、batch_in_epoch、losses]
