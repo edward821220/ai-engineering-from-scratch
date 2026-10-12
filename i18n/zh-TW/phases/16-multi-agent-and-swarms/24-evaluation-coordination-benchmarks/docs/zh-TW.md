@@ -1,6 +1,6 @@
 # 評測體系與協同能力基準測試（Evaluation and Coordination Benchmarks）
 
-> 2025 至 2026 年間的五大權威基準測試全面覆蓋了多 Agent 評測空間。**MultiAgentBench / MARBLE**（ACL 2025，arXiv:2503.01935）評估了星狀、鏈狀、樹狀與圖狀拓撲結構並引入里程碑關鍵績效指標（KPI）；**圖狀拓撲在深度科研任務上拔得頭籌**，而認知規劃能帶來約 3% 的里程碑達成率增益。**COMMA** 專攻多模態非對稱資訊協同；實測顯示包含 GPT-4o 在內的前沿頂尖模型在 Agent 間協同上甚至難以擊敗隨機基準模型。**MedAgentBoard**（arXiv:2505.12371）覆蓋四大醫療任務類別，明確發現多 Agent 架構在多數類別中並未超越單一 LLM。**AgentArch**（arXiv:2509.10769）專門評測結合了工具呼叫、記憶與編排機制的企業級 Agent 架構。**SWE-bench Pro**（[arXiv:2509.16941](https://arxiv.org/abs/2509.16941)）涵蓋橫跨商業應用、B2B 服務與開發者工具的 41 個儲存庫共 1,865 道難題；尖端模型在 Pro 上的得分僅約 23%，相對於 Verified 上的 70%+ 構成了清醒的抗資料污染對照鏡。Claude Opus 4.7（2026 年 4 月）在明確的 Agent 團隊協同下於 Pro 上錄得 **64.3%**（Anthropic 尚未公開一手技術報告——暫作初步對照數字）；Verdent（Agent 鷹架）在 Verified 上達到 **76.1% pass@1**（[Verdent 技術報告](https://www.verdent.ai/blog/swe-bench-verified-technical-report)）。**AAAI 2026 Bridge 計畫 WMAC** (https://multiagents.org/2026/) 則是當前全球學術社群的交匯焦點。本課立足於 MARBLE 指標體系，執行拓撲對照評測掃描，並確立「僅通過 SWE-bench Verified 絕非具備泛化能力證明」的鐵律。
+> 2025 至 2026 年間的五項基準涵蓋多 Agent 評測領域。**MultiAgentBench / MARBLE**（ACL 2025，arXiv:2503.01935）評估了星狀、鏈狀、樹狀與圖狀拓撲結構並引入里程碑關鍵績效指標（KPI）；**圖狀拓撲在深度科研任務上拔得頭籌**，而認知規劃能帶來約 3% 的里程碑達成率增益。**COMMA** 專攻多模態非對稱資訊協同；實測顯示包含 GPT-4o 在內的前沿頂尖模型在 Agent 間協同上甚至難以擊敗隨機基準模型。**MedAgentBoard**（arXiv:2505.12371）覆蓋四大醫療任務類別，明確發現多 Agent 架構在多數類別中並未超越單一 LLM。**AgentArch**（arXiv:2509.10769）專門評測結合了工具呼叫、記憶與編排機制的企業級 Agent 架構。**SWE-bench Pro**（[arXiv:2509.16941](https://arxiv.org/abs/2509.16941)）涵蓋橫跨商業應用、B2B 服務與開發者工具的 41 個儲存庫共 1,865 道難題；尖端模型在 Pro 上的得分僅約 23%，相對於 Verified 上的 70%+ 構成了清醒的抗資料污染對照鏡。Claude Opus 4.7（2026 年 4 月）在明確的 Agent 團隊協同下於 Pro 上錄得 **64.3%**（Anthropic 尚未公開一手技術報告——暫作初步對照數字）；Verdent（Agent 鷹架）在 Verified 上達到 **76.1% pass@1**（[Verdent 技術報告](https://www.verdent.ai/blog/swe-bench-verified-technical-report)）。**AAAI 2026 Bridge 計畫 WMAC** (https://multiagents.org/2026/) 則是當前全球學術社群的交匯焦點。本課立足於 MARBLE 指標體系，執行拓撲對照評測掃描，並確立「僅通過 SWE-bench Verified 絕非具備泛化能力證明」的鐵律。
 
 **Type:** Learn
 **Languages:** Python (stdlib)
@@ -9,7 +9,7 @@
 
 ## Problem｜問題
 
-每當一篇論文宣稱「我們的多 Agent 系統表現更優」時，核心問題永遠是：相比於什麼基準？在何種任務上？又是依據什麼指標衡量的？2023 至 2024 年的多 Agent 評測領域充斥著混亂——每個人都在挑選各自的自訂指標、自訂比較基準與封閉任務集。2025 至 2026 年新興的一系列標準化基準測試，終於為該領域確立了嚴格的科學秩序。
+每當一篇論文宣稱「我們的多 Agent 系統表現更優」時，核心問題永遠是：相比於什麼基準？在何種任務上？又是依據什麼指標衡量的？2023 至 2024 年的多 Agent 評測領域充斥著混亂——每個人都在挑選各自的自訂指標、自訂比較基準與任務集。2025 至 2026 年新興的一系列標準化基準測試，終於為該領域確立了嚴格的科學秩序。
 
 若缺乏共享的公認基準測試，你根本無法對兩套不同的多 Agent 系統展開有意義的橫向評比。更致命的是，若缺乏嚴密保留的乾淨基準資料集，前沿模型極易產生嚴重的資料污染（Contamination）。截至 2025 年中，SWE-bench Verified 已部分受到訓練語料污染；排行榜分數虛胖飆升；而 SWE-bench Pro 的誕生，正是作為未受污染的清醒現實照妖鏡。
 
@@ -60,11 +60,11 @@
 - Verdent（專門的 Agent 鷹架）在 Verified 上的得分：**76.1% pass@1**（[技術報告](https://www.verdent.ai/blog/swe-bench-verified-technical-report)）。
 - 前沿裸模型在缺乏專屬 Agent 鷹架時於 Pro 上的原始得分：僅約 23-35%（[SWE-bench Pro 論文](https://arxiv.org/abs/2509.16941)）。
 
-核心戰略結論：「我們在 SWE-bench Verified 上打敗了誰」在當下已徹底喪失作為實質能力的證明力。Pro 是目前主要的 gating test。而配備了成熟的 Agent 團隊協同鷹架能在 Pro 上斬獲高達 30-40 個百分點的實質飛躍，這是 2026 年支撐多 Agent 協同具備實質工程價值的最強有力實證。
+核心戰略結論：「我們在 SWE-bench Verified 上勝出」在當下已徹底喪失作為實質能力的證明力。Pro 是目前主要的 gating test。而配備了成熟的 Agent 團隊協同鷹架能在 Pro 上斬獲高達 30-40 個百分點的實質飛躍，這是 2026 年支撐多 Agent 協同具備實質工程價值的最強有力實證。
 
 ### AAAI 2026 WMAC
 
-AAAI 2026 Bridge 計畫——多 Agent 協同工作坊 (https://multiagents.org/2026/)。這是 2026 年多 Agent AI 研究社群的聚焦點。其錄取論文與工作坊論文集，是評估各類全新方法的主要正式場域；在進行重大工程決策時，應當優先採納經 WMAC 評審通過的成熟結論，而非盲信未經同儕審查的 arXiv 預印本。
+AAAI 2026 Bridge 計畫——多 Agent 協同工作坊 (https://multiagents.org/2026/)。這是 2026 年多 Agent AI 研究社群的聚焦點。其錄取論文與工作坊論文集，是評估各類全新方法的主要正式場域；在進行重大工程決策時，應當優先採納經 WMAC 評審通過的成熟結論，而非採信 arXiv 預印本。
 
 ### 批判性解讀評測宣稱——2026 年自檢清單
 

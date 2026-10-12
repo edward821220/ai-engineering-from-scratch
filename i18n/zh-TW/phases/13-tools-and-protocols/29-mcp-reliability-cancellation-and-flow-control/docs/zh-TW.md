@@ -245,7 +245,7 @@ X-Accel-Buffering: no
 
 ## 重新連線意味著必須重新取得狀態
 
-現代 Streamable HTTP **完全不支援**透過 `Last-Event-ID` 實現中斷續傳的 SSE 機制。
+現代 Streamable HTTP **完全不支援**透過 `Last-Event-ID` 續傳 SSE。
 
 當 `subscriptions/listen` 串流發生連線中斷後：
 

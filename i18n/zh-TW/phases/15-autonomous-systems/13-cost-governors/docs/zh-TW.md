@@ -9,7 +9,7 @@
 
 ## The Problem｜問題
 
-自主 agent 在運作的每一輪對話中都在消耗真金白銀。傳統 chatbot 的不良輸出最多只是一句糟糕的回覆；而一個自主 agent 陷入死迴圈，換來的是一張天文數字的帳單。業界將這種典型的失效模式稱為「錢包阻斷（Denial of Wallet）」——agent 不斷自我推理、不斷呼叫工具、不斷產生計費，而沒有任何防護機制能加以阻止，因為最初根本就沒有人為它設計煞車系統。
+自主 agent 在運作的每一輪對話中都在消耗真金白銀。傳統 chatbot 的不良輸出最多只是一句糟糕的回覆；而一個自主 agent 陷入死迴圈，換來的是一張天文數字的帳單。業界將這種典型的失效模式稱為「Denial of Wallet」（帳單失控）——agent 不斷自我推理、不斷呼叫工具、不斷產生計費，而沒有任何防護機制能加以阻止，因為最初根本就沒有人為它設計煞車系統。
 
 解決之道絕非僅靠設定單一數字。它必須是一套涵蓋不同時間尺度與控制粒度的分層限制堆疊：包含單次請求、單次任務、每小時、每日以及每月維度。一套設計精良的防護堆疊能在數分鐘內攔截失控的無窮迴圈、在數小時內揪出緩慢的暗中洩漏，並在一整天內及時捕獲有瑕疵的軟體發布。唯有依賴這套防護體系，長時程自主 agent 的預算管理才可能在現實中真正落地。
 
@@ -58,7 +58,7 @@ Claude Code Agent SDK 在其公開文件中提供了以下控制參數：
 
 ### 真實案例剖析：從 1,200 美元到 4,800 美元的失控暴增
 
-微軟官方文件中記錄了一個極具代表性的真實慘痛案例：某電商平台的 agent 在引入一項全新工具後，其單月帳單暴增了三倍。該工具允許 agent 在每個對話工作階段中主動輪詢訂單狀態。然而系統缺乏死迴圈偵測、缺乏單一工具呼叫上限，更沒有任何週對週成本異常增長的告警機制。最終的修復方案是追加單一工具呼叫配額，並設定每日成本增長警示。這是一份經典的工程教訓：每一個新增的工具表面，都是潛在死迴圈的全新入口；每一個工具都必須配備專屬的呼叫配額與告警策略。
+微軟官方文件中記錄了一個極具代表性的真實慘痛案例：某電商平台的 agent 在引入一項全新工具後，其每月成本增至原本的三倍。該工具允許 agent 在每個對話工作階段中主動輪詢訂單狀態。然而系統缺乏死迴圈偵測、缺乏單一工具呼叫上限，更沒有任何週對週成本異常增長的告警機制。最終的修復方案是追加單一工具呼叫配額，並設定每日成本增長警示。這是一份經典的工程教訓：每增加一項工具介面，就多一個潛在的死迴圈入口；每一個工具都必須配備專屬的呼叫配額與告警策略。
 
 ```figure
 cost-governor-stack
@@ -88,7 +88,7 @@ cost-governor-stack
 
 | 術語 | 常見說法 | 實際意義 |
 |---|---|---|
-| 錢包阻斷 |「帳單失控」| agent 迴圈持續產生費用，卻沒有上限能阻止 |
+| Denial of Wallet |「帳單失控」| agent 迴圈持續產生費用，卻沒有上限能阻止 |
 | max_tokens |「單次請求上限」| 單次生成內容的大小上限 |
 | max_turns |「迭代上限」| agent 工作階段迴圈的迭代次數上限 |
 | max_budget_usd |「美元斷路開關」| 工作階段成本上限；超限時中止 |
@@ -100,7 +100,7 @@ cost-governor-stack
 ## Further Reading｜延伸閱讀
 
 - [Anthropic Claude Code Agent SDK — agent loop and budgets](https://code.claude.com/docs/en/agent-sdk/agent-loop) — `max_turns`, `max_budget_usd`, tool allowlists.
-- [Microsoft Agent Framework — human-in-the-loop and governance](https://learn.microsoft.com/en-us/agent-framework/workflows/human-in-the-loop) — 人類參與迴圈與治理。
+- [Microsoft Agent Framework — human-in-the-loop and governance](https://learn.microsoft.com/en-us/agent-framework/workflows/human-in-the-loop) — 成本控管檢查點。
 - [Anthropic — Claude Managed Agents overview](https://platform.claude.com/docs/en/managed-agents/overview) — 服務供應商端的成本控制。
 - [Anthropic — Prompt caching (Claude API docs)](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) — 快取機制。
 - [Anthropic — Measuring agent autonomy in practice](https://www.anthropic.com/research/measuring-agent-autonomy) — 長時程 agent 的成本概況。

@@ -117,7 +117,7 @@ mcp-contract-pipeline
 
 本課實作了一套刻意精簡的 JSON Schema 子集校驗器，完全立足於 Python 標準函式庫，以確保機制完全透明。它覆蓋了範例工具所涉及的核心機制：
 
-- 物件、陣列、字串、整數、浮點數、布林值與 null 等型別校驗；
+- 物件、陣列、字串、整數、數值型別、布林值與 null 等型別校驗；
 - 必填屬性檢查；
 - `additionalProperties: false` 封閉屬性約束；
 - 陣列元素項目型別約束；
@@ -170,7 +170,7 @@ Mcp-Param-Region: eu-west
 - 標頭名稱不得為空，且必須符合 HTTP 標頭欄位 Token 語法規範；
 - 標頭名稱不分大小寫必須全域唯一；
 - 宣告屬性型別嚴格僅限 string、integer 或 boolean；
-- **嚴禁使用** `number` 浮點數型別；
+- **嚴禁使用** `number` 數值型別；
 - 該標註僅允許出現在 `inputSchema.properties` 的頂層直屬成員上；
 - 整數數值必須嚴格維持在 `-9007199254740991` 至 `9007199254740991` 的 JavaScript 安全整數範圍內。
 

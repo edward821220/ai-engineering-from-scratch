@@ -9,7 +9,7 @@
 
 ## Learning Objectives｜學習目標
 
-- 將驗收關卡定義為基於各項工作台產物（Artifacts）的確定性純函式。
+- 將驗收關卡定義為基於各項工作台產物（Artifacts）的確定性函式。
 - 綜合規則報告、範疇報告、回饋記錄與 Git Diff 差異，產出單一全域裁決。
 - 輸出可供審核 Agent 與 CI 自動化管線共同解析消費的 `verification_report.json`。
 - 確立最高原則：遭遇任何阻斷級別（block）的缺陷時，堅決拒絕標記任務完工，絕無例外。
@@ -125,7 +125,7 @@ python3 code/main.py
 
 | 術語 | 常見俗稱 | 實際工程意義 |
 |---|---|---|
-| Verification gate | 「阻斷卡點」 | 基於各項工作台產物、產出客觀通關／阻斷裁決的確定性純函式 |
+| Verification gate | 「阻斷卡點」 | 基於各項工作台產物、產出客觀通關／阻斷裁決的確定性函式 |
 | Block severity | 「強制阻斷缺陷」 | 徹底阻止輸出 `passed: true`、強制要求人類簽名覆寫的致命違規 |
 | Override log | 「特批放行紀錄」 | 包含覆寫理由與操作者 ID、經 Git 追蹤且可供稽核的簽名放行紀錄 |
 | Acceptance command | 「驗收測試指令」 | 結束狀態碼為 0 即代表 `done` 之最高客觀事實的 Shell 指令 |

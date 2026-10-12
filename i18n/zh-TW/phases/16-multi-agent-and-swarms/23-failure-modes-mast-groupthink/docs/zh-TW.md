@@ -1,6 +1,6 @@
 # 失效模式——MAST 分類體系、群體盲從、單一文化與連鎖崩潰（Failure Modes — MAST, Groupthink, Monoculture, Cascading Errors）
 
-> 2026 年多 Agent 領域的權威失效分類標準當屬 **MAST**（Cemri 等人，NeurIPS 2025，arXiv:2503.13657），該研究深入剖析了橫跨 7 個頂尖開源多 Agent 系統的 1,642 條真實執行軌跡，揭示出高達 **41% 至 86.7% 的驚人失敗率**。三大核心根因分類為：**規格定義問題（Specification Problems）**（佔比 41.77%）——角色邊界模糊、任務目標欠缺精準約束；**協同失靈（Coordination Failures）**（佔比 36.94%）——通訊中斷、狀態不同步；**驗證缺失（Verification Gaps）**（佔比 21.30%）——缺乏獨立檢驗、客觀品質把關缺位。**群體盲從家族（Groupthink Family）**（arXiv:2508.05687）進一步歸納了：單一文化崩潰（同質基底模型導致相關性錯誤）、從眾偏見（Agent 互相迎合並強化彼此的幻覺（hallucination））、心智理論缺陷、混合動機內耗以及連鎖可靠性崩潰。連鎖崩潰的典型代表為重試風暴（Retry storms）：支付服務失敗引發訂單與庫存重試，讓庫存服務在數秒內承受 10 倍負載（需配置熔斷機制）。記憶污染：單一 Agent 的幻覺滲入共享記憶，下游 Agent 奉為真理，導致系統準確率（accuracy）慢性衰退，使根因追溯極其痛苦。**STRATUS**（NeurIPS 2025）指出：透過部署專門的偵測、診斷與驗證 Agent 鐵三角，能使故障緩解成功率提升 1.5 倍。本課將各類失效模式視為一等公民的架構輸入目標。
+> 2026 年多 Agent 領域的權威失效分類標準當屬 **MAST**（Cemri 等人，NeurIPS 2025，arXiv:2503.13657），該研究深入剖析了橫跨 7 個頂尖開源多 Agent 系統的 1,642 條真實執行軌跡，揭示出高達 **41% 至 86.7% 的驚人失敗率**。三大核心根因分類為：**規格定義問題（Specification Problems）**（佔比 41.77%）——角色邊界模糊、任務目標欠缺精準約束；**協同失靈（Coordination Failures）**（佔比 36.94%）——通訊中斷、狀態不同步；**驗證缺失（Verification Gaps）**（佔比 21.30%）——缺乏獨立檢驗、客觀品質把關缺位。**群體盲從家族（Groupthink Family）**（arXiv:2508.05687）進一步歸納了：單一文化崩潰（同質基底模型導致相關性錯誤）、從眾偏見（Agent 互相迎合並強化彼此的錯誤）、心智理論缺陷、混合動機內耗以及連鎖可靠性崩潰。連鎖崩潰的典型代表為重試風暴（Retry storms）：支付服務失敗引發訂單與庫存重試，讓庫存服務在數秒內承受 10 倍負載（需配置熔斷機制）。記憶污染：單一 Agent 的幻覺滲入共享記憶，下游 Agent 奉為真理，導致系統準確率（accuracy）慢性衰退，使根因追溯極其痛苦。**STRATUS**（NeurIPS 2025）指出：透過部署專門的偵測、診斷與驗證 Agent 鐵三角，能使故障緩解成功率提升 1.5 倍。本課將各類失效模式視為一等公民的架構輸入目標。
 
 **Type:** Learn
 **Languages:** Python (stdlib)
@@ -31,7 +31,7 @@
 **協同失靈（Coordination Failures，佔比 36.94%）。** 通訊中斷或狀態嚴重不同步。
 
 具體範例：
-- 兩個 Agent 在缺乏同步鎖的前提下同時修改共享狀態。
+- 兩個 Agent 未同步就更新共享狀態。
 - 訊息在傳遞中途遺失（佇列故障、連線逾時）。
 - 狀態感知漂移：Agent A 認定任務已圓滿結束，而 Agent B 卻仍在背景苦苦運算。
 
@@ -64,7 +64,7 @@
 
 **混合動機內耗（Mixed-motive dynamics）。** 當各 Agent 具備部分衝突的利益目標時，討論會迅速滑向毫無原則的中庸妥協，最終端出令所有人都無法接受的平庸產物。
 
-**連鎖可靠性崩潰（Cascading reliability failures）。** 某個單一元件的微小異常模式，引爆了依賴它的下游所有元件的連鎖大規模崩潰。
+**連鎖可靠性崩潰（Cascading reliability failures）。** 某個元件的錯誤模式會觸發相依元件也出現錯誤模式。
 
 ### 連鎖崩潰案例——重試風暴（Retry Storm）
 
@@ -124,10 +124,10 @@ STRATUS（NeurIPS 2025）指出，在系統中專門部署以下三位專業 Age
 
 ### 警惕致命的「無聲失效」
 
-在所有故障類別中，最具破壞性的是「無聲的正確性失效」。一個直接拋出例外異常、當機崩潰並引發刺耳警報的系統，排查難度相對極低。而一個表面上運作無比絲滑、但端出的成果卻言之鑿鑿全是致命錯誤的系統，根本無法被標準的例外紀錄所捕獲。這正是為何「驗證缺失」雖然在數量上僅佔總崩潰的 21.30%，但其單次事故所造成的實質商業代價卻最為昂貴。
+在所有故障類別中，最具破壞性的是「無聲的正確性失效」。一個直接拋出例外異常、當機崩潰並引發刺耳警報的系統，排查難度相對極低。而一個表面上運作無比絲滑、但端出的成果卻言之鑿鑿全是致命錯誤的系統，根本無法被標準的例外紀錄所捕獲。這正是為何「驗證缺失」雖然按失效案例數計算僅佔 21.30%，但其單次事故所造成的實質商業代價卻最為昂貴。
 
 必須重度投資：
-- 基於抽樣的人工專家定期盲測審查。
+- 抽樣人工審查。
 - 打造金牌標準測試集（Golden datasets）執行每週回歸測試。
 - 針對高危核心產出，強制實施跨 Agent 交叉覆核。
 
@@ -202,6 +202,6 @@ python3 code/main.py
 
 - [Cemri et al. — Why Do Multi-Agent LLM Systems Fail?](https://arxiv.org/abs/2503.13657) — MAST 分類法，NeurIPS 2025
 - [Groupthink failures in multi-agent LLMs](https://arxiv.org/abs/2508.05687) — 單一文化、從眾與五類失效分類
-- [STRATUS — specialized agents for MAS incident response](https://neurips.cc/) — NeurIPS 2025 論文集項目（偵測＋診斷＋驗證）
+- [STRATUS — specialized agents for MAS incident response](https://neurips.cc/) — NeurIPS 2025 論文集收錄條目（偵測＋診斷＋驗證）
 - [Release It! — stability patterns (Nygard)](https://pragprog.com/titles/mnee2/release-it-second-edition/) — 斷路器模式的經典參考
 - [Anthropic — Multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system) — 正式環境失效模式說明

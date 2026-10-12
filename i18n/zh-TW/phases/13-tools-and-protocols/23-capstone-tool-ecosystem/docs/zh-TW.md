@@ -198,7 +198,7 @@ t3-capstone-chain
 
 ## Build It｜動手實作
 
-執行行程內整合harness：
+執行行程內整合測試框架：
 
 ```bash
 cd phases/13-tools-and-protocols/23-capstone-tool-ecosystem

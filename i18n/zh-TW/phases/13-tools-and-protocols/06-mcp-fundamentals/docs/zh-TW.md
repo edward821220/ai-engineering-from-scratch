@@ -40,7 +40,7 @@ MCP 伺服器對外公開三大核心原語：
 2. **資源（Resources）**：以 URI 定址的資料，透過 `resources/list` 探測發現，透過 `resources/read` 檢索讀取。
 3. **Prompt 範本（Prompts）**：可重複使用的結構化 prompt 範本，透過 `prompts/list` 探測發現，透過 `prompts/get` 進行實例化彩現。
 
-請注意：Roots、sampling 與 logging 在 `2026-07-28` 規範中為相容性而保留，但已棄用。新系統在架構設計時，應將根目錄作為顯式的工具或資源引數傳入、直接呼叫模型服務供應商的原生 API 執行 Sampling，並透過 stderr 或 OpenTelemetry 將資訊寫入紀錄。引導式互動（Elicitation）仍可透過多輪往返請求（Multi Round-Trip Requests）進行：由伺服器回傳輸入請求，並由用戶端重試最初的操作。現代伺服器絕不可自主發起獨立的逆向 JSON-RPC 請求。
+請注意：Roots、sampling 與 logging 在 `2026-07-28` 規範中為相容性而保留，但已棄用。新系統在架構設計時，應將根目錄作為顯式的工具或資源引數傳入、直接呼叫模型服務供應商的原生 API 執行 Sampling，並透過 stderr 或 OpenTelemetry 將資訊寫入紀錄。Elicitation（徵詢：向使用者請求輸入）仍可透過多輪往返請求（Multi Round-Trip Requests）進行：由伺服器回傳輸入請求，並由用戶端重試最初的操作。現代伺服器絕不可自主發起獨立的逆向 JSON-RPC 請求。
 
 ### JSON-RPC 封裝信封
 
@@ -192,7 +192,7 @@ python3 -m unittest discover code/tests -v
 | Stateless protocol | 無狀態協定；每個請求皆自包含解讀該請求所需的全部上下文中繼資料 |
 | Request metadata | 請求中繼資料；封裝於 `params._meta` 內部的協定版本、用戶端能力與建議識別資訊 |
 | `server/discover` | 伺服器必備標準方法；用於宣告支援版本、能力清單、操作指南與伺服器識別資訊 |
-| `resultType` | 標註於每個現代成功回應最外層的鑑別欄位（正常終態為 "complete"） |
+| `resultType` | 標註於每個現代成功 result 物件最外層的鑑別欄位（正常終態為 "complete"） |
 | Cacheable result | 包含必備 `ttlMs` 存活時間與 `cacheScope` 快取作用域提示的可快取結果 |
 | Protocol era | 協定歷史時代；劃分為「現代單請求自包含中繼資料」與「傳統連線級初始化交握」 |
 | Transport lifetime | 傳輸層生命週期；僅代表行程、TCP 連線或串流持續時間，不是協定工作階段 |

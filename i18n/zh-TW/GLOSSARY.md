@@ -130,6 +130,7 @@
 | response body | 回應本文 | 否 |  |  |
 | authentication | 身分驗證 | 否 |  |  |
 | authorization | 授權 | 否 |  |  |
+| elicitation | 徵詢 | 否 |  | MCP 術語，指在操作期間向使用者請求輸入；每課首次寫「Elicitation（徵詢：向使用者請求輸入）」，後文用「徵詢」。不要把它限定為問答或表單形式。 |
 | API key | API 金鑰 | 否 | API 密鑰 |  |
 | rate limit | 速率限制 | 否 |  |  |
 | billing unit | 計費單位 | 否 |  |  |

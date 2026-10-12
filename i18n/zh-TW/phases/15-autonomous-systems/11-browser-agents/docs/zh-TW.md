@@ -1,6 +1,6 @@
 # 瀏覽器 Agent 與長時程 Web 任務（Browser Agents and Long-Horizon Web Tasks）
 
-> ChatGPT agent（2025 年 7 月）將 Operator 與深度研究（deep research）合而為一，打造出兼具瀏覽器與終端機操作能力的 agent，並在 BrowseComp 創下 68.9% 的 SOTA 紀錄。OpenAI 隨後於 2025 年 8 月 31 日關閉獨立的 Operator——這是產品層級的整併。Anthropic 對 Vercept 的收購，讓 Claude Sonnet 在 OSWorld 上的得分從不到 15% 提升至 72.5%。WebArena-Verified（ServiceNow，ICLR 2026）修復了原始 WebArena 中 11.3 個百分點的偽陰性率，並釋出了包含 258 個任務的 Hard 子集。這些數字是真實的；攻擊表面同樣真實：OpenAI 的準備度主管公開坦承，針對瀏覽器 agent 的間接 prompt 注入「並非能夠被完全修補的 bug」。2025–2026 年文獻記錄的真實攻擊案例包括：Tainted Memories（Atlas CSRF 攻擊）、HashJack（Cato Networks）以及 Perplexity Comet 中的單次點選劫持。
+> ChatGPT agent（2025 年 7 月）將 Operator 與深度研究（deep research）合而為一，打造出兼具瀏覽器與終端機操作能力的 agent，並在 BrowseComp 創下 68.9% 的 SOTA 紀錄。OpenAI 隨後於 2025 年 8 月 31 日關閉獨立的 Operator——這是產品層級的整併。Anthropic 對 Vercept 的收購，讓 Claude Sonnet 在 OSWorld 上的得分從不到 15% 提升至 72.5%。WebArena-Verified（ServiceNow，ICLR 2026）修正了原始 WebArena 的偽陰性問題（原始偽陰性率約為 11.3%），並釋出了包含 258 個任務的 Hard 子集。這些數字是真實的；攻擊表面同樣真實：OpenAI 的準備度主管公開坦承，針對瀏覽器 agent 的間接 prompt 注入「並非能夠被完全修補的 bug」。2025–2026 年文獻記錄的真實攻擊案例包括：Tainted Memories（Atlas CSRF 攻擊）、HashJack（Cato Networks）以及 Perplexity Comet 中的單次點選劫持。
 
 **Type:** Learn
 **Languages:** Python (stdlib, indirect prompt-injection attack surface model)

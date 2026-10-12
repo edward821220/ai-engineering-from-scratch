@@ -1,6 +1,6 @@
 # 多 Agent 強化學習（MARL）——MADDPG、QMIX、MAPPO
 
-> 多 Agent 協同的強化學習淵源，至今仍影響 2026 年的 LLM Agent 系統。**MADDPG**（Lowe 等人，NeurIPS 2017，arXiv:1706.02275）提出集中訓練、分散執行（Centralized Training, Decentralized Execution, CTDE）：訓練時，每個 critic 能看到所有 Agent 的狀態與動作；測試時只執行本地 actor。適用於合作、競爭與混合情境。**QMIX**（Rashid 等人，ICML 2018，arXiv:1803.11485）採用價值分解與單調混合網路：各 Agent 的 Q 值合成聯合 Q，使 `argmax` 能乾淨地分散計算——在星海爭霸多 Agent 挑戰（SMAC）上表現突出。**MAPPO**（Yu 等人，NeurIPS 2022，arXiv:2103.01955）是帶有集中式價值函數的 PPO；在粒子世界、SMAC、Google Research Football、Hanabi 上，只需極少調參就「出人意料地有效」。這些方法支撐了必須分散行動的 Agent 團隊的策略訓練。MAPPO 是 **2026 年合作型 MARL 的預設基準**。本課先在小型網格世界中實作三種想法，再接觸 LLM Agent 訓練。
+> 多 Agent 協同的強化學習淵源，至今仍影響 2026 年的 LLM Agent 系統。**MADDPG**（Lowe 等人，NeurIPS 2017，arXiv:1706.02275）提出集中訓練、分散執行（Centralized Training, Decentralized Execution, CTDE）：訓練時，每個 critic 能看到所有 Agent 的狀態與動作；測試時只執行本地 actor。適用於合作、競爭與混合情境。**QMIX**（Rashid 等人，ICML 2018，arXiv:1803.11485）採用價值分解與單調混合網路：各 Agent 的 Q 值合成聯合 Q，使 `argmax` 能乾淨地分散計算——在星海爭霸多 Agent 挑戰（SMAC）上占主導地位。**MAPPO**（Yu 等人，NeurIPS 2022，arXiv:2103.01955）是帶有集中式價值函數的 PPO；在粒子世界、SMAC、Google Research Football、Hanabi 上，只需極少調參就「出人意料地有效」。這些方法支撐了必須分散行動的 Agent 團隊的策略訓練。MAPPO 是 **2026 年合作型 MARL 的預設基準**。本課先在小型網格世界中實作三種想法，再接觸 LLM Agent 訓練。
 
 **Type:** Learn
 **Languages:** Python (stdlib, small NumPy-free implementations)
@@ -50,7 +50,7 @@ Q_tot(tau, a) = f(Q_1(tau_1, a_1), ..., Q_n(tau_n, a_n)),   df/dQ_i >= 0
 
 單調性（monotonicity）保證：`argmax_a Q_tot` 可以由每個 Agent 各自選擇 `argmax_{a_i} Q_i` 得到。這正是**分散執行**所需的性質。訓練時，混合網路（mixing network）由各 Agent 的 Q 值產生 `Q_tot`。
 
-為什麼 QMIX 在 SMAC 上表現突出：星海爭霸的合作微操有同質 Agent、局部觀測與全域獎勵，很適合價值分解。
+為什麼 QMIX 在 SMAC 上占主導地位：星海爭霸的合作微操有同質 Agent、局部觀測與全域獎勵，很適合價值分解。
 
 失效模式：單調性限制較強；有些任務的獎勵結構無法單調分解（例如某個 Agent 為團隊犧牲）。QTRAN、QPLEX 等擴充放寬了這個限制。
 

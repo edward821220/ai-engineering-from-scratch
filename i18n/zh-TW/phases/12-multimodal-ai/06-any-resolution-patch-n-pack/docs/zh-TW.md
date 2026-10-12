@@ -32,7 +32,7 @@ Transformer 預期接收一維向量序列。一個批次通常是多個長度�
 
 ### NaViT 與 Patch-n'-Pack
 
-NaViT（Dehghani 等人，2023）首次在大規模實踐中驗證了原生動態打包的可行性。其機制非常純粹機械化：
+NaViT（Dehghani 等人，2023）這篇論文展示了原生動態打包可在大規模運作。其機制非常純粹機械化：
 
 1. 針對批次中的每張影像，依預設的 patch 尺寸（如 14）計算其原生的 patch 網格形狀。
 2. 將每張影像的 patch 展平為各自長短不一的一維序列。
@@ -59,7 +59,7 @@ LLaVA-NeXT 提出的 AnyRes 則是極具工程務實色彩的替代方案。給�
 
 ### M-RoPE（Qwen2-VL）
 
-Qwen2-VL 引入了革命性的多模態旋轉位置編碼（Multimodal Rotary Position Embedding, M-RoPE）。它徹底拋棄了 NaViT 的分數位置與 AnyRes 的切片拼圖概念，直接為每個 patch 賦予三維旋轉座標（時間、高度、寬度）。Query 與 Key 的高維旋轉自然相容於任意的 H、W 與時間序列長度。
+Qwen2-VL 引入了革命性的多模態旋轉位置編碼（Multimodal Rotary Position Embedding, M-RoPE）。它徹底拋棄了 NaViT 的分數位置與 AnyRes 的切片拼圖概念，直接為每個 patch 賦予時間、高度、寬度三軸位置。Query 與 Key 的高維旋轉自然相容於任意的 H、W 與時間序列長度。
 
 M-RoPE 在推論時原生支援任意動態解析度，完全無需為不同尺寸重訓模型。在推論階段傳入任意 H×W 影像，patch 編碼器直接輸出 H/14 × W/14 個 token，每個 token 依據座標取得其 (t=0, r=列, c=欄) 的空間座標，RoPE 便能以正確的頻率旋轉注意力。Qwen2.5-VL 與 Qwen3-VL 延續了這項典範；InternVL3 的 V2PE 亦是同類的跨模態變異編碼。
 
@@ -88,7 +88,7 @@ M[i, j] = 1 iff there exists b where offsets[b] <= i < offsets[b+1] and offsets[
 
 - OCR 與長文件理解：配置 1024 至 4096 個 token。選用 SigLIP 2 NaFlex @ 1024，或 AnyRes 3×3 切片加全域縮圖。
 - 統計圖表與 UI 介面截圖：在 384 至 448 原生解析度下配置 729 至 1024 個 token。採用具備像素上限封頂的 Qwen2.5-VL 動態解析度。
-- 自然風景與日常生活照片：256 至 576 個 token 足矣。下游 LLM 已經能捕捉充沛語意。請將寶貴的 token 預算花在資訊密度極高的真實內容上。
+- 自然照片：256 至 576 個 token 足矣。下游 LLM 已經能捕捉充沛語意。請將寶貴的 token 預算花在資訊密度極高的真實內容上。
 - 影片理解：空間池化後每個影格僅需 64 至 128 個 token，影格率維持在 2 至 8 FPS。第 12.17 課將詳解此主題。
 
 2026 年正式環境的黃金法則：為不同任務設定每張圖的像素上限（max-pixels cap），在上限範圍內維持原生長寬比直接編碼，緊密打包至單一序列，徹底消滅填充浪費。Qwen2.5-VL 專門開放的 `min_pixels` 與 `max_pixels` 參數，正是為這項工程實踐而量身打造。

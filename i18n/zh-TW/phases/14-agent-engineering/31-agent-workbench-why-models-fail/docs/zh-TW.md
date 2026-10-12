@@ -98,7 +98,7 @@ Agent 迴圈本質上就是一個 Worker 行程：消費事件（使用者訊息
 | Ralph Loop（Claude Code、Codex、agentic_harness 一書）——在 Agent 試圖過早結束時，將原始意圖重新注入全新視窗 | 一個觸發器將任務重新排入佇列並給予乾淨脈絡；工作階段持久化攜帶目標向前推進 |
 | 規劃／執行／驗證（PEV 三段式） | 三個獨立工作者，各自承擔單一角色，透過狀態與佇列在各階段間通訊 |
 | 控制平面與運算平面分離（Harness-compute separation，OpenAI Agents SDK，2026 年 4 月） | 重新包裝分散式系統中的控制平面（Control-plane）與資料平面（Data-plane）。早於 Agent 這個標籤數十年。 |
-| Open Agent Passport（OAP，2026 年 3 月）——在執行前對工具呼叫進行宣告式策略簽名審計 | 由動作前置 Worker 所強制執行的授權策略，附帶具備數位簽名的審計佇列 |
+| Open Agent Passport（OAP，2026 年 3 月）——在執行前依宣告式策略簽署並稽核每次工具呼叫 | 由動作前置 Worker 所強制執行的授權策略，附帶具備數位簽名的審計佇列 |
 | 指引與感測器（Guides and Sensors；Birgitta Böckeler／Thoughtworks）——前饋規則 + 回饋可觀測性 | 授權策略 + 確定性驗證函式 + 可觀測性追蹤鏈 |
 | 漸進式脈絡壓縮，5 階段（Claude Code 逆向工程，2026 年 4 月） | 一個狀態管理 Worker，如同 Cron 定時巡檢工作階段持久化儲存以維持預算 |
 | 掛鉤／中介軟體（Hooks / middleware；LangChain、Claude Code）——攔截模型與工具呼叫 | 包裹於執行環境呼叫路徑周圍的觸發器與函式組合 |

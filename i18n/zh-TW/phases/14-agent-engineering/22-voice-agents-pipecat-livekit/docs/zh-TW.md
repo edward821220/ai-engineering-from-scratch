@@ -45,7 +45,7 @@ Pipecat Flows 為對話注入結構化狀態機。Pipecat Cloud 則是官方雲�
 - 核心概念：`Agent`、`AgentSession`、`entrypoint`、`AgentServer`。
 - 兩大語音 Agent 類別：
   - **MultimodalAgent**：原生端到端音訊處理（透過 OpenAI Realtime API 或對等方案直接輸入／輸出音訊）。
-  - **VoicePipelineAgent**：STT → LLM → TTS 傳統級聯管線；賦予工程師字詞層級的精細控制力。
+  - **VoicePipelineAgent**：STT → LLM → TTS 傳統級聯管線；賦予工程師文字層級的精細控制力。
 - 基於 Transformer 模型的語意話輪偵測（Semantic Turn Detection）。
 - 原生支援 MCP 工具整合。
 - 支援傳統電話電信網路 SIP 接入。
@@ -81,7 +81,7 @@ voice-pipeline
 `code/main.py` 實作了一套極簡的訊框式管線：
 
 - `Frame` 核心資料型別（audio 音訊、transcript 逐字稿、text 文字、tts_audio 合成音訊、control 控制信號）；
-- 定義 `process(frame)` 介面的 `Processor` 基礎類別；
+- 定義含有 `process(frame)` 方法的 `Processor` 介面；
 - 由腳本化處理器構成的五階段標準管線（VAD → STT → LLM → TTS → transport）；
 - 演示打斷插話（Barge-in）的 UPSTREAM 取消訊框。
 
@@ -123,7 +123,7 @@ python3 code/main.py
 | VAD | 「語音活動偵測」 | 毫秒級即時判定使用者當前是否正在開口說話的感測演算法 |
 | Semantic turn detection | 「語意話輪偵測」 | 基於模型語意理解、判定使用者發言是否已經結束的演算法 |
 | MultimodalAgent | 「端到端音訊 Agent」 | 音訊直接進、音訊直接出；中間不經過文字轉譯 |
-| VoicePipelineAgent | 「級聯語音 Agent」 | STT + LLM + TTS 三階段串聯架構；保留字詞層級的精細控制力 |
+| VoicePipelineAgent | 「級聯語音 Agent」 | STT + LLM + TTS 三階段串聯架構；保留文字層級的精細控制力 |
 
 ## Further Reading｜延伸閱讀
 

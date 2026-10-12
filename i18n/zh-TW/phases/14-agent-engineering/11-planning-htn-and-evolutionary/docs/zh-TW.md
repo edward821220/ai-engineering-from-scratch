@@ -54,12 +54,12 @@ ChatHTN（arXiv:2505.11814）將符號 HTN 搜尋與 LLM 動態查詢交錯結�
 
 ### AlphaEvolve（Novikov 等人，2025）
 
-AlphaEvolve（arXiv:2506.13131，DeepMind，2025 年 6 月）則是另一類截然不同的架構：由 Gemini 2.0 Flash/Pro 整合模型所編排的**演化程式碼搜尋引擎**。
+AlphaEvolve（arXiv:2506.13131，DeepMind，2025 年 6 月）則是另一類截然不同的架構：由 Gemini 2.0 Flash/Pro 模型集成所編排的**演化程式碼搜尋引擎**。
 
 執行迴圈：
 
 1. 自一段初始種子程式碼 + 一個程式化評估器（回傳精確的適應度分數）啟動；
-2. 由 LLM 整合團隊主動提出程式碼變異提案（Mutations）；
+2. 由 LLM 模型集成主動提出程式碼變異提案（Mutations）；
 3. 將產生的變異程式碼輸入評估器執行評分；
 4. 保留得分最高的最優候選；發起下一輪突變迭代。
 
@@ -110,7 +110,7 @@ python3 code/main.py
 
 - **HTN 規劃器**：`pyhop`、`SHOP3`，或針對特定垂直領域的安全策略自建規則引擎。
 - **ChatHTN**：學術前沿程式碼；其核心模式（符號主幹 + LLM 降級支援）可乾淨移植至任何現代 HTN 規劃器中。
-- **AlphaEvolve**：DeepMind 論文；其架構（模型整合突變 + 評估器）可重現。開源社群中的 OpenEvolve 等專案正在迅速演進發展。
+- **AlphaEvolve**：DeepMind 論文；其架構（模型集成 + 評估器）可重現。開源社群中的 OpenEvolve 等專案正在迅速演進發展。
 - **現成 Agent 框架**：目前主流框架尚未原生內建 HTN 或 AlphaEvolve。建議將其封裝為獨立的專業子 agent 或背景工作者。
 
 ## Ship It｜交付成果
@@ -133,7 +133,7 @@ python3 code/main.py
 | Method | 「任務拆解規則」 | 將複合任務向下分解為具體子任務的定義途徑 |
 | Operator | 「基本原子動作」 | 具備嚴格前置條件與執行效果的最小操作單元 |
 | ChatHTN | 「LLM + HTN 混合規劃」 | 符號規劃器為主幹，當無已知方法匹配時向 LLM 動態請教拆解建議 |
-| AlphaEvolve | 「演化程式碼搜尋」 | 由整合 LLM 提出程式碼變異，由確定性評估器篩選留存的極限最佳化引擎 |
+| AlphaEvolve | 「演化程式碼搜尋」 | 由 LLM 模型集成提出程式碼變異，由確定性評估器篩選留存的極限最佳化引擎 |
 | Fitness function | 「適應度評估器」 | 對產出結果進行評分、可由機器客觀自動化驗證的確定性函式 |
 | Online method learning | 「快取 LLM 拆解經驗」 | 持久化儲存並泛化 LLM 產出的規劃規則，大幅削減後續 API 查詢開銷 |
 
