@@ -22,7 +22,7 @@
 
 ### 用戶端 SDK vs Agent SDK
 
-- **用戶端 SDK（`anthropic`）**：暴露底層原始的 Messages API。工程師必須親手編寫控制迴圈、管理工具執行與維護全域狀態。
+- **用戶端 SDK（`anthropic`）**：暴露底層原始的 Messages API。工程師必須親手編寫控制迴圈、管理工具執行與維護狀態。
 - **Agent SDK（`claude-agent-sdk`）**：原生內建工具執行、MCP 連線管理、生命週期鉤子、子 agent 衍生與工作階段儲存庫。將 Claude Code 的核心迴圈直接封裝為高階函式庫。
 
 ### 原生內建工具集
@@ -123,7 +123,7 @@ python3 code/main.py
 | 術語 | 常見俗稱 | 實際工程意義 |
 |---|---|---|
 | Agent SDK | 「函式庫版的 Claude Code」 | 封裝工具執行、MCP 連線、鉤子、子 agent 與工作階段的執行環境架構 |
-| Subagent | 「子 Agent」 | 具備獨立上下文視窗與專屬預算的子執行體；結果匯總回傳給協調者 |
+| Subagent | 「子 Agent」 | 具備獨立上下文視窗與專屬預算的子 agent；結果匯總回傳給協調者 |
 | Session store | 「對話歷史資料庫」 | 支援回合追加、載入、列舉與級聯刪除的持久化儲存設施 |
 | Hook | 「生命週期回呼函式」 | 於工具呼叫前後、工作階段起訖、輸入送出或壓縮前執行的自訂擴充點 |
 | W3C trace context | 「跨行程分散式追蹤」 | 父層 Span 透過標準標頭透明傳播至 CLI 子行程中的追蹤機制 |

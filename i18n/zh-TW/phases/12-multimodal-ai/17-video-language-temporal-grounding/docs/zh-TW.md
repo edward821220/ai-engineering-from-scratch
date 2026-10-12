@@ -1,6 +1,6 @@
 # 影片語言模型：時間 Token 與時間軸定位（Video-Language Models: Temporal Tokens and Grounding）
 
-> 影片絕非一疊單純的靜態照片堆疊。一段 5 秒鐘的短片蘊含著嚴格的因果次序、動作動詞以及事件發生的精確時間點，這些是純靜態影像模型完全無力表達的。Video-LLaMA（Zhang 等人，2023 年 6 月）推出了首款具備影片音訊時空定位的開源影片 LLM；VideoChat 與 Video-LLaVA 則進一步將此模式規模化。到了 2025 年，Qwen2.5-VL 憑藉 TMRoPE 徹底縮小了開源模型與頂級閉源模型的差距。各家系統對時間 token 的解法大異其趣——以短片為單位的 Q-former、逐影格池化拼接，或是細粒度至逐 token 的 TMRoPE。本課帶你梳理各類流派，動手實作均勻與動態影格取樣器，並在時間軸定位任務上展開嚴謹評測。
+> 影片絕非一疊單純的靜態照片堆疊。一段 5 秒鐘的短片蘊含著嚴格的因果次序、動作動詞以及事件發生的精確時間點，這些是純靜態影像模型完全無力表達的。Video-LLaMA（Zhang 等人，2023 年 6 月）推出了首款具備影片音訊時空定位的開放影片 LLM；VideoChat 與 Video-LLaVA 則進一步將此模式規模化。到了 2025 年，Qwen2.5-VL 憑藉 TMRoPE 徹底縮小了與頂級專有模型的差距。各家系統對時間 token 的解法大異其趣——以短片為單位的 Q-former、逐影格池化拼接，或是細粒度至逐 token 的 TMRoPE。本課帶你梳理各類流派，動手實作均勻與動態影格取樣器，並在時間軸定位任務上展開嚴謹評測。
 
 **Type:** Build
 **Languages:** Python (stdlib, frame sampler + temporal-grounding evaluator)
@@ -9,7 +9,7 @@
 
 ## Learning Objectives｜學習目標
 
-- 解釋為何時間位置編碼能獨立於視覺編碼器之外，根本性地拉動影片 VLM 的任務表現。
+- 解釋為何時間位置編碼能獨立於視覺編碼器之外，影響影片 VLM 的任務表現。
 - 在每秒 token 消耗與時間軸定位精確度兩大維度上，深入對比均勻取樣、動態 FPS 取樣與事件驅動取樣。
 - 剖析「短片級 Q-Former（Video-LLaMA）」、「逐影格池化（Video-LLaVA）」與「逐 token M-RoPE（Qwen2.5-VL）」三種架構設計的本質差異。
 - 掌握四大核心影片評測基準：VideoMME、TempCompass、EgoSchema 與 Video-MMMU。
@@ -32,7 +32,7 @@
 
 ### Video-LLaMA：片段級 Q-Former 加音訊路徑
 
-Video-LLaMA（2023）是首款開源影片大型語言模型。其典型架構為：
+Video-LLaMA（2023）是首款開放影片 LLM。其典型架構為：
 
 - 接收以 2 FPS 取樣的 16 個影格短片片段（總長度為 8 秒）。
 - 逐影格提取 ViT 特徵 → 送入影片 Q-Former 對全體 16 個影格進行交叉注意力 → 壓縮為 32 個學習到的 query 向量 → 餵入 LLM。
@@ -62,7 +62,7 @@ TMRoPE 真正解鎖了「貓在第幾秒跳了起來？」這類極精確的時�
 
 均勻取樣（Uniform）：在整個影片時長內等間距抽取 N 個影格。實作最簡單，但容易錯失高速動作的關鍵瞬間。
 
-動態 FPS 取樣（Dynamic FPS）：依據畫面動態劇烈程度自適應調整影格取樣率。利用光流（Optical Flow）或相鄰影格差分演算法，自動在劇烈運動區間提高影格取樣密度。Qwen2.5-VL 在此策略上進行了深度預訓練。
+動態 FPS 取樣（Dynamic FPS）：依據畫面動態劇烈程度自適應調整影格取樣率。利用光流（Optical Flow）或相鄰影格差分演算法，自動在劇烈運動區間提高影格取樣密度。Qwen2.5-VL 也以這種方式訓練。
 
 事件驅動取樣（Event-driven）：前端先執行一個輕量的事件偵測器，僅在發生動作的區間密集抽樣。常為 VideoAgent 所採用。
 
@@ -131,7 +131,7 @@ video-temporal-patches
 
 4. 閱讀 Video-LLaVA 論文第 3 節關於「投影前先對齊（Alignment Before Projection）」的論述。為何這種聯合訓練範式，遠勝過分別訓練孤立的靜態影像編碼器與動態影片編碼器？
 
-5. 檢視當前的 VideoMME 排行榜，分析頂級開源模型與頂級閉源商業模型之間的實際差距。這段差距中有多大比例應歸因於時間位置編碼架構，有多大比例歸因於底座語言模型的規模？
+5. 檢視當前的 VideoMME 排行榜，分析頂級開放模型與頂級專有模型之間的實際差距。這段差距中有多大比例應歸因於時間位置編碼架構，有多大比例歸因於底座語言模型的規模？
 
 ## Key Terms｜關鍵術語
 

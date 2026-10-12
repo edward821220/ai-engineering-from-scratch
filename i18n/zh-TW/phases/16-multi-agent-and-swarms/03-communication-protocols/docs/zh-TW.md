@@ -616,7 +616,7 @@ function textMessage(role: MessageRole, text: string): AgentMessage {
   return createMessage(role, [{ text }]);
 }
 ```
-值得特別留意：`MessagePart` 是多模態的（文字、結構化資料、二進位檔案），完全對齊真實的 A2A 與 ACP 規範。如同 A2A 1.0 的設計，具體存在的欄位（`text`、`data` 或 `url`）直接宣告了該片段的型別本質；無需額外的 `kind` 標籤。`TrajectoryEntry` 則用於記錄完整的推理鏈條，精準契合 ACP 的 TrajectoryMetadata。
+值得特別留意：`MessagePart` 是多模態的（文字、結構化資料、檔案），完全對齊真實的 A2A 與 ACP 規範。如同 A2A 1.0 的設計，具體存在的欄位（`text`、`data` 或 `url`）直接宣告了該片段的型別本質；無需額外的 `kind` 標籤。`TrajectoryEntry` 則用於記錄完整的推理鏈條，精準契合 ACP 的 TrajectoryMetadata。
 
 ### 步驟二：A2A Agent Card 與註冊表
 

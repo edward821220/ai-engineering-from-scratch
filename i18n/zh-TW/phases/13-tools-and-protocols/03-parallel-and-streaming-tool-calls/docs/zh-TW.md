@@ -138,7 +138,7 @@ tp-parallel-fanout
 
 4. 挑選兩款絕不能並行發起的工具（例如先執行 `create_file` 再執行 `write_file`）。在工具註冊表中加入 `ordering_dependency` 相依性圖譜定義，並在並行扇出調度器中加入相依性防護閘門。這正是後續 Agent 工程學中依賴感知排程的最小核心原型。
 
-5. 精讀 OpenAI 的並行函式呼叫手冊與 Anthropic 的 `disable_parallel_tool_use` 文件。指出 Anthropic 官方強烈建議關閉並行呼叫的一種典型真實場景（提示：針對同一外部資源進行連續的破壞性寫入操作）。
+5. 精讀 OpenAI 的並行函式呼叫手冊與 Anthropic 的 `disable_parallel_tool_use` 文件。指出 Anthropic 建議停用並行呼叫的一種實際工具類型（提示：對同一外部資源進行影響重大的變更）。
 
 ## Key Terms｜關鍵術語
 

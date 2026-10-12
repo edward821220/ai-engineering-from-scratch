@@ -12,11 +12,11 @@
 - 精準指認 OpenAI、Anthropic 與 Gemini 在函式呼叫酬載（宣告、呼叫、結果）上的三大形態結構差異。
 - 在三大服務供應商格式之間自由雙向轉譯單一工具宣告，並預測各家嚴格模式（Strict Mode）約束條件的不同之處。
 - 靈活運用各平台的 `tool_choice` 參數，以強制呼叫、禁止呼叫或讓模型自動選擇工具。
-- 掌握各廠商在正式環境中的硬性配額上限（工具總數、結構描述巢狀深度、引數長度限制），以及踩線違規時各自拋出的典型錯誤代號。
+- 掌握各廠商在正式環境中的硬性配額上限（工具總數、結構描述巢狀深度、引數長度限制），以及踩線違規時各自拋出的典型錯誤特徵。
 
 ## The Problem｜問題
 
-函式呼叫的請求與回應格式，因服務供應商不同而存在細微卻致命的差異。來自 2026 年商業正式環境的三個具體實例：
+函式呼叫的請求與回應格式，因服務供應商不同而有所差異。來自 2026 年商業正式環境的三個具體實例：
 
 **OpenAI Chat Completions / Responses API**：傳入 `tools: [{type: "function", function: {name, description, parameters, strict}}]`。模型回傳的回應包含 `choices[0].message.tool_calls: [{id, type: "function", function: {name, arguments}}]`，其中 `arguments` 是一個你必須自行手動解析的字串化 JSON。嚴格模式（`strict: true`）透過語法受限解碼強制確保引數絕對符合結構描述規範。
 

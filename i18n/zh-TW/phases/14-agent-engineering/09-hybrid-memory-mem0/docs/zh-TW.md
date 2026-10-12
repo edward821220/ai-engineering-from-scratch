@@ -54,7 +54,7 @@ score = w_relevance * relevance(q, record)
 - **重要性（Importance）**：寫入時標註或自動學習得出（部分事實天然具備更高重要性：姓名、ID、政策規範）。
 - **新近性（Recency）**：隨最後寫入或讀取時間呈指數衰減。
 
-權重依具體業務產品進行調校：對話型聊天 agent 提高 `w_recency` 權重；法規審計 agent 提高 `w_importance` 權重；知識庫檢索 agent 則大幅提高 `w_relevance` 權重。
+權重依具體業務產品進行調整：對話型聊天 agent 提高 `w_recency` 權重；法規審計 agent 提高 `w_importance` 權重；知識庫檢索 agent 則提高 `w_relevance` 權重。
 
 ### Mem0g 與時態推理
 

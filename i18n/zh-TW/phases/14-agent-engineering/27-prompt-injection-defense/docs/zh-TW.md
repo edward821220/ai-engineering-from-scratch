@@ -88,7 +88,7 @@ python3 code/main.py
 ## Use It｜實際應用
 
 - **OpenAI Agents SDK 護欄**（第 16 課）：內建 PVE 形態的防護模式。
-- **Gemini 2.5 Computer Use 安全服務**：官方雲端託管的逐步驟安全過濾。
+- **Gemini 2.5 Computer Use 安全服務**：廠商管理的逐步驟安全過濾。
 - **Anthropic 工具使用最佳實踐**：將所有檢索資料視為不可信；Claude 的系統 prompt 對此有顯式說明。
 - **自建 PVE 引擎**：針對你垂直業務的特定攻擊特徵，訓練或配置專屬的輕量驗證器模型。
 
@@ -111,7 +111,7 @@ python3 code/main.py
 | Indirect prompt injection | 「資料夾帶注入」 | 攻擊指令隱藏於 Agent 外部檢索取得的資料中，讀入時覆蓋系統設定 |
 | Direct prompt injection | 「越獄攻擊（Jailbreak）」 | 惡意使用者在直接輸入中繞過安全邊界 |
 | PVE | 「Prompt—驗證—執行」 | 主模型提出候選工具呼叫後、執行工具前先由輕量驗證器審核的防禦架構模式 |
-| Source tag | 「內容出處標籤」 | 標註資料究竟源自使用者、工具還是外部檢索的來源中繼資料 |
+| Source tag | 「內容溯源標籤」 | 標註資料究竟源自使用者、工具還是外部檢索的來源中繼資料 |
 | Allowlist navigation | 「網址允許清單」 | 嚴格限制 Agent 獲准連線或存取的外部目標清單 |
 | Worming | 「蠕蟲自複製傳播」 | 注入指令指示 Agent 在後續輸出中攜帶自身惡意程式碼以感染其他系統 |
 | Memory poisoning | 「持久記憶投毒」 | 將惡意指令持久化存入記憶庫，使 Agent 在未來的全新工作階段中持續中毒 |

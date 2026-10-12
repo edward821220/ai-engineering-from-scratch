@@ -69,7 +69,7 @@ Multi-Agent PPO：PPO 加上集中式價值函數。每個 Agent 有自己的策
 三個直接應用：
 
 1. **路由器訓練（Router training）。** 一個元 Agent 決定由哪個子 Agent 處理任務。這是 N 個分散子 Agent 與一個集中路由器的 MARL 問題。MAPPO 適用。
-2. **角色湧現（Role emergence）。** 在生成式 Agent 模擬中，訓練 Agent 隨時間形成互補角色，本質上也是 MARL 問題。QMIX 式的價值分解在結構上會促成互補。
+2. **角色湧現（Role emergence）。** 在生成式 Agent 模擬中，訓練 Agent 隨時間形成互補角色，本質上也是 MARL 問題。QMIX 式的價值分解會依其結構強制形成互補性。
 3. **多 Agent 工具使用。** 當 Agent 共享工具並競爭預算時，透過 CTDE 訓練可得到能遵守資源限制的本地策略。
 
 實務上的提醒：2026 年多數正式環境 LLM Agent 系統是用 prompt 設定策略，而非訓練策略。當你同時有 (a) 大量互動資料、(b) 清楚的獎勵訊號，以及 (c) 願意投資訓練基礎設施時，才適合導入 MARL。

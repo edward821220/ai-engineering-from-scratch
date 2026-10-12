@@ -116,7 +116,7 @@ python3 code/main.py
 | 術語 | 常見俗稱 | 實際工程意義 |
 |---|---|---|
 | GenAI SIG | 「OTel 生成式 AI 工作組」 | 負責制定 Agent 與 LLM 遙測資料標準結構描述的 OTel 工作小組 |
-| invoke_agent | 「Agent 執行 Span」 | 代表 Agent 執行過程的標準根 Span 名稱 |
+| invoke_agent | 「Agent 執行 Span」 | 代表 Agent 執行過程的 Span 名稱 |
 | CLIENT span | 「遠端服務呼叫」 | 標註呼叫遠端雲端代管 Agent 服務時所發射的 Span 類型 |
 | INTERNAL span | 「本機行程內部呼叫」 | 標註在同一行程內執行的 Agent 框架時所發射的 Span 類型 |
 | gen_ai.provider.name | 「模型服務供應商標籤」 | 標準鍵名，標註 anthropic / openai / aws.bedrock / google.vertex |

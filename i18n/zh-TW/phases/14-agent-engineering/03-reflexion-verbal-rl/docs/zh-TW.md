@@ -104,7 +104,7 @@ LangGraph 將反思實作為標準的節點圖模式。Claude Code 的 `/memory`
 
 ## Ship It｜交付成果
 
-`outputs/skill-reflexion-buffer.md` 專門建立並維護具備反思捕獲、TTL 淘汰與語意去重能力的情節記憶緩衝區。給定任務類別與失敗現象，它能自動產出真正對下一次試驗具備實質指導意義的高品質反思（絕非空洞的「請更加謹慎」）。
+`outputs/skill-reflexion-buffer.md` 專門建立並維護具備反思捕獲、TTL 淘汰與去重能力的情節記憶緩衝區。給定任務類別與失敗現象，它能自動產出真正對下一次試驗具備實質指導意義的高品質反思（絕非空洞的「請更加謹慎」）。
 
 ## Exercises｜練習
 

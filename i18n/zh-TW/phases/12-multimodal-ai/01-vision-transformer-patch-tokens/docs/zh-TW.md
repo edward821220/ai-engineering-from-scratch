@@ -49,7 +49,7 @@ Patch 本身不具備任何固有順序——在 Transformer 眼中它們只是�
 
 1. `[CLS]` token。在 patch 序列開頭前綴一個可學習向量。在通過所有 Transformer 區塊後，CLS token 的隱藏狀態即代表整張影像。此設計承襲自 BERT，為原創 ViT 與 CLIP 所採用。
 2. 平均池化（Mean pool）。將所有 patch token 的輸出隱藏狀態取平均。SigLIP、DINOv2 及多數現代 VLM 採用此方案。
-3. 暫存器 token（Register tokens）。Darcet 等人（2023）觀察到，若 ViT 在訓練時缺乏顯式的彙整接收 token，會自發形成高範數（high-norm）的「假影」patch，進而干擾自注意力機制。額外引入 4 到 16 個可學習的暫存器 token 能夠吸收這些冗餘負荷，顯著提升密集預測（如分割、深度估計）的品質。DINOv2 與 SigLIP 2 皆原生內建暫存器機制。
+3. 暫存器 token（Register tokens）。Darcet 等人（2023）觀察到，若 ViT 在訓練時缺乏顯式的彙整接收 token，會自發形成高範數（high-norm）的「假影」patch，進而干擾自注意力機制。額外引入 4 到 16 個可學習的暫存器 token 能夠吸收這些冗餘負荷，改善密集預測（如分割、深度估計）的品質。DINOv2 與 SigLIP 2 皆原生內建暫存器機制。
 
 這項抉擇對下游任務影響深遠。CLS 適用於單純分類；但對於需要將 patch token 餵入 LLM 的 VLM 而言，完全無需進行影像層級的池化——每個 patch 都會直接轉化為 LLM 的輸入 token。而暫存器 token 則會在交付給 LLM 之前被安全剔除（它們只是鷹架，並非實際內容）。
 
@@ -58,7 +58,7 @@ Patch 本身不具備任何固有順序——在 Transformer 眼中它們只是�
 2020 年原版 ViT 採用 JFT-300M 上的監督式分類進行預訓練，隨後迅速被更強大的範式所取代：
 
 - CLIP（2021）：在 4 億組圖文配對上進行對比式學習。詳見第 12.02 課。
-- MAE（2021，He 等人）：隨機遮蓋 75% 的 patch 並重建原始像素。純自我監督，僅需未標註影像即可訓練。
+- MAE（2021，He 等人）：遮蓋 75% 的 patch 並重建像素。自我監督，可處理純影像。
 - DINO（2021）／DINOv2（2023）：透過學生—教師網路進行自我蒸餾，無標籤、無文字描述。2023 年的 DINOv2 ViT-g/14 是最強大的純視覺骨幹，也是「密集特徵（dense features）」應用場景的標準首選。
 - SigLIP ／ SigLIP 2（2023、2025）：採用 sigmoid 損失函式並支援原生長寬比 NaFlex 的改良版 CLIP。是 2026 年開源 VLM（Qwen、Idefics2、LLaVA-OneVision）最主流的視覺塔。
 

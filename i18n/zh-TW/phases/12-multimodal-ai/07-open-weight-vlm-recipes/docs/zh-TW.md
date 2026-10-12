@@ -40,7 +40,7 @@ Idefics2（Laurençon 等人，2024）精闢地定義了這五大維度：
 
 蘋果 MM1 論文第 3.2 節明確指出：僅將視覺編碼器從 CLIP ViT-L/14 換成 SigLIP SO400m/14，MMMU 分數便直接提升了 3 個百分點以上。然而將連接器從極簡的 MLP 更換為複雜的 Perceiver 重取樣器，帶來的提升卻不足 1 個百分點。Idefics2 亦復現了完全相同的現象：SigLIP 明顯優於 CLIP；而在相同 token 數量下，Q-Former ≈ MLP ≈ Perceiver。
 
-Cambrian-1 的「視覺編碼器對決榜」（Tong 等人，2024）在以純視覺為核心的 CV-Bench 基準上評測了 20 多種編碼器。排行榜前段的模型來自 DINOv2 與 SigLIP；經典 CLIP 僅處於中段班；而 ImageBind 與 ViT-MAE 則排在其後。從 CLIP ViT-L 升級至 DINOv2 ViT-g/14，在 CV-Bench 上帶來了整整 5 到 7 個百分點的巨大躍升。
+Cambrian-1 的「視覺編碼器對決榜」（Tong 等人，2024）在以純視覺為核心的 CV-Bench 基準上評測了 20 多種編碼器。排行榜前段的模型來自 DINOv2 與 SigLIP；經典 CLIP 僅處於中段班；而 ImageBind 與 ViT-MAE 則排在其後。從 CLIP ViT-L 升級至 DINOv2 ViT-g/14，在 CV-Bench 上帶來約 5 到 7 個百分點的提升。
 
 2026 年開源 VLM 的預設首選編碼器是具備語意與密集特徵雙重優勢的 SigLIP 2 SO400m/14；有時會與 DINOv2 ViT-g/14 的特徵在通道維度拼接融合（Cambrian 的「空間視覺聚合器」即採此策略）。
 
@@ -64,7 +64,7 @@ Molmo 與 PixMo（Deitke 等人，2024）是 2024 年最震撼學界的重大成
 
 結果令人震撼：Molmo-72B 在全數 11 項關鍵基準測試上，勝過擁有 900 億參數的 Llama-3.2-90B-Vision。這一巨大勝差絕非源自模型架構——而是完全由圖片說明品質所決定。詳盡的人工說明每張影像所包含的有效資訊量，是粗淺網路 alt-text 的 5 到 10 倍以上；人工描述較能以事實為依據，而 GPT-4V 蒸餾可能產生幻覺。
 
-ShareGPT4V（Chen 等人，2023）與 Cauldron（Idefics2）亦遵循了相同的原則（混合優質人工標註與精準 GPT-4V 描述）。趨勢無比清晰：在 2026 年的前沿多模態研發中，說明資訊密度 > 說明資料總量 > 廉價的合成蒸餾便利性。
+ShareGPT4V（Chen 等人，2023）與 Cauldron（Idefics2）亦採用相同做法，混合人工與 GPT-4V 產生的圖片說明。趨勢無比清晰：在 2026 年的前沿多模態研發中，說明資訊密度 > 說明資料總量 > 廉價的合成蒸餾便利性。
 
 ### 維度五：解析度與其訓練時程安排
 
@@ -93,7 +93,7 @@ Prismatic VLMs（Karamcheti 等人，2024）控制了所有設計軸。固定相
 - 連接器：直接採用作用於 patch token 的雙層 MLP。除非面臨極端苛刻的 token 數量預算，否則請果斷略過 Q-Former。
 - 語言模型底座：首選 Qwen2.5、Llama-3.1 或 Gemma 2；注重低成本延遲選 7B，追求極致品質選 70B。
 - 訓練資料：以 PixMo + ShareGPT4V + Cauldron 為核心基底，並混入垂直領域特定的專業指令資料。
-- 解析度策略：原生動態解析度（長邊設定 min 256、max 1280 像素邊界門檻）。
+- 解析度策略：原生動態解析度（每張影像長邊設定 min 256、max 1280 像素）。
 - 訓練時程規劃：第 1 階段僅更新投影器進行對齊，第 2 階段全參 fine-tuning，第 3 階段針對目標垂直任務進行 fine-tuning。
 
 上述每一項預設工程決策，皆嚴格奠定於本課文末所引用的扎實實證文獻之上。
@@ -139,7 +139,7 @@ l5-vlm-recipe-knobs
 | AnyRes / dynamic res | 「高畫質動態路徑」 | 透過網格切片拼圖或 M-RoPE 機制，直接吞吐超越編碼器原生解析度大圖的擴展策略 |
 | Resolution ramp | 「解析度階梯式學習」 | 訓練初期採用較低解析度快速建立語意對齊，後期提升解析度捕捉細節的時程調度策略 |
 | Vision-centric bench | 「純視覺感知基準」 | 如 CV-Bench 或 BLINK 等專門著重嚴苛視覺細節感知，而非依賴語言邏輯推理的評測集 |
-| PixMo | 「Molmo 的核心語料庫」 | 艾倫人工智慧研究所打造的 71.2 萬張高密度圖片說明資料集；由人類語音即時轉錄而成 |
+| PixMo | 「Molmo 的核心語料庫」 | 艾倫人工智慧研究所打造的 71.2 萬張高密度圖片說明資料集；由人類語音轉錄成密集圖片說明 |
 
 ## Further Reading｜延伸閱讀
 

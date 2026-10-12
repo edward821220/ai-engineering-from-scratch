@@ -1,6 +1,6 @@
 # 交接與例行流程——無狀態編排架構（Handoffs and Routines — Stateless Orchestration）
 
-> OpenAI 於 2024 年 10 月發布的 Swarm 將多 Agent 編排體系高度提煉為兩大核心原語：**例行流程（Routines）**（以系統 prompt 封裝的指令集與可用工具）以及**交接（Handoffs）**（一個回傳另一個 Agent 物件的專屬工具）。沒有複雜的狀態機，沒有繁瑣的條件判定 DSL——底層 LLM 僅僅透過呼叫正確的交接工具來自行完成路由跳轉。OpenAI Agents SDK（2025 年 3 月發布）是其工業級正式環境繼承者。然而 Swarm 本身依然是業界最為乾淨純粹的概念參照——其全部核心原始碼僅有寥寥數百行。這套模式之所以能迅速普及，在於其 API 介面極度精煉：「Agent = Prompt + 工具；交接 = 回傳 Agent 的函式」。客觀局限性：本質上完全無狀態，因此記憶的跨輪次維護完全成為外層呼叫者的責任。
+> OpenAI 於 2024 年 10 月發布的 Swarm 將多 Agent 編排體系高度提煉為兩大核心原語：**例行流程（Routines）**（以系統 prompt 封裝的指令集與可用工具）以及**交接（Handoffs）**（一個回傳另一個 Agent 物件的專屬工具）。沒有複雜的狀態機，沒有繁瑣的條件判定 DSL——底層 LLM 僅僅透過呼叫正確的交接工具來自行完成路由跳轉。OpenAI Agents SDK（2025 年 3 月發布）是其工業級正式環境繼承者。然而 Swarm 本身依然是業界最為乾淨純粹的概念參照——其全部核心原始碼僅有寥寥數百行。這套模式之所以能迅速普及，在於其 API 介面極度精煉：「Agent = Prompt + 工具；交接 = 回傳 Agent 的函式」。客觀局限性：本質上完全無狀態，因此各次執行之間的記憶由外層呼叫者負責維護。
 
 **Type:** Learn + Build
 **Languages:** Python (stdlib)

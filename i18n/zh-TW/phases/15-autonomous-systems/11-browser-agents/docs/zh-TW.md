@@ -29,7 +29,7 @@
 
 ### BrowseComp、OSWorld 與 WebArena 的維度對比
 
-| 基準測試 | 衡量內容 | 時程 |
+| 基準測試 | 衡量內容 | 時間跨度 |
 |---|---|---|
 | BrowseComp | 在時間壓力下，於開放網路上找出特定事實 | 數分鐘 |
 | OSWorld | Agent 操作完整桌面（滑鼠、鍵盤、shell） | 數十分鐘 |
@@ -94,7 +94,7 @@ injection-boundary
 | Tainted Memories | 「記憶攻擊」 | agent 將攻擊者提供的指令寫入持久記憶；於下一個工作階段觸發 |
 | HashJack | 「URL 片段攻擊」 | 隱藏在 URL 片段或查詢字串中的酬載會進入 agent 上下文，卻不會被可見地渲染 |
 | 單次點選劫持 | 「有問題的按鈕」 | 可見的操作介面會帶出 agent 執行的後續酬載 |
-| BrowseComp | 「網頁搜尋基準測試」 | 在開放網路上找出特定事實；時程以分鐘計 |
+| BrowseComp | 「網頁搜尋基準測試」 | 在開放網路上找出特定事實；以分鐘計的時間跨度 |
 | OSWorld | 「桌面基準測試」 | 完整作業系統控制；多步驟的 GUI 任務 |
 | WebArena-Verified | 「修正後的網頁任務基準測試」 | ServiceNow 重新計分的 WebArena，並含 Hard 子集 |
 | 讀取／寫入邊界 | 「副作用閘門」 | 讀取不產生後果；若內容來自信任範圍之外，寫入需要重新核准 |

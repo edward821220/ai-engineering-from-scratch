@@ -91,7 +91,7 @@ python3 code/main.py
 
 ## Use It｜實際應用
 
-LangGraph 將 Plan-and-Execute 作為標準配方提供（`create_react_agent` 用於 ReAct，自訂圖用於 plan-execute）。CrewAI 的 Flows 架構直接內建了此模式：你預先定義好各項任務，由 Flow DAG 自動按拓撲排程執行。Plan-and-Act 的合成資料方法目前主要見於學術前沿；而顯式規劃 DAG 的執行環境模式則已透過 LangGraph 與 CrewAI Flows 在正式環境廣泛落地。
+LangGraph 將 Plan-and-Execute 作為標準配方提供（`create_react_agent` 用於 ReAct，自訂圖用於 plan-execute）。CrewAI 的 Flows 架構直接內建了此模式：你預先定義好各項任務，由 Flow DAG 自動按拓撲排程執行。Plan-and-Act 的合成資料方法目前主要見於學術前沿；而顯式規劃 DAG 的執行環境模式則已透過 LangGraph 與 CrewAI Flows 在正式環境中提供。
 
 ## Ship It｜交付成果
 

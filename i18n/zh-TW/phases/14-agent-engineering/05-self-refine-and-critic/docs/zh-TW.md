@@ -130,7 +130,7 @@ Anthropic 的 Evaluator-Optimizer 正是此模式在 Claude 語境下的具象�
 | Self-Refine | 「模型自我修復」 | 單一模型內部閉環：生成 → 回饋 → 精煉，嚴格保留累積歷史脈絡 |
 | CRITIC | 「工具錨定驗證」 | 將回饋環節替換為外部工具（搜尋、程式碼執行、計算機、測試套件） |
 | Evaluator-Optimizer | 「評估者—最佳化者」 | Anthropic 提出的架構模式：評估者評分，最佳化者依建議修改，迭代至收斂 |
-| Output guardrail | 「事後合規護欄」 | OpenAI Agents SDK 於 agent 產出結果後立即執行的獨立驗證卡點 |
+| Output guardrail | 「事後檢查」 | OpenAI Agents SDK 於 agent 產出結果後立即執行的獨立驗證卡點 |
 | Verify step | 「批判階段」 | 關鍵決策：驗證是以工具結果為依據，還是由模型自行評分 |
 | Refine history | 「模型先前的嘗試歷史」 | 附加於精煉 prompt 前端的前次輸出與批判；遺失歷史會導致品質暴跌 |
 | Rubber-stamp loop | 「形式主義盲目放行」 | 生成與審核風格雷同導致系統快速收斂至「我看沒問題」的嚴重架構失效 |

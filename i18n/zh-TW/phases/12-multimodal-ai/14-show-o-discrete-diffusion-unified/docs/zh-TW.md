@@ -24,9 +24,9 @@ Show-o 給出的另闢蹊徑解答是：讓兩種模態皆維持純粹的離散�
 
 ### 遮蓋式離散擴散（MaskGIT）
 
-Chang 等人（2022）發表的 MaskGIT 機制非常精妙。生成流程從一張全遮蓋的影像開始（每個 patch 位置皆填入特殊的 `<MASK>` token ID）。在每一個生成步長中，Transformer 同時且平行預測所有當前被遮蓋的 token；隨後僅保留預測信心度最高的 Top-K 個 token 並將其鎖定，其餘未達標的位置則重新施加遮蓋。歷經約 8 到 16 次迭代後，所有 token 皆被高信心度的 VQ 碼本索引填滿。每一步該解除多少比例的遮蓋，取決於精心調校的排程——餘弦排程（Cosine Schedule）的效果良好。
+Chang 等人（2022）發表的 MaskGIT 機制非常精妙。生成流程從一張全遮蓋的影像開始（每個 token 都是特殊的 `<MASK>` token ID）。在每一個生成步長中，Transformer 同時且平行預測所有當前被遮蓋的 token；隨後僅保留預測信心度最高的 Top-K 個 token 並將其鎖定，其餘未達標的位置則重新施加遮蓋。歷經約 8 到 16 次迭代後，所有 token 皆被高信心度的 VQ 碼本索引填滿。每一步該解除多少比例的遮蓋，取決於經過調整的排程——餘弦排程（Cosine Schedule）的效果良好。
 
-其訓練流程極度簡潔：從區間 [0, 1] 中均勻隨機取樣一個遮蓋比例，將其套用於影像的 VQ 離散 token 序列中，並訓練 Transformer 準確預測被遮蓋的原始 token。這正是 BERT 在文字領域採用的經典遮蓋語言建模，被極為巧妙地擴展至多模態影像生成領域。
+其訓練流程極度簡潔：從區間 [0, 1] 中均勻隨機取樣一個遮蓋比例，將其套用於影像的 VQ 離散 token 序列中，並訓練 Transformer 準確預測被遮蓋的原始 token。這正是 BERT 用於文字的做法，現在擴展至影像生成。
 
 ### Show-o：單一 Transformer，混合注意力遮罩
 
@@ -77,7 +77,7 @@ mask_ratio(t) = cos(pi * t / (2 * T))   # t = 0..T
 
 ### Show-o2
 
-2025 年發布的升級版 Show-o2（arXiv:2506.15564）全面擴展了此架構：換裝更強大的語言模型底座、升級更高重建上限的 Tokenizer，並最佳化了遮蓋排程演算法。核心架構形態維持一致。
+2025 年發布的升級版 Show-o2（arXiv:2506.15564）全面擴展了此架構：換裝更強大的語言模型底座、採用更好的 tokenizer，並最佳化了遮蓋排程演算法。核心架構形態維持一致。
 
 ### Show-o 在技術光譜中的座標
 
@@ -88,7 +88,7 @@ mask_ratio(t) = cos(pi * t / (2 * T))   # t = 0..T
 - 連續表徵 + 擴散去噪：Transfusion、MMDiT、DiT。成圖逼真度最高，但訓練排程與雙損失調控較繁複。
 - 連續表徵 + 流匹配 VLM：JanusFlow、InternVL-U。最新前沿探索。
 
-選型指南：若需要在單一開源模型中同時通吃文生圖、影像局部重繪與視覺問答，且注重快速推論吞吐，選 Show-o；若對成圖逼真度有極致苛求，且具備調控雙損失的深厚工程實力，選 Transfusion。
+選型指南：若需要在單一開放模型中同時通吃文生圖、影像局部重繪與視覺問答，且注重快速推論吞吐，選 Show-o；若對成圖逼真度有極致苛求，且具備調控雙損失的深厚工程實力，選 Transfusion。
 
 ```figure
 masked-diffusion-unmask
@@ -107,7 +107,7 @@ masked-diffusion-unmask
 
 ## Ship It｜交付成果
 
-本課產出 `outputs/skill-unified-gen-model-picker.md`。當產品同時需要視覺感知理解（VQA、圖片說明）與視覺生成（T2I、影像局部修復）且限定採用開放權重時，它能客觀對比 Show-o 體系、Transfusion/MMDiT 體系與 Emu3/Chameleon 體系，並給出具體的工程取捨分析與決策推薦。
+本課產出 `outputs/skill-unified-gen-model-picker.md`。當產品同時需要視覺感知理解（VQA、圖像描述）與視覺生成（T2I、影像局部修復）且限定採用開放權重時，它能客觀對比 Show-o 體系、Transfusion/MMDiT 體系與 Emu3/Chameleon 體系，並給出具體的工程取捨分析與決策推薦。
 
 ## Exercises｜練習
 

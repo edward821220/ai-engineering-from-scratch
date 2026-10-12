@@ -1,6 +1,6 @@
 # 人在迴圈中：先提議後確認寫入（Human-in-the-Loop: Propose-Then-Commit）
 
-> 2026 年業界對「人在迴圈中（HITL）」達成了高度具體的共識。它絕非「agent 發問、使用者點選核准」這種粗暴互動，而是嚴謹的先提議後確認寫入（propose-then-commit）模式：擬議動作會連同冪等性金鑰（idempotency key）存入持久化儲存區；帶著執行意圖、資料血緣（data lineage）、觸及權限、爆炸半徑（blast radius）以及回滾方案（rollback plan），完整呈現給人類審查員；唯有在獲得明確積極確認後才執行 commit；執行完畢後立即讀取驗證，確保外部副作用確實正確發生。LangGraph 的 `interrupt()` 搭配 PostgreSQL 檢查點機制、微軟 Agent Framework 的 `RequestInfoEvent`，以及 Cloudflare 的 `waitForApproval()` 皆採用相同的架構。該模式最典型的失效模式是「橡皮圖章式核准」：使用者不假思索便直接點選「核准」。有文獻記載的緩解方式是引入附帶明確核對清單的質詢應答（challenge-and-response）機制。
+> 2026 年業界對「人在迴圈中（HITL）」達成了高度具體的共識。它絕非「agent 發問、使用者點選核准」這種粗暴互動，而是嚴謹的先提議後確認寫入（propose-then-commit）模式：擬議動作會連同冪等性金鑰（idempotency key）存入持久化儲存區；帶著執行意圖、資料血緣（data lineage）、觸及權限、爆炸半徑（blast radius）以及回滾方案（rollback plan），完整呈現給人類審查員；唯有在獲得明確積極確認後才執行 commit；執行完畢後立即讀取驗證，確認外部副作用確實發生。LangGraph 的 `interrupt()` 搭配 PostgreSQL 檢查點機制、微軟 Agent Framework 的 `RequestInfoEvent`，以及 Cloudflare 的 `waitForApproval()` 皆採用相同的架構。該模式最典型的失效模式是「橡皮圖章式核准」：使用者不假思索便直接點選「核准」。有文獻記載的緩解方式是引入附帶明確核對清單的質詢應答（challenge-and-response）機制。
 
 **Type:** Learn
 **Languages:** Python (stdlib, propose-then-commit state machine with idempotency)
@@ -60,11 +60,11 @@ HITL 預設的陽春介面（僅提供單純的「核准」／「拒絕」按鈕
 
 ### 動作後驗證（Post-Action Verification）
 
-「確認寫入指令已發出」並不等同於「外部副作用已確實正確生效」。網路分割與並行競爭可能導致工作流程誤以為操作已成功，而後端儲存層實際上根本未持久化該變更。驗證步驟會在 commit 後立即重新讀取目標資源以核實狀態。這與資料庫事務中附帶 `RETURNING` 子句，或在 AWS S3 中發起 `PutObject` 之後立即執行 `GetObject` 進行驗證的架構哲學完全一致。
+「確認寫入指令已發出」並不等同於「外部副作用確實發生」。網路分割與並行競爭可能導致工作流程誤以為操作已成功，而後端儲存層實際上根本未持久化該變更。驗證步驟會在 commit 後立即重新讀取目標資源以核實狀態。這與資料庫交易中附帶 `RETURNING` 子句，或在 AWS S3 中發起 `PutObject` 之後立即執行 `GetObject` 進行驗證的架構哲學完全一致。
 
 ### 歐盟 AI 法案第 14 條的法律要求
 
-歐盟《人工智慧法案》第 14 條明確規定，部署在歐盟的高風險 AI 系統必須配備「有效的人類監督」。法律條文中的「有效」絕非裝飾性詞彙。監管機構的具體指引明確排除了流於形式的橡皮圖章核准模式。在微軟 Agent 治理工具包的法規遵循文件中，附帶質詢應答機制的先提議後確認寫入模式，正是能從容通過第 14 條嚴格檢驗的架構模式。
+歐盟《人工智慧法案》第 14 條明確規定，部署在歐盟的高風險 AI 系統必須配備「有效的人類監督」。法律條文中的「有效」絕非裝飾性詞彙。法規用語明確排除了流於形式的橡皮圖章核准模式。在微軟 Agent 治理工具包的法規遵循文件中，附帶質詢應答機制的先提議後確認寫入模式，正是能從容通過第 14 條嚴格檢驗的架構模式。
 
 ```figure
 mx-propose-then-commit
