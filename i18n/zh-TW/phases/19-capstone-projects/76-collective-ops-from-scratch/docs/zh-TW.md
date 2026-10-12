@@ -1,6 +1,6 @@
 # 從零實作分散式集合通訊原語（Collective Ops From Scratch）
 
-> 支撐現代分散式深度學習訓練的四大核心集合通訊原語（Collectives）分別為：allreduce、broadcast、allgather 以及 reduce_scatter。任何分散式訓練框架所提供的其餘所有進階原語，本質上皆是圍繞這四者進行的薄層封裝。本課將在基於 `multiprocessing.Queue` 的行程網格拓撲上，從零手寫實作這四大原語，並對照官方參考實作完成嚴密校驗。
+> 支撐現代分散式深度學習訓練的四大核心集合通訊原語（Collectives）分別為：allreduce、broadcast、allgather 以及 reduce_scatter。任何分散式訓練框架所提供的其餘所有進階原語，本質上皆是圍繞這四者進行的薄層封裝。本課將在基於 `multiprocessing.Queue` 的行程網格拓撲上，從零手寫實作這四大原語，並對照參考實作完成嚴密校驗。
 
 **Type:** Build
 **Languages:** Python
@@ -11,12 +11,12 @@
 
 - 分兩階段（Reduce-Scatter 隨後 AllGather）實作經典的環狀 AllReduce（Ring AllReduce），並從數學上證明單節點通訊量恆等於 2(N-1)/N 位元組／元素。
 - 在基於 `multiprocessing.Queue` 的點對點佇列網格之上，從零實作 broadcast、allgather 與 reduce_scatter。
-- 針對完全相同的輸入張量與節點規模，使用 `torch.distributed` 的 gloo 官方後端嚴密校驗每一個自定義原語的數值精確度。
+- 針對完全相同的輸入張量與節點規模，使用 `torch.distributed` 的 gloo 後端嚴密校驗每一個自定義原語的數值精確度。
 - 深入辯論：依據叢集拓撲形狀、網路延遲底線與頻寬物理上限，科學選定環狀（Ring）還是樹狀（Tree）通訊架構。
 
 ## The Problem｜問題
 
-若採用樸素的中心化 AllReduce：跨 N 個節點的通訊將張量複製 N 次發送給主節點 Root，並由 Root 再次廣播 N 次回所有節點。單節點的頻寬消耗隨節點數呈現 O(N) 爆炸增長，Root 節點迅速淪為致命效能瓶頸，整個叢集的物理通訊耗時完全被最慢的一條網路鏈路死死拖垮。環狀 AllReduce（Ring AllReduce）以天才般的構思打破了該僵局：將通訊量展開為 2(N-1) 個大小為 T/N 的傳輸分塊，使得單節點通訊總位元組數縮減至 2T(N-1)/N，**完全與叢集節點總數解耦無關**！而在節點數較小或網路延遲極高的跨機房場景下，樹狀 AllReduce（Tree AllReduce）則以僅需 log_2(N) 跳的深度優勢強勢勝出。為特定叢集選錯了通訊拓撲，最慢的一張顯卡將直接決定整個訓練步長。
+若採用樸素的中心化 AllReduce：跨 N 個節點的通訊將張量複製 N 次發送給主節點 Root，並由 Root 再次廣播 N 次回所有節點。單節點的頻寬消耗隨節點數呈現 O(N) 爆炸增長，Root 節點迅速淪為致命效能瓶頸，整個叢集的通訊耗時下限是最慢鏈路耗時的 N 倍。環狀 AllReduce（Ring AllReduce）以天才般的構思打破了該僵局：將通訊量展開為 2(N-1) 個大小為 T/N 的傳輸分塊，使得單節點通訊總位元組數縮減至 2T(N-1)/N，**完全與叢集節點總數解耦無關**！而在節點數較小或網路延遲極高的跨機房場景下，樹狀 AllReduce（Tree AllReduce）則以僅需 log_2(N) 跳的深度優勢強勢勝出。為特定叢集選錯了通訊拓撲，最慢的一張顯卡將直接決定整個訓練步長。
 
 你在本專案軌道中所見到的每一個分散式訓練框架，底層全部嚴格依託這四大原語：PyTorch DDP 透過分桶 AllReduce 同步參數梯度；ZeRO 透過 reduce_scatter 分片儲存最佳化器狀態，並在反向傳播後透過 allgather 廣播更新後的權重；FSDP 將整場前向傳播轉譯為 allgather 與 reduce_scatter 的交替管線化；管線並行（Pipeline Parallel）則依託 broadcast 跨階段傳遞前向活化值。若無法親手實作這四大集合原語，你將根本無法理解訓練為何會偶發停滯、為何第 3 號卡會莫名其妙出現梯度不匹配，或者為何切換網路拓撲後管線氣泡（Bubble）會直接翻倍。
 
@@ -48,11 +48,11 @@ flowchart LR
 
 ### 行程佇列網格作為 NCCL 的精準替代
 
-NVIDIA NCCL 依託 PCIe 與 NVLink 匯流排，在 GPU 硬體層面實現硬體卸載歸約。而在普通 CPU 上我們缺乏該專屬硬體。在環狀拓撲的每條邊上建立一個 `multiprocessing.Queue`，即可為單生產者-單消費者提供保證順序的點對點通道。歸約計算在使用者空間進行，雖然承擔了微弱的 Python 記憶體複製開銷，但其在網路線路上的通訊模式與真實 NCCL Ring AllReduce 完全相同。在佇列網格上驗證演算法正確性，叢集行為也會隨之成立。
+NVIDIA NCCL 依託 PCIe 與 NVLink 匯流排，在 GPU 硬體層面實作硬體卸載歸約。而在普通 CPU 上我們缺乏該專屬硬體。在環狀拓撲的每條邊上建立一個 `multiprocessing.Queue`，即可為單生產者-單消費者提供保證順序的點對點通道。歸約計算在使用者空間進行，雖然承擔了微弱的 Python 記憶體複製開銷，但其在網路線路上的通訊模式與真實 NCCL Ring AllReduce 完全相同。在佇列網格上驗證演算法正確性，叢集行為也會隨之成立。
 
 ### 對照 gloo 進行驗證
 
-本課實作的每一個原語，皆配備了專屬的單元測試：在完全相同的張量輸入與相同的 World Size 下，將自研原語的輸出與基於 gloo 後端的 `torch.distributed` 官方輸出進行嚴密比對。若兩者的浮點數偏差大於 float32 的機器精度 epsilon，測試當場宣告失敗。對照黃金參考基準的嚴密校驗是絕對不可妥協的底線；缺乏該校驗，潛在的數值累加順序偏差往往會潛伏到真實訓練的第一萬步才引發災難性崩潰。
+本課實作的每一個原語，皆配備了專屬的單元測試：在完全相同的張量輸入與相同的 World Size 下，將自研原語的輸出與基於 gloo 後端的 `torch.distributed` 輸出進行嚴密比對。若兩者的浮點數偏差大於 float32 的機器精度 epsilon，測試當場宣告失敗。對照黃金參考基準的嚴密校驗是絕對不可妥協的底線；缺乏該校驗，潛在的數值累加順序偏差往往會潛伏到真實訓練的第一萬步才引發災難性崩潰。
 
 ```figure
 ci-ring-allreduce
@@ -67,7 +67,7 @@ ci-ring-allreduce
 - `broadcast(mesh, rank, world_size, tensor, src)`：基於對數樹狀拓撲的極速廣播。
 - `allgather(mesh, rank, world_size, tensor)`：透過 N-1 次環狀旋轉完成全域收集。
 - `reduce_scatter(mesh, rank, world_size, tensor)`：作為 AllReduce 的前置獨立半程演算法。
-- `_gloo_reference(op, world_size, tensor)`：調用 PyTorch 官方 `torch.distributed`（gloo 後端）產出二進位黃金對照值。
+- `_gloo_reference(op, world_size, tensor)`：呼叫 PyTorch `torch.distributed`（gloo 後端）產出二進位黃金對照值。
 
 執行測試：
 
@@ -75,7 +75,7 @@ ci-ring-allreduce
 python3 code/main.py
 ```
 
-輸出結果：展示各原語在自研佇列網格與官方 gloo 之間的逐項誤差對比表，並附帶單節點傳輸位元組計數器，在實證層面確鑿證明其通訊量嚴格滿足 2T(N-1)/N 的縮放定律。
+輸出結果：展示各原語在自研佇列網格與 gloo 之間的逐項誤差對比表，並附帶單節點傳輸位元組計數器，在實證層面確鑿證明其通訊量嚴格滿足 2T(N-1)/N 的縮放定律。
 
 ## 工業級正式環境落地模式
 
@@ -83,17 +83,17 @@ python3 code/main.py
 
 **在 AllReduce 之前強制對梯度進行分桶（Bucket gradients）**：一個 10 億參數的大模型擁有數萬個細碎的梯度張量。為每個張量發起一次獨立的 AllReduce，意味著在網路上支付數萬次網路往返延遲底線。PyTorch DDP 將微小梯度打包為約 25 MB 的大型緩衝區塊（Bucket），並針對整個桶發起單次 AllReduce；小張量搭乘大張量的順風車一次性傳輸完畢。缺乏分桶機制，延遲開銷將直接吃光整場訓練的物理時鐘。
 
-**計算與通訊的極限重疊管線化（Overlap communication with computation）**：反向傳播是沿著神經網路層逆向逐層推導梯度的。在最後一層梯度計算完畢的瞬間，立即向網路發射該層的 AllReduce 通訊，而計算核心同時在背景接續計算倒數第二層的梯度！PyTorch DDP 透過 Bucket-Ready 回呼鉤子實現了該重疊機制。當網路頻寬充足時，計算與通訊的管線重疊能直接將體感通訊耗時砍掉一半。
+**計算與通訊的極限重疊管線化（Overlap communication with computation）**：反向傳播是沿著神經網路層逆向逐層推導梯度的。在最後一層梯度計算完畢的瞬間，立即向網路發射該層的 AllReduce 通訊，而計算核心同時在背景接續計算倒數第二層的梯度！PyTorch DDP 透過 Bucket-Ready 回呼鉤子實作該重疊機制。當網路頻寬充足時，計算與通訊的管線重疊能直接將體感通訊耗時砍掉一半。
 
 **依據封包尺寸科學選型，而非盲信單一宗教**：NCCL 內部內建了一套拓撲自動偵測器：當傳輸的封包尺寸大於約 1 MB 時，自動選用環狀拓撲；小於 1 MB 時自動切換為樹狀拓撲。這是「頻寬 vs 延遲」的精確物理權衡：在大於 1 MB 時，頻寬項 2T(N-1)/N 佔據絕對主導，環狀拓撲大獲全勝；而在小於 1 MB 時，log2(N) 的跳數優勢佔據主導，樹狀拓撲遙遙領先。
 
 ## Use It｜實際應用
 
-工業級生產框架在底層全體調用完全相同的原語：
+工業級生產框架在底層全體呼叫完全相同的原語：
 
-- **PyTorch DDP**：在反向傳播後，在分桶梯度上直接調用 `dist.all_reduce`。分桶大小可動態調整，在 100Gbit 乙太網中預設 25 MB 是極具性價比的甜蜜點。
-- **DeepSpeed ZeRO**：調用 reduce_scatter 將梯度分片分散到各節點，並在下一次前向傳播前調用 allgather 重構全量參數。本課所手寫的原語，正是 ZeRO 在底層所發起的實體調用。
-- **FSDP**：前向傳播開始時調用 allgather 解分片，計算完畢後立即調用 reduce_scatter 歸約並銷毀全量張量。相同的四大原語，不同的調度節奏。
+- **PyTorch DDP**：在反向傳播後，在分桶梯度上直接呼叫 `dist.all_reduce`。分桶大小可動態調整，在 100Gbit 乙太網中，25 MB 作為預設分桶大小是合理的。
+- **DeepSpeed ZeRO**：呼叫 reduce_scatter 將梯度分片分散到各節點，並在下一次前向傳播前呼叫 allgather 重構全量參數。本課所手寫的原語，正是 ZeRO 在底層所發起的實際呼叫。
+- **FSDP**：前向傳播開始時呼叫 allgather 解分片，計算完畢後立即呼叫 reduce_scatter 歸約並銷毀全量張量。相同的四大原語，不同的調度節奏。
 
 ## Ship It｜交付成果
 
@@ -104,7 +104,7 @@ python3 code/main.py
 1. 實作樹狀 AllReduce（Tree AllReduce）變體，並在程式碼中依據封包大小自動在 Ring 與 Tree 之間動態切換。實測繪製出兩者的效能交叉拐點。
 2. 為佇列通訊加入 `recv_timeout_ms` 逾時控制：當某個 Rank 節點發生死鎖或離線時，主動拋出明確的死線逾時異常，而絕不允許行程無休止永久掛死。
 3. 將底層的 `multiprocessing.Queue` 替換為真實的 TCP 本機 Socket 連線。在完全相同的測試集上驗證通訊語意。
-4. 為原語封裝頻寬監控鉤子，將每個節點的即時通訊位元組數與耗時以標準結構化格式寫入 JSONL 檔案中。
+4. 為原語封裝頻寬監控鉤子，將每個節點的即時通訊位元組數以標準結構化格式寫入 JSONL 檔案中。
 5. 在 4 個 Rank 的叢集上，分別針對 1KB、1MB、16MB 三種尺寸的張量對比 Ring 與 Tree 的物理耗時，以實證資料捍衛拓撲切換的決策閾值。
 
 ## Key Terms｜關鍵術語
@@ -112,7 +112,7 @@ python3 code/main.py
 | 術語 | 常見說法 | 實際含義 |
 |---|---|---|
 | Allreduce（全域歸約） | 「跨 Rank 求和」 | 呼叫結束後，每個 Rank 都持有相同的歸約後張量 |
-| Ring topology（環狀拓撲） | 「快速拓撲」 | 將 N-1 個大小為 T/N 的分塊在閉合環路中連續旋轉傳遞兩輪的極限頻寬演算法 |
+| Ring topology（環狀拓撲） | 「快速拓撲」 | 將 N-1 個大小為 T/N 的分塊在閉合環路中連續旋轉傳遞兩輪 |
 | Tree topology（樹狀拓撲） | 「對數拓撲」 | 沿著二元樹結構層層歸約並向下分發的拓撲結構；其深度嚴格為 log2(N) 跳 |
 | Allgather（全域收集） | 「串接分片」 | 每個節點貢獻一個局部分片，呼叫結束後所有節點皆持有拼接後的完整全量張量 |
 | Reduce_scatter（規約散射） | 「切分總和」 | 跨節點對張量求和，但呼叫結束後每個節點僅各自保留其中單一分塊的全局總和 |

@@ -28,7 +28,7 @@
 - harassment（騷擾）、harassment/threatening（帶威脅的騷擾）
 - hate（仇恨言論）、hate/threatening（帶威脅的仇恨言論）
 - self-harm（自殘）、self-harm/intent（自殘意圖）、self-harm/instructions（自殘指引教學）
-- sexual（露骨色情）、sexual/minors（涉及未成年人的性內容）
+- sexual（性內容）、sexual/minors（涉及未成年人的性內容）
 - violence（暴力）、violence/graphic（血腥暴力描寫）
 - illicit（違法犯罪）、illicit/violent（暴力違法犯罪）
 
@@ -40,7 +40,7 @@
 
 ### Llama Guard 3/4
 
-詳見第 18 課第 16 節。基於 MLCommons AILuminate 的 14 項標準危害大類（與 OpenAI 的 13 項布林值類別在劃分維度上略有不同）。v3 支援 8 種主流語言；2025 年 4 月發布的 Llama Guard 4 則是 12B 原生多模態大模型。
+詳見第 18 課第 16 節。涵蓋 MLCommons 的 14 項危害類別（與 OpenAI 的 13 項布林值類別在劃分維度上略有不同）。v3 支援 8 種主流語言；2025 年 4 月發布的 Llama Guard 4 則是 12B 原生多模態大模型。
 
 兩套體系高度互補但邊界迥異。例如 OpenAI 將各類犯罪統包於「illicit」單一大類中；而 Llama Guard 則嚴格細分為「暴力犯罪」與「非暴力犯罪」。企業應當依據自身法務與合規偏好選用對應的分類器。
 
@@ -48,7 +48,7 @@
 
 早於大模型充當審查員浪潮的傳統毒性評分系統（2020 年前建立）。核心分類維度：TOXICITY（一般毒性）、SEVERE_TOXICITY（極端毒性）、INSULT（侮辱謾罵）、PROFANITY（髒話褻瀆）、THREAT（威脅人身安全）、IDENTITY_ATTACK（身分偏見攻擊）。以單一的主毒性標量得分作為核心，附帶各子維度的細化分數。
 
-被廣泛用作內容審查學術研究的權威基準線，因為其 API 表現極其穩定、文件高度透明，且累積了長達數年的海量校準資料。對於現代複雜大模型業務而言，Llama Guard 或 OpenAI Moderation 通常能提供更具語義深度的上下文防護。
+常用作內容審查研究的基準，因為其 API 穩定、有相關文件，且累積多年校準資料。對於現代複雜大模型業務而言，Llama Guard 或 OpenAI Moderation 通常能提供更具語義深度的上下文防護。
 
 ### 三層縱深防禦架構（The three-layer pattern）
 
@@ -61,14 +61,14 @@
 ### 依賴單一層次的經典失效模式
 
 - **僅部署輸入審查**：無法防範大模型自身的幻覺輸出（第 12 至 14 節的編碼攻擊會繞過輸入分類器）。
-- **僅部署輸出審查**：允許任何惡意 Prompt 毫無阻礙地打入大模型深處；不僅平白燃燒昂貴的 GPU 推論算力，且會向攻擊者暴露內部推理。
-- **僅部署自定義正則規則**：跨語義範疇的防禦韌性極差；硬編碼的正規表示式極易被同義詞替換或空格插入輕易繞過。
+- **僅部署輸出審查**：允許任何輸入到達模型，增加成本，並會向攻擊者暴露內部推理。
+- **僅部署自定義正則規則**：無法穩健涵蓋不同類別；正規表示式很脆弱。
 
 分層是預設做法。
 
 ### 微軟 Azure 服務退役公告
 
-Azure Content Moderator：已於 2024 年 2 月正式宣告棄用（Deprecated），將於 2027 年 2 月徹底關停除役（Retired）。全面由基於大模型技術打造、深度整合進 Azure OpenAI 的 Azure AI Content Safety 取代。這項遷移是所有基於微軟雲端體系建構的推論架構在 2024 至 2027 年間的必做功課。
+Azure Content Moderator：已於 2024 年 2 月正式宣告棄用（Deprecated），將於 2027 年 2 月徹底關停除役（Retired）。全面由基於大模型技術打造、深度整合進 Azure OpenAI 的 Azure AI Content Safety 取代。這是 Azure 部署在 2024 至 2027 年間的一項遷移專案。
 
 ### 該研究在第 18 階段中的宏觀座標
 
@@ -91,7 +91,7 @@ an-moderation-layers
 1. 執行 `code/main.py`。分別將良性文字、處於灰色邊界的模糊文字以及明確惡意的攻擊文字送入管線。記錄並呈報每一條測試樣本具體是在哪一層防線被觸發攔截。
 2. 為該微型架構擴充一個 Perspective API 風格的毒性評分模組。在特定類別上對比該分數與常規分類器得分在閾值設定上的敏感度差異。
 3. 仔細研讀 OpenAI 內容審查 API 文件與 Llama Guard 3 的危害類別清單。嘗試將 OpenAI 的 13 項布林類別對應至最接近的 Llama Guard 類別。指出其中哪三項類別在語義邊界上完全無法清晰對齊。
-4. 為一款企業級程式碼輔助助手（如 GitHub Copilot）量身設計一套三層審查技術堆疊。明確指出哪些常規審查類別在此高度相關、哪些類別無關緊要，並起草三條專屬於軟體工程的自定義業務審查規則。
+4. 為一款企業級程式碼輔助助手（如 GitHub Copilot）量身設計一套三層審查技術堆疊。明確指出哪些常規審查類別在此高度相關、哪些類別無關緊要，並提出軟體工程專屬的自訂業務審查規則。
 5. 微軟 Azure Content Moderator 將於 2027 年 2 月徹底除役。為一家基於該服務維運的大型跨國企業起草一份平滑遷移至 Azure AI Content Safety 的技術路線圖。標定出整個遷移過程中風險最高的核心環節。
 
 ## Key Terms｜關鍵術語

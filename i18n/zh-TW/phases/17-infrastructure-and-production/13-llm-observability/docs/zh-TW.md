@@ -10,13 +10,13 @@
 ## Learning Objectives｜學習目標
 
 - 嚴格區分研發一體化平台（捆綁評測 + Prompt 管理 + Session 重放）與純 Gateway/遙測工具（僅處理 Trace 追蹤 + 核心指標）的邊界。
-- 梳理六大主流可觀測性工具（Langfuse、LangSmith、Phoenix、Arize AX、Helicone、Opik）在開源授權、定價模型與最佳甜蜜點場景上的映射關係。
+- 梳理六大主流可觀測性工具（Langfuse、LangSmith、Phoenix、Arize AX、Helicone、Opik）的授權方式、定價與最適用情境。
 - 深刻理解以 OpenTelemetry 作為通用黏著劑的現代架構模式，無縫串聯前端 Gateway 與獨立評測平台。
 - 指出 2026 年大規模下的核心成本分水嶺（Arize AX 的資料湖零拷貝 vs 傳統單體採集），並理解其標稱百倍成本差異的底層原理。
 
 ## The Problem｜問題
 
-你剛剛交付了一項核心 LLM 功能。它運作正常。但你對背後的真實情況一無所知：Prompt 為何偶發報錯？工具呼叫是否陷入死循環？P99 延遲為何暗中惡化？Token 帳單為何突發暴增？前綴快取命中率究竟是多少？你在 Google 上搜尋「LLM 可觀測性」，跳出了八種工具，每家都宣稱能解決完全相同的痛點，背後卻標著三種天壤之別的價格矩陣。
+你剛剛交付了一項核心 LLM 功能。它運作正常。但你對背後的真實情況一無所知：Prompt 為何偶發報錯？工具呼叫是否陷入死循環？延遲為何退化？成本為何突然飆升？前綴快取命中率究竟是多少？你在 Google 上搜尋「LLM 可觀測性」，跳出了八種工具，每家都宣稱能解決完全相同的痛點，背後卻標著三種天壤之別的價格矩陣。
 
 它們解決的根本不是同一個問題。LangSmith 專門解答「這一次 LangGraph 運作究竟為什麼崩潰？」Phoenix 專門回答「我的 RAG pipeline 是否正在漂移？」Helicone 專門揪出「後台究竟是哪一款 App 在瘋狂吞噬 Token？」而 Langfuse 則解答「我們能否自行託管整套系統？」工具不同，面對的目標受眾亦截然不同。
 
@@ -39,7 +39,7 @@
 
 ### Phoenix (Arize)——遙測優先、OpenTelemetry 原生
 
-- 採 Elastic License 2.0 授權；本機單行指令即可極速拉起。
+- 採 Elastic License 2.0 授權；自行託管相當簡單。
 - 擅長 RAG 與 drift 視覺化。原生提供將 Embedding 投影至降維散佈圖的開箱即用功能。
 - 設計初衷並非作為永久存檔的正式環境監控後端——其核心定位是研發階段與測試環境下的深度除錯利器。
 - 最佳甜蜜點：RAG 檢索管線調優、語意漂移排查；在正式環境中通常與前端獨立 Gateway 搭檔協同。
@@ -53,7 +53,7 @@
 ### LangSmith——LangChain 與 LangGraph 生態王者（LangSmith — LangChain/LangGraph first）
 
 - 商業閉源，每使用者每月 39 美元。私有化自建僅開放給頂級 Enterprise 企業客戶。
-- 針對 LangChain 與 LangGraph 技術堆疊提供堪稱極致的原生調適。但若你的底層架構並未採用這兩款框架，其性價比將大打折扣。
+- 針對 LangChain 與 LangGraph 技術堆疊提供一流的支援。但若你的底層架構並未採用這兩款框架，就較不具吸引力。
 - 最佳甜蜜點：已全面深度綁定 LangChain 生態、且具備充足軟體採購預算的研發團隊。
 
 ### Helicone——基於代理的最小可行方案（Helicone — proxy-based minimum viable）
@@ -82,15 +82,15 @@ OpenTelemetry 聯盟於 2025 年底正式發布了官方 GenAI 語意約定標�
 1. 每次 LLM 呼叫都輸出採用 GenAI 慣例的 OpenTelemetry Trace。
 2. 日常使用時，將流量路由至 Gateway（Helicone / Portkey）。
 3. 同步雙寫分流至離線評測平台（Phoenix / Langfuse）以自動檢測回歸缺陷。
-4. 全量日誌冷存至基於 Iceberg 的資料湖中，供 Arize AX 或 DuckDB 展開長時程深度資料分析。
+4. 將資料封存至 Iceberg 資料湖，供 Arize AX 或 DuckDB 長期分析。
 
 ### 致命陷阱：在錯誤的架構層次進行埋點（The trap: instrumenting at the wrong layer）
 
-在特定的 Agent 框架內部進行侵入式埋點（例如直接在程式碼中硬編碼 LangSmith 追蹤邏輯），會導致業務邏輯與該特定框架死死綁定。而在最底層的 HTTP 傳輸層或 OpenAI-SDK 封裝層進行透明攔截（透過 OpenLLMetry 或統一 Gateway），則較具可移植性。
+在特定的 agent 框架內部埋點（例如加入 LangSmith traces），會使你與該框架耦合。而在 HTTP/OpenAI-SDK 層埋點（透過 OpenLLMetry 或 Gateway），則較具可移植性。
 
 ### 採樣策略——你無法保留所有原始追蹤（Sampling — you can't keep everything）
 
-當系統請求量突破每日 100 萬次大關時，全量保留每一筆 Trace 原始輸入輸出的儲存帳單，將迅速超越呼叫 LLM 本身的費用。落實基於規則的階梯採樣：對所有報錯異常 100% 全量保留；對所有極端高成本請求 100% 全量保留；對一般成功的平淡請求僅隨機採樣 5%。度量指標永遠維持 100% 聚合；原始詳細 Payload 僅針對長尾異常予以保留。
+當系統每日請求量超過 100 萬次時，全量保留 Trace 的成本會高於 LLM 呼叫成本。依規則進行採樣：保留 100% 的錯誤和高成本請求、保留 5% 的成功請求。彙總資料一律保留；長尾部分則保留原始資料。
 
 ### 務必銘記的核心數字指標（Numbers you should remember）
 
@@ -110,7 +110,7 @@ i4-otel-glue
 
 ## Ship It｜交付成果
 
-本課交付標準實戰產物 `outputs/skill-observability-stack.md`。輸入當前程式語言、框架技術堆疊、每日請求規模、月度預算上限與開源授權偏好，該 Skill 將自動為你推導出最佳工具選型組合與標準的 OpenTelemetry 埋點配置清單。
+本課交付標準實戰產物 `outputs/skill-observability-stack.md`。給定技術堆疊、規模、預算與授權策略後，挑選合適的工具。
 
 ## Exercises｜練習
 

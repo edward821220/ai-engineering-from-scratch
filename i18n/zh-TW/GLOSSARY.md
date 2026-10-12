@@ -315,6 +315,7 @@
 | Git LFS | Git LFS | 是 |  | 專案名稱。 |
 | DVC | DVC | 是 |  | Data Version Control 工具名稱。 |
 | data version control | 資料版本控制 | 否 |  | 管理資料集與模型版本的方式。 |
+| provenance | 溯源 | 否 |  | data provenance→資料溯源；provenance signal→溯源信號；provenance chain→溯源鏈條；content provenance→內容溯源；Data Provenance Initiative→資料溯源倡議。避免譯為「出處」或「血緣」。 |
 | Hugging Face Hub | Hugging Face Hub | 是 |  | Hugging Face 的資料集與模型託管平台。 |
 | LSP | LSP | 是 |  | Language Server Protocol 縮寫。 |
 | Pylance | Pylance | 是 |  | 產品名稱。 |

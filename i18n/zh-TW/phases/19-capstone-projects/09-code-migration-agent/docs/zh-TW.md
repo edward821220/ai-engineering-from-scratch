@@ -16,9 +16,9 @@
 
 ## Concept｜核心概念
 
-整個遷移管線採用雙層架構。**確定性基座（Deterministic Substrate）**（Java 端採用 OpenRewrite，Python 端採用 libcst）安全高效地完成絕大多數機械性重寫：import 語句替換、方法簽名修正、空值安全檢查、try-with-resources 語法轉換、已棄用 API 替換。其特點是執行極速且產出的 Git Diff 完全具備審計性。**Agent 智慧層**（基於 OpenAI Agents SDK 或 LangGraph 編排 Claude Opus 4.7 與 GPT-5.4-Codex）專門攻克配方無法覆蓋的死角：建置配置檔案升級（Maven pom.xml / Gradle / pyproject.toml）、傳遞性依賴版本衝突、不穩定的 Flaky 測試修復、垂直自定義註解調校。
+整個遷移管線採用雙層架構。**確定性基座（Deterministic Substrate）**（Java 端採用 OpenRewrite，Python 端採用 libcst）安全高效地完成絕大多數機械性重寫：import 語句替換、方法簽名修正、空值安全相關改寫、try-with-resources 語法轉換、已棄用 API 替換。其特點是執行極速且產出的 Git Diff 完全具備審計性。**Agent 智慧層**（基於 OpenAI Agents SDK 或 LangGraph 編排 Claude Opus 4.7 與 GPT-5.4-Codex）專門攻克配方無法覆蓋的死角：建置配置檔案升級（Maven pom.xml / Gradle / pyproject.toml）、傳遞性依賴版本衝突、不穩定的 Flaky 測試修復、垂直自訂註解調整。
 
-每個待遷移儲存庫皆分配一個預先安裝好目標執行環境（Java 17 或 Python 3.12）的 Daytona 獨立沙盒容器。Agent 展開自動化迭代迴圈：執行建置、捕獲編譯報錯、分類故障原因、實施修補、重新建置。系統設定硬性熔斷邊界：每個儲存庫最多運行 30 分鐘、花費封頂 8 美元、最多執行 20 輪 Agent 控制迴圈。若所有測試全綠通過且測試覆蓋率未發生負向回退，系統自動推播branch開啟 GitHub Pull Request；否則，該儲存庫將連同完整的錯誤日誌與復現步驟被歸檔至專屬的失敗分類目錄中。
+每個待遷移儲存庫皆分配一個預先安裝好目標執行環境（Java 17 或 Python 3.12）的 Daytona 獨立沙盒容器。Agent 展開自動化迭代迴圈：執行建置、捕獲編譯報錯、分類故障原因、實施修補、重新建置。系統設定硬性熔斷邊界：每個儲存庫最多運行 30 分鐘、花費封頂 8 美元、最多執行 20 輪 Agent 控制迴圈。若所有測試全綠通過且測試覆蓋率未發生負向回退，系統會為該 branch 開啟 GitHub Pull Request；否則，該儲存庫將連同完整的錯誤紀錄與復現步驟被歸檔至專屬的失敗分類目錄中。
 
 失敗分類學（Failure Taxonomy）是本專案實戰的核心研究交付物。遍歷 50 個程式碼儲存庫後，究竟是什麼原因導致了遷移中斷？傳遞性相依套件衝突？冷門自定義註解？建置工具自身版本不相容？還是原本就存在的脆弱測試？每個失敗大類皆必須統計發生頻次並附帶經典的 Git Diff 案例。未來的規則編寫者即可精準針對前三大失敗類別研製新的自動化確定性配方。
 
@@ -57,7 +57,7 @@ file under failure class + attach repro
 - 確定性重寫基座：OpenRewrite（Java 領域）或 libcst（Python 領域）
 - Agent 編排引擎：OpenAI Agents SDK 或 LangGraph，後台對接 Claude Opus 4.7 + GPT-5.4-Codex
 - 隔離沙盒環境：Daytona branch 層級 devcontainer 容器，預裝目標執行環境（Java 17 / Python 3.12）
-- 專案建置系統：Maven、Gradle、Python uv 高性能套件管理器
+- 專案建置系統：Maven、Gradle、Python uv 高效能套件管理器
 - 權威評測基準：亞馬遜 MigrationBench 50 個儲存庫精選子集（Java 8 至 17）、Google App Engine Py2 至 Py3 儲存庫集
 - 自動化測試套件：並行測試執行器，使用 Jacoco（Java）或 coverage.py（Python）度量覆蓋率
 - 全鏈路可觀測性：Langfuse，記錄每個儲存庫的完整探索軌跡並快照每一段產出的 Diff 區塊
@@ -79,7 +79,7 @@ ce-migration-funnel
 
 5. **測試與覆蓋率嚴格閘門**。專案編譯綠燈通過後，強制執行完整測試套件。嚴格計算測試覆蓋率並與遷移前的基準進行比對。若測試覆蓋率出現超過 2% 的下滑，強制歸檔至 coverage_regression 失敗類別。
 
-6. **自動開啟 Pull Request**。全部測試綠燈通過後，系統自動將branch 推送至遠端 GitHub，自動發起 PR，並在 PR 正文中詳細列出：哪些修改是由確定性配方自動完成的、哪些 Commit 是由 Agent 智慧層自主修復的。
+6. **自動開啟 Pull Request**。全部測試綠燈通過後，系統自動將 branch push 至遠端 GitHub，自動發起 PR，並在 PR 正文中詳細列出：哪些修改是由確定性配方自動完成的、哪些 Commit 是由 Agent 智慧層自主修復的。
 
 7. **失敗原因分類體系建置**。針對所有未能全自動跑通的程式碼儲存庫，自動打上精確的分類標籤：`dep_upgrade_required`（需要手動升級外部依賴）、`build_tool_drift`（建置工具底層行為變更）、`custom_annotation`（私有自定義註解失效）、`test_flake`（測試本身存在隨機波動）、`syntax_edge_case`（極端冷門語法）、`budget_exhausted`（算力預算耗盡）。開發前端儀表板集中呈現。
 
@@ -117,7 +117,7 @@ $ migrate legacy-java-service --target java17
 2. 引入「程式碼風格（Lint-Clean）」強制檢查：遷移完成後，在沙盒中調用靜態程式碼檢查工具（Java 端使用 Spotless，Python 端使用 Ruff）。若遷移後的程式碼引入了新的風格違規，強制打回 PR。度量「測試全過但因程式碼風格退化而失敗」的發生比例。
 3. 為系統加入一個「最小 Diff（Minimal-Diff）最佳化器」：在 Agent branch成功跑通所有測試後，啟動第二輪清理掃描，精確剔除所有不必要的格式更動或無效冗餘程式碼。度量開啟該模組後 Git Diff 的行數縮減比例。
 4. 將該架構橫向遷移至第三種升級情境：Node.js 18 升級至 Node.js 22。複用相同的沙盒隔離機制；將 Java 配方層替換為自定義的 JavaScript Codemod 腳本。
-5. 將「首個綠燈建置耗時（TTFGB，Time-to-first-green-build）」作為關鍵工程體驗指標進行度量。設定性能紅線：p50 中位數耗時必須控制在 10 分鐘之內。
+5. 將「首個綠燈建置耗時（TTFGB，Time-to-first-green-build）」作為關鍵工程體驗指標進行度量。設定效能紅線：p50 中位數耗時必須控制在 10 分鐘之內。
 
 ## Key Terms｜關鍵術語
 

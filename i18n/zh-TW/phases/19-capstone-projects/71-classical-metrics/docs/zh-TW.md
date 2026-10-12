@@ -1,6 +1,6 @@
 # 經典評測度量指標（Classical Metrics）
 
-> BLEU、ROUGE-L、F1、Exact-Match、Accuracy。這五大經典指標至今依然統治著學術界所發布的絕大多數大模型評測論文。從第一性原理出發親手實作每一個指標，你才能真正洞悉這些數字背後的實質物理意義。
+> BLEU、ROUGE-L、F1、Exact-Match、Accuracy。這五大經典指標至今仍占已發表 LLM 評測數字的大多數。從第一性原理出發親手實作每一個指標，你才能真正洞悉這些數字背後的實質意義。
 
 **Type:** Build
 **Languages:** Python
@@ -9,7 +9,7 @@
 
 ## Learning objectives｜學習目標
 
-- 實作 token 級別的 Exact-Match、F1 與 Accuracy 指標，並嚴格綁定明確的 token 化規則。
+- 實作 token 級別的 Exact-Match、F1 與 Accuracy 指標，並嚴格綁定明確的 tokenization 規則。
 - 從零手寫完整實作 BLEU-4：修正 n-gram 精確率、1 到 4-gram 幾何平均數計算，以及字串過短懲罰（Brevity Penalty）。
 - 基於動態規劃的最長公共子序列（LCS）演算法實作 ROUGE-L，並融合計算對稱的 F-beta 數值。
 - 依據第七十課定義的 metric_name 欄位進行統一動態分發，確保執行器主迴圈對具體指標完全保持無感解耦。
@@ -25,7 +25,7 @@ cd-bleu-overlap
 
 Python 標準庫搭配 numpy 綽綽有餘。BLEU 本質上是計數與截斷；ROUGE-L 本質上是動態規劃；F1 本質上是 token 多重集合的交集運算。整套實作中最關鍵的決策，是選定一套明確的 tokenizer 並堅決恪守它。
 
-## 分詞 token 化合約
+## Tokenization 合約
 
 本課的 tokenizer 統一定義為：`re.findall(r"\w+", text.lower())`。強制轉小寫、提取連續字母數字詞彙、徹底剝離標點符號。本課中的所有指標，無一例外皆強制使用這套完全同一的 tokenizer。執行器絕對無權在此處隨意切換。一旦你擅自替換了 tokenizer，你實質上是在運作一個完全不同的全新評測基準！
 
@@ -44,7 +44,7 @@ def exact_match(pred, targets):
     return float(any(pred.strip() == t.strip() for t in targets))
 ```
 
-在單個任務樣本上回傳 1.0 或 0.0。在整個資料集上計算算術平均。它是基礎算術、多選題（MCQ）以及短文本分類任務的絕對主力基石。
+在單個任務樣本上回傳 1.0 或 0.0。在整個資料集上計算算術平均。它是基礎算術、選擇題（MCQ）以及短文本分類任務的絕對主力基石。
 
 ## token 級別 F1 分數
 
@@ -144,4 +144,4 @@ def score(metric_name, pred, targets):
 
 ## 工程深化
 
-經典度量指標是必不可少的基礎設施，但它們並非萬能靈丹。它們本質上獎勵的是表面的字詞重疊，而容易忽略深層的語義邏輯。在未來的成熟工程中，你應當在堅固的經典指標地基之上，進一步追加基於大模型的進階語義指標（如 BLEURT、BERTScore、G-Eval）。但當務之急是：親手把這五大經典指標徹底跑通、用單元測試將其行為死死釘住，你便擁有了一套高度透明、運算極速、完全可審計且 100% 可重現的度量基石。
+經典度量指標是必不可少的基礎設施，但它們並非萬能靈丹。它們本質上獎勵的是表面的字詞重疊，而容易忽略深層的語義邏輯。在未來的成熟工程中，你應當在堅固的經典指標地基之上，進一步追加基於大模型的進階語義指標（如 BLEURT、BERTScore、G-Eval）。但當務之急是：親手把這五大經典指標徹底跑通、用單元測試將其行為死死釘住，你便擁有了一套高度透明、運算極速、完全可審計且可重現的度量基石。

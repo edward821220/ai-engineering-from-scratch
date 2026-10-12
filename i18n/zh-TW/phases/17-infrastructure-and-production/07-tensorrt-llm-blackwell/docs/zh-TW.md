@@ -1,6 +1,6 @@
 # 硬體特化推論編譯——Blackwell 上的 FP8 與 NVFP4（Hardware-Specialized Inference Compilation — FP8 and NVFP4 on Blackwell）
 
-> 針對專屬硬體進行極限特化的推論編譯，是以犧牲跨平台可移植性為代價換取登峰造極的吞吐量，而專為 Blackwell 架構深度調校的 NVIDIA 獨佔套件 TensorRT-LLM，正是該權衡大獲全勝的最極致範例。在 GB200 NVL72 叢集搭配 Dynamo 編排架構下，SemiAnalysis InferenceX 實測 2026 年第一至第二季運作 120B 模型的成本僅為 $0.012/M，相較於 H100 搭配 vLLM 的 $0.09/M——創造了高達 7 倍的驚人經濟落差。其底層技術堆疊是三種浮點精度的精妙複合：FP8 對於 KV 快取與注意力核心始終不可或缺，因其具備無可替代的動態範圍；NVFP4（4 位元微縮放 Microscaling）負責承載權重與暫態活化值；疊加多 Token 預測（MTP）與 Prefill/Decode 拆解架構又在此基礎上額外貢獻了 2 至 3 倍增益。首日發布（Day-0）的模型直接提供原生 FP4 權重，徹底省去了耗時的後訓練量化轉換。2026 年研發團隊必須面對的現實是：TRT-LLM 雖開源但深度綁定 NVIDIA——高度專精於 CUDA 與 Blackwell——採納它意味著以架構鎖定換取極限經濟效益。在簽字立項前，務必對你自身的模型組合與硬體資產展開嚴密精算。
+> 針對專屬硬體進行極限特化的推論編譯，是以犧牲跨平台可移植性為代價換取登峰造極的吞吐量，而專為 Blackwell 架構深度調整的 NVIDIA 獨佔套件 TensorRT-LLM，正是該權衡大獲全勝的最極致範例。在 GB200 NVL72 叢集搭配 Dynamo 編排架構下，SemiAnalysis InferenceX 實測 2026 年第一至第二季運作 120B 模型的成本僅為 $0.012/M，相較於 H100 搭配 vLLM 的 $0.09/M——創造了高達 7 倍的驚人經濟落差。其底層技術堆疊是三種浮點精度的精妙複合：FP8 對於 KV 快取與注意力核心始終不可或缺，因其具備無可替代的動態範圍；NVFP4（4 位元微縮放 Microscaling）負責承載權重與暫態活化值；疊加多 Token 預測（MTP）與 Prefill/Decode 拆解架構又在此基礎上額外貢獻了 2 至 3 倍增益。首日發布（Day-0）的模型直接提供原生 FP4 權重，徹底省去了耗時的後訓練量化轉換。2026 年研發團隊必須面對的現實是：TRT-LLM 雖開源但深度綁定 NVIDIA——高度專精於 CUDA 與 Blackwell——採納它意味著以架構鎖定換取極限經濟效益。在簽字立項前，務必對你自身的模型組合與硬體資產展開嚴密精算。
 
 **Type:** Learn
 **Languages:** Python (stdlib, toy FP8/NVFP4 memory and cost calculator)
@@ -18,7 +18,7 @@
 
 2026 年推論經濟學的終極衡量維度只有一個：「每一美元究竟能買到多少 Token」。這個問題的答案取決於四層架構決策的層層疊加：硬體代際（Hopper H100/H200 vs Blackwell B200/GB200）、計算精度（BF16 → FP8 → NVFP4）、推論服務引擎（vLLM vs SGLang vs TRT-LLM），以及叢集編排模式（單體傳統 vs Prefill/Decode 拆解 vs Dynamo 智慧調度）。
 
-在 Hopper 叢集上使用 vLLM 運作 120B MoE 模型，推論成本約為 $0.09/M。而在 Blackwell 叢集上使用 TRT-LLM 搭配 Dynamo，相同模型的成本直接驟降至約 $0.012/M——足足便宜了 7 倍。這項巨大落差一部分歸功於底層硬體突破（Blackwell 的每 GPU LLM 吞吐量是 Hopper 的 11 至 15 倍）；另一部分則完全源自全端技術堆疊的精準咬合：FP4 權重、MTP 推測解碼、Prefill/Decode 物理拆解，以及 NVLink 5 專為 MoE 專家通訊設計的極速 All-to-All 通訊。
+在 Hopper 叢集上使用 vLLM 運作 120B MoE 模型，推論成本約為 $0.09/M。而在 Blackwell 叢集上使用 TRT-LLM 搭配 Dynamo，相同模型的成本直接驟降至約 $0.012/M——足足便宜了 7 倍。這項巨大落差一部分歸功於底層硬體突破（Blackwell 的每 GPU LLM 吞吐量是 Hopper 的 11 至 15 倍）；另有一部分來自全端技術堆疊的精準咬合：FP4 權重、MTP 推測解碼、Prefill/Decode 物理拆解，以及 NVLink 5 專為 MoE 專家通訊設計的極速 All-to-All 通訊。
 
 然而你完全無法在 NVIDIA 以外的任何硬體生態中複製這套奇蹟。這是一場嚴肅的工程取捨——以架構可移植性換取極致的財務回報。看清技術堆疊中每一項抉擇究竟分別貢獻了多少比例的成本差距，是本課的核心主旨。
 
@@ -39,7 +39,7 @@ NVFP4（2025-2026 年成熟）專門適用於模型靜態權重與動態活化�
 
 ### TRT-LLM 善用的 Blackwell 專屬硬體原語（The Blackwell-specific primitives TRT-LLM uses）
 
-- **首日發布原生 FP4 權重（Day-0 FP4 weights）**：頂級開源模型發行方直接開箱釋出原生 FP4 格式的權重檔案；TRT-LLM 原生支援直接載入，徹底省去了傳統後訓練量化（AWQ / GPTQ）的冗長轉檔管線。
+- **首日發布原生 FP4 權重（Day-0 FP4 weights）**：模型供應商直接開箱釋出原生 FP4 格式的權重檔案；TRT-LLM 原生支援直接載入，徹底省去了傳統後訓練量化（AWQ / GPTQ）的冗長轉檔管線。
 - **多 Token 預測（Multi-token prediction, MTP）**：底層思維與 EAGLE（第 17 課第 05 節）一致，但其草稿生成核心整合至 TRT-LLM 的建置中。
 - **拆解式服務（Disaggregated serving）**：將 Prefill 與 Decode 物理切分至完全獨立的專屬 GPU 資源池，兩者之間的 KV 快取透過 NVLink 或 InfiniBand 傳遞。設計哲學與 Dynamo（第 17 課第 20 節）一脈相承。
 - **All-to-All 集合通訊原語**：NVLink 5 將 MoE 架構下跨卡路由 Token 至各專家 GPU 的通訊延遲相較於 Hopper 降低了 3 倍。TRT-LLM 的 MoE 核心針對此硬體原語進行了極限手工調優。
@@ -50,7 +50,7 @@ NVFP4（2025-2026 年成熟）專門適用於模型靜態權重與動態活化�
 - HGX B200 在 GPT-OSS-120B 模型上透過 TRT-LLM 測得的成本：約 $0.02/M。
 - GB200 NVL72 叢集在 Dynamo 編排調度 TRT-LLM 下測得的極限成本：$0.012/M。
 - H100 搭配 vLLM 在等價負載下的基準成本：約 $0.09/M。
-- 僅在 2026 年初的三個月內，TRT-LLM 透過底層編譯器更新便累計帶來了 2.8 倍的額外吞吐量增益。
+- TRT-LLM 在 2026 年的三個月更新期間，吞吐量提升 2.8 倍。
 - Blackwell 相較於 Hopper 在單 GPU LLM 吞吐量上的硬體提升：高達 11 至 15 倍。
 - MLPerf Inference v6.0（2026 年 4 月發布）：Blackwell 在所有送測的資料中心基準測試項目中全面橫掃霸榜。
 
@@ -62,7 +62,7 @@ NVFP4 是一項極其激進的壓縮技術。在高度依賴嚴密邏輯推理�
 
 ### 為何這項決策本質上是 NVIDIA 生態系鎖定（Why this is an NVIDIA-lock decision）
 
-TRT-LLM 核心完全由 C++ 與 CUDA 編寫，並深嵌大量未公開原始碼的高性能微核心。所有模型必須針對特定的 GPU SKU 型號進行專屬靜態編譯。不支援 AMD，不支援 Intel，更不支援 ARM。若你企業的基礎架構長遠戰略嚴格要求跨雲多供應商相容，那麼採用 TRT-LLM 的服務層不適合該策略；在混合硬體上仍可使用 vLLM。但若你的機房本就百分之百純度押注 NVIDIA，這高達 7 倍的成本差距足以回本一切代價。
+TRT-LLM 核心完全由 C++ 與 CUDA 編寫，並深嵌大量未公開原始碼的高效能微核心。所有模型必須針對特定的 GPU SKU 型號進行專屬靜態編譯。不支援 AMD，不支援 Intel，更不支援 ARM。若你企業的基礎架構長遠戰略嚴格要求跨雲多供應商相容，那麼採用 TRT-LLM 的服務層不適合該策略；在混合硬體上仍可使用 vLLM。但若你的機房本就百分之百純度押注 NVIDIA，這高達 7 倍的成本差距足以回本一切代價。
 
 ### 2026 年實戰落地處方（2026 practical recipe）
 
@@ -86,7 +86,7 @@ pipeline-parallel
 
 ## Exercises｜練習
 
-1. 執行 `code/main.py`。針對擁有 30% 活躍參數的 120B MoE 模型，精確計算其在 H100 BF16、H100 FP8 與 B200 NVFP4/FP8 架構下受限於記憶體頻寬的解碼吞吐量。最大的一次跳躍究竟來自硬體換代還是精度壓縮？
+1. 執行 `code/main.py`。針對擁有 30% 活躍參數的 120B MoE 模型，精確計算其在 H100 BF16、H100 FP8 與 B200 NVFP4/FP8 架構下受限於記憶體頻寬的解碼吞吐量。最大的提升來自哪裡？
 2. 某企業客戶當前每年在 H100 + vLLM 上支出 200 萬美元推論費用。在 Blackwell 具備 7 倍經濟優勢的前提下，若要在 12 個月內完全打平移轉至 TRT-LLM 的工程轉換成本，他們至少需要採購多少張 Blackwell GPU？
 3. 在將權重轉換至 NVFP4 後，你觀察到模型在 MATH 基準測試上的得分下跌了 3 個百分點。給出兩條挽救精度的工程路徑：一條以品質優先（回退至 FP8 權重），另一條以成本優先（使用領域專屬資料展開精細化校準）。
 4. 仔細研讀 MLPerf v6.0 的正式推論實測報告。哪一項基準任務展現出的 Blackwell-over-Hopper 效能差距最小？背後的底層物理瓶頸為何？

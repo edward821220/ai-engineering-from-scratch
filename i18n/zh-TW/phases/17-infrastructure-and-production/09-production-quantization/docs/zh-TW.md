@@ -1,6 +1,6 @@
 # 正式環境量化技術——AWQ、GPTQ、GGUF K-quants、FP8、MXFP4/NVFP4（Production Quantization — AWQ, GPTQ, GGUF K-quants, FP8, MXFP4/NVFP4）
 
-> 量化格式的選型絕非一體適用的通用公式——它是實體硬體、推論服務引擎與業務負載特徵的三維函數。GGUF 的 Q4_K_M 或 Q5_K_M 透過 llama.cpp 與 Ollama 統治了 CPU 與邊緣運算裝置。GPTQ 則在 vLLM 中憑藉同一 Base 模型並行掛載多個 LoRA 變體的強大能力獨占鰲頭。搭載 Marlin-AWQ 高性能核心的 AWQ 在 7B 等級模型上能飆出約 741 tok/s 的吞吐量，並在 INT4 精度下斬獲最優 Pass@1 正確率——是 2026 年資料中心 GPU 正式環境的事實預設。FP8 則是 Hopper、Ada 與 Blackwell 架構上的穩健中庸防線——品質近乎無損，且支援度廣泛。NVFP4 與 MXFP4（Blackwell 微縮放技術）極其激進，必須嚴格經過逐區塊品質驗收。兩大經典陷阱常讓團隊慘遭滑鐵盧：校準資料集必須嚴格匹配業務垂直領域，以及 KV 快取量化與模型權重的量化彼此獨立——誤信「我的模型已經縮小到 4 GB」的初學者，往往會忽略正式環境高並行負載下 KV 快取額外需要的 10 至 30 GB 記憶體。
+> 量化格式的選型絕非一體適用的通用公式——它是實體硬體、推論服務引擎與業務負載特徵的三維函數。GGUF 的 Q4_K_M 或 Q5_K_M 透過 llama.cpp 與 Ollama 統治了 CPU 與邊緣運算裝置。GPTQ 則在 vLLM 中憑藉同一 Base 模型並行掛載多個 LoRA 變體的強大能力獨占鰲頭。搭載 Marlin-AWQ 高效能核心的 AWQ 在 7B 等級模型上能飆出約 741 tok/s 的吞吐量，並在 INT4 精度下斬獲最優 Pass@1 正確率——是 2026 年資料中心 GPU 正式環境的事實預設。FP8 則是 Hopper、Ada 與 Blackwell 架構上的穩健中庸防線——品質近乎無損，且支援度廣泛。NVFP4 與 MXFP4（Blackwell 微縮放技術）極其激進，必須嚴格經過逐區塊品質驗收。兩大經典陷阱常讓團隊慘遭滑鐵盧：校準資料集必須嚴格匹配業務垂直領域，以及 KV 快取量化與模型權重的量化彼此獨立——誤信「我的模型已經縮小到 4 GB」的初學者，往往會忽略正式環境高並行負載下 KV 快取額外需要的 10 至 30 GB 記憶體。
 
 **Type:** Learn
 **Languages:** Python (stdlib, toy memory and throughput comparison across formats)
@@ -43,17 +43,17 @@ GGUF 本質上是一種檔案格式，而非單一的量化演算法——它能
 
 GPTQ 是一種包含校準步驟的後訓練量化（PTQ）演算法。Marlin 核心的引入使其在現代 GPU 上的執行效率獲得了質的飛躍（相比於傳統無 Marlin 的 GPTQ 取得 2.6 倍加速）。在 7B 模型上測得約 712 tok/s 的強勁表現。
 
-其最獨特且不可替代的王牌優勢在於：vLLM 中的 GPTQ-Int4 支援 LoRA adapters。若你的業務架構需要維運單一基礎 Base 模型並在此之上同時並行服務 10 至 50 個 fine-tuning 客製化調校變體（每個變體以極輕量的獨立 LoRA 掛載），GPTQ 是一條適用路徑。截至 2026 年初，NVFP4 等新興格式尚未支援 LoRA 動態掛載。
+其最獨特且不可替代的王牌優勢在於：vLLM 中的 GPTQ-Int4 支援 LoRA adapters。若你的業務架構需要維運單一基礎 Base 模型並在此之上同時並行服務 10 至 50 個 fine-tuning 變體（每個變體以極輕量的獨立 LoRA 掛載），GPTQ 是一條適用路徑。截至 2026 年初，NVFP4 等新興格式尚未支援 LoRA 動態掛載。
 
 ### AWQ——資料中心 GPU 正式環境預設（AWQ — the datacenter GPU default）
 
-活化感知權重端量化（Activation-aware Weight Quantization, AWQ）。核心哲學在於量化過程中保護約 1% 最顯著的權重。Marlin-AWQ 融合核心：相較於天真無核心的實作取得高達 10.9 倍的性能飛躍。在 7B 模型上測得約 741 tok/s，並在所有 INT4 格式中展現出最頂尖的 Pass@1 正確率。
+活化感知權重端量化（Activation-aware Weight Quantization, AWQ）。核心哲學在於量化過程中保護約 1% 最顯著的權重。Marlin-AWQ 融合核心：相較於未最佳化的實作，可達 10.9 倍加速。在 7B 模型上測得約 741 tok/s，並在所有 INT4 格式中展現出最頂尖的 Pass@1 正確率。
 
 新的 GPU serving 預設選 AWQ，除非需要 multi-LoRA（GPTQ）或 Blackwell FP4（NVFP4）。
 
 ### FP8——穩健可靠的折衷防線（FP8 — the reliable middle）
 
-8 位元浮點精度。品質近乎無損。支援度廣泛。Hopper 架構的第四代 Tensor Core 具備強悍的硬體級 FP8 矩陣加速；Blackwell 完美繼承並進一步發揚光大。在輸出品質絕對不容妥協的核心場景下（推理、醫療、程式碼生成），FP8 是 2026 年最穩妥的安全底線。雖然其顯示記憶體節省幅度僅有 INT4 的一半，但其品質風險遠低於 INT4。
+8 位元浮點精度。品質近乎無損。支援度廣泛。Hopper 架構的 Tensor Core 可原生加速 FP8；Blackwell 也延續這項能力。在輸出品質絕對不容妥協的核心場景下（推理、醫療、程式碼生成），FP8 是 2026 年最穩妥的安全底線。雖然其顯示記憶體節省幅度僅有 INT4 的一半，但其品質風險遠低於 INT4。
 
 ### MXFP4 / NVFP4——Blackwell 激進新星（MXFP4 / NVFP4 — Blackwell aggressive）
 
@@ -94,7 +94,7 @@ AWQ 僅僅將靜態模型權重壓縮至 4 位元。KV 快取是獨立的一等�
 - GPU 資料中心推論、需同時並行服務多個 LoRA 變體：首選搭配 Marlin 的 GPTQ。
 - 深度邏輯推理、數學計算、高難度程式碼生成：嚴格鎖定 FP8。
 - 部署在 Blackwell 資料中心、且模型品質已通過嚴密線下驗證：採用 NVFP4 權重搭配 FP8 KV 快取。
-- 存在不確定性：在候選格式上分別抽取 1,000 條真實樣本執行橫向對比評測。
+- 存在不確定性：在候選格式上分別抽取 1,000 筆樣本執行橫向對比評測。
 
 ```figure
 gpu-memory-breakdown
@@ -112,7 +112,7 @@ gpu-memory-breakdown
 
 1. 執行 `code/main.py`。針對 70B 模型在 128 個並行請求、2k 上下文長度下，精確計算各量化格式所需的 HBM 總顯示記憶體容量。哪幾種格式能允許你將其完整放入單張 80GB 的 H100 之中？
 2. 你負責為一個 7B 參數的程式碼生成模型進行推論架構選型。挑選出最佳格式並給出充分論證。若對品質容忍度的判斷有誤，該如何復原？
-3. 為一個醫療垂直領域大模型設計 AWQ 校準方案。精確估算所需校準資料集的合理樣本量。為何在校準階段「資料量越大越好」的直覺是完全錯誤的？
+3. 為一個醫療垂直領域大模型設計 AWQ 校準方案。精確估算所需校準資料集的合理樣本量。為何資料越多不一定越好？
 4. 仔細研讀 Marlin-AWQ 的核心架構論文或官方技術發布紀錄。用三句話深刻闡述：為何 AWQ 在 7B 模型上能飆出 741 tok/s，而未經 Marlin 融合的傳統 GPTQ 僅能達到約 712 tok/s？
 5. 在何種特定的硬體與架構情境下，將「AWQ 權重端的量化」與「FP8 KV 快取量化」雙重疊加是理性的？何時則應當堅決保持 KV 快取於 BF16 精度？
 

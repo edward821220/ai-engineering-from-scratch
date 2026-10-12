@@ -48,15 +48,15 @@ KAI Scheduler（早期專案代號為 Karp，後正式定名）專門補足預�
 
 **Gang 原子排程（Gang scheduling）**——要麼全量調度、要麼全部延遲（All-or-nothing）。針對需要 8 張 GPU 的分散式推論 Pod，要麼 8 張同時就緒並同步啟動，要麼一個都不啟動。若無此機制，必然觸發「部分分配陷阱」：8 個 Pod 中有 7 個搶先啟動，隨後陷入無窮盡的等待，空耗寶貴算力。
 
-**硬體拓撲感知（Topology awareness）**——精確洞悉哪些 GPU 共享極速 NVLink、哪些 GPU 位處同一個機架、哪些節點之間具備 InfiniBand 直連。據此精準指派 Pod。例如 DeepSeek-V3 67B 模型的張量平行（Tensor Parallelism）運算必須留在同一個 NVLink 網域內；KAI Scheduler 能從底層嚴格保障這項拓撲約束。
+**硬體拓撲感知（Topology awareness）**——精確洞悉哪些 GPU 共享極速 NVLink、哪些 GPU 位處同一個機架、哪些節點之間具備 InfiniBand 直連。據此精準指派 Pod。例如 DeepSeek-V3 67B 模型的張量平行（Tensor Parallelism）運算必須留在同一個 NVLink 網域內；KAI Scheduler 會遵守這項拓撲約束。
 
-**階層化優先權佇列（Hierarchical queues）**——多個業務團隊依據優先權配額共享同一個實體 GPU 資源池。只有在明確的優先權規則允許下，團隊 A 的正式環境尖峰流量才能搶佔團隊 B 的離線訓練任務。
+**階層化優先權佇列（Hierarchical queues）**——多個業務團隊依據優先權配額共享同一個實體 GPU 資源池。只有在優先權規則允許時，團隊 B 的訓練工作才能搶佔團隊 A 的正式環境尖峰負載。
 
 KAI 通常作為輔助排程器與原生 kube-scheduler 並行部署；你只需在 Workload 的 Annotation 中指定使用它即可。Ray 與 vLLM production stack 也有整合。
 
 ### 第 3 層——應用程式層級特徵訊號（Application-level signals）
 
-**傳統 HPA 監控指標的致命盲區**：`DCGM_FI_DEV_GPU_UTIL` 僅是一項佔空比（Duty-cycle）度量——它度量的是在特定採樣間隔內 GPU 是否正在執行指令。100% 的利用率可能意味著當前有 10 個並行請求，也可能意味著有 100 個；在這兩種情況下 GPU 皆處於滿載運算狀態。依據佔空比進行擴縮容，無異於盲人摸象。
+**傳統 HPA 監控指標的致命盲區**：`DCGM_FI_DEV_GPU_UTIL` 僅是一項佔空比（Duty-cycle）度量——它度量的是在特定採樣間隔內 GPU 是否正在執行指令。100% 的利用率可能意味著當前有 10 個並行請求，也可能意味著有 100 個；這兩種情況下 GPU 都處於忙碌狀態。依據佔空比進行擴縮容，無異於盲人摸象。
 
 更棘手的是，vLLM 等推論引擎會預先分配 KV 快取記憶體，配置量受 `--gpu-memory-utilization` 限制。因此即便僅有 1 個請求流入，記憶體佔用率依然高掛在 90% 附近。基於記憶體使用率的傳統 HPA 永遠無法觸發自動縮容。
 
@@ -85,7 +85,7 @@ NVIDIA Dynamo Planner 與 llm-d Workload Variant Autoscaler 直接監聽並消�
 
 ### 冷啟動延遲在此同樣關鍵（Cold start matters here too）
 
-冷啟動抑制機制（第 17 課第 10 節）決定了節點佈建耗時是否會直接傳導為使用者肉眼可見的卡頓。Karpenter 耗費 45 至 60 秒開闢節點，加上拉取並載入 20GB 模型權重，再加上推論引擎的初始化，意味著從零啟動一個全新請求將耗時 2 至 5 分鐘。在對 SLO 極度敏感的核心鏈路上，可保留 warm pool（`min_workers=1`），或在應用層使用 Modal 風格的 checkpointing。
+冷啟動抑制機制（第 17 課第 10 節）決定了節點佈建耗時是否會直接傳導為使用者肉眼可見的卡頓。Karpenter 耗費 45 至 60 秒開闢節點，加上載入 20GB 模型權重，再加上推論引擎的初始化，意味著從零啟動一個全新請求將耗時 2 至 5 分鐘。在對 SLO 極度敏感的核心鏈路上，可保留 warm pool（`min_workers=1`），或在應用層使用 Modal 風格的快照機制。
 
 ### 務必銘記的核心數字指標（Numbers you should remember）
 

@@ -1,6 +1,6 @@
 # 專案實戰 12——長影片理解管線（場景分割、問答與語義檢索）（Capstone 12 — Video Understanding Pipeline (Scene, QA, Search)）
 
-> Twelve Labs 將 Marengo 與 Pegasus 成功商業化。VideoDB 推出了專為影片量身打造的 CRUD API。艾倫人工智慧研究所（AI2）發布了 Molmo 2 開源視覺語言模型。Google Gemini 原生支援長達數小時的超長影片上下文。TimeLens-100K 定義了大規模時序定位（Temporal Grounding）標準。2026 年工業級影片理解管線已徹底定型：場景邊界分割、單場景 VLM 語義描述與關鍵影格 frame embedding、音訊字幕精確對齊、多向量索引儲存，並支援回傳精確 (開始, 結束) 時間戳記與影格預覽縮圖的問答檢索。本專案實戰要求你端到端攝取 100 小時的龐大長影片庫，使用公開基準測試評估，並針對「計數類」與「動作類（action-type）」問題上的經典幻覺展開嚴格度量。
+> Twelve Labs 將 Marengo 與 Pegasus 成功商業化。VideoDB 推出了專為影片量身打造的 CRUD API。艾倫人工智慧研究所（AI2）發布了 Molmo 2 開源視覺語言模型。Google Gemini 原生支援長達數小時的超長影片上下文。TimeLens-100K 展示了大規模時序定位（Temporal Grounding）。2026 年工業級影片理解管線已徹底定型：場景邊界分割、單場景 VLM 語義描述與關鍵影格 frame embedding、音訊字幕精確對齊、多向量索引儲存，並支援回傳精確 (開始, 結束) 時間戳記與影格預覽縮圖的問答檢索。本專案實戰要求你端到端攝取 100 小時的龐大長影片庫，使用公開基準測試評估，並針對「計數類」與「動作類（action-type）」問題上的經典幻覺展開嚴格度量。
 
 **Type:** Capstone
 **Languages:** Python (pipeline), TypeScript (UI)
@@ -80,7 +80,7 @@ cf-scene-index
 
 6. **跨模態混合檢索**。針對使用者的自然語言查詢，並行發射三路稠密向量搜尋；調用倒數排名融合（RRF）演算法進行打分融合；精選出 Top-K=5 的候選場景。
 
-7. **時序精確定位（Temporal Grounding）**。在排名前列的最佳場景內部，運行 TimeLens 風格的時序定位適配器，將長達數分鐘的粗粒度場景進一步收斂為(開始, 結束) 事件視窗。
+7. **時序精確定位（Temporal Grounding）**。在排名前列的最佳場景內部，運行 TimeLens 風格的時序定位適配器，將 (開始, 結束) 視窗在場景內進一步細化。
 
 8. **多模態長上下文答案合成**。呼叫 Gemini 2.5 Pro，同時餵入提問文本、Top-3 場景的關鍵影格或短短片段影像，以及對應的對話字幕。強制要求模型在回答中精確標明 `(video_id, start_ms, end_ms)` 引用。
 
@@ -116,11 +116,11 @@ citations: [scene 3: 00:12-00:58]
 
 ## Exercises｜練習
 
-1. 在場景標註環節，將 Gemini 2.5 Pro 替換為本地部署的 Qwen3-VL-Max。在一個由人工打分的 50 個場景抽樣集上，對比兩者在關鍵特徵捕捉與描述精確度上的具體差異。
+1. 在場景描述階段以 Qwen3-VL-Max 取代 Gemini 2.5 Pro。在 50 個由人工評分的場景樣本上，回報描述品質的差異。
 2. 將單個場景的關鍵影格多向量表徵降維為單一的平均池化向量（Pooled Vector）。重新度量檢索召回率的退化幅度。
 3. 設計一套「嚴格計數驗證」模式：要求答案合成器在回答計數提問時，必須為其數出的每一個實體目標獨立標註一個精確的時間戳記，使用者點選該標籤可即時跳轉檢驗。度量引入使用者驗證後幻覺率是否降低。
 4. 針對三種不同的 VLM 選型實施成本基準測量：計算每 1 美元預算所能完整處理的影片小時數。在精度與成本之間鎖定最優效費比拐點。
-5. 為管線擴充說話者分離（Speaker Diarization）能力：在音訊軌道上運行 pyannote 模型，將轉錄逐字稿精確劃分至不同說話者。展示系統如何精準回答「Alice 剛才針對某個話題發表了什麼看法？」這類複雜提問。
+5. 為管線擴充說話人分離（Speaker Diarization）能力：在音訊軌道上運行 pyannote 模型，將轉錄逐字稿精確劃分至不同說話人。展示系統如何精準回答「Alice 剛才針對某個話題發表了什麼看法？」這類複雜提問。
 
 ## Key Terms｜關鍵術語
 
@@ -136,11 +136,11 @@ citations: [scene 3: 00:12-00:58]
 
 ## Further Reading｜延伸閱讀
 
-- [AI2 Molmo 2](https://allenai.org/blog/molmo2) — 艾倫人工智慧研究所開源前沿 VLM 檢查點。
+- [AI2 Molmo 2](https://allenai.org/blog/molmo2) — 艾倫人工智慧研究所開源前沿 VLM model checkpoints。
 - [TimeLens (CVPR 2026)](https://github.com/TencentARC/TimeLens) — 大規模影片時序精確定位權威框架。
 - [Gemini Video long-context](https://deepmind.google/technologies/gemini) — 雲端全託管長影片多模態參考架構。
 - [VideoDB](https://videodb.io) — 影片專屬資料庫與 CRUD 介面標竿。
 - [Twelve Labs Marengo + Pegasus](https://www.twelvelabs.io) — 商業級長影片語義檢索領先產品。
-- [TransNetV2](https://github.com/soCzech/TransNetV2) — 高性能深度學習鏡頭切分模型儲存庫。
+- [TransNetV2](https://github.com/soCzech/TransNetV2) — 高效能深度學習鏡頭切分模型儲存庫。
 - [PySceneDetect](https://github.com/Breakthrough/PySceneDetect) — 經典輕量級影片場景分割開源庫。
 - [ActivityNet-QA](https://arxiv.org/abs/1906.02467) — 長影片多模態問答權威學術評測基準。

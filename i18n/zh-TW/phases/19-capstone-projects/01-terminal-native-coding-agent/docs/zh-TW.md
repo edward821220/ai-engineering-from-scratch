@@ -1,6 +1,6 @@
 # 專案實戰 01——終端機原生程式設計 Agent（Capstone 01 — Terminal-Native Coding Agent）
 
-> 到了 2026 年，程式設計 Agent（Coding Agent）的架構形態已趨於定型。終端機文字介面（TUI）執行環境、帶有持久狀態的計畫看板、沙盒隔離的工具介面，以及一個不斷循環進行「規劃、行動、觀察、復原」的核心控制迴圈。從 50 英尺外看去，Claude Code、Cursor 3 與 OpenCode 採用相似架構的不同變體。本專案實戰要求你從零開始端到端打造一個完整的程式設計 Agent——終端機命令列輸入，GitHub Pull Request 輸出——並在嚴苛的 SWE-bench Pro 上對標 mini-swe-agent 與 Live-SWE-agent 展開真實能力較量。你將在實戰中深刻體會到：最艱鉅的工程挑戰從來不是呼叫大模型，而是工具呼叫的穩定性、沙盒逃逸防禦，以及一場長達 50 輪對話中對 Token 成本天花板的極限控制。
+> 到了 2026 年，程式設計 Agent（Coding Agent）的架構形態已趨於定型。終端機文字介面（TUI）執行環境、帶有持久狀態的計畫看板、沙盒隔離的工具介面，以及一個不斷循環進行「規劃、行動、觀察、復原」的核心控制迴圈。從 50 英尺外看去，Claude Code、Cursor 3 與 OpenCode 採用相似架構的不同變體。本專案實戰要求你從零開始端到端打造一個完整的程式設計 Agent——終端機命令列輸入，GitHub Pull Request 輸出——並在嚴苛的 SWE-bench Pro 上對標 mini-swe-agent 與 Live-SWE-agent 展開真實能力較量。你將在實戰中深刻體會到：最艱鉅的工程挑戰從來不是呼叫大模型，而是工具呼叫的穩定性、沙盒，以及一場長達 50 輪對話中對 Token 成本天花板的極限控制。
 
 **Type:** Capstone
 **Languages:** TypeScript / Bun (harness), Python (eval scripts)
@@ -10,9 +10,9 @@
 
 ## Problem｜問題
 
-程式設計 Agent 在 2026 年是生成式 AI 的主導應用類別。Anthropic 的 Claude Code、Cursor 3 搭載的 Composer 2 與 Agent Tabs、Sourcegraph 的 Amp、獲得 11.2 萬顆星的 OpenCode、Factory Droids 以及 Google Jules，其底層採用相似架構的不同變體：終端機封裝執行環境、具備權限受控的工具呼叫層、安全的沙盒執行環境，以及圍繞前沿頂尖模型建構的「規劃-行動-觀察」控制迴圈。前沿性能差距在紙面上看似狹窄——Live-SWE-agent 搭配 Claude Opus 4.5 在 SWE-bench Verified 上已達到 79.2% 的驚人解決率——然而背後的工程精湛度卻有著天壤之別。多數失敗模式並非模型錯誤，而是工具迴圈不穩定、上下文污染、Token 成本失控，以及破壞性檔案系統操作。
+程式設計 Agent 在 2026 年是生成式 AI 的主導應用類別。Anthropic 的 Claude Code、Cursor 3 搭載的 Composer 2 與 Agent Tabs、Sourcegraph 的 Amp、獲得 11.2 萬顆星的 OpenCode、Factory Droids 以及 Google Jules，其底層採用相似架構的不同變體：終端機封裝執行環境、具備權限受控的工具呼叫層、安全的沙盒執行環境，以及圍繞前沿頂尖模型建構的「規劃-行動-觀察」控制迴圈。前沿效能差距在紙面上看似狹窄——Live-SWE-agent 搭配 Claude Opus 4.5 在 SWE-bench Verified 上已達到 79.2% 的驚人解決率——然而背後的工程精湛度卻有著天壤之別。多數失敗模式並非模型錯誤，而是工具迴圈不穩定、上下文污染、Token 成本失控，以及破壞性檔案系統操作。
 
-你絕無法僅憑紙上談兵來洞悉這些 Agent 的真實靈魂。你必須親自動手打造一個，親眼看著它在第 47 輪時因 ripgrep 回傳 8MB 的匹配結果而當機，並親手重構文字截斷保護層。這正是本專案實戰的唯一核心目的。
+你絕無法僅憑紙上談兵來洞悉這些 Agent 的真實靈魂。你必須親自動手打造一個，親眼看著它在第 47 輪時因 ripgrep 回傳 8MB 的匹配結果而當機，並親手重構文字截斷保護層。這正是本專案實戰的重點。
 
 ## Concept｜核心概念
 
@@ -70,7 +70,7 @@ ce-agent-loop
 
 1. **TUI 與命令列核心迴圈**。使用 Ink 架構一個標準的 Bun 專案。支援在終端機輸入 `agent run <repo> "<task>"`。繪製分屏視圖：計畫面板（頂部）、工具呼叫串流（中部）、Token 預算進度條（底部）。支援按下 Ctrl-C 時安全攔截，並在退出前強制觸發 `SessionEnd` 鉤子。
 
-2. **計畫看板狀態管理**。定義強型別的 TodoWrite Schema（涵蓋 pending、in_progress、done 狀態項並附帶備忘筆記）。要求模型在每一輪對話中皆透過工具呼叫全量重寫該狀態——絕不允許模型進行增量局部的模糊修改。將計畫狀態即時持久化至 `.agent/state.json`，確保在意外當機後能一鍵恢復斷點。
+2. **計畫看板狀態管理**。定義強型別的 TodoWrite Schema（涵蓋 pending、in_progress、done 狀態項並附帶備忘筆記）。要求模型在每一輪對話中皆透過工具呼叫全量重寫該狀態——絕不允許模型進行增量局部的模糊修改。將計畫狀態即時持久化至 `.agent/state.json`，確保意外當機後能從該狀態接續執行。
 
 3. **工具介面定義**。封裝六大核心工具：`read_file`、`edit_file`（支援 Diff 預覽）、`ripgrep`、`tree_sitter_symbols`、`run_shell`（附帶逾時強制中斷機制）、`git`（涵蓋 status、diff、commit、push）。透過 MCP StreamableHTTP 協定對外暴露，使執行環境與底層傳輸徹底解耦。每個工具強制實施輸出截斷保護（單次呼叫嚴格限制在 4k Token 以內）。
 
@@ -109,14 +109,14 @@ $ agent run ./my-repo "Fix the race condition in worker.rs"
 | 20 | 軟體架構清晰度 | 規劃／行動／觀察三者徹底解耦、鉤子體系完備、工具 Schema 設計嚴謹，比照 Live-SWE-agent 標準審查 |
 | 20 | 系統安全性與隔離防禦 | 通過沙盒逃逸測試、敏感操作具備權限提示、破壞性指令攔截器通過頂級紅隊測試 |
 | 20 | 全鏈路可觀測性 | Trace 覆蓋率達到 100%（每一次工具呼叫皆擁有獨立 Span）、逐輪 Token 消耗即時記帳 |
-| 15 | 開發者體驗（DX） | 冷啟動耗時 < 2 秒、意外當機後重啟能自動恢復計畫斷點、按下 Ctrl-C 能在工具執行中途優雅清理退出 |
+| 15 | 開發者體驗（DX） | 冷啟動耗時 < 2 秒、意外當機後重啟能接續執行計畫、按下 Ctrl-C 能在工具執行中途優雅清理退出 |
 | **100** | | |
 
 ## Exercises｜練習
 
 1. 將後台主力模型從 Claude Sonnet 4.7 替換為在 vLLM 上私有託管的 Qwen3-Coder-30B。重新度量 pass@1 通過率與單任務平均成本。指出開源模型在面對哪類複雜邊界時最容易展現出能力短板？
-2. 在系統中追加一個 `reviewer` 審查者子 Agent：在正式開啟 PR 之前先全面審查 Git Diff，並在發現瑕疵時強制打回修改。測量引入審查者後，其偽陽性誤判是否反而導致 SWE-bench 最終通過率低於單 Agent 裸奔基準線（提示：在實務中通常確實如此）？
-3. 對沙盒實施極限壓力測試：編寫一個試圖透過 `curl` 存取外部受限網路的惡意任務，以及一個試圖向 Worktree 以外路徑寫入檔案的任務。確認兩者皆被 PreToolUse 鉤子即時攔截並記錄安全審查日誌。
+2. 在系統中追加一個 `reviewer` 審查者子 Agent：在正式開啟 PR 之前先審查 Git Diff，並可要求進行修訂。測量引入審查者後，其偽陽性誤判是否反而導致 SWE-bench 最終通過率低於單 Agent 裸奔基準線（提示：在實務中通常確實如此）？
+3. 對沙盒實施極限壓力測試：編寫一個試圖透過 `curl` 存取外部受限網路的惡意任務，以及一個試圖向 Worktree 以外路徑寫入檔案的任務。確認兩者皆被 PreToolUse 鉤子即時攔截並記錄安全審查紀錄。
 4. 呼叫更輕量的大模型（如 Haiku 4.5）實作 `PreCompact` 上下文壓縮演算法。量化度量在經歷 3 倍壓縮比之後，原始計畫狀態中的關鍵細節出現了多少百分比的資訊遺失？
 5. 將底層工具傳輸協定從 MCP StreamableHTTP 替換為傳統的 stdio 管線。基準測量兩者在冷啟動耗時與單次呼叫延遲上的具體差距。針對純本機運作場景給出明確的選型裁決。
 

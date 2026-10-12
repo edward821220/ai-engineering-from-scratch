@@ -10,7 +10,7 @@
 ## Learning Objectives｜學習目標
 
 - 梳理實驗室外對齊研究生態系中的五個組織及其核心產出。
-- 描述 MATS 的培育規模（研究員數量、論文產出、h-index）及其作為全球頂尖安全人才培育途徑的關鍵樞紐地位。
+- 描述 MATS 的規模（研究者、論文、h-index）及其作為人才培育途徑的角色。
 - 掌握 Redwood Research 的 AI 控制體系及其與英國國家級 AISI 的戰略合作模式。
 - 掌握 METR 基於真實長程任務的能力評測方法論。
 
@@ -35,15 +35,15 @@
 
 ### Redwood Research
 
-應用對齊實驗室。由 Buck Shlegeris 創始領導。引入了 AI Control 議程（第 10 課）。與英國 AISI 合作研究控制安全論證。就 DeepMind 與 Anthropic 的評估設計提供建議。
+應用對齊實驗室，由 Buck Shlegeris 創立。提出 AI Control 議程（第 10 課），與英國 AISI 合作研究控制安全論證，並就 DeepMind 與 Anthropic 的評估設計提供建議。
 
 標誌性論文：Greenblatt、Shlegeris 等人的《AI Control》（arXiv:2312.06942，ICML 2024）；與 Anthropic 聯合發表的《Alignment Faking》（Greenblatt、Denison、Wright 等人，arXiv:2412.14093）。
 
-科研風格：極具資安工程學硬派特色，預設最壞情況的惡意對手，打造在極限對抗施壓下仍可被嚴格檢驗的具體工程協定。
+研究風格：明確的威脅模型、最壞情況的對手，以及可進行壓力測試的具體協定。
 
 ### Apollo Research
 
-為前沿實驗室提供部署前的謀劃行為評估。主導撰寫了《In-Context Scheming》（第 08 節，arXiv:2412.04984）。2025 年與 OpenAI 深度合作開展審思反謀劃訓練。發布了《Towards Safety Cases for AI Scheming》（2024 年）。
+為前沿實驗室提供部署前的謀劃行為評估。撰寫了《In-Context Scheming》（第 08 節，arXiv:2412.04984）。2025 年參與與 OpenAI 合作的反謀劃訓練。發布了《Towards Safety Cases for AI Scheming》（2024 年）。
 
 科研風格：評估可能出現欺騙的自主 Agent 情境；確立了謀劃行為的三大支柱（目標背離、目標導向性、情境感知）。
 
@@ -57,7 +57,7 @@
 
 ### Eleos AI Research
 
-專精於大模型福祉（Model Welfare）的上線前評測機構。進行了 Claude Opus 4 的模型福祉評估，相關內容記錄於系統卡第 5.3 節。為本課第 19 節關於模型主觀體驗的相關論述提供了堅實的外部方法論查驗。
+專精於大模型福祉（Model Welfare）的部署前評估。進行了 Claude Opus 4 的模型福祉評估，相關內容記錄於系統卡第 5.3 節。為第 19 課與福祉相關的主張提供外部方法論檢查。
 
 ### 全球對齊人才與智力流向閉環
 
@@ -65,7 +65,7 @@ MATS 培訓研究人員。畢業生加入 Anthropic、DeepMind、OpenAI 的實�
 
 ### 為何這層非實驗室機構至關重要
 
-單一來源的自查自評缺乏公信力：大模型生產商在評估自家產品時存在無可避免的商業利益衝突。外部評估者能提出並驗證實驗室可能低報的失效模式。2024 年的休眠代理刺客（第 07 節）是 Anthropic 攜手 Redwood 共同完成的；虛假對齊偽裝（第 09 節）同樣由兩家聯合署名；上下文內謀劃（第 08 節）由 Apollo 獨立攻克；反謀劃訓練則由 Apollo 與 OpenAI 聯合實施。多機構架構提供品質控管。
+單一來源的評估並不可靠：實驗室在評估自家模型時存在結構性利益衝突。外部評估者能提出並驗證實驗室可能低報的失效模式。2024 年的《Sleeper Agents》（第 07 節）由 Anthropic 與 Redwood 合作；《Alignment Faking》（第 09 節）也由兩者合作；《In-Context Scheming》（第 08 節）由 Apollo 撰寫；反謀劃訓練由 Apollo 與 OpenAI 合作。多機構架構提供品質控管。
 
 ### 該研究在第 18 階段中的宏觀座標
 

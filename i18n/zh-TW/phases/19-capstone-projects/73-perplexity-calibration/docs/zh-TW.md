@@ -23,7 +23,7 @@ cd-reliability-diagram
 
 困惑度的數學本質是：**每個 token 平均負對數概似（NLL）的指數化數值**。數值越低代表模型越強。困惑度等於 1 意味著模型為每一個真實出現的 token 皆賦予了 100% 的絕對確定性機率；困惑度等於詞表容量大小意味著模型輸出的機率完全呈現均勻分佈，等同於大腦一片空白什麼都沒學會。真實數值介於兩者之間：一個強大的 2026 年底座模型在 WikiText-103 基準上的困惑度通常落在 8 到 12 之間；而一個拙劣的劣質模型在完全相同的文字上困惑度會高達 50 以上。
 
-評測套件本身不負責直接計算對數機率。那些底層 Logits 來自於模型適配器。評測套件承擔的是全局聚合職責：接收單 token 負對數機率清單與每個序列的 token 計數清單，最終輸出語料庫級別的真實困惑度。
+評測套件本身不負責直接計算對數機率。那些對數機率來自於模型適配器。評測套件承擔的是全局聚合職責：接收單 token 負對數機率清單與每個序列的 token 計數清單，最終輸出語料庫級別的真實困惑度。
 
 ```python
 def perplexity(neg_log_probs, token_counts):
@@ -114,7 +114,7 @@ report.populated_bins  # int
 
 ## 程式碼導讀
 
-`main.py` 定義了 `perplexity`、`expected_calibration_error`、`brier_score`、`reliability_diagram`，以及 `CalibrationReport` 與 `PerplexityResult` 資料類別。底部的演示程式在已知 Ground Truth 的合成預測上運作：一個校準良好的模型、一個過度自信的模型，以及一個信心偏低的模型。`code/tests/test_calibration.py` 單元測試鎖定了所有極限邊界與數值精度。
+`main.py` 定義了 `perplexity`、`expected_calibration_error`、`brier_score`、`reliability_diagram`，以及 `CalibrationReport` 與 `PerplexityResult` 資料類別。底部的演示程式在已知 Ground Truth 的合成預測上運作：一個校準良好的模型、一個過度自信的模型，以及一個信心偏低的模型。`code/tests/test_calibration.py` 單元測試鎖定了所有極限邊界，以及合成預測器的參考值。
 
 自頂向下通讀 `main.py`。程式碼編排由純量運算過渡至向量運算、最後收斂至綜合報告。每個函式皆包含嚴密的數學註解與合約規範。
 

@@ -1,6 +1,6 @@
 # EchoLeak 漏洞與 AI 專屬 CVE 的崛起（EchoLeak and the Emergence of CVEs for AI）
 
-> CVE-2025-32711「EchoLeak」（CVSS 評分高達 9.3）是第一個在正式環境中的 LLM 系統（微軟 Microsoft 365 Copilot）裡被公開記錄的零點選（Zero-click）間接 Prompt 注入漏洞。由 Aim Labs（Aim Security）研究團隊發現，負責任地通報給微軟安全回應中心（MSRC），並於 2025 年 6 月透過伺服器端熱更新完成修復。攻擊鏈：攻擊者向受害企業的任意員工發送一封偽裝正常的電子郵件；當受害者在日常辦公中使用 Copilot 執行例行查詢時，Copilot 的 RAG 檢索模組自動將該郵件拉入上下文；隱密惡意指令隨即觸發執行；Copilot 透過微軟官方已加入內容安全政策（CSP）白名單的合法網域，將企業機密資料悄悄外洩至攻擊者手中。該攻擊成功繞過了微軟跨 Prompt 注入防禦過濾網（XPIA）以及 Copilot 自身的惡意連結遮罩防護。Aim Labs 為其確立了專屬術語：「LLM 權限作用域越界（LLM Scope Violation）」——外部不可信資料惡意操縱模型越權存取特權資料並將其外洩。相關大案：CamoLeak（CVSS 9.6，發生在 GitHub Copilot Chat）剝削了 Camo 圖片代理服務，微軟最終被迫以全面停用 Copilot Chat 的圖片渲染能力作為代價徹底止血；以及 GitHub Copilot 的遠端程式碼執行（RCE）漏洞 CVE-2025-53773。NIST 官方將間接 Prompt 注入定性為「生成式 AI 有史以來最大的安全缺陷」；OWASP 2025 更將其列為大模型應用的頭號威脅。
+> CVE-2025-32711「EchoLeak」（CVSS 評分高達 9.3）是第一個在正式環境中的 LLM 系統（微軟 Microsoft 365 Copilot）裡被公開記錄的零點選（Zero-click）間接 Prompt 注入漏洞。由 Aim Labs（Aim Security）研究團隊發現，負責任地通報給微軟安全回應中心（MSRC），並於 2025 年 6 月透過伺服器端熱更新完成修復。攻擊鏈：攻擊者向受害企業的任意員工發送一封偽裝正常的電子郵件；當受害者在日常辦公中使用 Copilot 執行例行查詢時，Copilot 的 RAG 檢索模組自動將該郵件拉入上下文；隱密惡意指令隨即觸發執行；Copilot 透過微軟官方已加入內容安全政策（CSP）白名單的合法網域，將企業機密資料悄悄外洩至攻擊者手中。該攻擊成功繞過了微軟跨 Prompt 注入防禦過濾網（XPIA）以及 Copilot 自身的惡意連結遮罩防護。Aim Labs 為其確立了專屬術語：「LLM 權限作用域越界（LLM Scope Violation）」——外部不可信資料惡意操縱模型越權存取特權資料並將其外洩。相關案例：CamoLeak（CVSS 9.6，發生在 GitHub Copilot Chat）利用 Camo 圖片代理服務，修補方式是在 Copilot Chat 中停用圖片呈現功能；以及 GitHub Copilot 的遠端程式碼執行（RCE）漏洞 CVE-2025-53773。NIST 官方將間接 Prompt 注入定性為「生成式 AI 有史以來最大的安全缺陷」；OWASP 2025 更將其列為大模型應用的頭號威脅。
 
 **Type:** Learn
 **Languages:** Python (stdlib, scope-violation trace reconstruction)
@@ -16,7 +16,7 @@
 
 ## The Problem｜問題
 
-第 18 課第 15 節從純理論層面介紹了間接 Prompt 注入（IPI）。而第 25 節則記錄了該攻擊在真實世界商業軟體中斬獲的第一批正式 CVE 漏洞編號。政策啟示：AI 系統安全漏洞如今已全面納入經典資安工程的常態化管理軌道——它們享有官方 CVE 編號、遵循業界通用的 CVSS 風險評分體系，並需要負責任地披露。實務啟示：威脅模型已在正式環境中獲得驗證，而不只是基準測試結果。
+第 18 課第 15 節從概念層面介紹了間接 Prompt 注入（IPI）；第 25 課則記錄了該攻擊類別的第一個正式環境 CVE。政策啟示：AI 系統安全漏洞如今已全面納入經典資安工程的常態化管理軌道——它們享有官方 CVE 編號、遵循業界通用的 CVSS 風險評分體系，並需要負責任地披露。實務啟示：威脅模型已在正式環境中獲得驗證，而不只是基準測試結果。
 
 ## The Concept｜核心概念
 
@@ -61,7 +61,7 @@ EchoLeak 的模式是：廠商最初將其評為低嚴重性（僅資訊揭露�
 
 ### NIST 與 OWASP 權威定級
 
-- NIST《AI 系統安全規範 2024》：將 Prompt 注入定性為「生成式 AI 有史以來最大的系統安全漏洞」。
+- NIST AI SPD 2024：將 Prompt 注入定性為「生成式 AI 有史以來最大的系統安全漏洞」。
 - OWASP 大模型安全 Top 10（2025 版）：將 Prompt 注入確立為 **LLM01** 全場頭號威脅。
 
 ### 該研究在第 18 階段中的宏觀座標
@@ -74,7 +74,7 @@ an-echoleak-chain
 
 ## Use It｜實際應用
 
-`code/main.py` 以狀態轉移日誌的形式完整重現了 EchoLeak 的端到端攻擊軌跡。你可以直觀目睹惡意郵件如何被自動檢索召回、隱藏指令如何劫持模型控制流程，以及外洩 URL 如何被精準組裝。程式同時展示了一套簡潔的防禦架構（作用域隔離：強制阻斷任何由不可信外部內容直接誘發的工具調用），親眼見證該防衛如何秒級化解資料外洩。
+`code/main.py` 以狀態轉移記錄的形式重現 EchoLeak 的端到端攻擊軌跡。你可以直觀目睹惡意郵件如何被自動檢索召回、隱藏指令如何劫持模型控制流程，以及外洩 URL 如何被精準組裝。程式同時展示了一套簡潔的防禦架構（作用域隔離：強制阻斷任何由不可信外部內容直接誘發的工具調用），親眼見證該防衛如何秒級化解資料外洩。
 
 ## Ship It｜交付成果
 

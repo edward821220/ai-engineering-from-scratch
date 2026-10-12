@@ -16,7 +16,7 @@
 
 ## Concept｜核心概念
 
-資料攝取協定全面採用 OTLP HTTP。SDK 自動生成符合 GenAI 語意約定的標準 Span 欄位：`gen_ai.system`、`gen_ai.request.model`、`gen_ai.usage.input_tokens`、`gen_ai.response.id`、`llm.prompts`、`llm.completions`。Span 串流批次寫入 ClickHouse 進行高性能列式儲存與 OLAP 分析；業務中繼資料（用戶 ID、工作階段 Session、應用 App）則持久化至 Postgres。
+資料攝取協定全面採用 OTLP HTTP。SDK 自動生成符合 GenAI 語意約定的標準 Span 欄位：`gen_ai.system`、`gen_ai.request.model`、`gen_ai.usage.input_tokens`、`gen_ai.response.id`、`llm.prompts`、`llm.completions`。Span 串流批次寫入 ClickHouse 進行高效能列式儲存與 OLAP 分析；業務中繼資料（用戶 ID、工作階段 Session、應用 App）則持久化至 Postgres。
 
 自動評估工作以批次任務形式在抽樣 Trace 上持續運作。DeepEval 自動為回答的忠實度、毒性與相關性評分。當 Trace 攜帶檢索上下文時，RAGAS 自動度量檢索指標。自定義的 LLM 裁判則針對垂直業務規則展開合規排查（如 PII 外洩、跨越安全紅線）。所有評測結果皆作為子 Span 關聯回原始的父級 Trace，並寫回同一個 ClickHouse 叢集。
 
@@ -71,13 +71,13 @@ ce-otel-drift
 
 1. **OTel 收集器配置**。部署 OpenTelemetry Collector，啟用 OTLP HTTP 接收器，配置尾部抽樣器：對所有包含 Error 報錯的 Trace 實施 100% 全量保留，對成功請求保留 10% 抽樣。配置匯出器（Exporter）同步導流至 ClickHouse 與 S3。
 
-2. **ClickHouse 高性能 Schema**。設計 `spans` 列式資料表，欄位嚴格映射 GenAI 語意約定：`gen_ai_system`、`gen_ai_request_model`、`input_tokens`、`output_tokens`、`latency_ms`、`prompt_hash`、`trace_id`、`parent_span_id`，並提供儲存非結構化長文字的 JSON 欄位。按 user_id 與 app_id 建立二級索引。
+2. **ClickHouse 高效能 Schema**。設計 `spans` 列式資料表，欄位嚴格映射 GenAI 語意約定：`gen_ai_system`、`gen_ai_request_model`、`input_tokens`、`output_tokens`、`latency_ms`、`prompt_hash`、`trace_id`、`parent_span_id`，並提供儲存非結構化長文字的 JSON 欄位。按 user_id 與 app_id 建立二級索引。
 
 3. **跨 SDK 覆蓋度驗證測試**。針對 6 類主流 SDK（OpenAI、Anthropic、Google、LangChain、LlamaIndex、vLLM）分別撰寫微型測試應用，掛載 OpenLLMetry 自動埋點。確認每個 SDK 皆能穩定產出標準的 GenAI 語意 Span 並成功入庫 ClickHouse。
 
 4. **後台評測定時任務**。編寫排程工作行程，定時抓取最近 15 分鐘內的抽樣 Trace，呼叫 DeepEval 度量忠實度、毒性與答案相關性。將評估結論封裝為帶有關聯關係的 Eval 子 Span 寫回 ClickHouse。
 
-5. **私有 LLM 隱私裁判**。實作 PII 外洩裁判邏輯：針對模型產出的回答，呼叫微型護欄模型判定存在 PII 隱私洩漏的機率。一旦判定為高風險，立即將該筆記錄拋入前端待審批隊列。
+5. **私有 LLM 隱私裁判**。實作 PII 外洩裁判邏輯：針對模型產出的回答，呼叫微型護欄模型判定存在 PII 隱私洩漏的機率。一旦判定為高風險，立即將該筆記錄拋入待分流佇列。
 
 6. **Prompt 分佈漂移監控**。編寫每週排程任務：提取本週全量 Prompt 的語義向量，計算其與過去 4 週基準分佈之間的總體穩定性指標（PSI）。當 PSI 突破安全閾值時，即刻觸發漂移警報。
 
@@ -139,5 +139,5 @@ $ curl -X POST https://my-otel-collector/v1/traces -d @trace.json
 - [OpenTelemetry GenAI semantic conventions](https://opentelemetry.io/docs/specs/semconv/gen-ai/) — 官方標準大模型遙測資料格式約定。
 - [Helicone](https://www.helicone.ai) — 商業級全託管大模型可觀測性平台。
 - [Braintrust](https://www.braintrust.dev) — 以自動評測為第一優先級的工程平台。
-- [ClickHouse documentation](https://clickhouse.com/docs) — 高性能列式資料庫官方架構手冊。
+- [ClickHouse documentation](https://clickhouse.com/docs) — 高效能列式資料庫官方架構手冊。
 - [DeepEval](https://github.com/confident-ai/deepeval) — 業界主流單元級大模型評測開源庫。

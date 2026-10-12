@@ -10,7 +10,7 @@
 ## Learning Objectives｜學習目標
 - 透過反覆合併訓練語料中出現頻率最高的相鄰符號對，從原始文字語料中訓練出位元組對編碼（Byte-Pair Encoding，BPE）詞彙表。
 - 實作確定性合併表（Merge Table），並將其應用於全新文字，產出標準的子詞（Subword）ID 串流。
-- 實現任意 UTF-8 字串與 ID 之間完全無損的雙向可逆回溯（Round-trip）。
+- 實作任意 UTF-8 字串與 ID 之間完全無損的雙向可逆回溯（Round-trip）。
 - 保留並隔離保護特殊 Token（`<|endoftext|>`、`<|pad|>`），確保它們在訓練與解碼過程中完好存活。
 - 深刻理解為何「位元組級字母表（Byte-Level Alphabet）」是建構通用 tokenizer 的合適基礎。
 

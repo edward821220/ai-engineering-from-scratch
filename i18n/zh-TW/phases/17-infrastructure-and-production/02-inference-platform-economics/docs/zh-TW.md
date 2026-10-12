@@ -12,11 +12,11 @@
 - 指出三大市場區塊（專屬客製晶片、GPU 平台、API 優先型市集），並將各家廠商精準歸類。
 - 深刻解釋為何「按 Token 計費（Per-token）」的 API 定價模型，會不可避免地被壓縮並貼齊推論服務引擎的成本曲線，而非單純的底層硬體成本。
 - 計算跨至少三家廠商的單次請求實質成本，並指出何時按分鐘計費（Baseten、Modal）會碾壓按 Token 計費。
-- 依據給定的具體負載特徵（無伺服器突發流量、平穩高吞吐量、fine-tuning 定制衍生版本、多模態），精準挑選預設最適平台。
+- 依據給定的具體負載特徵（無伺服器突發流量、平穩高吞吐量、fine-tuning 客製化變體、多模態），精準挑選預設最適平台。
 
 ## The Problem｜問題
 
-你評估過各大超大規模雲端平台後，得出結論：你需要更聚焦、推論延遲更低的專業服務商——追求極致延遲選 Fireworks、追求全模型覆蓋選 Together、部署自研 fine-tuning 模型選 Baseten。然而當你面對六家真實廠商的定價頁面時，卻發現維度完全無法對齊：各家定價頁的標示單位分別為：Fireworks 以 $/M tokens; Baseten shows $/minute；Modal 以 $/second; Replicate shows $/prediction。 在不對真實負載建立數學模型的前提下，你根本無法將它們放在同一個基準上橫向對比。
+你評估過各大超大規模雲端平台後，得出結論：你需要更聚焦、推論延遲更低的專業服務商——追求極致延遲選 Fireworks、追求全模型覆蓋選 Together、部署自研 fine-tuning 模型選 Baseten。然而當你面對六家真實廠商的定價頁面時，卻發現維度完全無法對齊：各家定價頁的計價單位分別為：Fireworks 以 $/M tokens; Baseten shows $/minute；Modal 以 $/second; Replicate shows $/prediction。 在不對真實負載建立數學模型的前提下，你根本無法將它們放在同一個基準上橫向對比。
 
 更棘手的是，每份定價頁面背後的商業邏輯截然不同。Fireworks 在共享 GPU 上運作自研的 FireAttention 專屬推論引擎，其每 Token 費率直接反映了其算力利用率曲線；Baseten 提供 Truss 打包框架與獨佔專屬 GPU，其按分鐘計費反映的是資源專有權；Modal 則是徹底的 Python 無伺服器（Serverless）架構——提供按秒計費與亞秒級的冷啟動體驗。產出完全相同的文字（一段 LLM 回應），背後卻對應三種本質迥異的成本函數。
 
@@ -79,7 +79,7 @@
 
 ### 自研專屬推論引擎是真正的護城河（Custom engine is the real moat）
 
-市面上凡是位階高於原生 vLLM 與 SGLang 的平台，皆一致宣稱旗下具備強大的自研推論引擎：FireAttention、RayTurbo、Baseten 的私有推論堆疊。自研引擎的宣傳往往帶有些許市場包裝色彩——客觀冷靜的產業現狀是：vLLM 與 SGLang 構成了當前開源正式環境推論約 80% 的堅實基石，而各商業平台層之間真正的勝負分水嶺，更多取決於開發者體驗、帳單歸因粒度與企業級 SLA 承諾。
+市面上凡是建構在 vLLM 與 SGLang 之上的平台，皆一致宣稱旗下具備強大的自研推論引擎：FireAttention、RayTurbo、Baseten 的私有推論堆疊。自研引擎的宣傳往往帶有些許市場包裝色彩——客觀冷靜的產業現狀是：vLLM 與 SGLang 構成了當前開源正式環境推論約 80% 的堅實基石，而各商業平台層之間真正的勝負分水嶺，更多取決於開發者體驗、帳單歸因粒度與企業級 SLA 承諾。
 
 ### 務必銘記的核心數字指標（Numbers you should remember）
 

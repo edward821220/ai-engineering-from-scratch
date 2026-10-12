@@ -18,7 +18,7 @@
 
 你無法直接度量你內心真正想要的終極目標。你只能度量一項能勉強替代它的代理指標。每一個 RLHF 管線皆建立在這項無奈的代換之上：「人類偏好」被代換為「在 5 萬對已標註配對資料上擬合的 Bradley-Terry 純標量模型」。一個在代理指標上刷出極高分數的最佳化器，從構造定義上來說，僅僅是在你所量測的那個指標上表現優異。至於它是否真正滿足了你最初想要的目標，完全取決於代理指標與真實目標的咬合緊密程度——而殘酷的現實是：咬合程度永遠遠比你期望的要鬆散得多。
 
-Gao、Schulman 與 Hilton（2023）直接對該現象進行了嚴密測量。他們基於 10 萬條標籤訓練出一個作為參考基準的「黃金獎勵模型（Gold RM）」。隨後分別抽取其 {1k, 3k, 10k, 30k} 的子集訓練出不同品質的「代理獎勵模型（Proxy RM）」。讓策略模型分別針對各代理模型展開強化學習最大化。以相對於初始策略的 KL 散度為橫軸，繪製黃金模型的真實得分曲線。結果令人警醒：每一條曲線皆呈現先上升、觸頂，隨後不可逆崩潰暴跌的態勢。代理模型品質越高，峰值出現得越晚；但崩潰的命運從未缺席。
+Gao、Schulman 與 Hilton（2023）直接對該現象進行了嚴密測量。他們基於 10 萬條標籤訓練出一個作為參考基準的「黃金獎勵模型（Gold RM）」。隨後分別抽取其 {1k, 3k, 10k, 30k} 的子集訓練出不同品質的「代理獎勵模型（Proxy RM）」。讓策略模型分別針對各代理模型展開強化學習最大化。以相對於初始策略的 KL 散度為橫軸，繪製黃金模型的真實得分曲線。結果令人警醒：每一條曲線都會先上升、達到峰值，隨後下跌。代理模型品質越高，峰值出現得越晚；但下跌仍不可避免。
 
 ## The Concept｜核心概念
 
@@ -33,7 +33,7 @@ R_proxy(d) = alpha * d - beta_proxy * d^2
 R_gold(d)  = alpha * d - beta_gold  * d^2
 ```
 
-其中嚴格滿足 `beta_gold > beta_proxy`。兩條曲線皆從零 KL 處昂首起步，皆會迎來峰值；但黃金真實獎勵的峰值距離原點要近得多。當 `d` 持續放大時，黃金獎勵早已跌破基準線甚至墜入負值，而代理獎勵表面上依然在盲目飆升。無論是最佳 N 選一採樣（BoN）、PPO 強化學習還是 SFT-to-best，這項代理-真實鴻溝展現出完全一致的特徵指紋。
+其中嚴格滿足 `beta_gold > beta_proxy`。兩條曲線皆從零 KL 處昂首起步，皆會迎來峰值；但黃金真實獎勵的峰值距離原點要近得多。當 `d` 持續放大時，黃金真實獎勵會跌破基準線，而代理獎勵仍持續上升。無論是最佳 N 選一採樣（BoN）、PPO 強化學習還是 SFT-to-best，這項代理-真實鴻溝展現出完全一致的特徵指紋。
 
 這正是著名的「過度最佳化曲線（Over-optimization curve）」。它絕非某個特定獎勵模型的偶發瑕疵；它是這類數學問題與生俱來的物理結構。
 
@@ -48,9 +48,9 @@ R_gold(d)  = alpha * d - beta_gold  * d^2
 
 ### 災難性古德哈特效應（Catastrophic Goodhart）
 
-業界常見的一項天真防禦主張：「我們只需引入嚴格的 KL 正則化約束，強迫策略模型不脫離初始參考模型太遠，獎勵作弊便能被牢牢鎖定在安全邊界內。」Gao 等人的實驗早已證實：KL 正則化會緩和黃金真實獎勵的崩潰，但無法阻止它。
+業界常見的一種防禦說法是：「加入 KL 正則化，讓策略保持接近參考模型，獎勵作弊便會受到限制。」Gao 等人的實驗已證實：KL 正則化會緩和黃金真實獎勵的崩潰，但無法阻止它。
 
-「災難性古德哈特效應（Catastrophic Goodhart）」（OpenReview UXuBzWoZGK）從數學上給出了更無情的證明：假設代理獎勵模型的預測誤差呈現厚尾分佈（Heavy-tailed）——即客觀存在極少數罕見輸入，在這些輸入上代理評分遠遠高於黃金真實得分，且其差值無界。在嚴苛的 KL 散度約束下，最優策略會將其所有機率質量精確灌注在這些極端模式上：代理獎勵被刷至無限高，而黃金真實獎勵則維持在基準水準。KL 正則化約束了機率分佈的平滑度，但一旦參考模型自身本就包含這些有缺陷的邊界模式，KL 項對策略模型定向鑽空子毫無防禦力。
+「災難性古德哈特效應（Catastrophic Goodhart）」（OpenReview UXuBzWoZGK）從數學上給出了更無情的證明：假設代理獎勵模型的預測誤差呈現厚尾分佈（Heavy-tailed）——即客觀存在極少數罕見輸入，在這些輸入上代理評分遠遠高於黃金真實得分，且其差值無界。在嚴苛的 KL 散度約束下，最優策略會將其所有機率質量精確灌注在這些極端模式上：代理獎勵被刷至無限高，而黃金真實獎勵則維持在基準水準。KL 正則化會限制策略分布，但當參考模型中存在這些模式時，並不能限制策略選擇它們作為目標。
 
 這項「厚尾誤差」假說絕非天方夜譚。任何對無界世界所做的有界測量，在尾端都會有厚尾誤差。
 
@@ -79,7 +79,7 @@ rlhf-reward-kl
 
 ## Ship It｜交付成果
 
-本課交付標準實戰產物 `outputs/skill-reward-hack-auditor.md`。輸入已訓練完成的 RLHF 模型日誌與評測報告，該 Skill 將自動診斷當前模型究竟呈現出了四大獎勵作弊面具中的哪一種，在訓練日誌中定位代理-黃金曲線的斷裂點，並精確推薦具備實證支撐的專屬緩解方案（高品質資料補充、獎勵模型韌性強化、KL 步長保守調度、過程監督介入）。
+本課交付標準實戰產物 `outputs/skill-reward-hack-auditor.md`。輸入已訓練的 RLHF 模型及其訓練報告，該 Skill 將自動診斷當前模型究竟呈現出了四大獎勵作弊面具中的哪一種，在訓練紀錄中定位代理-黃金曲線的斷裂點，並精確推薦具備實證支撐的專屬緩解方案（高品質資料補充、獎勵模型韌性強化、KL 步長保守調度、過程監督介入）。
 
 ## Exercises｜練習
 
@@ -105,7 +105,7 @@ rlhf-reward-kl
 ## Further Reading｜延伸閱讀
 
 - [Gao, Schulman, Hilton — Scaling Laws for Reward Model Overoptimization (ICML 2023)](https://proceedings.mlr.press/v202/gao23h/gao23h.pdf) — 解析函數擬合與過度最佳化曲線經典奠基論文。
-- [Catastrophic Goodhart (OpenReview UXuBzWoZGK)](https://openreview.net/forum?id=UXuBzWoZGK) — 深刻揭示為何在厚尾獎勵誤差下單純依賴 KL 正則化必將全面潰敗。
+- [Catastrophic Goodhart (OpenReview UXuBzWoZGK)](https://openreview.net/forum?id=UXuBzWoZGK) — 說明 KL 正則化在厚尾獎勵誤差下為何會失效。
 - [Turpin et al. — Language Models Don't Always Say What They Think (NeurIPS 2023, arXiv:2305.04388)](https://arxiv.org/abs/2305.04388) — 不忠實思維鏈 CoT 權威實證論文。
 - [Manheim & Garrabrant — Categorizing Variants of Goodhart's Law (arXiv:1803.04585)](https://arxiv.org/abs/1803.04585) — 回歸型／極值型／因果型／對抗型四大古德哈特分類體系。
 - [Rafailov et al. — Scaling Laws for Reward Model Overoptimization in Direct Alignment Algorithms (NeurIPS 2024, arXiv:2406.02900)](https://arxiv.org/abs/2406.02900) — 證實 DPO 直接對齊體系同樣難逃過度最佳化宿命。

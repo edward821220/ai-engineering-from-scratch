@@ -54,7 +54,7 @@ flowchart LR
 
 ## PyTorch Dataset 類別
 
-標準 PyTorch Dataset 必須實作兩個核心方法：`__len__` 回傳總樣本數；`__getitem__` 回傳指定索引的一對張量樣本。我們的 Dataset 內部僅持有編碼後的 ID 陣列與步長整數。索引訪問時即時動態計算視窗的起始偏移量，因此無論步長將資料集擴展為多少樣本，其在記憶體中的物理開銷永遠只有一份原始 ID 陣列。
+標準 PyTorch Dataset 必須實作兩個核心方法：`__len__` 回傳總樣本數；`__getitem__` 回傳指定索引的一對張量樣本。我們的 Dataset 內部僅持有編碼後的 ID 陣列與步長整數。索引存取時即時動態計算視窗的起始偏移量，因此無論步長將資料集擴展為多少樣本，其在記憶體中的物理開銷永遠只有一份原始 ID 陣列。
 
 ```mermaid
 sequenceDiagram
@@ -71,7 +71,7 @@ sequenceDiagram
     Note over Tokenizer,Dataset: tokenizer.encode runs once at build time
 ```
 
-錯位平移操作在 `__getitem__` 內部優雅完成。Dataset 回傳 `(input, target)` 元組，其中 `input = window[:-1]`，`target = window[1:]`。兩者皆為 PyTorch long 整數張量。訓練迴圈將它們直接作為 Ground Truth 進行前向計算。
+錯位平移操作在 `__getitem__` 內部優雅完成。Dataset 回傳 `(input, target)` 元組，其中 `input = window[:-1]`，`target = window[1:]`。兩者皆為 PyTorch long 整數張量。訓練迴圈將它們直接作為 Ground Truth。
 
 ## 確定性洗牌
 

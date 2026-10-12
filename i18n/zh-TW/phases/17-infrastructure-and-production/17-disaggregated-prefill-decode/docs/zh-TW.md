@@ -55,7 +55,7 @@ NIXL 是 NVIDIA 打造的跨節點極速傳輸層。在硬體支援時走 RDMA/I
 
 **NVIDIA Dynamo**（GTC 2025 發表，現已 1.0 GA）：
 - 架構於 vLLM、SGLang、TRT-LLM 等底層推論引擎之上，充當全域調度協調者。
-- 內建 Planner Profiler 即時監控業務特徵，SLA Planner 自動調整 prefill:decode 比例以符合 SLO。
+- Planner Profiler 衡量工作負載，SLA Planner 自動設定 prefill:decode 比例。
 - 採用 Rust 打造極致核心，外層提供豐富的 Python 擴充能力。
 - 吞吐量實測：NVIDIA 官方報告指出，在中等延遲條件下於 GB200 NVL72 + Dynamo 上運作 DeepSeek-R1 MoE 能取得約 6 倍提升（developer.nvidia.com，2025-06）；在完整的 Blackwell + Dynamo + DeepSeek-R1 堆疊上，社群報告「高達 30 倍」的提升，但缺乏單一一手文獻支撐，請視為方向性指標。
 - GB300 NVL72 + Dynamo：NVIDIA 官方產品頁面標示相較於 Hopper 可達 50 倍 MoE 吞吐量（頁面未標日期）。
@@ -75,10 +75,10 @@ NIXL 是 NVIDIA 打造的跨節點極速傳輸層。在硬體支援時走 RDMA/I
 - 某業務原本在傳統混部架構下每年支出 200 萬美元推論費用。
 - 全面遷移至基於 Dynamo 的拆解式架構。
 - 維持完全相同的請求量級與 P99 延遲 SLA。
-- 實測節省幅度：每年節省 60 萬至 80 萬美元（總支出縮減 30% 至 40%）。
+- 回報的節省金額：每年 60 萬至 80 萬美元（支出減少 30% 至 40%）。
 - 完全無需採購任何新硬體。
 
-我們綜合了多家企業客戶的內部披露數字；業界最近似的新聞是 Baseten 藉由 Dynamo KV 路由實現了 2 倍快的 TTFT 與 61% 的吞吐量躍升（baseten.co，2025-10），以及 VAST 與 CoreWeave 預測在 40% 至 60% KV 命中率下可提升 60% 至 130% 的每美元 Token 產出（vastdata.com，2025-12）。這筆巨額節省的核心來源於將各資源池的硬體配置徹底精準對齊其真實瓶頸；長前綴密集型負載（如包含 8k 以上前綴的 RAG 業務）享受到的紅利遠超常規平衡業務。
+這個數字是根據多家客戶披露資料綜合估算，而非單一可引用的案例；最接近的已發表資料點是 Baseten 使用 Dynamo KV routing 後 TTFT 加快 2 倍、吞吐量提升 61%（baseten.co，2025-10），以及 VAST 與 CoreWeave 在 KV 命中率為 40% 至 60% 時預估每美元 token 產出增加 60% 至 130%（vastdata.com，2025-12）。節省來自為各資源池配置合適容量；前處理負載較重的工作（例如前綴長度為 8K 以上的 RAG）比負載較均衡的工作受益更多。
 
 ### 何時絕不應拆解（When NOT to disaggregate）
 
@@ -111,16 +111,16 @@ prefill-decode-split
 
 ## Use It｜實際應用
 
-`code/main.py` 模擬了一套混部服務 vs 拆解式服務的真實負載對抗環境。即時輸出全域吞吐量、單請求實質成本，並精確標定出拆解架構超越混部架構的 Prompt 長度黃金交會點。
+`code/main.py` 模擬混部與拆解式服務的對比，回報吞吐量、每次請求的成本，以及 prompt 長度的交叉點。
 
 ## Ship It｜交付成果
 
-本課交付標準實戰產物 `outputs/skill-disaggregation-decider.md`。輸入具體業務負載特徵曲線與現有 GPU 群集硬體拓撲，該 Skill 將自動進行財務與延遲精算，並判斷是否應實施 Prefill/Decode 物理拆解。
+本課交付標準實戰產物 `outputs/skill-disaggregation-decider.md`。給定工作負載與叢集後，判斷是否需要拆解。
 
 ## Exercises｜練習
 
-1. 執行 `code/main.py`。在輸入 Prompt 達到多少 Token 以上時，拆解式服務的端到端表現才開始全面碾壓傳統混部架構？
-2. 針對 P99 前綴長度為 8k、輸出 300 Token 的企業級 RAG 檢索服務，精準設計其 Prefill 池與 Decode 池的實體 GPU 數量配比。
+1. 執行 `code/main.py`。拆解式服務在什麼 prompt 長度下會勝過混部服務？
+2. 為 P99 前綴長度為 8K、輸出長度為 300 的 RAG 服務設計 prefill pool 與 decode pool。
 3. 深入對比 Dynamo 與 llm-d：針對一支只使用 Kubernetes、且不偏好特定 Python 執行環境的雲原生團隊，哪一款工具較適合？說明你的選擇。
 4. 精算 KV 快取跨節點傳輸開銷：在 70B FP8 模型下，4k Token 的 Prefill 將產出約 500 MB 的 KV 快取。在 100 GB/s 的 RDMA 網格下傳輸僅需 5 ms；而在 10 GB/s 的傳統 TCP 網路下需要 50 ms。這 45 ms 的落差對你的業務 SLA 會產生何種影響？
 5. MoE 混合專家架構的路由會改變 KV 存取模式。當每個 Token 會啟用不同專家時，拆解式服務會如何運作？

@@ -24,7 +24,7 @@
 
 第一步：敏感字詞識別（Word Identification）。面對一個惡意請求，攻擊者首先調用輔助 LLM 抽取出其中觸發安全審查的核心敏感字詞（例如「how to make a bomb」中的「bomb」）。
 
-第二步：偽裝 Prompt 生成（Cloaked Prompt Generation）。將辨識出的敏感詞替換為對應的 ASCII 藝術圖案（通常為 7x5 或 7x7 的標點與空格矩陣，精巧勾勒出字母的外觀輪廓）。目標大模型接收到的是由標點符號構成的網格字串，足夠聰明的前沿模型能憑藉空間推理將其拼讀還原為目標單詞；而前置的安全過濾網僅能看到一堆無害的標點符號。
+第二步：偽裝 Prompt 生成（Cloaked Prompt Generation）。將辨識出的敏感詞替換為對應的 ASCII 藝術圖案（通常為 7x5 或 7x7 的標點與空格矩陣，精巧勾勒出字母的外觀輪廓）。目標大模型接收到的是由標點符號構成的網格字串，能力足夠的模型能辨識出其中的字詞；而前置的安全過濾網僅能看到一堆無害的標點符號。
 
 實測結論：GPT-4、Gemini、Claude、Llama-2 與 GPT-3.5 都未能穩健識別；在基準測試子集上，攻擊成功率（ASR）超過 75%。
 
@@ -48,11 +48,11 @@
 
 ### 多模態影像領域的同構攻擊
 
-原生多模態視覺大模型（GPT-5.2、Gemini 3 Pro、Claude Opus 4.5、Grok 4.1）進一步放大了這項威脅。直接以真實圖片的形式發起 ArtPrompt 風格的字體走私攻擊，其殺傷力甚至超越純字元 ASCII 畫，因為圖片編碼器向解碼層注入了更豐富的高維視覺特徵。
+原生多模態視覺大模型（GPT-5.2、Gemini 3 Pro、Claude Opus 4.5、Grok 4.1）進一步放大了這項威脅。直接以真實圖片的形式發起 ArtPrompt 風格的字體走私攻擊，其效果甚至優於純字元 ASCII 畫，因為影像編碼器會產生更豐富的訊號。
 
 ### 該研究在第 18 階段中的宏觀座標（Where this fits in Phase 18）
 
-第 12 至 14 節確立了三大正交的越獄攻擊維度：自動化迭代精煉（PAIR）、長上下文深度壓迫（MSJ）以及跨模態編碼偽裝（ArtPrompt / StructuralSleight）。隨後的第 15 節將從純模型受攻擊面，正式跨入系統架構邊界處的實體注入攻擊（間接 Prompt 注入）；第 16 節則全面落實防禦工具鏈體系。
+第 12 至 14 節確立了三大正交的越獄攻擊維度：自動化迭代精煉（PAIR）、長上下文深度壓迫（MSJ）以及編碼攻擊（ArtPrompt / StructuralSleight）。隨後的第 15 節將從純模型受攻擊面，正式跨入系統架構邊界處的實體注入攻擊（間接 Prompt 注入）；第 16 節則全面落實防禦工具鏈體系。
 
 ```figure
 al-ascii-cloak
@@ -64,7 +64,7 @@ al-ascii-cloak
 
 ## Ship It｜交付成果
 
-本課交付標準實戰產物 `outputs/skill-encoding-audit.md`。輸入一份企業越獄防禦評測報告，該 Skill 將自動全面審計系統對各類編碼攻擊家族的防禦覆蓋情況（ASCII 藝術字、Base64 編碼、Leet-speak 駭客語、UTF-8 同形同音字、UTES 罕見結構），並精確標註攔截各項攻擊的具體防禦架構層次。
+本課交付標準實戰產物 `outputs/skill-encoding-audit.md`。輸入一份企業越獄防禦評測報告，該 Skill 將自動全面審計系統對各類編碼攻擊家族的防禦覆蓋情況（ASCII 藝術字、Base64 編碼、Leet-speak 駭客語、UTF-8 外觀相似字元、UTES 罕見結構），並精確標註攔截各項攻擊的具體防禦架構層次。
 
 ## Exercises｜練習
 

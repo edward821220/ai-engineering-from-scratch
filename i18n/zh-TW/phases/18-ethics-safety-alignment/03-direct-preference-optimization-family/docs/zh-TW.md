@@ -36,7 +36,7 @@ r(x, y) = beta * log(pi*(y|x) / pi_ref(y|x)) + beta * log Z(x)
 
 將該隱式獎勵代入 Bradley-Terry 成對偏好概似函數中，配分函數 `Z(x)` 由於僅依賴輸入 `x` 而在分子分母中被完美精巧抵消。最終剩餘的全部損失函數僅由策略模型的內部參數直接構成——完全不再需要獨立的獎勵模型。這正是 DPO 的神來之筆。
 
-然而微小的瑕疵在於：該數學推導嚴格假設該理論最優解在實務中百分之百可達、偏好資料完全處於分佈內（In-distribution），且參考策略是絕對完美的真實錨點。在真實世界中，這些嚴苛假設無一成立。DPO 家族的每一位後續成員，皆是在修復其中一項被打破的底層假設。
+然而微小的瑕疵在於：該數學推導嚴格假設該理論最優解在實務中百分之百可達、偏好資料完全處於分佈內（In-distribution），且參考策略是絕對完美的真實錨點。在真實世界中，這些假設都不會完全成立。DPO 家族的每一位後續成員，皆是在修復其中一項被打破的底層假設。
 
 ## The Concept｜核心概念
 
@@ -67,7 +67,7 @@ L_IPO = (log(pi(y_w | x) / pi_ref(y_w | x)) - log(pi(y_l | x) / pi_ref(y_l | x))
 
 ### KTO（Ethayarajh 等人，2024）
 
-卡尼曼-特沃斯基最佳化（Kahneman-Tversky Optimization）。徹底拋棄了嚴苛的「成對（Pairwise）」資料結構。僅需對單一輸出給出「滿意（Desirable）」或「不滿意（Undesirable）」的二元標籤，隨後將其映射至行為經濟學的前景理論（Prospect theory）效用函數：
+卡尼曼-特沃斯基最佳化（Kahneman-Tversky Optimization）。徹底拋棄了嚴苛的「成對（Pairwise）」資料結構。僅需對單一輸出給出「可取（Desirable）」或「不可取（Undesirable）」的二元標籤，隨後將其映射至行為經濟學的前景理論（Prospect theory）效用函數：
 
 ```
 v(x, y) = sigma(beta * log(pi(y|x) / pi_ref(y|x)) - z_ref)
@@ -98,7 +98,7 @@ L_ORPO = L_NLL(y_w) + lambda * L_OR
 L_OR = -log sigmoid(log(odds(y_w) / odds(y_l)))
 ```
 
-徹底無需保留參考策略模型——SFT 項自身就是天然的剛性正則化錨點。直接實現從預訓練 Base 模型到對齊模型的**單階段（Single-stage）端到端訓練**，完全省去了獨立的中間 SFT 檢查點。
+徹底無需保留參考策略模型——SFT 項自身就是天然的剛性正則化錨點。直接從預訓練 Base 模型進行**單階段（Single-stage）端到端訓練**，即可得到對齊模型；不需要獨立的 SFT model checkpoint。
 
 ### BPO（ICLR 2026 投稿，OpenReview id=b97EwMUWu7）
 
@@ -106,7 +106,7 @@ L_OR = -log sigmoid(log(odds(y_w) / odds(y_l)))
 
 ### 普適規律：直接對齊演算法依然無法逃脫過度最佳化
 
-Rafailov 等人在 NeurIPS 2024 論文《Scaling Laws for Reward Model Overoptimization in Direct Alignment Algorithms》中，在跨越不同 KL 預算下針對 DPO、IPO 與 SLiC 進行了窮盡壓測。以真實黃金獎勵為縱軸、KL 散度為橫軸的曲線，依然呈現出 Gao 等人所發現的「先衝上峰值隨後不可避免暴跌」的過度最佳化形狀。訓練期間會查詢分佈外樣本的隱式獎勵；單純的 KL 正則化根本無法平抑這一崩潰趨勢。
+Rafailov 等人在 NeurIPS 2024 論文《Scaling Laws for Reward Model Overoptimization in Direct Alignment Algorithms》中，在跨越不同 KL 預算下針對 DPO、IPO 與 SLiC 進行了窮盡壓測。以黃金真實獎勵為縱軸、KL 散度為橫軸的曲線，依然呈現出 Gao 等人所發現的「先衝上峰值隨後不可避免暴跌」的過度最佳化形狀。訓練期間會查詢分佈外樣本的隱式獎勵；單純的 KL 正則化根本無法平抑這一崩潰趨勢。
 
 直接對齊演算法並沒有消滅古德哈特定律。它們僅僅是將漏洞爆發的界面，從「顯式獎勵模型被過度最佳化」轉移到了「與參考策略的比值被過度最佳化」。最根本的解法——更高質量的資料、模型集成、及時終止訓練——對兩者一體適用。
 
@@ -147,7 +147,7 @@ dpo-margin
 | DPO | 「不使用獎勵模型的 RLHF」 | 從 RLHF 的封閉解最佳解推導出的損失；僅需策略參數 |
 | Implicit reward | 「對數比值」 | `beta * log(pi(y\|x) / pi_ref(y\|x))` — DPO 隱含的獎勵 |
 | IPO | 「有界 DPO」 | 以恆等函數取代 log-sigmoid；隱含獎勵差距上限為 `1/(2 beta)` |
-| KTO | 「非成對 DPO」 | 對單一標籤套用展望理論效用與損失趨避 |
+| KTO | 「非成對 DPO」 | 對單一標籤套用前景理論效用與損失趨避 |
 | SimPO | 「不需參考模型的 DPO」 | 長度正規化的對數概似加上間隔；不使用參考策略 |
 | ORPO | 「單階段 DPO」 | NLL 加上勝算比偏好項；一次從基礎模型訓練 |
 | BPO | 「保留 chosen 的 DPO」 | 在 DPO 中加入懲罰，避免降低 chosen 回應的絕對對數機率 |

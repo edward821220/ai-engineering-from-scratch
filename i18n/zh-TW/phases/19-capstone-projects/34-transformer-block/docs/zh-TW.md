@@ -1,6 +1,6 @@
 # 從零建構 Transformer 區塊（Transformer Block from Scratch）
 
-> 單一區塊（Block）是每一款現代自回歸 Decoder 大語言模型的基本構成單元。層正規化（LayerNorm）、多頭自注意力、殘差連接、前饋網路 MLP、殘差連接。Pre-LN 變體具備極致的訓練穩定性，甚至無需學習率預熱（Warmup）；而 Post-LN 變體則是 2017 年初代 Transformer 論文所採用的原始結構。本課將並列實作這兩種變體，深入對比並實證究竟是哪一種架構能夠在常規學習率下完好存活於 12 層的深度堆疊中。
+> 單一區塊（Block）是每一款現代自回歸 Decoder 大語言模型的基本構成單元。層正規化（LayerNorm）、多頭自注意力、殘差連接、前饋網路 MLP、殘差連接。Pre-LN 變體能穩定訓練，甚至無需學習率預熱（Warmup）；而 Post-LN 變體則是 2017 年初代 Transformer 論文所採用的原始結構。本課將並列實作這兩種變體，深入對比並實證究竟是哪一種架構能夠在常規學習率下完好存活於 12 層的深度堆疊中。
 
 **Type:** Build
 **Languages:** Python
@@ -67,7 +67,7 @@ flowchart TB
 
 ### 殘差連接的雙重使命
 
-殘差連接在數學上達成了兩大不可或缺的工程目標：第一，它讓深度方向上的梯度反向傳播變為純加法通道，使梯度範數在穿透 12 層後依然能保持穩定的數量級；第二，它允許每個區塊僅需對既有的語義表徵學習「微小的加法增量（Additive Update）」，而無需承擔將整個表徵完全推倒重寫的沉重負擔。這兩大效應是 Transformer 架構能夠無止境進行深度擴展的基石。
+殘差連接在數學上達成了兩大不可或缺的工程目標：第一，它讓深度方向上的梯度反向傳播變為純加法通道，使梯度範數在穿透 12 層後依然能保持穩定的數量級；第二，它允許每個區塊僅需對既有的語義表徵學習「微小的加法增量（Additive Update）」，而無需承擔將整個表徵完全推倒重寫的沉重負擔。這兩大效應是 Transformer 區塊能隨深度擴展的原因。
 
 ```figure
 cc-transformer-block
@@ -104,7 +104,7 @@ python3 code/main.py
 
 **註冊因果遮罩 Buffer（Registered causal mask buffer）**：因果遮罩的形狀嚴格僅取決於預設的最大上下文長度。在建構時透過 `register_buffer` 一次性分配該張量，在每次前向傳播時透過切片截取當前視窗，徹底省去逐次重複動態分配記憶體的開銷。忽略該最佳化技巧會導致遮罩生成在超長上下文場景下成為吞噬記憶體配置器的效能熱點。
 
-**嚴格兩處 Dropout，絕非三處（Dropout in two places, not three）**：Dropout 應當且僅應當放置在注意力 Softmax 之後（Attention Dropout）以及 MLP 的第二層線性變換之後（Residual Dropout）。若在殘差相加的直連通道本身施加 Dropout，將直接摧毀允許梯度在深層網路中無損傳導的加法恆等映射。歷史上某些早期初學者實作曾在此處踩坑，並為此付出了訓練極度脆弱崩潰的慘痛代價。
+**嚴格兩處 Dropout，絕非三處（Dropout in two places, not three）**：Dropout 應當且僅應當放置在注意力 Softmax 之後（Attention Dropout）以及 MLP 的第二層線性變換之後（Residual Dropout）。若在殘差本身施加 Dropout，會破壞讓梯度在深層網路中傳遞的加法恆等映射。某些早期實作曾犯下這個錯誤，導致訓練容易變得脆弱。
 
 ## Use It｜實際應用
 

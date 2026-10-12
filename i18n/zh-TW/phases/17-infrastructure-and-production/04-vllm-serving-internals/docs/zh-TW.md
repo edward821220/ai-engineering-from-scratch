@@ -30,7 +30,7 @@ vLLM 同時解決了這三大核心痛點。PagedAttention 徹底終結了傳統
 
 PagedAttention 巧妙借鑑了作業系統的虛擬分頁記憶體思想。它打破了 KV 快取必須連續分佈於實體 GPU 記憶體中的硬性枷鎖，將其劃分為固定大小的微小 Block 區塊（預設大小為 16 Token）。每個序列皆維護一張專屬的 Block 表（Block table），精準將邏輯 Token 位置映射至實體 Block 索引。當序列長度超越當前配置的 Block 時，系統動態追加一個新 Block；當該序列推論完畢時，對應的 Block 立即釋放回全域資源池。
 
-GPU 記憶體碎片浪費率因而從傳統連續配置的 60% 至 80% 驟降至 4% 以下。在 vLLM 中，你無需手動傳入任何開關參數——PagedAttention 是其唯一內建的記憶體配置器。核心調校旋鈕是 `--gpu-memory-utilization`（預設值為 0.9），它直接指示 vLLM 在扣除模型權重與暫態活化值（Activation）之後，允許將多少比例的剩餘 HBM 劃歸為 KV Block 資源池。
+GPU 記憶體碎片浪費率因而從傳統連續配置的 60% 至 80% 驟降至 4% 以下。在 vLLM 中，你無需手動傳入任何開關參數——PagedAttention 是其唯一內建的記憶體配置器。核心調整參數是 `--gpu-memory-utilization`（預設值為 0.9），它直接指示 vLLM 在扣除模型權重與暫態活化值（Activation）之後，允許將多少比例的剩餘 HBM 劃歸為 KV Block 資源池。
 
 ### 迭代週期的連續批次處理（Continuous batching at the iteration level）
 
@@ -106,7 +106,7 @@ tensor-parallel
 - `CONTINUOUS` 模式：解碼迭代週期的無縫准入與退出。
 - `CONTINUOUS + CHUNKED` 模式：Prefill 微分塊與解碼交錯排程。
 
-終端機將即時輸出整體吞吐量（每虛擬秒 Token 數）、平均 TTFT 首字延遲以及 P99 ITL。在真實混合流量下，`CONTINUOUS + CHUNKED` 模式將展現出壓倒性優勢。
+終端機將即時輸出整體吞吐量（每虛擬秒 Token 數）、平均 TTFT 首字延遲以及 P99 ITL。在混合流量下，`CONTINUOUS + CHUNKED` 模式應會占優。
 
 ## Ship It｜交付成果
 
