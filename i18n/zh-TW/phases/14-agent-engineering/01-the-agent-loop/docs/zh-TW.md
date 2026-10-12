@@ -38,7 +38,7 @@ Action: finish("Paris")
 
 - ALFWorld：在僅提供 1–2 個上下文範例的前提下，絕對任務成功率大幅提升了 34 個百分點。
 - WebShop：相較於模仿學習與搜尋基準線，表現高出 10 分。
-- Hotpot QA：ReAct 透過將每一步錨定於檢索結果，從幻覺中恢復（hallucination）。
+- Hotpot QA：ReAct 透過將每一步錨定於檢索結果，從幻覺中復原（hallucination）。
 
 推論追蹤鏈（Reasoning Traces）達成了單純僅靠「行動提示（Action-only prompting）」所無法企及的三大能力：歸納產出規劃、跨多個步驟追蹤規劃進度，以及在某個行動回傳非預期觀察時優雅處理異常。
 

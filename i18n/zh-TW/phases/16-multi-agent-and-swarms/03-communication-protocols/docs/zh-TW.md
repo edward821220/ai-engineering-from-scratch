@@ -280,7 +280,7 @@ ACP 是一套專為**企業級環境**量身打造的通訊協定。不同於許
 sequenceDiagram
     participant Client
     participant ACP as ACP Agent
-    participant Audit as 稽核日誌
+    participant Audit as 稽核記錄
 
     Client->>ACP: POST /runs (mode: sync)
     ACP->>ACP: Process request...

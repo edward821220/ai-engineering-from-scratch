@@ -260,7 +260,7 @@ if not result.get("nextCursor"):
 
 回傳結果至多包含 100 筆建議，並可附帶 `total` 與 `hasMore` 旗標。
 
-必須強制套用與目標 Prompt 或資源完全相同的授權邊界。在範例中，分析師角色僅能收到 `development` 與 `staging` 建議；唯有運維工程師才有權取得 `production` 選項。
+必須強制套用與目標 Prompt 或資源完全相同的授權邊界。在範例中，分析師角色僅能收到 `development` 與 `staging` 建議；唯有維運工程師才有權取得 `production` 選項。
 
 生產級補全機制亦需要：
 
