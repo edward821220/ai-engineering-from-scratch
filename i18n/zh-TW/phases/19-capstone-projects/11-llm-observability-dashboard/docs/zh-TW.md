@@ -58,7 +58,7 @@ production apps:
 - 收集器：OpenTelemetry Collector，配置尾部抽樣（Tail-Sampling）處理器（用於控制儲存成本）
 - 儲存引擎：ClickHouse 儲存全量 Span，Postgres 儲存業務中繼資料，S3 用於原始事件長期封存
 - 自動評測：DeepEval、RAGAS 0.2、Arize Phoenix 評估模組包、私有自定義 LLM 裁判
-- 漂移偵測：每週針對匯集的 Prompt 語義向量（使用 sentence-transformers）計算 PSI 與 KL 散度
+- 漂移偵測：每週針對匯集的 Prompt 語義向量（使用 sentence-transformers）計算 PSI 或 KL 散度
 - 告警路由：Prometheus Alertmanager -> Slack / PagerDuty
 - 前端架構：Next.js 15（App Router）+ Recharts 圖表庫 + Server Actions
 - 原生開箱即用支援的 SDK：OpenAI、Anthropic、Google GenAI、LangChain、LlamaIndex、vLLM

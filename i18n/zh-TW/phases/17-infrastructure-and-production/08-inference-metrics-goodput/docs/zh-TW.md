@@ -9,7 +9,7 @@
 
 ## Learning Objectives｜學習目標
 
-- 精確定義 TTFT、TPOT、ITL、E2E、吞吐量（Throughput）與有效吞吐量（Goodput），並指出各指標衡量的組成部分。
+- 精確定義 TTFT、TPOT、ITL、E2E、吞吐量（Throughput）與Goodput，並指出各指標衡量的組成部分。
 - 深刻解釋為何平均值是評估 LLM 推論服務的錯誤統計度量，並學會解讀 P50、P90 與 P99 百分位數背後的真實系統狀態。
 - 建構多維度複合 SLO 約束條件（例如 TTFT<500 ms AND TPOT<15 ms AND E2E<2 s），並精確計算對應的 Goodput 履約率。
 - 指出兩款在相同測試下對 TPOT 計算產生嚴重分歧的業界主流壓測工具，並剖析背後的定義差異根因。
@@ -56,7 +56,7 @@ SLO 是一項多維度的邏輯「且」複合約束。單一請求唯有在同�
 
 在 2026 年，Goodput 是 MLPerf Inference v6.0 的參測結果及 AI 平台供應商內部 SLA 追蹤所使用的指標。
 
-### 為何平均值是最危險的統計度量（Why mean is the wrong statistic）
+### 為何平均值是錯誤的統計量（Why mean is the wrong statistic）
 
 大模型推論的延遲分佈呈現嚴重的右偏態（Right-skewed）長尾特徵。一個解碼批次中若混入了一個超長 Prefill 的鄰居，可能導致前 500 個 Token 的 TPOT 穩定在 7 ms，但中途有 20 個 Token 的 TPOT 暴增至 60 ms。此時算術平均 TPOT 僅為看似健康的 9 ms；然而 P99 TPOT 卻高達 65 ms。真實使用者會頻繁遭遇這 65 ms 的肉眼可見停頓——這正是導致使用者流失的元兇。
 
@@ -88,7 +88,7 @@ SLO 是一項多維度的邏輯「且」複合約束。單一請求唯有在同�
 
 - TTFT P99 <= 800 ms。
 - TPOT P99 <= 25 ms。
-- 針對 300 Token 以內的短文字生成，E2E P99 <= 3 s。
+- 針對少於 300 Token 的短文字生成，E2E P99 <= 3 s。
 - Goodput 綜合履約率目標 >= 99%。
 
 在企業級內部 API 場景下，通常會將 TTFT 門檻進一步收緊至 200-400 ms，並適度放寬 E2E。核心在於將各維度白紙黑字寫死，持續監控這三者，並追蹤 Goodput 作為綜合指標。
@@ -124,7 +124,7 @@ throughput-latency
 
 | 術語 | 常見俗稱 | 實際工程意義 |
 |------|----------------|------------------------|
-| TTFT | 「首個 token 的時間」 | 佇列、網路與 Prefill 時間的總和；長 Prompt 下主要由 Prefill 決定 |
+| TTFT | 「第一個 token 延遲」 | 佇列、網路與 Prefill 時間的總和；長 Prompt 下主要由 Prefill 決定 |
 | TPOT | 「每個輸出 token 的時間」 | 首個 token 之後，每個 token 的記憶體頻寬受限解碼成本 |
 | ITL | 「token 間延遲」 | 多數工具中與 TPOT 相同（但並非全部，見 GenAI-Perf） |
 | E2E | 「端到端」 | TTFT + TPOT * output_len，再加上回應端網路時間 |

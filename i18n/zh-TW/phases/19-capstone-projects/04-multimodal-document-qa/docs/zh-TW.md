@@ -10,7 +10,7 @@
 
 ## Problem｜問題
 
-當代企業內部儲存著大量足以讓傳統 OCR 管線徹底崩潰的複雜 PDF 文件：表格旋轉的掃描版 10-K、公式密集的學術論文、必須以圖像理解的圖表，以及帶有手寫批註的文件。以文字優先方式處理這些文件，意味著會遺失約一半的訊號。2026 年的工業級標準答案是：在原始頁面影像上直接實施基於多向量的後期交互檢索。由 Illuin Tech 提出的 ColPali 開創了這一流派；隨後 ColQwen2.5-v0.2 與 ColQwen3-omni 進一步將精準度推向全新高度。在 ViDoRe v3 權威基準上，視覺優先檢索的得分以顯著幅度全面碾壓傳統的「先 OCR 後純文字」管線——且在圖表、跨欄表格與手寫筆記上，兩者的差距進一步擴大。
+當代企業內部儲存著大量足以讓傳統 OCR 管線徹底崩潰的複雜 PDF 文件：表格旋轉的掃描版 10-K、公式密集的學術論文、必須以圖像理解的圖表，以及帶有手寫批註的文件。以文字優先方式處理這些文件，意味著會遺失約一半的訊號。2026 年的工業級標準答案是：在原始頁面影像上直接實施基於多向量的後期交互檢索。由 Illuin Tech 提出的 ColPali 開創了這一流派；隨後 ColQwen2.5-v0.2 與 ColQwen3-omni 進一步將精準度推向全新高度。在 ViDoRe v3 權威基準上，視覺優先檢索的得分以顯著幅度高於傳統的「先 OCR 後純文字」管線——且在圖表、跨欄表格與手寫筆記上，兩者的差距進一步擴大。
 
 然而這種極致精準度換來的代價是儲存空間與運算延遲的急劇膨脹。一個 ColQwen image embedding 在單頁上會產生約 2048 個 Patch 向量，而非傳統單一的 1024 維匯聚向量。向量資料庫的原始儲存量大幅增加。2026 年推出的 DocPruner 演算法能在完全不損害可度量精準度的前提下實施 50% 的動態剪枝壓縮。你將在本專案實戰中為 1 萬頁文件建立全量索引、精確測量 ViDoRe v3 上的 nDCG@5 指標、將端到端查詢回答延遲壓制在 2 秒內，並直接對標「先 OCR 後純文字」的傳統基準線展開全面橫向剖析。
 
@@ -65,7 +65,7 @@ ce-late-interaction
 
 ## Build It｜動手實作
 
-1. **多模態資料攝取掃描**。遍歷包含 1 萬頁 PDF 的龐大語料庫（涵蓋 10-K 財務年報、前沿科研論文與掃描文件）。將每一頁以 1536x2048 解析度精準渲染為無損 PNG 圖片。持久化中繼資料記錄：`{doc_id, page_num, image_path}`。
+1. **多模態資料攝取掃描**。遍歷包含 1 萬頁 PDF 的龐大語料庫（涵蓋 10-K 財務年報、前沿科研論文與掃描文件）。將每一頁以 1536x2048 解析度精準渲染為 PNG 圖片。持久化中繼資料記錄：`{doc_id, page_num, image_path}`。
 
 2. **多向量 embedding 與動態剪枝**。在每一頁影像上運行 ColQwen2.5-v0.2。單頁輸出形狀約為 2048 個 128 維的 Patch 向量。調用 DocPruner 剪枝策略，僅保留訊號最高的一半向量。將精簡後的向量集批次寫入 Vespa 多向量欄位或 Qdrant 之中。
 
@@ -136,4 +136,4 @@ answer:
 - [Vespa multi-vector tutorial](https://docs.vespa.ai/en/colpali.html) — 多向量推論服務端官方參考架構。
 - [Qdrant multi-vector support](https://qdrant.tech/documentation/concepts/vectors/#multivectors) — Qdrant 多向量支援技術文件。
 - [AstraDB multi-vector](https://docs.datastax.com/en/astra-db-serverless/databases/vector-search.html) — 雲端全託管多向量資料庫技術手冊。
-- [Nougat OCR](https://github.com/facebookresearch/nougat) — 專攻學術公式與複雜表格的專屬神經網路 OCR 模型。
+- [Nougat OCR](https://github.com/facebookresearch/nougat) — 可處理公式的 OCR 備援工具。

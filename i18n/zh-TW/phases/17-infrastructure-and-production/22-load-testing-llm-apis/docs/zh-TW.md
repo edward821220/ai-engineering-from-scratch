@@ -10,7 +10,7 @@
 ## Learning Objectives｜學習目標
 
 - 深刻解釋導致傳統通用壓測工具在面對 LLM API 時頻繁說謊的兩大反模式（GIL 陷阱與 Prompt 同質化陷阱）。
-- 根據具體壓測目標精準完成工具選型：LLMPerf（效能基準測試）、k6 搭配串流擴充（CI 阻斷閘門）、guidellm（巨量擬真合成壓測）、GenAI-Perf（NVIDIA 官方標準）。
+- 根據具體壓測目標精準完成工具選型：LLMPerf（效能基準測試）、k6 搭配串流擴充（CI 阻斷閘門）、guidellm（巨量擬真合成壓測）、GenAI-Perf（NVIDIA 參考測試工具）。
 - 設計四大標準負載模式（平穩穩態、階梯遞增、突發衝擊、長時浸泡），並指出每一種模式會捕捉的故障模式。
 - 學會使用輸入 Token 的平均值與標準差建構擬真的輸入 Token 長度分布，而非採用固定長度文本。
 
@@ -39,15 +39,15 @@ Locust 完全基於 Python 開發，其用戶端的 Token 級計時必須在 Pyt
 ### 四大標準負載壓測模式（Four load patterns）
 
 1. **平穩穩態（Steady-state）**——維持恆定 RPS 壓力持續執行 30 至 60 分鐘。捕捉：基準線效能回歸缺陷。
-2. **階梯遞增（Ramp）**——在 15 分鐘內將 RPS 從 0 線性推升至目標上限。捕捉：系統容量極限崩潰點（Breakpoint）與冷啟動預熱異常。
-3. **突發尖峰（Spike）**——將 RPS 突然提高至 3 至 10 倍並維持 2 分鐘，然後回到原本水準。捕捉：Kubernetes 自動擴縮的反應延遲、排程佇列飽和崩潰，以及冷啟動雪崩。
+2. **階梯遞增（Ramp）**——在 15 分鐘內將 RPS 從 0 線性推升至目標上限。捕捉：容量臨界點（Breakpoint）與冷啟動預熱異常。
+3. **突發尖峰（Spike）**——將 RPS 突然提高至 3 至 10 倍並維持 2 分鐘，然後回到原本水準。捕捉：自動擴縮延遲、佇列飽和與冷啟動影響。
 4. **長時浸泡（Soak）**——在穩態壓力下持續不間斷壓測 4 至 8 小時。捕捉：記憶體洩漏、連線池耗盡漂移，以及可觀測性記錄儲存溢位。
 
 ### 2026 年主流壓測工具選型全貌（2026 tool mapping）
 
 **LLMPerf**（Anyscale 出品）——雖然基於 Python，但底層 tokenization 完全交由 Rust 高效能核心接管。原生支援基於均值/標準差的動態文本生成與串流計時。是目前推論效能基準測試的最佳首選。
 
-**NVIDIA GenAI-Perf**——NVIDIA 官方出品的權威參考實作。原生支援 Triton 用戶端，具備極致全方位的指標覆蓋。注意其計算 ITL 時排除了首字 TTFT；兩者對同一伺服器回報的 TPOT 不同：GenAI-Perf 計算 ITL 時排除 TTFT，而 LLMPerf 的定義包含 TTFT。
+**NVIDIA GenAI-Perf**——NVIDIA 的參考測試工具。原生支援 Triton 用戶端，具備極致全方位的指標覆蓋。注意其計算 ITL 時排除了首字 TTFT；兩者對同一伺服器回報的 TPOT 不同：GenAI-Perf 計算 ITL 時排除 TTFT，而 LLMPerf 的定義包含 TTFT。
 
 **LLM-Locust**（TrueFoundry 出品）——用於 LLM 的 Locust 擴充套件，修正了 Python GIL 陷阱。提供熟悉的 Locust DSL 語法與串流指標度量。
 

@@ -16,9 +16,9 @@
 
 ## The Problem｜問題
 
-一個現代大語言模型預訓練任務，在數十個背景 Worker 的驅動下，往往需要以每秒數十萬個樣本的驚人頻寬吞吐 Token。儲存在磁碟上的 JSONL 文字檔案在遭遇第一次冷快取分頁缺失（Page Fault）時就會當場崩潰：JSON 解析器極其緩慢、文件邊界無法被二進位隨機定址，且若想跳轉讀取「第 4,217,884 個樣本」，系統不得不從檔案第 0 行開始全量掃描。即便是在壓縮率上表現優異的 Parquet 格式此處同樣難以勝任，因為訓練器不需要複雜的列式資料庫特徵，它所渴望的本質上是一整條支援 O(1) 常數級隨機存取的扁平 Token 串流。
+一個現代語言模型訓練作業，在數十個背景 Worker 的驅動下，往往需要以每秒數十萬個樣本的驚人頻寬吞吐 Token。儲存在磁碟上的 JSONL 文字檔案在遭遇第一次冷快取分頁缺失（Page Fault）時就會當場崩潰：JSON 解析器極其緩慢、文件邊界無法被二進位隨機定址，且若想跳轉讀取「第 4,217,884 個樣本」，系統不得不從檔案第 0 行開始全量掃描。即便是在壓縮率上表現優異的 Parquet 格式此處同樣難以勝任，因為訓練器不需要複雜的列式資料庫特徵，它所渴望的本質上是一整條支援 O(1) 常數級隨機存取的扁平 Token 串流。
 
-HDF5 完美契合了該極端負載需求：它提供具備分塊（Chunked）、動態擴展（Resizable）的純整數資料集，其在磁碟上的物理佈局對作業系統的 Page Cache 極度友好。當訓練器請求 `tokens[3,200,000 : 3,200,8192]` 的切片時，HDF5 直接將請求的資料選取區域（hyperslab）從 Linux Page Cache 記憶體中複製進新分配的 NumPy 陣列中。每個 Worker 僅需維持一個開啟的檔案句柄以及一個分塊大小的 Page Cache 記憶體開銷，相較於解碼文字 JSONL 的沉重負擔，該代價微乎其微。
+HDF5 完美契合了該極端負載需求：它提供具備分塊（Chunked）、動態擴展（Resizable）的純整數資料集，其在磁碟上的物理佈局對作業系統的 Page Cache 極度友好。當訓練器請求 `tokens[3,200,000 : 3,200,8192]` 的切片時，HDF5 直接將請求的資料選取區域（hyperslab）從 Page Cache 中複製進新分配的 NumPy 陣列中。每個 Worker 僅需維持一個開啟的檔案句柄以及一個分塊大小的 Page Cache 記憶體開銷，相較於解碼文字 JSONL 的沉重負擔，該代價微乎其微。
 
 整個建構過程中最考驗工程功力的是寫入端的嚴謹紀律。可動態擴展的資料集極易被錯誤濫用：若每處理一篇文件就執行一次資料集擴容寫入，HDF5 檔案將產生嚴重的碎片化直至無法讀取；若將所有文件全部在記憶體中快取並在最後一次擴容寫入，一旦行程意外崩潰將丟失整批資料。唯一正確的工程準則是：**先緩衝再擴容（Buffer-then-extend）**，將緩衝區大小精確設定為 HDF5 的分塊大小（Chunk Size），並採用跨檔案分片寫入，確保任何單點崩潰最多只會損失單一分片。
 
@@ -64,7 +64,7 @@ cc-hdf5-corpus
 
 `code/main.py` 實作了以下核心模組：
 
-- `Tokenizer`：位元組級確定性 tokenizer，暴露 `encode(text) -> list[int]` 與 `vocab_size` 屬性。
+- `Tokenizer`：位元組級確定性 tokenizer，足以應付本課示範。介面為 `encode(text) -> list[int]` 與 `vocab_size`。
 - `HDF5ShardWriter`：建立可擴展整數資料集、在記憶體中以 Chunk 大小為單位快取 Token、按固定步長實施擴容與寫入，並在關閉時將真實 `token_count` 與 `sha256` 寫入 HDF5 屬性中。
 - `ShardedTokenizationPipeline`：遍歷輸入文件、分發路由至對應寫入器，並輸出最終的 `shards.json` 索引清單。
 - `MmapTokenStore`：以記憶體映射模式打開多個分片檔案、計算全局定址偏移量，並暴露統一的 `get_slice(start, stop)` 切片讀取介面。
@@ -124,8 +124,8 @@ python3 code/main.py
 ## Further Reading｜延伸閱讀
 
 - [HDF5 chunking documentation](https://support.hdfgroup.org/documentation/hdf5/latest/hdf5_chunking.html) — 本課所採用的 HDF5 動態分塊資料集物理儲存規格。
-- [h5py user guide](https://docs.h5py.org/en/stable/) — Python 呼叫 HDF5 底層 C 函式庫的官方驅動手冊。
-- [NumPy memory mapping](https://numpy.org/doc/stable/reference/generated/numpy.memmap.html) — HDF5 在讀取端所依託的作業系統記憶體映射底層原語。
+- [h5py user guide](https://docs.h5py.org/en/stable/) — HDF5 的 Python 繫結。
+- [NumPy memory mapping](https://numpy.org/doc/stable/reference/generated/numpy.memmap.html) — HDF5 透過 h5py 暴露的讀取端記憶體映射基礎功能。
 - 第 19 階段第 42 課：深入了解為本課提供原始輸入語料的海量下載器架構。
 - 第 19 階段第 44 課：學習直接消費該 DataLoader 輸出串流的餘弦退火學習率排程架構。
 - 第 19 階段第 45 課：學習包裹單步訓練、結合混合精度 AMP 的極限吞吐控制迴圈。

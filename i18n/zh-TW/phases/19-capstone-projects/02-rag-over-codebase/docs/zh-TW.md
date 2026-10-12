@@ -1,6 +1,6 @@
 # 專案實戰 02——基於程式碼儲存庫的 RAG 檢索（跨儲存庫語義搜尋）（Capstone 02 — RAG over Codebase (Cross-Repo Semantic Search)）
 
-> 到了 2026 年，每一家嚴謹的工程團隊內部皆運作著一套能真正理解語義而非僅做字串匹配的程式碼搜尋引擎。Sourcegraph Amp、Cursor 的 Codebase 問答、Augment 的企業程式碼圖譜、Aider 的 repomap，以及 Pinterest 內部的 MCP 檢索——皆共享完全相同的架構原型。跨多個程式碼儲存庫攝取資料、使用 tree-sitter 進行語法解析、在函式與類別層次切割分塊並為程式碼區塊計算 embedding、實施混合搜尋、二次重排序，並生成附帶精確引用的權威回答。本專案實戰要求你端到端建構一套能抗住 10 個程式碼儲存庫、200 萬行程式碼規模，並能在每次 Git push 後增量更新索引的工業級系統。
+> 到了 2026 年，每一家嚴謹的工程團隊內部皆運作著一套能真正理解語義而非僅做字串匹配的程式碼搜尋引擎。Sourcegraph Amp、Cursor 的 Codebase 問答、Augment 的企業程式碼圖譜、Aider 的 repomap，以及 Pinterest 內部的 MCP 檢索——皆共享相似的架構。跨多個程式碼儲存庫攝取資料、使用 tree-sitter 進行語法解析、在函式與類別層次切割分塊並為程式碼區塊計算 embedding、實施混合搜尋、二次重排序，並生成附帶精確引用的回答。本專案實戰要求你端到端建構一套能抗住 10 個程式碼儲存庫、200 萬行程式碼規模，並能在每次 Git push 後增量更新索引的工業級系統。
 
 **Type:** Capstone
 **Languages:** Python (ingestion), TypeScript (API + UI)

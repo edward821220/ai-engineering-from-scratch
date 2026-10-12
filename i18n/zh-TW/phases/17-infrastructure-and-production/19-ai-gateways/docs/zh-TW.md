@@ -1,6 +1,6 @@
 # AI Gateways 閘道技術——LiteLLM、Portkey、Kong AI Gateway、Bifrost（AI Gateways — LiteLLM, Portkey, Kong AI Gateway, Bifrost）
 
-> AI 閘道（Gateway）位處你的應用程式與底層模型服務供應商之間。其核心能力涵蓋服務供應商智慧路由、故障容錯移轉、指數退避重試、速率限制、機密憑證參照、全鏈路可觀測性以及安全性 Guardrails 防護欄。2026 年的市場技術格局清晰分立：**LiteLLM** 採 MIT 授權開源，支援 100 多家模型服務供應商並與 OpenAI 相容，但在公開壓測中約在 2,000 RPS 時遭遇效能崩潰（記憶體使用量約 8 GB，並引發連鎖故障）；最適配 Python 技術堆疊、500 RPS 以下或研發測試原型。**Portkey** 主打企業級控制平面定位（防護欄、PII 個資遮罩、越獄偵測、合規稽核追蹤），於 2026 年 3 月全面轉為 Apache 2.0 開源，單請求引入約 20 至 40 ms 延遲，提供每月 49 美元的正式環境方案。**Kong AI Gateway** 則直接生長於成熟的 Kong Gateway 企業級底座之上——Kong 官方在等價 12 核心 CPU 上的實測顯示：其吞吐量比 Portkey 快 228%，比 LiteLLM 更是狂飆 859%；採每模型每月 100 美元計價（Plus 層級上限 5 款模型）；若企業已深度採用 Kong 則堪稱最佳歸宿。**Bifrost**（Maxim AI 出品）主打具備動態退避的自動化重試，以及在 OpenAI 回應 429 時自動改用 Anthropic。**Cloudflare 與 Vercel AI Gateways** 則提供邊緣端零維運的全託管基礎重試能力。資料落地合規要求直接驅動了企業是否私有化自建的決策；Portkey 與 Kong 則憑藉開源加可選託管的混合架構穩居中流砥柱。
+> AI 閘道（Gateway）位處你的應用程式與底層模型服務供應商之間。其核心能力涵蓋服務供應商智慧路由、故障容錯移轉、指數退避重試、速率限制、機密憑證參照、全鏈路可觀測性以及安全性 Guardrails 防護欄。2026 年的市場技術格局清晰分立：**LiteLLM** 採 MIT 授權開源，支援 100 多家模型服務供應商並與 OpenAI 相容，但在公開壓測中約在 2,000 RPS 時遭遇效能崩潰（記憶體使用量約 8 GB，並引發連鎖故障）；最適配 Python 技術堆疊、500 RPS 以下或研發測試原型。**Portkey** 主打企業級控制平面定位（防護欄、PII 個資遮罩、越獄偵測、合規稽核追蹤），於 2026 年 3 月全面轉為 Apache 2.0 開源，單請求引入約 20 至 40 ms 延遲，提供每月 49 美元的正式環境方案。**Kong AI Gateway** 則直接生長於成熟的 Kong Gateway 企業級底座之上——Kong 官方在等價 12 核心 CPU 上的實測顯示：其吞吐量比 Portkey 快 228%，比 LiteLLM 更是狂飆 859%；採每模型每月 100 美元計價（Plus 層級上限 5 款模型）；若企業已深度採用 Kong 則堪稱最佳歸宿。**Bifrost**（Maxim AI 出品）主打採用可設定退避的自動重試，以及在 OpenAI 回應 429 時自動改用 Anthropic。**Cloudflare 與 Vercel AI Gateways** 則提供邊緣端零維運的全託管基礎重試能力。資料落地合規要求直接驅動了企業是否私有化自建的決策；Portkey 與 Kong 則憑藉開源加可選託管的混合架構穩居中流砥柱。
 
 **Type:** Learn
 **Languages:** Python (stdlib, toy gateway-routing simulator)
@@ -11,14 +11,14 @@
 
 - 列出 AI 閘道的六項核心功能（智慧路由、容錯移轉、自動重試、速率限制、機密憑證參照、可觀測性、安全防護欄）。
 - 梳理 2026 年四大主流閘道（LiteLLM、Portkey、Kong AI、Bifrost）的規模與效能上限及適用場景。
-- 引用 Kong 官方權威跑分結論（相較於 Portkey 快 228%，相較於 LiteLLM 快 859%），並深刻解釋為何這項落差在突破 500 RPS 門檻後具備生死攸關的意義。
+- 引用 Kong 官方權威跑分結論（相較於 Portkey 快 228%，相較於 LiteLLM 快 859%），並說明這項落差對超過 500 RPS 的情境有何影響。
 - 立足於資料落地法律約束與工程維運預算，理性在私有化自建與雲端全託管之間做出架構決策。
 
 ## The Problem｜問題
 
 你的核心產品同時整合了 OpenAI、Anthropic 以及私有自建的 Llama 群集。每家服務供應商皆擁有獨立的 SDK、迥異的錯誤碼格式、自成一體的速率限制，以及獨家的身分鑑別機制。你需要故障切換（若 OpenAI 回應 429，則嘗試 Anthropic）、單一憑證儲存庫、統一的可觀測性，以及按租戶設定的速率限制。
 
-若在應用層重複造輪子實作這些邏輯，將會讓系統中的每一個微服務與每一家外部服務供應商產生嚴重的強耦合。架構專屬的 AI Gateway 閘道層，將上述複雜性統一收攏至單一獨立行程中，對外暴露單一標準 API（通常相容 OpenAI 規範），由其在底層向各大服務供應商扇出發派。
+若在應用層重複造輪子實作這些邏輯，會讓每項服務都與每家服務供應商耦合。架構專屬的 AI Gateway 閘道層，將上述複雜性統一收攏至單一獨立行程中，對外暴露單一標準 API（通常相容 OpenAI 規範），由其在底層向各大服務供應商扇出發派。
 
 ## The Concept｜核心概念
 
@@ -44,7 +44,7 @@
 - 自 2026 年 3 月起全面轉為 Apache 2.0 開源協議。主打企業級安全防護欄、PII 個資遮罩、Prompt 越獄偵測與稽核軌跡。
 - 每次請求增加約 20 至 40 ms 延遲。
 - 正式環境託管版每月 49 美元，包含資料保留與 SLA。
-- 最優適配：高度受監管的金融科技與醫療行業，強烈要求將安全防護欄與可觀測性一體化整合的場景。
+- 最適用於需要整合安全防護欄與可觀測性的受監管產業。
 
 ### Kong AI Gateway——極致吞吐量規模之選（Kong AI Gateway — the scale play）
 
@@ -55,19 +55,19 @@
 
 ### Bifrost (Maxim AI)
 
-- 主打具備精細化動態退避演算法的自動重試機制。
-- 當遭遇 OpenAI 429 速率限制時，自動靜默降級至 Anthropic 是其標誌性的經典配方。
+- 主打可設定退避的自動重試機制。
+- 當遭遇 OpenAI 429 速率限制時，改用 Anthropic 是其典型做法。
 - 較新的商業產品。
 
 ### Cloudflare AI Gateway / Vercel AI Gateway
 
 - 雲端全託管、極致零維運。提供開箱即用的基本重試與調用監控。
 - 最優適配：原廠運作於 Cloudflare Workers 或 Vercel 邊緣運算環境之上的 JavaScript/TypeScript 應用。
-- 在複雜安全防護欄與細粒度速率限制的自定義深度上，弱於 Kong 與 Portkey。
+- 相較於 Kong 與 Portkey，其安全防護欄與速率限制功能較有限。
 
 ### 自建私有化 vs 雲端全託管（Self-hosted vs managed）
 
-資料落地法規是推動自建私有化的根本決定性力量。醫療保健與金融機構預設全面採用私有化自建（部署 LiteLLM、Portkey 開源版或 Kong）。消費級通用產品則預設擁抱全託管雲端閘道（Cloudflare AI Gateway）或中庸託管（Portkey 商業版）。混合架構：針對強監管企業租戶提供自建獨立實例，其餘普通流量統一導向雲端託管閘道。
+資料落地法規是推動自建私有化的根本決定性力量。醫療保健與金融機構預設自行託管（部署 LiteLLM、Portkey 開源版或 Kong）。消費級通用產品則預設擁抱全託管雲端閘道（Cloudflare AI Gateway）或中庸託管（Portkey 商業版）。混合架構：針對強監管企業租戶提供自建獨立實例，其餘普通流量統一導向雲端託管閘道。
 
 ### 延遲預算精算（Latency budget）
 
@@ -80,7 +80,7 @@
 
 ### 速率限制語意至關重要（Rate-limit semantics matter）
 
-簡單的 Token-bucket 演算法可用於中等規模。多租戶場景需要滑動窗口（Sliding-window）演算法、突發額度與租戶分級配額。LiteLLM 內建基礎代幣桶；Kong 提供滑動窗口；Portkey 則完整封裝了多維度階梯配額。
+簡單的 Token-bucket 演算法可用於中等規模。多租戶場景需要滑動窗口（Sliding-window）演算法、突發額度與租戶分級配額。LiteLLM 內建基礎 token-bucket；Kong 提供滑動窗口；Portkey 則提供分級配額。
 
 ### 閘道 + 可觀測性 + 路由的三位一體（Gateway + observability + routing compose）
 
@@ -100,7 +100,7 @@ mx-gateway-fallback
 
 ## Use It｜實際應用
 
-`code/main.py` 模擬一套在主動注入 429 限流與 5xx 故障的負載下，跨 3 家模型服務供應商進行智慧路由與自動降級的微型閘道。終端機即時輸出各策略下的端到端延遲、重試觸發率以及容錯移轉成功率指標。
+`code/main.py` 模擬一套在主動注入 429 限流與 5xx 故障的負載下，跨 3 家模型服務供應商進行智慧路由與自動降級的微型閘道。終端機即時輸出各策略下的端到端延遲、重試觸發率以及備援命中率指標。
 
 ## Ship It｜交付成果
 

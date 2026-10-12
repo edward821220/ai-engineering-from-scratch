@@ -1,6 +1,6 @@
 # 公平性準則——群體、個體與反事實（Fairness Criteria — Group, Individual, Counterfactual）
 
-> 三大流派建構了現代公平性研究的完整架構體系。群體公平（Group fairness）：人口統計均等（demographic parity）、均等化賠率（Equalized odds）、條件使用準確度均等（Conditional use accuracy equality）——核心要求受保護群體在統計均值上的各項機率相等。個體公平（Individual fairness，Dwork 等人，2012）：相似的個體應當獲得相似的決策裁定；在數學上表現為決策映射函數滿足李普希茨連續性條件（Lipschitz condition）。反事實公平（Counterfactual fairness，Kusner 等人，2017）：若某個體在因果世界模型中將其敏感屬性反事實替換後其決策結果保持不變，則該決策對其公平。2024 年重大理論突破（NeurIPS 2024）：反事實公平與預測準確率之間存在固有的取捨；提出了一套模型無關方法，能以有界的準確率損失，將最優但不公平的預測器轉換為反事實公平預測器。溯因反事實（Backtracking counterfactuals，arXiv:2401.13935，2024 年 1 月）：開闢了新範式，避免了對受法律保護屬性進行干預的法律疑慮。哲學調和（ICLR Blogposts 2024）：在明確因果有向無環圖（DAG）的前提下，滿足特定群體公平指標在實質上隱含並導向了反事實公平。
+> 三類準則構成公平研究文獻。群體公平（Group fairness）：人口統計均等（demographic parity）、均等化賠率（Equalized odds）、條件使用準確度均等（Conditional use accuracy equality）——受保護群體間的平均比率相等。個體公平（Individual fairness，Dwork 等人，2012）：相似的個體應當獲得相似的決策裁定；在數學上表現為決策映射函數滿足李普希茨連續性條件（Lipschitz condition）。反事實公平（Counterfactual fairness，Kusner 等人，2017）：若某個體在因果世界模型中將其敏感屬性反事實替換後其決策結果保持不變，則該決策對其公平。2024 年重大理論突破（NeurIPS 2024）：反事實公平與預測準確率之間存在固有的取捨；提出了一套模型無關方法，能以有界的準確率損失，將最優但不公平的預測器轉換為反事實公平預測器。溯因反事實（Backtracking counterfactuals，arXiv:2401.13935，2024 年 1 月）：開闢了新範式，避免了對受法律保護屬性進行干預的法律疑慮。哲學調和（ICLR Blogposts 2024）：在明確因果有向無環圖（DAG）的前提下，滿足特定群體公平指標在實質上隱含並導向了反事實公平。
 
 **Type:** Learn
 **Languages:** Python (stdlib, three-criteria comparison)
@@ -16,7 +16,7 @@
 
 ## The Problem｜問題
 
-第 18 課第 20 節討論偏見的衡量；第 21 課則定義這些衡量所要依循的公平標準。三類公平標準在結構上各不相同——模型可以符合群體公平但不符合個體公平，也可以符合反事實公平但不符合群體公平。選擇標準是一項政策決策；沒有任何標準在所有情境中都普遍最佳。
+第 20 課討論偏見的衡量；第 21 課則定義衡量所依循的公平標準。三類公平標準在結構上各不相同——模型可以符合群體公平但不符合個體公平，也可以符合反事實公平但不符合群體公平。選擇標準是一項政策決策；沒有任何標準在所有情境中都普遍最佳。
 
 ## The Concept｜核心概念
 
@@ -70,7 +70,7 @@ an-fairness-trilemma
 
 ## Ship It｜交付成果
 
-本課交付標準實戰產物 `outputs/skill-fairness-criterion.md`。輸入一項企業對外的公平性宣告或合規政策草案，該 Skill 將自動嚴審：該政策究竟採用了哪一套具體的數學定義？在非對稱的群體基礎機率下該承諾是否在數學上自相矛盾？以及其宣告背後究竟預設了怎樣的因果有向無環圖（DAG）結構。
+本課交付標準實戰產物 `outputs/skill-fairness-criterion.md`。輸入一項公平性主張或政策，該 Skill 將辨識其主張採用哪項準則、在所主張的基礎率不相等時模型是否能滿足其他準則，以及該主張依賴的因果有向無環圖（DAG）。
 
 ## Exercises｜練習
 

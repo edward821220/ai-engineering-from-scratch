@@ -1,6 +1,6 @@
 # 端到端科研閉環實戰演示（End-to-End Research Demo）
 
-> 實戰演示（Demo）是先前撰寫的每一份契約在物理世界上交會碰撞的終極考場。只要其中任意一處契約存在微小漏洞，演示程式就是將該漏洞精準捕獲的第一現場。
+> 實戰演示（Demo）是先前撰寫的每一份契約在物理世界上交會碰撞的終極考場。只要其中任一處契約出現漏洞，演示程式就能發現問題。
 
 **Type:** Build
 **Languages:** Python
@@ -81,7 +81,7 @@ Critic loop ...... returns LoopResult with status converged or stopped
 Paper writer ..... raises PaperValidationError on contract break
 ```
 
-任意一個階段的故障皆會透過強型別異常即刻短路終止整個演示。單元測試集嚴密釘死了這一契約：`test_no_triggers_raises_typed_error` 與 `test_best_picker_raises_when_no_triggers` 嚴格斷言當沒有任何研究 branch 突破論文發表閾值時，挑選器會主動拋出 `NoTriggerError` / `BestResultError`，且後續的論文撰寫器絕對不會被錯誤喚醒。
+任意一個階段的故障皆會透過強型別異常即刻短路終止整個演示。單元測試集嚴密釘死了這一契約：`test_no_triggers_raises_typed_error` 與 `test_best_picker_raises_when_no_triggers` 嚴格斷言當沒有任何研究 branch 發出觸發事件時，挑選器會主動拋出 `NoTriggerError` / `BestResultError`，且後續的論文撰寫器絕對不會被錯誤喚醒。
 
 ## 最佳成果挑選器
 
@@ -89,7 +89,7 @@ Paper writer ..... raises PaperValidationError on contract break
 
 ## 串聯批判迴圈
 
-第五十五課的批判迴圈運作於 `MiniPaper` 資料結構之上。演示程式透過讀取被選中 branch 的中繼資料動態組裝 `MiniPaper`：將 branch ID 填入摘要、播種引言與結果兩個初始章節，並根據 branch 的平均回報設定 `originality_tag`（若 `>= 0.8` 設為 high，若 `>= 0.6` 設為 medium，其餘設為 low）。
+第五十五課的批判迴圈運作於 `MiniPaper` 資料結構之上。演示程式根據被選中的 branch 建立 `MiniPaper`：將 branch ID 填入摘要、播種引言與結果兩個初始章節，並根據 branch 的平均回報設定 `originality_tag`（若 `>= 0.8` 設為 high，若 `>= 0.6` 設為 medium，其餘設為 low）。
 
 修訂器隨後驅動草稿進行多輪自我修訂直至收斂。收斂產物直接注入論文撰寫器。
 

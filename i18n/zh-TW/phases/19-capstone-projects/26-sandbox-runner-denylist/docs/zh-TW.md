@@ -1,6 +1,6 @@
 # 專案實戰第 26 課：帶有黑名單與路徑拘禁的安全沙盒執行器（Capstone Lesson 26: Sandbox Runner with Denylist and Path Jail）
 
-> 驗證閘門決定了一個工具呼叫**是否被允許執行**；而安全沙盒則決定了當它執行時**具體會發生什麼**。本課將親手打造一個子行程（Subprocess）執行器：嚴格攔截危險可執行程式、阻斷畸形危險的 argv 參數結構、將所有檔案路徑強制拘禁在專案根目錄內（Path Jail）、自動截斷過大終端輸出，並在物理時鐘逾時後強制終止失控行程。這是橫亙在大模型與底層作業系統實體環境之間的第二道核心安全防線。
+> 驗證閘門決定了一個工具呼叫**是否被允許執行**；而安全沙盒則決定了當它執行時**具體會發生什麼**。本課將親手打造一個子行程（Subprocess）執行器：嚴格攔截危險可執行程式、阻斷畸形危險的 argv 參數結構、將所有檔案路徑強制拘禁在專案根目錄內（Path Jail）、自動截斷過大終端輸出，並在實際經過時間逾時後強制終止失控行程。這是橫亙在模型與底層作業系統實體環境之間的第二道核心安全防線。
 
 **Type:** Build
 **Languages:** Python (stdlib)
@@ -21,11 +21,11 @@
 
 Agent 的追蹤記錄中反覆出現三類失敗模式。
 
-第一類是**高危險可執行程式**。當一個大模型在修復路徑或權限報錯遭遇挫敗施壓時，往往會鋌而走險呼叫 `sudo`、`chmod -R 777`、`rm -rf`、`mkfs`、`dd`。這些毀滅性指令在任何正常的 Agent 運作中皆絕無立足之地。黑名單機制能在第一時間按原始名稱或別名精準捕獲它們。
+第一類是**高危險可執行程式**。當一個模型在修復路徑或權限報錯遭遇挫敗施壓時，往往會鋌而走險呼叫 `sudo`、`chmod -R 777`、`rm -rf`、`mkfs`、`dd`。這些毀滅性指令在任何正常的 Agent 運作中皆絕無立足之地。黑名單機制能在第一時間按原始名稱或別名精準捕獲它們。
 
-第二類是 **argv 偽裝繞過技巧**。當大模型被明確告知「禁止呼叫 Shell」時，它極易嘗試透過直譯器發起繞過：例如呼叫 `python3 -c "import os; os.system('rm -rf /')"`、`bash -c '...'`、`node -e '...'`、`perl -e '...'`。沙盒必須敏銳洞察：任何攜帶類似 `-c` 或 -e 參數的直譯器呼叫，本質上只不過是包了一層偽裝的 Shell 呼叫而已。
+第二類是 **argv 偽裝繞過技巧**。當模型被明確告知「禁止呼叫 Shell」時，它極易嘗試透過直譯器發起繞過：例如呼叫 `python3 -c "import os; os.system('rm -rf /')"`、`bash -c '...'`、`node -e '...'`、`perl -e '...'`。沙盒必須敏銳洞察：任何攜帶類似 `-c` 或 -e 參數的直譯器呼叫，本質上只不過是包了一層偽裝的 Shell 呼叫而已。
 
-第三類是**檔案系統路徑逃逸（Path Escape）**。大模型本應讀取 `./src/main.py`，卻意外或惡意嘗試讀取 `../../etc/passwd`。沙盒透過 `os.path.realpath` 將傳入的所有路徑實施規範化解析，並嚴格斷言其絕對路徑前綴必須完全隸屬於專案根目錄之內。
+第三類是**檔案系統路徑逃逸（Path Escape）**。模型本應讀取 `./src/main.py`，卻意外或惡意嘗試讀取 `../../etc/passwd`。沙盒透過 `os.path.realpath` 將傳入的所有路徑實施規範化解析，並嚴格斷言其絕對路徑前綴必須完全隸屬於專案根目錄之內。
 
 必須清醒認識到：該沙盒絕非作業系統核心意義上的完美安全隔離邊界。一個具備任意程式碼執行能力的頂級攻擊者依然可能找到逃逸漏洞。該沙盒的核心定位是**開發階段的剛性防護欄（Development-Time Guardrail）**：它會讓常見失敗模式更明顯，並阻止 Agent 因單純失誤造成損害。
 
@@ -71,10 +71,10 @@ flowchart LR
 2. `SandboxConfig` 資料類別：project_root、max_output_bytes、timeout_seconds、denylist、interpreter_block。
 3. `Sandbox` 主類別：`run(argv, *, shell=False, cwd=None)` 回傳結構化的 `SandboxResult`。
 4. 內部私有檢查輔助方法：`_check_executable_denylist`、`_check_argv_interpreter`、`_check_shell_metachars`、`_check_path_jail`。
-5. 終端輸出截斷機制，帶有清晰的 `truncated` 布林標識並在捕獲的日誌末尾追加截斷標記行。
+5. 終端輸出截斷機制，帶有清晰的 `truncated` 布林標識並在擷取的串流末尾追加截斷標記行。
 6. 底部端到端演示：依序發起一系列合法指令與惡意對抗指令，清晰呈現每一個呼叫的最終處置結果。
 
-沙盒底層呼叫 `subprocess.run`，預設強制指定 `shell=False` 並開啟 `capture_output=True`。物理時鐘逾時控制依託 `timeout` 參數；一旦觸發 `TimeoutExpired` 異常，沙盒立即強制殺死整個子行程組（Process Group）並合成標準的 SandboxResult。
+沙盒底層呼叫 `subprocess.run`，預設強制指定 `shell=False` 並開啟 `capture_output=True`。實際經過時間逾時控制依託 `timeout` 參數；一旦觸發 `TimeoutExpired` 異常，沙盒立即強制殺死整個子行程組（Process Group）並合成標準的 SandboxResult。
 
 ## 本課沙盒的邊界聲明
 

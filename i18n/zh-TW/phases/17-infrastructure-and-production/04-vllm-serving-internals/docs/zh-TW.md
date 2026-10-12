@@ -54,7 +54,7 @@ Prefill 階段屬於典型的運算受限（Compute-bound）操作。在單張 H
 
 這三大功能彼此高度共生、互為基石。PagedAttention 為排程器提供了細粒度的 KV GPU 記憶體資源；連續批次處理依賴這項細粒度資源，使得新序列的併入無需牽動全局記憶體搬移重組；而分塊 Prefill 則是排程器在同一個 `RUNNING` 清單上做出的精緻切片決策——它是排程器的一種策略體現，而非獨立存在的割裂系統。
 
-你無需背誦每一項瑣碎的命令列參數。你只需看清排程器的終極目標：在嚴格鎖定的 KV Block 預算上限內，在分塊 Prefill 的切片約制下，將系統的有效吞吐量（Goodput）推向極限。
+你無需背誦每一項瑣碎的命令列參數。你只需看清排程器的終極目標：在嚴格鎖定的 KV Block 預算上限內，在分塊 Prefill 的切片約制下，將系統的 Goodput 推向極限。
 
 ### 嚴格核對版本相容性矩陣（Check the compatibility matrix）
 
@@ -106,7 +106,7 @@ tensor-parallel
 - `CONTINUOUS` 模式：解碼迭代週期的無縫准入與退出。
 - `CONTINUOUS + CHUNKED` 模式：Prefill 微分塊與解碼交錯排程。
 
-終端機將即時輸出整體吞吐量（每虛擬秒 Token 數）、平均 TTFT 首字延遲以及 P99 ITL。在混合流量下，`CONTINUOUS + CHUNKED` 模式應會占優。
+終端機將即時輸出整體吞吐量（每虛擬秒 Token 數）、平均 TTFT（第一個 token 延遲）以及 P99 ITL。在混合流量下，`CONTINUOUS + CHUNKED` 模式應會占優。
 
 ## Ship It｜交付成果
 
@@ -128,7 +128,7 @@ tensor-parallel
 | Block table | 「分頁表」 | 將每個序列的邏輯 token 位置對應至實體 KV 區塊的映射表 |
 | Continuous batching | 「更完善的動態批次」 | 每次解碼迭代都會決定納入或移除哪些請求 |
 | Chunked prefill | 「分塊 Prefill」 | 將長 Prefill 切成 512-token 片段，並與解碼交錯執行 |
-| TTFT | 「首個 token 的時間」 | Prefill、佇列與網路時間的總和；長 Prompt 下主要由 Prefill 決定 |
+| TTFT | 「第一個 token 延遲」 | Prefill、佇列與網路時間的總和；長 Prompt 下主要由 Prefill 決定 |
 | ITL | 「token 間延遲」 | 連續兩個解碼 token 之間的時間；主要受批次大小影響 |
 | Goodput | 「符合 SLO 的吞吐量」 | 每秒輸出且所有請求仍符合 TTFT 與 ITL 目標的 token 數 |
 | V1 scheduler | 「新版排程器」 | vLLM 於 2026 年採用的排程器；以分塊 Prefill 執行連續批次 |

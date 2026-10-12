@@ -144,5 +144,5 @@ $ ./pipeline.sh config/llama3.3-8b-domainX.yaml
 - [DeepSeek R1 paper (arXiv:2501.12948)](https://arxiv.org/abs/2501.12948) — GRPO 強化學習對齊方法論奠基論文。
 - [vLLM + EAGLE-3 documentation](https://docs.vllm.ai) — 工業級高吞吐推測解碼推論引擎技術文件。
 - [SGLang SpecForge](https://github.com/sgl-project/SpecForge) — 另一種優秀的推測解碼草稿頭訓練工具。
-- [Model Openness Framework 2026](https://isocpp.org/) — 全球權威開源大模型發布評級準則。
+- [Model Openness Framework 2026](https://isocpp.org/) — 開放模型發布評級標準。
 - [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) — 官方標準大模型基準評測執行器。

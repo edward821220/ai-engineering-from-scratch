@@ -1,6 +1,6 @@
 # 多樣本越獄攻擊（Many-Shot Jailbreaking）
 
-> Anil、Durmus、Panickssery、Sharma 等人（Anthropic 團隊，NeurIPS 2024）。多樣本越獄攻擊（Many-Shot Jailbreaking, MSJ）利用了現代大模型的長上下文視窗特性：在對話中蓄意塞入數百輪虛構的「使用者-助手」對話，在這些假對話中助手毫無防備地順從了各類有害請求，最後再追加攻擊者真正的目標提問。攻擊成功率嚴格遵循關於示範樣本數量（Shot count）的冪律法則（Power law）：在 5 個樣本時幾乎完全無效，但在達到 256 個樣本時，對暴力與欺騙類內容的越獄可可靠成功。該現象遵循與良性上下文學習（ICL）相同的冪律軌跡——攻擊行為與模型正常的少樣本學習共享同一個機制，這正是為何在保護良性 ICL 能力的同時防禦 MSJ 在工程上極具挑戰的原因。基於分類器的 Prompt 即時過濾修改技術，能在受測基準下將攻擊成功率從 61% 劇烈壓低至 2%。
+> Anil、Durmus、Panickssery、Sharma 等人（Anthropic 團隊，NeurIPS 2024）。多樣本越獄攻擊（Many-Shot Jailbreaking, MSJ）利用了現代模型的長上下文視窗特性：在對話中蓄意塞入數百輪虛構的「使用者-助手」對話，在這些假對話中助手毫無防備地順從了各類有害請求，最後再追加攻擊者真正的目標提問。攻擊成功率嚴格遵循關於示範樣本數量（Shot count）的冪律法則（Power law）：在 5 個樣本時幾乎完全無效，但在達到 256 個樣本時，對暴力與欺騙類內容的越獄可可靠成功。該現象遵循與良性上下文學習（ICL）相同的冪律軌跡——攻擊行為與模型正常的少樣本學習共享同一個機制，這正是為何在保護良性 ICL 能力的同時防禦 MSJ 在工程上極具挑戰的原因。基於分類器的 Prompt 修改技術，能在受測基準下將攻擊成功率從 61% 劇烈壓低至 2%。
 
 **Type:** Learn
 **Languages:** Python (stdlib, in-context learning vs MSJ simulator)
@@ -34,7 +34,7 @@ User: <target harmful question>
 Assistant: 
 ```
 
-大模型本能地延續上下文中的對話模式。輸入中偽造的數百輪助手回答，雖然從未真正由受測目標模型產生過——但目標模型會把它們當成可供遵循的模式。
+模型會延續上下文中的對話模式。輸入中偽造的數百輪助手回答，雖然從未真正由受測目標模型產生過——但目標模型會把它們當成可供遵循的模式。
 
 ### 呈冪律分佈的攻擊成功率（Power-law ASR）
 
@@ -56,7 +56,7 @@ Anthropic 的分類器式 prompt 修改會對完整上下文執行安全分類�
 
 ### 與其他攻擊手法的複合疊加
 
-MSJ 能與 PAIR（第 12 節）無縫複合：先利用 PAIR 自動化搜尋出最易攻破目標防禦的對抗句型結構，隨後將其複製擴展為數百輪 MSJ 示範樣本。Anil 等人（Anthropic，2024）回報，MSJ 可與競爭目標越獄結合；堆疊使用時的攻擊成功率高於任一單獨攻擊。
+MSJ 能與 PAIR（第 12 節）結合：先用 PAIR 找出攻擊結構，再填入多個 MSJ 示範樣本。Anil 等人（Anthropic，2024）回報，MSJ 可與競爭目標越獄結合；堆疊使用時的攻擊成功率高於任一單獨攻擊。
 
 ### 2025 至 2026 年前沿模型的標準防線
 
@@ -64,7 +64,7 @@ MSJ 能與 PAIR（第 12 節）無縫複合：先利用 PAIR 自動化搜尋出�
 
 ### 該研究在第 18 階段中的宏觀座標（Where this fits in Phase 18）
 
-第 12 節展示了常規長度下的自動化迭代攻擊；第 13 節揭示了超長上下文視窗所專屬的長度漏洞；第 14 節（ASCII 藝術與視覺越獄）將跨入多模態編碼攻擊；第 15 節則剖析實體系統邊界處的間接 Prompt 注入。四者共同界定了 2026 年的越獄攻擊面。
+第 12 節展示了常規長度下的自動化迭代攻擊；第 13 節揭示了超長上下文視窗所專屬的長度漏洞；第 14 節（ASCII 藝術與視覺越獄）將跨入多模態編碼攻擊；第 15 節則剖析系統邊界攻擊（間接 Prompt 注入）。四者共同界定了 2026 年的越獄攻擊面。
 
 ```figure
 jailbreak-defense
@@ -103,4 +103,4 @@ jailbreak-defense
 - [Anil, Durmus, Panickssery et al. — Many-shot Jailbreaking (Anthropic, NeurIPS 2024)](https://www.anthropic.com/research/many-shot-jailbreaking) — 官方原著論文與冪律實測結果。
 - [Chao et al. — PAIR (Lesson 12, arXiv:2310.08419)](https://arxiv.org/abs/2310.08419) — 能與 MSJ 深度複合的自動化迭代攻擊。
 - [Zou et al. — GCG (arXiv:2307.15043)](https://arxiv.org/abs/2307.15043) — 白盒梯度攻擊經典。
-- [Mazeika et al. — HarmBench (arXiv:2402.04249)](https://arxiv.org/abs/2402.04249) — 涵蓋 MSJ 在內的全球權威安全對抗基準。
+- [Mazeika et al. — HarmBench (arXiv:2402.04249)](https://arxiv.org/abs/2402.04249) — 涵蓋 MSJ 在內的安全評測基準。

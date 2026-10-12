@@ -45,7 +45,7 @@ alpha 會隨著業務領域的分佈產生劇烈波動。在 ShareGPT 風格的�
 
 ### 2026 年正式環境落地 SOP（The 2026 production recipe）
 
-1. 首先以未啟用推測解碼的目標模型上線。在目標並行度下，精確記錄基準 TTFT 首字延遲、ITL 吐字間隔與整體吞吐量。
+1. 首先以未啟用推測解碼的目標模型上線。在目標並行度下，精確記錄基準 TTFT（第一個 token 延遲）、ITL 吐字間隔與整體吞吐量。
 2. 透過 vLLM 的 `speculative_config` 配置啟用 EAGLE-3 草稿能力。重新執行相同的基準測試。
 3. 嚴密監控並記錄接受率 alpha。vLLM V1 排程器將此暴露為 `spec_decode_metrics.accepted_tokens_per_request` 指標。將其除以配置的草稿長度 K 即可得出即時 alpha。
 4. 若在真實正式環境流量分佈下 alpha < 0.55，果斷停用推測解碼，或安排資源訓練領域專屬的 EAGLE-3 草稿頭部。

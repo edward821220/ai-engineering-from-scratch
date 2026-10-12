@@ -1,6 +1,6 @@
 # LLM 可觀測性技術堆疊選型（LLM Observability Stack Selection）
 
-> 2026 年的大模型可觀測性市場清晰分化為兩大陣營。研發一體化平台（LangSmith、Langfuse、Comet Opik）將指標監控與 Eval 評測、Prompt 版本管理以及 Session 對話重放深度捆綁。Gateway 與遙測工具（Helicone、SigNoz、OpenLLMetry、Phoenix）則專注於遙測資料。Langfuse 核心採 MIT 授權開源，在社群與企業級功能間取得了最佳平衡（雲端版每月免費 5 萬事件）。Phoenix 則在 Elastic License 2.0 下原生擁抱 OpenTelemetry——在 RAG 檢索管線視覺化與資料漂移排查上表現極其驚豔，但並非專為長久儲存的正式環境後端而設計。Arize AX 則透過零拷貝的 Iceberg/Parquet 資料湖整合，宣稱在大規模流量下成本比傳統單體可觀測性平台低 100 倍。LangSmith 在 LangChain/LangGraph 生態中領先，每使用者每月 39 美元，私有自建僅限頂級企業版。Helicone 採反向代理架構，15 至 30 分鐘即可極速接入，每月提供 10 萬次免費請求，但在多步驟 Agent 複雜鏈路上深度略顯不足。常見的 production pattern：前端 Gateway（Helicone/Portkey）+ 評測平台（Phoenix/TruLens），兩者透過 OpenTelemetry 協定連接。
+> 2026 年的大模型可觀測性市場清晰分化為兩大陣營。研發一體化平台（LangSmith、Langfuse、Comet Opik）將指標監控與 Eval 評測、Prompt 版本管理以及 Session 對話重放深度捆綁。Gateway 與遙測工具（Helicone、SigNoz、OpenLLMetry、Phoenix）則專注於遙測資料。Langfuse 核心採 MIT 授權開源，在社群與企業級功能間取得了良好平衡（雲端版每月免費 5 萬事件）。Phoenix 則在 Elastic License 2.0 下原生擁抱 OpenTelemetry——在 RAG 檢索管線視覺化與資料漂移排查上表現出色，但並非專為長久儲存的正式環境後端而設計。Arize AX 則透過零拷貝的 Iceberg/Parquet 資料湖整合，宣稱在大規模流量下成本比傳統單體可觀測性平台低 100 倍。LangSmith 在 LangChain/LangGraph 生態中領先，每使用者每月 39 美元，私有自建僅限頂級企業版。Helicone 採反向代理架構，15 至 30 分鐘即可極速接入，每月提供 10 萬次免費請求，但在多步驟 Agent 複雜鏈路上深度略顯不足。常見的 production pattern：前端 Gateway（Helicone/Portkey）+ 評測平台（Phoenix/TruLens），兩者透過 OpenTelemetry 協定連接。
 
 **Type:** Learn
 **Languages:** Python (stdlib, toy trace-sampling simulator)
@@ -34,14 +34,14 @@
 
 - 核心程式碼採 Apache / MIT 開源授權；支援透過 Docker 極速私有化自建。
 - 雲端託管版提供每月 5 萬次免費事件額度；團隊版起跳價每月 29 美元。
-- 完整涵蓋 Eval 評測、Prompt 納管、分散式追蹤與基準測試資料集四大能力。
+- 完整涵蓋 Eval 評測、Prompt 納管、追蹤與資料集。
 - 最佳甜蜜點：期望享有 LangSmith 級別的完整研發體驗，但強烈要求必須開源可控或本地私有化部署。
 
 ### Phoenix (Arize)——遙測優先、OpenTelemetry 原生
 
 - 採 Elastic License 2.0 授權；自行託管相當簡單。
 - 擅長 RAG 與 drift 視覺化。原生提供將 Embedding 投影至降維散佈圖的開箱即用功能。
-- 設計初衷並非作為永久存檔的正式環境監控後端——其核心定位是研發階段與測試環境下的深度除錯利器。
+- 設計初衷並非作為永久存檔的正式環境監控後端——主要用於開發階段的可觀測性。
 - 最佳甜蜜點：RAG 檢索管線調優、語意漂移排查；在正式環境中通常與前端獨立 Gateway 搭檔協同。
 
 ### Arize AX——超大規模下的成本破局者（Arize AX — the scale play）
@@ -81,7 +81,7 @@ OpenTelemetry 聯盟於 2025 年底正式發布了官方 GenAI 語意約定標�
 
 1. 每次 LLM 呼叫都輸出採用 GenAI 慣例的 OpenTelemetry Trace。
 2. 日常使用時，將流量路由至 Gateway（Helicone / Portkey）。
-3. 同步雙寫分流至離線評測平台（Phoenix / Langfuse）以自動檢測回歸缺陷。
+3. 同步雙寫至離線評測平台（Phoenix / Langfuse）以進行回歸評估。
 4. 將資料封存至 Iceberg 資料湖，供 Arize AX 或 DuckDB 長期分析。
 
 ### 致命陷阱：在錯誤的架構層次進行埋點（The trap: instrumenting at the wrong layer）
@@ -106,7 +106,7 @@ i4-otel-glue
 
 ## Use It｜實際應用
 
-`code/main.py` 在日均 100 萬次 Trace 追蹤的模擬業務下，橫向演練了三種資料保留策略（100% 全量寫入、採樣、採樣並保留錯誤）。終端機即時輸出各策略下的實體儲存費用，以及在遭遇偶發長尾事故時所面臨的診斷盲區代價。
+`code/main.py` 在日均 100 萬次 Trace 追蹤的模擬業務下，橫向演練了三種資料保留策略（100% 全量寫入、採樣、採樣並保留錯誤）。終端機即時輸出各策略下的儲存成本，以及各策略會遺失的資訊。
 
 ## Ship It｜交付成果
 
@@ -138,8 +138,8 @@ i4-otel-glue
 ## Further Reading｜延伸閱讀
 
 - [SigNoz — Top LLM Observability Tools 2026](https://signoz.io/comparisons/llm-observability-tools/) — 頂級大模型可觀測性工具橫向橫評。
-- [Langfuse — Arize AX Alternative analysis](https://langfuse.com/faq/all/best-phoenix-arize-alternatives) — 官方深度架構對比手冊。
+- [Langfuse — Arize AX Alternative analysis](https://langfuse.com/faq/all/best-phoenix-arize-alternatives)
 - [PremAI — Setting Up Langfuse, LangSmith, Helicone, Phoenix](https://blog.premai.io/llm-observability-setting-up-langfuse-langsmith-helicone-phoenix/) — 四大主流工具端到端配置實戰。
 - [OpenTelemetry GenAI Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/gen-ai/) — 官方語意約定規格說明書。
 - [Arize Phoenix docs](https://docs.arize.com/phoenix) — Phoenix 官方架構指南。
-- [Helicone docs](https://docs.helicone.ai/) — Helicone 快速上手與進階配置手冊。
+- [Helicone docs](https://docs.helicone.ai/)

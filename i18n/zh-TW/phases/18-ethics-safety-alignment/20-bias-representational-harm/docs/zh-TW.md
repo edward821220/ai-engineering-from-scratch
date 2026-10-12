@@ -1,4 +1,4 @@
-# 大模型中的偏見與表徵性傷害（Bias and Representational Harm in LLMs）
+# LLM 中的偏見與表徵性傷害（Bias and Representational Harm in LLMs）
 
 > Gallegos、Rossi、Barrow、Tanjim、Kim、Dernoncourt、Yu、Zhang 與 Ahmed（Computational Linguistics 2024，arXiv:2309.00770）。2024 年奠基性綜述，嚴格界定了表徵性傷害（Representational harms，刻板印象與群體抹除）與分配性傷害（Allocational harms，實體資源分配不公）的本質區別，並將評測指標分類為基於 Embedding 向量、基於生成機率，以及基於端到端生成文本三大範式。2024 至 2025 年實證研究：An 等人（PNAS Nexus，2025 年 3 月）在橫跨 20 個入門級職位的履歷自動篩選實驗中，針對 GPT-3.5 Turbo、GPT-4o、Gemini 1.5 Flash、Claude 3.5 Sonnet 與 Llama 3-70B 全面度量了性別與種族的交叉性偏見（Intersectional bias）。WinoIdentity（COLM 2025，arXiv:2508.07111）針對交叉性身分引入了基於不確定性的公平性評測基準。Yu 與 Ananiadou（2025）在 MLP 層中定位出性別神經元；Ahsan 與 Wallace（2025）利用稀疏自動編碼器（SAE）揭示了臨床診斷中的種族偏見；Zhou 等人（UniBias，2024）則透過直接操縱注意力頭實踐零樣本去偏。後設批判（arXiv:2508.11067）：十年間學術文獻不成比例地過度聚焦於二元性別偏見。
 
@@ -9,7 +9,7 @@
 
 ## Learning Objectives｜學習目標
 
-- 嚴格定義表徵性傷害（Representational harm）與分配性傷害（Allocational harm），並分別給出在大模型正式環境落地中的具體實例。
+- 嚴格定義表徵性傷害（Representational harm）與分配性傷害（Allocational harm），並分別給出在 LLM 正式環境中的具體實例。
 - 梳理 Gallegos 等人（2024）提出的三大評測指標類別（基於向量、基於機率、基於生成文本），並分別詳述每一類中的典型指標。
 - 深刻理解交叉性（Intersectionality）概念，並闡明 WinoIdentity 基於不確定性的公平性度量如何彌補單軸偏見評測的巨大盲區。
 - 描述兩種利用機制可解釋性（Mechanistic interpretability）介入偏見的方法，包括性別神經元、SAE 特徵與注意力頭操縱。
@@ -22,10 +22,10 @@
 
 ### 表徵性傷害 vs 分配性傷害
 
-- **表徵性傷害（Representational harm）**：強化負面刻板印象、邊緣群體文化抹除、貶低性形象描摹。例如一個大模型在所有情境下皆將護理師預設描繪為女性，便構成了典型的表徵性傷害。
-- **分配性傷害（Allocational harm）**：實體物質資源分配上的系統性不平等。例如一個大模型在企業求職初篩中，對非裔應徵者的履歷給出系統性偏低的打分，便構成了實質性的分配性傷害。
+- **表徵性傷害（Representational harm）**：強化負面刻板印象、邊緣群體文化抹除、貶低性形象描摹。例如一個 LLM 在所有情境下皆將護理師預設描繪為女性，便構成了典型的表徵性傷害。
+- **分配性傷害（Allocational harm）**：實體物質資源分配上的系統性不平等。例如一個 LLM 在企業求職初篩中，對非裔應徵者的履歷給出系統性偏低的打分，便構成了實質性的分配性傷害。
 
-兩者絕非同一概念。一個模型完全可以做到「表面表徵毫無偏見」（能生成多樣化的群體描寫），但在「分配決策上仍有偏見」（給出不平等的建議）。嚴謹的評測體系必須同時度量這兩個正交維度。
+兩者絕非同一概念。一個模型完全可以做到「表面表徵毫無偏見」（能生成多樣化的群體描寫），但在「分配決策上仍有偏見」（給出不平等的建議）。嚴謹的評測體系必須同時度量這兩類傷害。
 
 ### 三大評測指標類別（Gallegos et al. 2024）
 
@@ -35,7 +35,7 @@
 
 ### 交叉性（Intersectionality）
 
-單純在「性別」或「種族」單一維度上展開的偏見評測，會徹底遺漏那些唯有在（性別 × 種族）多維交叉點上才會引爆的複合偏見。An 等人（2025）實測證實：GPT-4o 在履歷自動篩選中，對非裔女性候選人施加的隱性扣分懲罰，分別高於對非裔男性與白人女性的懲罰。單軸評估無法捕捉這些差異。
+只評測「性別」偏見，會遺漏只有在（性別 × 種族）交叉組合中才會出現的偏見。An 等人（2025）實測證實：GPT-4o 在履歷自動篩選中，對非裔女性候選人施加的隱性扣分懲罰，分別高於對非裔男性與白人女性的懲罰。單軸評估無法捕捉這些差異。
 
 WinoIdentity（COLM 2025）引入了基於不確定性的交叉性公平評測體系。它度量的核心指標是：模型對不同交叉身分組合的預測不確定性是否不同——而非僅僅關注點預測（Point prediction）。這能捕捉模型在各群體同樣預測錯誤、但對某些群體較不確定的情況，進而造成不同的下游分配行為。
 
@@ -43,7 +43,7 @@ WinoIdentity（COLM 2025）引入了基於不確定性的交叉性公平評測�
 
 2024 至 2025 年的可解釋性研究，讓研究者能對偏見進行機制層級的介入：
 
-- **性別神經元（Yu & Ananiadou 2025）**：在 Transformer 的 MLP 隱藏層中精準定位出與性別刻板特徵高度相關的特定神經元。消融（Ablate）這些神經元可降低性別差距指標，能力成本有限。
+- **性別神經元（Yu & Ananiadou 2025）**：特定 MLP 神經元與性別特定行為相關。消融（Ablate）這些神經元可降低性別差距指標，能力成本有限。
 - **透過 SAE 分析臨床種族偏見（Ahsan & Wallace 2025）**：SAE 可將模型內部表徵分解為可解釋維度；與種族相關的特徵可被識別並抑制。
 - **UniBias 注意力頭動態干預（Zhou et al. 2024）**：透過直接操縱特定的注意力頭，達成零樣本去偏。研究發現，模型內部的特定注意力頭會放大對身分標籤的敏感度；將這些注意力頭歸零或重新加權，可在不進行 fine-tuning 的情況下降低偏見。
 
@@ -53,7 +53,7 @@ WinoIdentity（COLM 2025）引入了基於不確定性的交叉性公平評測�
 
 ### 該研究在第 18 階段中的宏觀座標
 
-第 20 與 21 節在形式上確立偏見與公平性的衡量標準；第 22 節探討差分隱私；第 23 節剖析數位內容浮水印。這些研究共同構成了面向廣大終端使用者的社會責任與倫理防護層。
+第 20 與 21 節在形式上確立偏見與公平性的衡量標準；第 22 節探討隱私；第 23 節剖析數位內容浮水印。這些研究共同構成了面向廣大終端使用者的社會責任與倫理防護層。
 
 ```figure
 an-bias-two-harms
@@ -89,7 +89,7 @@ an-bias-two-harms
 
 ## Further Reading｜延伸閱讀
 
-- [Gallegos et al. — Bias and Fairness in LLMs: A Survey (arXiv:2309.00770, Computational Linguistics 2024)](https://arxiv.org/abs/2309.00770) — 大模型偏見與公平性奠基性綜述大作。
-- [An et al. — Intersectional resume-evaluation bias (PNAS Nexus, March 2025)](https://academic.oup.com/pnasnexus/article/4/3/pgaf089/8111343) — 跨五款前沿大模型的交叉性履歷篩選實證研究。
+- [Gallegos et al. — Bias and Fairness in LLMs: A Survey (arXiv:2309.00770, Computational Linguistics 2024)](https://arxiv.org/abs/2309.00770) — LLM 偏見與公平性綜述。
+- [An et al. — Intersectional resume-evaluation bias (PNAS Nexus, March 2025)](https://academic.oup.com/pnasnexus/article/4/3/pgaf089/8111343) — 跨五款前沿 LLM 的交叉性履歷篩選實證研究。
 - [WinoIdentity — uncertainty-based intersectional fairness (arXiv:2508.07111, COLM 2025)](https://arxiv.org/abs/2508.07111) — 基於不確定性的全新交叉公平性基準。
 - [UniBias — attention-head manipulation (Zhou et al. 2024, ACL)](https://arxiv.org/abs/2405.20612) — 基於注意力頭干預的零樣本去偏論文。

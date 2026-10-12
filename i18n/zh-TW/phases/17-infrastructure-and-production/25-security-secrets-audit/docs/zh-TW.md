@@ -1,6 +1,6 @@
 # 安全工程——金鑰管理、API 金鑰輪換、稽核記錄與防護欄（Security — Secrets, API Key Rotation, Audit Logs, Guardrails）
 
-> 透過集中化保險庫（HashiCorp Vault、AWS Secrets Manager、Azure Key Vault）徹底消滅金鑰擴散（Secret sprawl）。嚴禁將機密憑證散落在設定檔、Git 版本控制系統中的環境變數檔，或是試算表之中。全面採用動態 IAM 角色取代傳統靜態金鑰；CI/CD 管線強制透過 OIDC 進行無金鑰身分鑑別。AI Gateway 閘道架構是 2026 年的正式環境標準解法：微服務應用 → 智慧閘道 → 底層模型供應商，閘道在執行時期直接從 Vault 保險庫動態提取最新憑證。只需在保險庫中完成一次金鑰輪換，全線應用程式便會在數分鐘內自動無感生效——無需重新部署，更無需在 Slack 群組中焦急呼喊「誰拿到了新金鑰」。強制金鑰輪換週期不得超過 90 天；在每一次 commit 時透過 TruffleHog / GitGuardian / Gitleaks 進行強制掃描。落實零信任架構：MFA 多因素驗證、SSO 單一登入、RBAC/ABAC 細粒度授權、短時效 Token 以及終端裝置合規態勢校驗。敏感資訊脫敏（PII scrubbing）利用實體辨識技術在請求轉發前即時遮罩 PHI/PII；一致性 tokenization（Consistent tokenization，如 Mesh 方案）將敏感數值映射至穩定的佔位符，使 LLM 能完美保留程式碼語法與業務關聯語意。網路出站限制：推論服務必須長駐於專屬 VPC/VNet 子網內部，嚴格僅將 `api.openai.com`、`api.anthropic.com` 等白名單網域放行，徹底封殺一切非授權出站連線。2026 年標誌性資安事件：Vercel 供應鏈遭受攻擊，攻擊者透過被外洩的 CI/CD 憑證盜取了數千個客戶部署的環境變數。
+> 透過集中化保險庫（HashiCorp Vault、AWS Secrets Manager、Azure Key Vault）徹底消滅金鑰擴散（Secret sprawl）。嚴禁將機密憑證散落在設定檔、Git 版本控制系統中的環境變數檔，或是試算表之中。全面採用動態 IAM 角色取代傳統靜態金鑰；CI/CD 管線強制透過 OIDC 進行無金鑰身分鑑別。AI Gateway 閘道架構是 2026 年的正式環境標準解法：微服務應用 → 智慧閘道 → 底層模型供應商，閘道在執行時期直接從 Vault 保險庫動態提取最新憑證。只需在保險庫中完成一次金鑰輪換，全線應用程式便會在數分鐘內自動無感生效——無需重新部署，更無需在 Slack 群組中焦急呼喊「誰拿到了新金鑰」。強制金鑰輪換週期不得超過 90 天；在每一次 commit 時透過 TruffleHog / GitGuardian / Gitleaks 進行強制掃描。落實零信任架構：MFA 多因素驗證、SSO 單一登入、RBAC/ABAC 細粒度授權、短時效 Token 以及終端裝置合規態勢校驗。敏感資訊脫敏（PII scrubbing）利用實體辨識技術在請求轉發前即時遮罩 PHI/PII；一致性 tokenization（Consistent tokenization，如 Mesh 方案）將敏感數值映射至穩定的佔位符，使 LLM 能保留程式碼語意與關聯語意。網路出站限制：推論服務必須長駐於專屬 VPC/VNet 子網內部，嚴格僅將 `api.openai.com`、`api.anthropic.com` 等白名單網域放行，徹底封殺一切非授權出站連線。2026 年標誌性資安事件：Vercel 供應鏈遭受攻擊，攻擊者透過被外洩的 CI/CD 憑證盜取了數千個客戶部署的環境變數。
 
 **Type:** Learn
 **Languages:** Python (stdlib, toy PII-scrubber + audit-log writer)
@@ -60,7 +60,7 @@
 
 1. 命名實體辨識（spaCy NER、微軟 Presidio 或商業級專案）。
 2. 對命中實體進行安全遮罩：`"My SSN is 123-45-6789"` → `"My SSN is [SSN_TOKEN_A3F]"`。
-3. 一致性 tokenization（Consistent tokenization，Mesh 模式）：完全相同的原始數值必須精確映射至完全相同的佔位符，確保大模型能理解上下文中的代名詞指代與業務關聯。
+3. 一致性 tokenization（Consistent tokenization，Mesh 模式）：完全相同的原始數值必須精確映射至完全相同的佔位符，確保大模型能保留關聯語意。
 4. 在模型吐出最終回應後，選擇性將真實數值反向還原回傳給使用者。
 
 純靜態正規表示式只能攔截固定格式；NER 能捕捉更多。兩者應搭配使用。
@@ -109,7 +109,7 @@ i4-vault-rotation
 
 ## Use It｜實際應用
 
-`code/main.py` 實作了一套具備一致性 tokenization 能力的微型 PII 脫敏處理器，以及一個嚴格追加寫入（Append-only）的不可篡改稽核記錄寫入器。
+`code/main.py` 實作了一套具備一致性 tokenization 能力的微型 PII 脫敏處理器，以及一個嚴格追加寫入（Append-only）的稽核記錄寫入器。
 
 ## Ship It｜交付成果
 
@@ -118,7 +118,7 @@ i4-vault-rotation
 ## Exercises｜練習
 
 1. 執行 `code/main.py`。連續發送兩條引用同一組 SSN 的 Prompt。確認兩者是否被精準替換為了完全相同的佔位符。
-2. 為一個在 EKS 上運作、需要同時存取 OpenAI、Anthropic 與 Weaviate 向量資料庫的推論微服務，設計一套嚴密的網路出站安全政策（NetworkPolicy）。
+2. 為一個在 EKS 上運作、需要同時存取 OpenAI、Anthropic 與 Weaviate 向量資料庫的推論微服務，設計一套網路出站安全政策。
 3. 你在 Git 歷史中發現一把兩年前的金鑰。正確的回應是什麼——輪換金鑰、清理歷史，還是兩者都做？請說明理由。
 4. 企業的推論稽核記錄每日以 10 GB 的速度暴增。設計一套標準的生命週期分層階梯儲存方案（熱資料長駐 30 天、溫資料長駐 12 個月、冷資料歸檔 6 年）。
 5. 深入辯論「反向 tokenization（將真實數值重新替換回模型回應中）」相較於直接向終端使用者呈現安全佔位符，其所增加的架構複雜度是否真正值得？

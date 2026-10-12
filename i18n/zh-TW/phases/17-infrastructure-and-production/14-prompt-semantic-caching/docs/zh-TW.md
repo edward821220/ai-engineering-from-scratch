@@ -101,7 +101,7 @@ semantic-cache-hit
 
 ## Use It｜實際應用
 
-`code/main.py` 在混合業務流量下模擬了一套整合 L1 語意快取與 L2 服務供應商前綴快取的雙層快取系統。即時輸出各層級命中率、最終月度帳單對比，並呈現並行化造成的費用影響。
+`code/main.py` 在混合業務流量下模擬了一套整合 L1 語意快取與 L2 服務供應商前綴快取的雙層快取系統。即時輸出各層級命中率、最終帳單對比，並呈現並行化造成的費用影響。
 
 ## Ship It｜交付成果
 
@@ -133,6 +133,6 @@ semantic-cache-hit
 
 - [Anthropic Prompt Caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) — 官方 `cache_control` 語意與 TTL 規格說明書。
 - [OpenAI Prompt Caching](https://platform.openai.com/docs/guides/prompt-caching) — 自動快取行為與生效條件指南。
-- [TianPan — Semantic Caching for LLMs Production](https://tianpan.co/blog/2026-04-10-semantic-caching-llm-production) — 工業級大模型語意快取架構指南。
+- [TianPan — Semantic Caching for LLMs Production](https://tianpan.co/blog/2026-04-10-semantic-caching-llm-production) — 正式環境大模型語意快取架構指南。
 - [ProjectDiscovery — Cut LLM Costs 59% With Prompt Caching](https://projectdiscovery.io/blog/how-we-cut-llm-cost-with-prompt-caching) — 透過快取重構節省 59% 成本的實戰案例。
-- [DigitalOcean / Anthropic — Prompt Caching](https://www.digitalocean.com/blog/prompt-caching-with-digital-ocean) — 雲端架構快取整合手冊。
+- [DigitalOcean / Anthropic — Prompt Caching](https://www.digitalocean.com/blog/prompt-caching-with-digital-ocean)

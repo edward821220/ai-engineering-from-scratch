@@ -1,6 +1,6 @@
 # 可擴展監督與弱到強泛化（Scalable Oversight and Weak-to-Strong Generalization）
 
-> Burns 等人（OpenAI 超級對齊團隊，「Weak-to-Strong Generalization」，2023）為超級對齊（Superalignment）難題提出了一項實證代理框架：使用由弱模型產出的標籤，去 fine-tuning 監督一個遠比其強大的強模型。若強模型能從充滿瑕疵的不完美弱監督中正確泛化，那麼現有適用於人類尺度的對齊方法，可能延伸至超人類系統。可擴展監督（Scalable Oversight）與弱到強泛化（W2SG）互補。可擴展監督（辯論機制、遞迴獎勵建模、任務拆解）透過技術手段實質提升監督者的有效認知能力，使其能跟上受監督模型的智力步伐；而 W2SG 則讓強模型能從監督者提供的不完美監督中正確泛化。2025 年 1 月的最新研究《Debate Helps W2SG》（arXiv:2501.13124）將兩者深度結合。
+> Burns 等人（OpenAI 超級對齊團隊，「Weak-to-Strong Generalization」，2023）為超級對齊（Superalignment）難題提出了一項實證代理框架：使用由弱模型產出的標籤，對強模型進行 fine-tuning。若強模型能從充滿瑕疵的不完美弱監督中正確泛化，那麼現有適用於人類尺度的對齊方法，可能延伸至超人類系統。可擴展監督（Scalable Oversight）與弱到強泛化（W2SG）互補。可擴展監督（辯論機制、遞迴獎勵建模、任務拆解）透過技術手段實質提升監督者的有效認知能力，使其能跟上受監督模型的智力步伐；而 W2SG 則讓強模型能從監督者提供的不完美監督中正確泛化。2025 年 1 月的研究《Debate Helps W2SG》（arXiv:2501.13124）將兩者結合。
 
 **Type:** Learn
 **Languages:** Python (stdlib, W2SG gap simulator)
@@ -39,7 +39,7 @@ Burns 等人將這個問題轉化為可操作的實證設定：用弱模型監�
 
 ### Burns 等人的關鍵實證發現（Burns et al. empirical findings）
 
-在自然語言處理（NLP）、西洋棋殘局謎題以及獎勵模型訓練等廣泛任務中，PGR 一貫為正：強模型成功展現出了超越弱監督者錯誤的卓越泛化能力。不同任務上的 PGR 介於約 20% 至 80% 之間。這顯示強模型能從不完美標籤中「理解」預期任務，並可能以預訓練先驗補足。
+在自然語言處理（NLP）、西洋棋殘局謎題以及獎勵模型訓練等廣泛任務中，PGR 一貫為正：強模型成功展現出了超越弱監督者錯誤的卓越泛化能力。不同任務上的 PGR 介於約 20% 至 80% 之間。這顯示強模型能從不完美標籤中「理解」預期任務，並以預訓練先驗補足。
 
 Burns 等人坦誠指出的架構局限性：
 - 該實驗中的「弱到強」本質上是基礎能力的代差，而非嚴格意義上的對齊代差。此處的弱模型天然是對齊的；而在真實的超人類情境下，人類與超智系統之間的認知代差遠比 GPT-2 到 GPT-4 龐大得多。
@@ -50,7 +50,7 @@ Burns 等人坦誠指出的架構局限性：
 
 - **辯論機制（Debate，Irving 等人，2018）**。由兩個不可信強模型 U 針對問題分別擔任正反方展開激烈交叉質詢；由弱裁判作出判斷。其底層核心假設：在客觀事實面前，為真實真理辯護的難度，遠低於為謊言狡辯的難度。2024 至 2025 年的最新實證研究（Khan 等人，Michael 等人）表明：辯論有時有幫助，有時則沒有，是否有幫助取決於任務結構。
 - **遞迴獎勵建模（Recursive Reward Modeling, RRM，Leike 等人，2018）**。由當前的強模型 U 輔助人類專家去訓練下一個更強模型 U+1 的獎勵模型。監督者的有效評估能力隨著被監管模型的迭代而同步水漲船高。
-- **任務層級拆解（Task Decomposition，Christiano、Shlegeris 與 Amodei，2018）**。將困難任務遞迴拆解為人類可以檢查的子任務。核心假設：複雜任務在語義結構上具備可分解性。
+- **任務層級拆解（Task Decomposition，Christiano、Shlegeris 與 Amodei，2018）**。將困難任務遞迴拆解為人類可以檢查的子任務。核心假設：任務可分解。
 
 上述每一種機制，皆對任務結構或中間元件的可靠性建立在特定的先驗假設之上。
 
@@ -67,7 +67,7 @@ OpenAI 官方設立的超級對齊團隊（Superalignment team）隨著負責人
 
 ### 該研究在第 18 階段中的宏觀座標（Where this fits in Phase 18）
 
-第 06 至 10 節確立了威脅建模與防禦典範（假設 U 不可信）。第 11 節是主動防護範式：讓監督者有足夠能力驗證 U 是否對齊。隨後的第 12 至 16 節將全面轉入對抗性實戰評測工具鏈的具體打磨。
+第 06 至 10 節確立了威脅建模與防禦典範（假設 U 不可信）。第 11 節是攻勢典範：讓監督者有足夠能力驗證 U 是否對齊。隨後的第 12 至 16 節將全面轉入對抗性實戰評測工具鏈的具體打磨。
 
 ```figure
 scalable-oversight
@@ -83,7 +83,7 @@ scalable-oversight
 
 ## Exercises｜練習
 
-1. 執行 `code/main.py`。分別在弱標註員準確率為 0.60、0.70 與 0.80 條件下度量最終的 PGR 指標。深入剖析 PGR 曲線隨弱監督者品質變動的物理規律。
+1. 執行 `code/main.py`。分別在弱標註員準確率為 0.60、0.70 與 0.80 條件下度量最終的 PGR 指標。解釋 PGR 曲線的形狀。
 2. 修改弱標註員的錯誤生成邏輯，使其帶有嚴重的結構化偏誤（例如在特定輸入類別上總是預測錯誤）。強模型的 PGR 是會上升、下降還是保持不變？給出原理解釋。
 3. 仔細研讀 Burns 等人（2023）原著論文第 4.3 節（NLP 基準測試）。重現其「置信度輔助損失函數（Confidence auxiliary loss）」的直覺核心：當強模型自身的預測置信度顯著超越弱標籤時，最佳化器究竟聽誰的？
 4. 為一項複雜的軟體工程架構設計任務，起草一套結合了「辯論機制」與「任務層級拆解」的複合可擴展監督協定。分別指出這兩個元件各自最容易爆發的失效模式，並說明組合如何處理或未能處理各自的失效模式。
@@ -103,8 +103,8 @@ scalable-oversight
 
 ## Further Reading｜延伸閱讀
 
-- [Burns et al. — Weak-to-Strong Generalization (OpenAI 2023)](https://openai.com/index/weak-to-strong-generalization/) — 弱到強泛化開山奠基論文。
-- [Irving, Christiano, Amodei — AI safety via debate (arXiv:1805.00899)](https://arxiv.org/abs/1805.00899) — 基於 AI 辯論的可擴展監督原創經典。
-- [Leike et al. — Scalable agent alignment via reward modeling (arXiv:1811.07871)](https://arxiv.org/abs/1811.07871) — 遞迴獎勵建模（RRM）理論奠基。
-- [Khan et al. — Debating with More Persuasive LLMs Leads to More Truthful Answers (arXiv:2402.06782)](https://arxiv.org/abs/2402.06782) — 2024 年關於強辯論者能否提升真實回答率的最新實證。
-- [Lang et al. — Debate Helps Weak-to-Strong Generalization (arXiv:2501.13124)](https://arxiv.org/abs/2501.13124) — 2025 年將辯論機制與 W2SG 深度結合的突破性成果。
+- [Burns et al. — Weak-to-Strong Generalization (OpenAI 2023)](https://openai.com/index/weak-to-strong-generalization/) — W2SG 論文。
+- [Irving, Christiano, Amodei — AI safety via debate (arXiv:1805.00899)](https://arxiv.org/abs/1805.00899) — AI 辯論機制。
+- [Leike et al. — Scalable agent alignment via reward modeling (arXiv:1811.07871)](https://arxiv.org/abs/1811.07871) — 遞迴獎勵建模（RRM）。
+- [Khan et al. — Debating with More Persuasive LLMs Leads to More Truthful Answers (arXiv:2402.06782)](https://arxiv.org/abs/2402.06782) — 2024 年關於強辯論者能否提升真實回答率的實證研究。
+- [Lang et al. — Debate Helps Weak-to-Strong Generalization (arXiv:2501.13124)](https://arxiv.org/abs/2501.13124) — 2025 年將辯論機制與 W2SG 結合的研究。

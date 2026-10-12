@@ -115,7 +115,7 @@ def all_reduce_grads_(module, world_size):
 
 ### 第五步：FSDP 參數分片與重構往返
 
-`fsdp_round_trip_sketch` 將每個參數張量展平為一維向量、對齊填充至 `world_size` 的整數倍、切分為局部切片、調用 all_gather 重構全量張量，並剝離填充項。每個 Rank 重構出的張量與原始張量 100% 精確吻合。這就是 FSDP 的動態解分片步驟；而其逆向操作（在計算完畢後立即丟棄全量張量、僅保留本地切片）則僅僅是一次記憶體切片釋放。
+`fsdp_round_trip_sketch` 將每個參數張量展平為一維向量、對齊填充至 `world_size` 的整數倍、切分為局部切片、調用 all_gather 重構全量張量，並剝離填充項。每個 Rank 重構出的張量與原始張量 100% 精確吻合。這就是 FSDP 的動態解分片步驟；而其逆向操作（前向計算後重新分片）只是從 all_gather 得到的張量切出一個切片。
 
 執行測試：
 

@@ -1,6 +1,6 @@
 # 託管式 LLM 平台——Bedrock、Vertex AI、Azure OpenAI（Managed LLM Platforms — Bedrock, Vertex AI, Azure OpenAI）
 
-> 三大超大規模雲端供應商（Hyperscaler），三種涇渭分明的戰略路徑。AWS Bedrock 是一座模型市集——將 Claude、Llama、Titan、Stability 與 Cohere 統一整合於單一 API 後方。Azure OpenAI 是 OpenAI 的獨家深度合作夥伴，並提供用於專屬容量的預置吞吐量單元（PTU）。Vertex AI 則是 Gemini 優先，擁有最強悍的超長上下文與多模態敘事能力。2026 年 Artificial Analysis 實測指出，在等價的 Llama 3.1 405B 等級部署上，Azure OpenAI 的首字延遲中位數約為 50 ms，而 Bedrock 則約為 75 ms——PTU 的專屬容量有助解釋這項差距，因為專屬容量通常比共享隨需容量有較低的延遲。決策鐵律絕非「哪家最快」，而是「哪家的模型型錄與 FinOps 成本歸因面能精準貼合你的產品需求」。本課教你拋開主觀感覺，基於白紙黑字的工程權衡做出冷靜選型。
+> 三大超大規模雲端供應商（Hyperscaler），三種涇渭分明的戰略路徑。AWS Bedrock 是一座模型市集——將 Claude、Llama、Titan、Stability 與 Cohere 統一整合於單一 API 後方。Azure OpenAI 是 OpenAI 的獨家深度合作夥伴，並提供用於專屬容量的預置吞吐量單元（PTU）。Vertex AI 則是 Gemini 優先，擁有最強悍的超長上下文與多模態敘事能力。2026 年 Artificial Analysis 實測指出，在等價的 Llama 3.1 405B 等級部署上，Azure OpenAI 的第一個 token 延遲中位數約為 50 ms，而 Bedrock 則約為 75 ms——PTU 的專屬容量有助解釋這項差距，因為專屬容量通常比共享隨需容量有較低的延遲。決策鐵律絕非「哪家最快」，而是「哪家的模型型錄與 FinOps 成本歸因面能精準貼合你的產品需求」。本課教你拋開主觀感覺，基於白紙黑字的工程權衡做出冷靜選型。
 
 **Type:** Learn
 **Languages:** Python (stdlib, toy cost-and-latency comparator)
@@ -10,7 +10,7 @@
 ## Learning Objectives｜學習目標
 
 - 指出三大平台戰略（市集型 vs 獨家型 vs Gemini 優先型），並將各自精準映射至合適的產品應用場景。
-- 深入解釋 Azure OpenAI 的預置吞吐量單元（Provisioned Throughput Units, PTU）究竟為你購買了什麼，以及為何隨需的 Bedrock 在 405B 規模下首字延遲通常慢約 25 ms。
+- 深入解釋 Azure OpenAI 的預置吞吐量單元（Provisioned Throughput Units, PTU）究竟為你購買了什麼，以及為何隨需的 Bedrock 在 405B 規模下第一個 token 延遲通常慢約 25 ms。
 - 繪製三大平台的 FinOps 成本歸因架構圖（Bedrock 的 Application Inference Profiles vs Vertex 的專案即團隊模式 vs Azure 的範圍作用域與 PTU 預留）。
 - 撰寫「至少雙供應商（Two-provider minimum）」政策，並說明為何在 2026 年單一供應商鎖定是代價高昂的錯誤。
 
@@ -34,7 +34,7 @@
 
 ### 規模化下的延遲落差（Latency gap at scale）
 
-權威獨立評測機構 Artificial Analysis 執行不間斷的自動化實測。在等價的 Llama 3.1 405B 共享隨需部署下，Azure OpenAI 的首字延遲（Time-to-First-Token, TTFT）中位數約為 50 ms；而 Bedrock 則落在約 75 ms 附近。這項差距絕非 AWS 底層技術落後——而是源於容量售賣模式的根本差異。Azure 主打販售 PTU（預置吞吐量單元），直接為你的租戶獨家預留實體 GPU 算力；Bedrock 雖亦有名為 Provisioned Throughput 的類似機制，但每單元每小時起跳價高達 21 美元，絕大多數客戶預設皆採用共享隨需模式。
+權威獨立評測機構 Artificial Analysis 執行不間斷的自動化實測。在等價的 Llama 3.1 405B 共享隨需部署下，Azure OpenAI 的第一個 token 延遲（Time-to-First-Token, TTFT）中位數約為 50 ms；而 Bedrock 則落在約 75 ms 附近。這項差距絕非 AWS 底層技術落後——而是源於容量售賣模式的根本差異。Azure 主打販售 PTU（預置吞吐量單元），直接為你的租戶獨家預留實體 GPU 算力；Bedrock 雖亦有名為 Provisioned Throughput 的類似機制，但每單元每小時起跳價高達 21 美元，絕大多數客戶預設皆採用共享隨需模式。
 
 隨需共享容量意味著你必須與全球所有其他租戶的突發流量共同爭奪 GPU。而專屬預留容量則完全與雜訊隔離。若你產品的服務等級協定（SLA）嚴格要求 P99 TTFT 必須小於 100 ms，你要麼在 Azure 上採購 PTU，要麼在 Bedrock 上購買預置吞吐量，要麼就必須默默承受隨需模式的高波動變異數。
 
@@ -58,7 +58,7 @@ Vertex 的預置容量則按特定 Gemini SKU 進行販售；定價因模型與�
 
 ### 供應商鎖定是 2026 年的最大風險（Lock-in is the 2026 risk）
 
-在單一模型獨步天下的舊時代，將籌碼全押在單一超大廠上無可厚非。然而到了 2026 年，技術前沿每個月都在劇烈洗牌——某個季度 Claude 3.7 技壓群雄，下個季度 Gemini 2.5 逆襲奪冠，再下個季度 GPT-5 又重回王座。若將系統死鎖在單一平台上，等同於主動將自己隔絕在三分之二的全球尖端智力之外。
+在單一模型獨步天下的舊時代，將籌碼全押在單一超大廠上無可厚非。然而到了 2026 年，技術前沿每個月都在劇烈洗牌——某個季度是 Claude 3.7，下個季度是 Gemini 2.5，再下個季度是 GPT-5。若將系統死鎖在單一平台上，等同於主動將自己隔絕在三分之二的全球尖端智力之外。
 
 成熟團隊採用的模式：任何產品關鍵 LLM 呼叫都至少採用**雙供應商（Two-provider minimum）**。Bedrock 搭配 Azure OpenAI 是常見組合——由前者供應 Claude、後者供應 GPT，並透過同一套 Gateway 在兩者間容錯移轉。由於 Gateway 會選擇最佳路由，成本增幅可忽略不計；服務中斷時（例如 Azure OpenAI 2025 年 1 月事件或 AWS us-east-1 中斷），可用性提升則具決定性。
 

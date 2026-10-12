@@ -10,13 +10,13 @@
 
 ## Problem｜問題
 
-非同步雲端程式設計 Agent（Async Cloud Coding Agent）與終端機互動式程式設計 Agent（專案實戰 01）代表了截然不同的產品形態。其使用者體驗完全寄生於 GitHub 標籤（Labels）之上：工程師在 GitHub Issue 上打上 `@agent fix this` 標籤，背景排程器隨即在雲端沙盒中喚醒一個 Worker 容器、克隆儲存庫、執行測試套件、編輯程式碼、驗證測試翻綠，並最終自動發布一個附上修復理由的 PR。全流程完全無人值守，無需本地終端機介入。AWS Remote SWE Agents、Cursor Background Agents、OpenAI Codex 雲端版、Google Jules 以及 Factory Droids 皆全面收斂於此架構。
+非同步雲端程式設計 Agent（Async Cloud Coding Agent）與終端機互動式程式設計 Agent（專案實戰 01）代表了截然不同的產品形態。其使用者體驗完全寄生於 GitHub 標籤（Labels）之上：工程師在 GitHub Issue 上打上 `@agent fix this` 標籤，背景排程器隨即在雲端沙盒中喚醒一個 Worker 容器、複製儲存庫、執行測試套件、編輯程式碼、驗證測試翻綠，並最終自動發布一個附上修復理由的 PR。全流程完全無人值守，無需本地終端機介入。AWS Remote SWE Agents、Cursor Background Agents、OpenAI Codex 雲端版、Google Jules 以及 Factory Droids 皆全面收斂於此架構。
 
 真正的工程難題極其具體：環境自動還原（Agent 必須在完全沒有預先快取特定開發環境的前提下，從零自適應建置程式碼儲存庫）、不穩定測試（Flaky Tests，必須進行多輪重試或動態隔離）、憑證權限控制（GitHub App 必須採用極致收斂的細粒度權限）、每個儲存庫每日成本配額封頂，以及物理層面的防止 force-push（No-force-push）資安防禦。本專案實戰將全面量化該自建系統相較於全託管商業競品的修復成功率、單任務成本與安全防禦指標。
 
 ## Concept｜核心概念
 
-整個系統的觸發源自 GitHub Webhook（Issue 打上標籤或 PR 出現評論）。分發器（Dispatcher）將任務送入 AWS SQS 訊息佇列，隨後調度 ECS Fargate 任務或 Lambda。Worker 容器將目標儲存庫克隆至 Daytona 或 E2B 隔離沙盒中，並依據儲存庫結構自動推導出的通用 Dockerfile（自動辨析程式語言與套件管理工具）動態配置執行環境。Agent 調用 mini-swe-agent 或 SWE-agent v2 控制迴圈，後台掛載 Claude Opus 4.7 或 GPT-5.4-Codex。展開自動化循環：精讀程式碼、起草修復補丁、應用修改、執行測試。
+整個系統的觸發源自 GitHub Webhook（Issue 打上標籤或 PR 出現評論）。分發器（Dispatcher）將任務送入 AWS SQS 訊息佇列，隨後調度 ECS Fargate 任務或 Lambda。Worker 容器將目標儲存庫複製至 Daytona 或 E2B 隔離沙盒中，並依據儲存庫結構自動推導出的通用 Dockerfile（自動辨析程式語言與套件管理工具）動態配置執行環境。Agent 調用 mini-swe-agent 或 SWE-agent v2 控制迴圈，後台掛載 Claude Opus 4.7 或 GPT-5.4-Codex。展開自動化循環：精讀程式碼、起草修復補丁、應用修改、執行測試。
 
 在沙盒中驗證 CI 全綠是發起 PR 的必備硬性門禁。在正式開啟 PR 前，沙盒內部的全套 CI 測試必須 100% 通過。系統自動比對測試覆蓋率變動 Delta；若覆蓋率出現異常下滑但所有測試依然全過，PR 仍會開啟但會被強制打上 `needs-review` 標籤。Agent 將完整的修復論證闡述在 PR 正文中，並在 PR 內部建立一個 `@agent` 討論串，供人類審查員隨時發布追問與修改要求。
 

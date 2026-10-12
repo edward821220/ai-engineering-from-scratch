@@ -16,7 +16,7 @@
 
 ## The Problem｜問題
 
-你評估過各大超大規模雲端平台後，得出結論：你需要更聚焦、推論延遲更低的專業服務商——追求極致延遲選 Fireworks、追求全模型覆蓋選 Together、部署自研 fine-tuning 模型選 Baseten。然而當你面對六家真實廠商的定價頁面時，卻發現維度完全無法對齊：各家定價頁的計價單位分別為：Fireworks 以 $/M tokens; Baseten shows $/minute；Modal 以 $/second; Replicate shows $/prediction。 在不對真實負載建立數學模型的前提下，你根本無法將它們放在同一個基準上橫向對比。
+你評估過各大超大規模雲端平台後，得出結論：你需要更聚焦、推論延遲更低的專業服務商——追求極致延遲選 Fireworks、追求全模型覆蓋選 Together、部署自研 fine-tuning 模型選 Baseten。然而當你面對六家真實廠商的定價頁面時，卻發現維度完全無法對齊：各家定價頁採用的計價單位分別為：Fireworks shows $/M tokens; Baseten shows $/minute; Modal shows $/second; Replicate shows $/prediction。在不對真實負載建立數學模型的前提下，你根本無法將它們放在同一個基準上橫向對比。
 
 更棘手的是，每份定價頁面背後的商業邏輯截然不同。Fireworks 在共享 GPU 上運作自研的 FireAttention 專屬推論引擎，其每 Token 費率直接反映了其算力利用率曲線；Baseten 提供 Truss 打包框架與獨佔專屬 GPU，其按分鐘計費反映的是資源專有權；Modal 則是徹底的 Python 無伺服器（Serverless）架構——提供按秒計費與亞秒級的冷啟動體驗。產出完全相同的文字（一段 LLM 回應），背後卻對應三種本質迥異的成本函數。
 
@@ -28,7 +28,7 @@
 
 **專屬客製化晶片（Custom silicon）**——Groq（LPU）、Cerebras（WSE）、SambaNova（RDU）。在相同模型下，解碼速度通常比基於常規 GPU 的叢集快 5 至 10 倍。雖然每 Token 單價相對較高（2025 年底 Groq 在 Llama-70B 上的報價為 ~$0.99/M），但在延遲極度敏感的場景下具備無可爭議的統治地位。Groq 是目前語音 Agent 與即時語意翻譯領域的正式環境首選。
 
-**GPU 算力平台（GPU platforms）**——Baseten、Together、Fireworks、Modal、Anyscale。基於 NVIDIA（2026 年廣泛部署 H100、H200、B200）或部分 AMD GPU 運作。它們是介於「純裸金屬 GPU 租賃（RunPod、Lambda）」與「超大廠託管服務（Bedrock）」之間的黃金經濟層。
+**GPU 算力平台（GPU platforms）**——Baseten、Together、Fireworks、Modal、Anyscale。基於 NVIDIA（2026 年的 H100、H200、B200）或部分 AMD GPU 運作。它們是介於「純裸金屬 GPU 租賃（RunPod、Lambda）」與「超大廠託管服務（Bedrock）」之間的黃金經濟層。
 
 **API 優先型市集（API-first marketplaces）**——Replicate、DeepInfra、OpenRouter、Fal。擁有極致廣泛的模型型錄，支援按次預測或按秒計費，將開發者「從註冊到首次呼叫成功耗時」的最佳化推向極致。
 
@@ -49,7 +49,7 @@
 ### Baseten——企業級成熟度最佳化（Baseten — enterprise-polish-optimized）
 
 - 推出 Truss 框架：在單一宣告式資訊清單內部完整封裝模型相依套件、機密憑證與 Serving 配置。
-- 硬體覆蓋從 T4 直至 B200。按分鐘計費，並具備優秀的冷啟動抑制機制。
+- 硬體覆蓋從 T4 直至 B200。按分鐘計費，並具備合理的冷啟動緩解機制。
 - 全面通過 SOC 2 Type II 認證，已做好符合 HIPAA 要求的準備。是金融科技與醫療領域的熱門首選。
 - 估值達 50 億美元，2026 年 1 月完成 3 億美元 E 輪融資（由 CapitalG、IVP 與 NVIDIA 聯合注資）。
 

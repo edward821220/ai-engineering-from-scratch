@@ -1,6 +1,6 @@
 # 直接偏好最佳化（DPO）家族演進（The Direct Preference Optimization Family）
 
-> Rafailov 等人（2023）證明了帶有 KL 散度約束的 RLHF 最佳解，可以直接透過偏好資料以封閉解析形式（Closed form）精準推導，從而允許工程師徹底跳過顯式的獨立獎勵模型，直接對策略模型展開端到端最佳化。這項突破性洞察催生出了一整個龐大的對齊家族——IPO、KTO、SimPO、ORPO、BPO——各自專攻修復 DPO 原始架構的一項致命缺陷。到了 2026 年，直接對齊演算法（DAA）承載的前沿後訓練作業比 PPO 更多。然而 Phase 18 · 02 揭示的過度最佳化曲線依然適用：直接對齊演算法並未逃脫古德哈特定律的詛咒，它們僅僅是轉移了漏洞被鑽取的具體位置。
+> Rafailov 等人（2023）證明了帶有 KL 散度約束的 RLHF 最佳解，可以直接透過偏好資料以封閉解析形式（Closed form）精準推導，從而允許工程師徹底跳過顯式的獨立獎勵模型，直接對策略模型展開端到端最佳化。這項突破性洞察催生出了一整個龐大的對齊家族——IPO、KTO、SimPO、ORPO、BPO——各自專攻修復 DPO 原始架構的一項失效模式。到了 2026 年，直接對齊演算法（DAA）承載的前沿後訓練作業比 PPO 更多。然而 Phase 18 · 02 揭示的過度最佳化曲線依然適用：直接對齊演算法並未逃脫古德哈特定律的詛咒，它們僅僅是轉移了漏洞被鑽取的具體位置。
 
 **Type:** Learn
 **Languages:** Python (stdlib, six-variant preference-loss comparator)
@@ -57,7 +57,7 @@ L_DPO = -log sigmoid(
 
 ### IPO（Azar 等人，2024）
 
-恆等偏好最佳化（Identity Preference Optimization）。核心在於用偏好機率的恆等映射（Identity mapping）徹底取代傳統的 log-sigmoid。損失函數蛻變為針對有界目標的均方誤差：
+恆等偏好最佳化（Identity Preference Optimization）。核心在於用偏好機率的恆等映射（Identity mapping）徹底取代傳統的 log-sigmoid。損失函數蛻變為針對有界目標的平方誤差：
 
 ```
 L_IPO = (log(pi(y_w | x) / pi_ref(y_w | x)) - log(pi(y_l | x) / pi_ref(y_l | x)) - 1/(2 beta))^2
@@ -116,9 +116,9 @@ Rafailov 等人在 NeurIPS 2024 論文《Scaling Laws for Reward Model Overoptim
 - 僅有單條二元滿意度標籤（未配對）：首選 KTO。
 - 期望從 Base 模型一步到位完成單階段對齊：首選 ORPO。
 - 觀察到被選中答案的對數機率發生退化暴跌：首選 BPO。
-- 樣本間的偏好強度差異極其懸殊、且 DPO 頻繁觸發梯度飽和：首選 IPO。
+- 樣本間的偏好強度差異極其懸殊、且 DPO 趨於飽和：首選 IPO。
 
-所有實驗室都會以一系列測試比較這五種演算法。沒有任何理由假設數學推理的最優對齊演算法會與安全對齊完全一致。
+所有實驗室都會用一系列測試比較這五種演算法，並依每項任務選出勝者。沒有理由假設數學推理與安全任務的最佳選擇會相同。
 
 ```figure
 dpo-margin

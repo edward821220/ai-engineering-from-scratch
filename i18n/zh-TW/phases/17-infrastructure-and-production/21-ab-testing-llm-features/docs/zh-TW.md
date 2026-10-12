@@ -44,7 +44,7 @@ Statsig 與 GrowthBook 都有實作該演算法。
 
 ### 循序檢定（Sequential testing）
 
-傳統經典的 A/B 測試嚴格依賴固定樣本量，中途偷看資料會嚴重虛胖顯著性。循序檢定（Sequential testing，允許「邊看邊做決策」）在多次連續觀測下嚴格將偽陽性（False-positive）機率控制在預設 α 門檻之內。有效循序檢定程序（如 mSPRT、Howard 信賴序列）允許你在結果明確勝出時提前停止實驗，極大節省線上試錯成本。
+傳統經典的 A/B 測試嚴格依賴固定樣本量，中途偷看資料會嚴重虛胖顯著性。循序檢定（Sequential testing，允許「邊看邊做決策」）在多次連續觀測下嚴格將偽陽性（False-positive）機率控制在預設 α 門檻之內。永遠有效的循序檢定程序（如 mSPRT、Howard 信賴序列）允許你在結果明確勝出時提前停止實驗，極大節省線上試錯成本。
 
 ### 多重比較校正（Multiple-comparison corrections）
 
@@ -75,8 +75,8 @@ Statsig 與 GrowthBook 都有實作該演算法。
 
 ### 工業級真實案例實效（Real case outcomes）
 
-- 某對話機器人採用獎勵模型變體：平均單次 Session 對話長度提升 +70%，使用者留存率提升 +30%。
-- Nextdoor 主旨行實驗：在經過精細化獎勵函數迭代後，郵件點閱率（CTR）取得 +1% 淨增長。
+- 某對話機器人採用獎勵模型變體：對話長度增加 70%，使用者留存率提升 +30%。
+- Nextdoor 主旨行實驗：獎勵函數經過調整後，CTR 提升 1%。
 - 可汗學院 Khanmigo 教育助手：在推論延遲與高難度數學解題準確率之間調整取捨。
 
 ### 致命反模式：憑個人感覺拍板發布（The anti-pattern: shipping on vibes）
