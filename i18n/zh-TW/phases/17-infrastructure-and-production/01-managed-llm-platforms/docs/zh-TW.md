@@ -16,7 +16,7 @@
 
 ## The Problem｜問題
 
-你為產品選定了 Claude 3.7 Sonnet。現在你需要對外提供服務。你可以直接呼叫 Anthropic 官方 API，也可以透過 AWS Bedrock 存取，或者在前端架構一層專屬 Gateway。直連官方 API 最為簡潔；Bedrock 則額外賦予了 BAA 醫療合規協議、VPC 私有端點、IAM 權限控管與 CloudWatch 細粒度計費歸因。而 Gateway 則能在跨供應商之間提供自動容錯移轉、統一帳單以及全域速率限制（Rate limiting）。
+你為產品選定了 Claude 3.7 Sonnet。現在你需要對外提供服務。你可以直接呼叫 Anthropic 官方 API，也可以透過 AWS Bedrock 存取，或者在前端架構一層專屬 Gateway。直連官方 API 最為簡潔；Bedrock 則額外賦予了 BAA 商業夥伴協議、VPC 私有端點、IAM 權限控管與 CloudWatch 細粒度計費歸因。而 Gateway 則能在跨供應商之間提供自動容錯移轉、統一帳單以及全域速率限制（Rate limiting）。
 
 更深層的核心課題在於模型型錄。若你的產品同時需要 Claude、Llama 與 Gemini，你根本無法從單一廠商處買齊全部能力——除非你同時擁抱 Bedrock、Vertex 與 Azure OpenAI。各大超大規模雲端廠商絕非彼此同質的替代品——它們在「究竟誰該擁有底層模型層」這項世紀賭注上，各自押下了截然不同的籌碼。
 
@@ -34,9 +34,9 @@
 
 ### 規模化下的延遲落差（Latency gap at scale）
 
-權威獨立評測機構 Artificial Analysis 執行不間斷的自動化實測。在等價的 Llama 3.1 405B 共享隨需部署下，Azure OpenAI 的第一個 token 延遲（Time-to-First-Token, TTFT）中位數約為 50 ms；而 Bedrock 則落在約 75 ms 附近。這項差距絕非 AWS 底層技術落後——而是源於容量售賣模式的根本差異。Azure 主打販售 PTU（預置吞吐量單元），直接為你的租戶獨家預留實體 GPU 算力；Bedrock 雖亦有名為 Provisioned Throughput 的類似機制，但每單元每小時起跳價高達 21 美元，絕大多數客戶預設皆採用共享隨需模式。
+Artificial Analysis 持續執行基準測試。在等價的 Llama 3.1 405B 共享隨需部署下，Azure OpenAI 的第一個 token 延遲（Time-to-First-Token, TTFT）中位數約為 50 ms；而 Bedrock 則落在約 75 ms 附近。這項差距絕非 AWS 底層技術落後——而是源於容量售賣模式的根本差異。Azure 主打販售 PTU（預置吞吐量單元），直接為你的租戶獨家預留實體 GPU 算力；Bedrock 雖亦有名為 Provisioned Throughput 的類似機制，但每單元每小時起跳價高達 21 美元，絕大多數客戶預設皆採用共享隨需模式。
 
-隨需共享容量意味著你必須與全球所有其他租戶的突發流量共同爭奪 GPU。而專屬預留容量則完全與雜訊隔離。若你產品的服務等級協定（SLA）嚴格要求 P99 TTFT 必須小於 100 ms，你要麼在 Azure 上採購 PTU，要麼在 Bedrock 上購買預置吞吐量，要麼就必須默默承受隨需模式的高波動變異數。
+隨需共享容量意味著你必須與全球所有其他租戶的突發流量共同爭奪 GPU。而專屬容量則不會與其他客戶流量競爭。若你產品的服務等級協定（SLA）嚴格要求 P99 TTFT 必須小於 100 ms，你要麼在 Azure 上採購 PTU，要麼在 Bedrock 上購買預置吞吐量，要麼就必須默默承受隨需模式的高波動變異數。
 
 ### 預置吞吐量經濟學（Provisioned Throughput economics）
 
@@ -64,7 +64,7 @@ Vertex 的預置容量則按特定 Gemini SKU 進行販售；定價因模型與�
 
 ### 資料落地、BAA 與強監管產業（Data residency, BAAs, and regulated industries）
 
-Bedrock：在全球絕大多數主要區域皆支援簽署 BAA 醫療隱私協議；提供全私有 VPC 端點與原生 Guardrails 防護欄。是金融科技領域極受歡迎的預設選擇。
+Bedrock：在全球絕大多數主要區域皆支援簽署 BAA（商業夥伴協議）；提供全私有 VPC 端點與原生 Guardrails 防護欄。是金融科技領域極受歡迎的預設選擇。
 Azure OpenAI：通過 HIPAA、SOC 2、ISO 27001 認證；提供嚴格的歐盟境內資料落地保護；是傳統大型跨國企業與高度監管行業的首選預設。
 Vertex：符合 HIPAA、GDPR 標準，支援各區域資料本機落地；繼承 Google Cloud 完整的合規技術堆疊。
 

@@ -1,6 +1,6 @@
 # 影子流量、金絲雀發布與 LLM 漸進式交付（Shadow Traffic, Canary Rollout, and Progressive Deployment for LLMs）
 
-> 大模型的上線發布融合了軟體工程中最艱難的挑戰：缺乏單元測試、故障模式極其發散瀰漫、線上回饋訊號嚴重滯後。標準落地順序為：(1) 影子模式（Shadow mode）——將正式環境的請求複製給候選模型，記錄並比較，對使用者產生零感知干擾；能有效排查顯著的輸入分佈異常，但絕非品質保證的充分條件；(2) 金絲雀發布（Canary rollout）——將真實使用者流量按 10% → 25% → 50% → 75% → 100% 階梯漸進切換，並在每個階段設立嚴格的發布閘門；全天候緊盯延遲百分位數、單請求成本、錯誤與拒絕回答率、輸出長度分佈以及使用者回饋率；(3) A/B 測試——唯有在系統穩定性得到客觀證實後，才針對具備顯著行為差異的候選方案展開 A/B 驗收。不可消除的隨機非確定性（Non-determinism）是全新常態——由於 GPU 浮點數運算不滿足結合律加上動態批次尺寸的隨機性，在完全相同的輸入下跨執行批次仍會產生高達 15% 的準確率波動。推論成本是一項動態變數，絕非固定常數——一個品質提升 20% 的模型，單次呼叫成本可能暴增 3 倍。回滾（Rollback）速度具有決定性意義：若回滾需要重新部署，那就太慢了。路由策略應當長駐於動態 Feature Flags 設定中；模型則存放於模型登錄（model registry）中，並鎖定其唯讀 SHA Digest 摘要；秒級回滾 = 翻轉動態策略開關 + 還原閾值 + 鎖定舊版本 Digest。
+> LLM 的上線發布融合了軟體工程中最艱難的挑戰：缺乏單元測試、故障模式極其發散瀰漫、線上回饋訊號嚴重滯後。標準發布順序為：(1) 影子模式（Shadow mode）——將正式環境的請求複製給候選模型，記錄並比較，不影響使用者；能有效排查顯著的輸入分佈異常，但絕非品質保證的充分條件；(2) 金絲雀發布（Canary rollout）——將真實使用者流量按 10% → 25% → 50% → 75% → 100% 階梯漸進切換，並在每個階段設立嚴格的發布閘門；追蹤延遲百分位數、單請求成本、錯誤與拒絕回答率、輸出長度分佈以及使用者回饋率；(3) A/B 測試——唯有在系統穩定性得到客觀證實後，才針對具備顯著行為差異的候選方案展開 A/B 測試。不可消除的隨機非確定性（Non-determinism）是全新常態——由於 GPU 浮點數運算不滿足結合律加上動態批次尺寸的隨機性，在完全相同的輸入下跨執行批次仍會產生高達 15% 的準確率波動。推論成本是一項動態變數，絕非固定常數——一個品質提升 20% 的模型，單次呼叫成本可能暴增 3 倍。回滾（Rollback）速度具有決定性意義：若回滾需要重新部署，那就太慢了。路由策略應當長駐於動態 Feature Flags 設定中；模型則存放於模型登錄（model registry）中，並固定 digest；秒級回滾 = 翻轉動態策略開關 + 還原閾值 + 鎖定舊版本 Digest。
 
 **Type:** Learn
 **Languages:** Python (stdlib, toy canary-progression simulator)
@@ -10,8 +10,8 @@
 ## Learning Objectives｜學習目標
 
 - 嚴格區分影子模式（零使用者影響的被動對比）、金絲雀發布（真實線上流量的階梯漸進放量）與 A/B 測試（在系統已驗證穩定前提下的行為對比）三者的生命週期邊界。
-- 列出大模型專屬的五項金絲雀指標（延遲百分位數、單請求成本、錯誤／拒答率、輸出長度分佈、使用者回饋）。
-- 深刻解釋大模型的不可消除非確定性（高達 15% 波動）如何重新定義了發布過程中的「系統穩定」概念。
+- 列出 LLM 專屬的五項金絲雀指標（延遲百分位數、單請求成本、錯誤／拒答率、輸出長度分佈、使用者回饋）。
+- 深刻解釋 LLM 的不可消除非確定性（高達 15% 波動）如何重新定義了發布過程中的「系統穩定」概念。
 - 設計一套能在數秒內極速完成（純策略開關翻轉）、而非耗時數小時（重新部署）的標準回滾架構。
 
 ## The Problem｜問題
@@ -57,7 +57,7 @@
 
 一個表現提升 20% 的模型，其單次呼叫的實質成本可能高達原先的 3 倍。單請求成本是五個閘門之一。發布的模型雖然表現更好，卻破壞單位經濟效益（Unit economics），這就可作為回滾理由。
 
-### 秒級回滾是唯一的自衛武器（Rollback is the weapon）
+### 回滾是武器（Rollback is the weapon）
 
 - **策略開關（Policy flag，動態功能標記系統）**：直接在配置中秒級翻轉流量切分比例；耗時僅需數秒。
 - **模型版本鎖定（Model pinning，模型登錄摘要）**：嚴格鎖定不可變的二進位 Digest 雜湊，堅決杜絕任何自動隱式升級。
@@ -108,8 +108,8 @@ i4-canary-ramp
 1. 執行 `code/main.py`。主動注入一項增加 25% 的成本回歸缺陷。金絲雀控制器會在放量的哪一個具體百分比階梯強制終止發布？
 2. 你的新模型在線下評測中展現出 3% 的準確率提升，但正式環境單請求成本增加了 18%。這項改動是否應該上線？依據策略，寫出兩種決策路徑。
 3. 設計一套能在 60 秒內完成的端到端回滾流程，並列出所需基礎設施。
-4. 由於底層非確定性，你的驗證集在相同條件下展現出 ±7% 的正常波動。在此物理現實下，你該如何科學設定金絲雀發布閘門的容差係數，以避免引發頻繁的假警報？
-5. 影子模式在正式放量前成功攔截了一次潛在的 40% 成本暴漲事故。為影子通道撰寫標準的自動化警報觸發規則與監控運算式。
+4. 由於底層非確定性，你的離線評測在相同條件下展現出 ±7% 的正常波動。在此物理現實下，你該如何科學設定金絲雀發布閘門的容差係數，以避免引發頻繁的假警報？
+5. 影子模式在正式放量前成功攔截了一次潛在的 40% 成本暴漲事故。為影子通道撰寫會觸發警報的規則。
 
 ## Key Terms｜關鍵術語
 
@@ -128,7 +128,7 @@ i4-canary-ramp
 ## Further Reading｜延伸閱讀
 
 - [TianPan — Releasing AI Features Without Breaking Production](https://tianpan.co/blog/2026-04-09-llm-gradual-rollout-shadow-canary-ab-testing) — 在不破壞正式環境的前提下平穩發布 AI 功能。
-- [MarkTechPost — Safely Deploying ML Models](https://www.marktechpost.com/2026/03/21/safely-deploying-ml-models-to-production-four-controlled-strategies-a-b-canary-interleaved-shadow-testing/) — 四大受控受限發布策略詳解。
-- [APXML — Advanced LLM Deployment Patterns](https://apxml.com/courses/mlops-for-large-models-llmops/chapter-4-llm-deployment-serving-optimization/advanced-llm-deployment-patterns) — 進階大模型交付架構模式。
+- [MarkTechPost — Safely Deploying ML Models](https://www.marktechpost.com/2026/03/21/safely-deploying-ml-models-to-production-four-controlled-strategies-a-b-canary-interleaved-shadow-testing/)
+- [APXML — Advanced LLM Deployment Patterns](https://apxml.com/courses/mlops-for-large-models-llmops/chapter-4-llm-deployment-serving-optimization/advanced-llm-deployment-patterns) — 進階 LLM 交付架構模式。
 - [Argo Rollouts docs](https://argo-rollouts.readthedocs.io/) — 雲原生漸進式發布控制器官方文件。
 - [Flagger docs](https://docs.flagger.app/) — Kubernetes 漸進式交付手冊。

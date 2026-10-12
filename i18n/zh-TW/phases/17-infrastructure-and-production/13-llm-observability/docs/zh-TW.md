@@ -1,6 +1,6 @@
 # LLM 可觀測性技術堆疊選型（LLM Observability Stack Selection）
 
-> 2026 年的大模型可觀測性市場清晰分化為兩大陣營。研發一體化平台（LangSmith、Langfuse、Comet Opik）將指標監控與 Eval 評測、Prompt 版本管理以及 Session 對話重放深度捆綁。Gateway 與遙測工具（Helicone、SigNoz、OpenLLMetry、Phoenix）則專注於遙測資料。Langfuse 核心採 MIT 授權開源，在社群與企業級功能間取得了良好平衡（雲端版每月免費 5 萬事件）。Phoenix 則在 Elastic License 2.0 下原生擁抱 OpenTelemetry——在 RAG 檢索管線視覺化與資料漂移排查上表現出色，但並非專為長久儲存的正式環境後端而設計。Arize AX 則透過零拷貝的 Iceberg/Parquet 資料湖整合，宣稱在大規模流量下成本比傳統單體可觀測性平台低 100 倍。LangSmith 在 LangChain/LangGraph 生態中領先，每使用者每月 39 美元，私有自建僅限頂級企業版。Helicone 採反向代理架構，15 至 30 分鐘即可極速接入，每月提供 10 萬次免費請求，但在多步驟 Agent 複雜鏈路上深度略顯不足。常見的 production pattern：前端 Gateway（Helicone/Portkey）+ 評測平台（Phoenix/TruLens），兩者透過 OpenTelemetry 協定連接。
+> 2026 年的大模型可觀測性市場清晰分化為兩大陣營。研發一體化平台（LangSmith、Langfuse、Comet Opik）將指標監控與 Eval 評測、Prompt 版本管理以及工作階段重播深度捆綁。Gateway 與遙測工具（Helicone、SigNoz、OpenLLMetry、Phoenix）則專注於遙測資料。Langfuse 核心採 MIT 授權開源，在開源功能與雲端方案之間取得良好平衡（雲端版每月免費 5 萬事件）。Phoenix 則在 Elastic License 2.0 下原生擁抱 OpenTelemetry——在 RAG 檢索管線視覺化與資料漂移排查上表現出色，但並非專為長久儲存的正式環境後端而設計。Arize AX 則透過零拷貝的 Iceberg/Parquet 資料湖整合，宣稱在大規模流量下成本比傳統單體可觀測性平台低 100 倍。LangSmith 在 LangChain/LangGraph 生態中領先，每使用者每月 39 美元，僅頂級企業版提供自行託管。Helicone 採反向代理架構，15 至 30 分鐘即可極速接入，每月提供 10 萬次免費請求，但在多步驟 Agent 複雜鏈路上深度略顯不足。常見的 production pattern：前端 Gateway（Helicone/Portkey）+ 評測平台（Phoenix/TruLens），兩者透過 OpenTelemetry 協定連接。
 
 **Type:** Learn
 **Languages:** Python (stdlib, toy trace-sampling simulator)
@@ -9,7 +9,7 @@
 
 ## Learning Objectives｜學習目標
 
-- 嚴格區分研發一體化平台（捆綁評測 + Prompt 管理 + Session 重放）與純 Gateway/遙測工具（僅處理 Trace 追蹤 + 核心指標）的邊界。
+- 嚴格區分研發一體化平台（捆綁評測 + Prompt 管理 + 工作階段重播）與純 Gateway/遙測工具（僅處理 Trace 追蹤 + 核心指標）的邊界。
 - 梳理六大主流可觀測性工具（Langfuse、LangSmith、Phoenix、Arize AX、Helicone、Opik）的授權方式、定價與最適用情境。
 - 深刻理解以 OpenTelemetry 作為通用黏著劑的現代架構模式，無縫串聯前端 Gateway 與獨立評測平台。
 - 指出 2026 年大規模下的核心成本分水嶺（Arize AX 的資料湖零拷貝 vs 傳統單體採集），並理解其標稱百倍成本差異的底層原理。
@@ -20,22 +20,22 @@
 
 它們解決的根本不是同一個問題。LangSmith 專門解答「這一次 LangGraph 運作究竟為什麼崩潰？」Phoenix 專門回答「我的 RAG pipeline 是否正在漂移？」Helicone 專門揪出「後台究竟是哪一款 App 在瘋狂吞噬 Token？」而 Langfuse 則解答「我們能否自行託管整套系統？」工具不同，面對的目標受眾亦截然不同。
 
-理性選型必須立足於四大維度：技術堆疊（依賴 LangChain？純原生 SDK？跨多供應商？）、開源授權容忍度（僅接受 MIT？接受 Elastic？純商業版無所謂？）、財務預算（免費版？每月 100 美元？每月 1000 美元？），以及自建需求（絕對剛需？加分項？絕不考慮？）。
+理性選型必須立足於四大維度：技術堆疊（依賴 LangChain？純原生 SDK？跨多供應商？）、開源授權容忍度（僅接受 MIT？接受 Elastic？純商業版無所謂？）、財務預算（免費版？每月 100 美元？每月 1000 美元？），以及自行託管需求（絕對剛需？加分項？絕不考慮？）。
 
 ## The Concept｜核心概念
 
 ### 兩大主流類別（Two categories）
 
-**研發一體化平台（Development platforms）**：將即時可觀測性與離線 Eval 評測、Prompt 版本納管、資料集版本控制以及對話 Session 重放深度融合。可執行實驗以查看哪個 Prompt 有效，並以舊的優勝結果為基準，對新 Prompt 進行資料集回歸評估。代表：LangSmith、Langfuse、Comet Opik。
+**研發一體化平台（Development platforms）**：將即時可觀測性與離線 Eval 評測、Prompt 版本納管、資料集版本控制以及工作階段重播深度融合。可執行實驗以查看哪個 Prompt 有效，並以舊的優勝結果為基準，對新 Prompt 進行資料集回歸評估。代表：LangSmith、Langfuse、Comet Opik。
 
 **Gateway 與遙測工具（Gateway/telemetry tools）**：極簡侵入推論呼叫鏈路——完整記錄 Prompt、回應內容、Token 數量、端到端延遲、呼叫模型與財務花費。代表：Helicone、SigNoz、OpenLLMetry、Phoenix。架構極度輕量，能透過標準 OpenTelemetry 與下游獨立評測工具無縫對接。
 
 ### Langfuse——開源生態的最佳平衡點（Langfuse — OSS balance）
 
-- 核心程式碼採 Apache / MIT 開源授權；支援透過 Docker 極速私有化自建。
+- 核心程式碼採 Apache / MIT 開源授權；支援透過 Docker 極速自行託管。
 - 雲端託管版提供每月 5 萬次免費事件額度；團隊版起跳價每月 29 美元。
 - 完整涵蓋 Eval 評測、Prompt 納管、追蹤與資料集。
-- 最佳甜蜜點：期望享有 LangSmith 級別的完整研發體驗，但強烈要求必須開源可控或本地私有化部署。
+- 最佳甜蜜點：期望享有 LangSmith 級別的完整研發體驗，但強烈要求必須採用開源授權或自行託管。
 
 ### Phoenix (Arize)——遙測優先、OpenTelemetry 原生
 
@@ -52,7 +52,7 @@
 
 ### LangSmith——LangChain 與 LangGraph 生態王者（LangSmith — LangChain/LangGraph first）
 
-- 商業閉源，每使用者每月 39 美元。私有化自建僅開放給頂級 Enterprise 企業客戶。
+- 商業閉源，每使用者每月 39 美元。僅頂級 Enterprise 企業客戶可自行託管。
 - 針對 LangChain 與 LangGraph 技術堆疊提供一流的支援。但若你的底層架構並未採用這兩款框架，就較不具吸引力。
 - 最佳甜蜜點：已全面深度綁定 LangChain 生態、且具備充足軟體採購預算的研發團隊。
 
@@ -132,7 +132,7 @@ i4-otel-glue
 | Arize AX | 「大規模可觀測性」 | 採用 Iceberg／Parquet 零拷貝方式的商業可觀測性平台 |
 | Helicone | 「代理伺服器可觀測性」 | 透過 HTTP 代理伺服器收集 LLM 遙測資料，並提供 gateway 功能 |
 | Opik | 「Comet 的 LLM 工具」 | Comet 推出的 Apache 2.0 開源開發平台 |
-| Session replay | 「追蹤重播」 | 重播包含工具呼叫的完整 agent 工作階段 |
+| Session replay | 「工作階段重播」 | 重播包含工具呼叫的完整 agent 工作階段 |
 | Eval | 「離線測試」 | 在有標籤的資料集上執行候選模型或 prompt |
 
 ## Further Reading｜延伸閱讀

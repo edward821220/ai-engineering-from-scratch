@@ -1,6 +1,6 @@
 # LLM API 的壓力負載測試——為何 k6 與 Locust 會向你說謊（Load Testing LLM APIs — Why k6 and Locust Lie）
 
-> 傳統的負載壓測工具並非為文字串流傳輸（Streaming）、動態輸出長度、Token 級微度量以及 GPU 飽和特性而設計。兩大經典陷阱常讓團隊慘遭誤導。GIL 鎖定陷阱：Locust 的 Token 級計時在 Python 全域直譯器鎖（GIL）下執行 tokenization，在極限並行下用戶端自身的運算瓶頸與請求發送激烈爭奪 CPU，tokenization 積壓會嚴重虛胖呈報的 Token 間延遲——此時真正的效能瓶頸在你的測試用戶端，而非後端推論伺服器。Prompt 同質化陷阱：在迴圈中使用單一固定 Prompt 僅僅測試了 Token 分佈空間上的孤立單點；真實業務流量長度多變，且有多樣的前綴匹配。LLMPerf 透過 `--mean-input-tokens` 與 `--stddev-input-tokens` 改善了這個問題。2026 年壓測工具矩陣：專用型工具（GenAI-Perf、LLMPerf、LLM-Locust、guidellm）守護 Token 級精確度；**k6 v2026.1.0** 搭配 **k6 Operator 1.0 GA（2025 年 9 月發布）** 支援原生串流感知，透過 TestRun 與 PrivateLoadZone 等 CRD 原生融入 Kubernetes 分散式測試，是 CI/CD 發布閘門的最佳首選；Vegeta 適用於 Go 語言極致恆定速率 HTTP 飽和壓測；原生 Locust 2.43.3 唯有掛載 LLM-Locust 擴充套件後才具備合法串流度量能力。四大標準壓測模式：平穩穩態（Steady-state）、漸進遞增（Ramp）、突發尖峰（Spike，檢驗自動擴縮）、長時浸泡（Soak，檢驗記憶體洩漏）。
+> 傳統的負載壓測工具並非為文字串流傳輸（Streaming）、動態輸出長度、Token 級微度量以及 GPU 飽和特性而設計。兩大經典陷阱常讓團隊慘遭誤導。GIL 鎖定陷阱：Locust 的 Token 級計時在 Python 全域直譯器鎖（GIL）下執行 tokenization，在極限並行下用戶端自身的運算瓶頸與請求發送激烈爭奪 CPU，tokenization 積壓會嚴重虛胖呈報的 Token 間延遲——此時真正的效能瓶頸在你的測試用戶端，而非後端推論伺服器。Prompt 同質化陷阱：在迴圈中使用單一固定 Prompt 僅僅測試了 Token 分佈空間上的孤立單點；真實業務流量長度多變，且有多樣的前綴匹配。LLMPerf 透過 `--mean-input-tokens` 與 `--stddev-input-tokens` 改善了這個問題。2026 年壓測工具矩陣：專用型工具（GenAI-Perf、LLMPerf、LLM-Locust、guidellm）守護 Token 級精確度；**k6 v2026.1.0** 搭配 **k6 Operator 1.0 GA（2025 年 9 月發布）** 支援原生串流感知，透過 TestRun 與 PrivateLoadZone 等 CRD 原生融入 Kubernetes 分散式測試，是 CI/CD 發布閘門的最佳首選；Vegeta 適用於 Go 語言極致恆定速率 HTTP 飽和壓測；原生 Locust 2.43.3 唯有掛載 LLM-Locust 擴充套件後才具備串流指標測量能力。四大標準壓測模式：平穩穩態（Steady-state）、漸進遞增（Ramp）、突發尖峰（Spike，檢驗自動擴縮）、長時浸泡（Soak，檢驗記憶體洩漏）。
 
 **Type:** Build
 **Languages:** Python (stdlib, toy realistic-prompt generator + latency collector)
@@ -20,7 +20,7 @@
 
 兩個致命盲區同時爆發。首先，你的 k6 腳本在迴圈中向伺服器發送了 500 個完全相同的 Prompt——後端推論引擎的請求合併（Request coalescing）與前綴快取機制（Prefix caching）被極致觸發，讓你誤以為自己正在處理 500 個並行解碼，實際上只處理一個請求。其次，傳統 k6 並未在串流回應內部逐 Token 記錄吐字間隔；在它眼裡這僅僅是一條耗時數秒的普通 HTTP 長連線，完全無法感知 500 個 Token 在使用者眼前斷斷續續、忽快忽慢的嚴重卡頓。
 
-針對大語言模型的負載測試，是一門獨立的專業領域。
+針對 LLM 的負載測試，是一門獨立的專業領域。
 
 ## The Concept｜核心概念
 
@@ -47,7 +47,7 @@ Locust 完全基於 Python 開發，其用戶端的 Token 級計時必須在 Pyt
 
 **LLMPerf**（Anyscale 出品）——雖然基於 Python，但底層 tokenization 完全交由 Rust 高效能核心接管。原生支援基於均值/標準差的動態文本生成與串流計時。是目前推論效能基準測試的最佳首選。
 
-**NVIDIA GenAI-Perf**——NVIDIA 的參考測試工具。原生支援 Triton 用戶端，具備極致全方位的指標覆蓋。注意其計算 ITL 時排除了首字 TTFT；兩者對同一伺服器回報的 TPOT 不同：GenAI-Perf 計算 ITL 時排除 TTFT，而 LLMPerf 的定義包含 TTFT。
+**NVIDIA GenAI-Perf**——NVIDIA 的參考測試工具。原生支援 Triton 用戶端，具備極致全方位的指標覆蓋。注意其計算 ITL 時排除了 TTFT（首 token 延遲）；兩者對同一伺服器回報的 TPOT 不同：GenAI-Perf 計算 ITL 時排除 TTFT，而 LLMPerf 的定義包含 TTFT。
 
 **LLM-Locust**（TrueFoundry 出品）——用於 LLM 的 Locust 擴充套件，修正了 Python GIL 陷阱。提供熟悉的 Locust DSL 語法與串流指標度量。
 
@@ -72,7 +72,7 @@ Locust 完全基於 Python 開發，其用戶端的 Token 級計時必須在 Pyt
 
 ### 建構高度擬真的 Prompt 長度分佈（Realistic prompt distribution）
 
-若手頭已有正式環境真實歷史軌跡，直接抽取脫敏後的真實記錄；若無，則採用公認的成熟資料集分佈（例如對話任務採用 ShareGPT，程式碼任務採用 HumanEval）。將均值與標準差精確餵給 LLMPerf。堅決杜絕在迴圈中使用單一固定 Prompt 欺騙自己。
+若手頭已有正式環境真實歷史軌跡，直接抽取真實記錄；若無，則採用公認的成熟資料集分佈（例如對話任務採用 ShareGPT，程式碼任務採用 HumanEval）。將均值與標準差精確餵給 LLMPerf。堅決杜絕在迴圈中使用單一固定 Prompt 欺騙自己。
 
 ### 務必銘記的核心數字指標（Numbers you should remember）
 

@@ -1,6 +1,6 @@
 # 自建模型服務選型——硬體與規模的終極適配（Self-Hosted Serving Selection — Matching Engine to Hardware and Scale）
 
-> 推論引擎的選型是底層硬體、並行規模與軟體生態的三維函數——絕非單純閱讀效能排行榜所能決定。2026 年自建推論領域由四大主力引擎統治：llama.cpp、Ollama、vLLM 與 SGLang，而昔日明星 TGI 則落入維護模式。**llama.cpp** 在純 CPU 運算上速度最快——具備最廣泛的模型型錄支援，提供對量化精度與多執行緒的完全控制權。**Ollama** 是個人筆電上一鍵安裝的開發工具，但比原生 llama.cpp 慢約 15% 至 30%（源於 Go + CGo + HTTP 序列化開銷），在類正式環境的高並行負載下吞吐量存在高達 3 倍的鴻溝。**TGI 於 2025 年 12 月 11 日正式轉入維護模式**——未來僅提供錯誤修復，原始吞吐量比 vLLM 慢約 10%，但歷史上擁有頂級的可觀測性與 Hugging Face 原生生態整合。維護模式使其成為高風險的長遠賭注——新專案應轉向 vLLM 或 SGLang。**vLLM** 是通用正式環境的事實標準——v0.15.1（2026 年 2 月）全面支援 PyTorch 2.10、RTX Blackwell SM120 架構與 H200 最佳化。**SGLang** 則是多輪對話 Agent 與前綴密集型任務的專精引擎，已在正式環境中部署於超過 40 萬張 GPU（xAI、LinkedIn、Cursor、Oracle、GCP、Azure、AWS）。硬體硬約束：純 CPU 優先 → 首選 llama.cpp；AMD 異質運算 → vLLM 是獲得最強支援的坦途（TRT-LLM 深度綁定 NVIDIA）。2026 年標準管線模式：開發端 = Ollama，預發布環境 = llama.cpp，正式環境 = vLLM 或 SGLang。各引擎吃不同的權重格式——llama.cpp 家族吃 GGUF，GPU 引擎吃 Hugging Face safetensors——在各階段之間可能需要進行格式轉換。
+> 推論引擎的選型是底層硬體、並行規模與軟體生態的三維函數——絕非單純閱讀效能排行榜所能決定。2026 年自建推論領域由四大主力引擎統治：llama.cpp、Ollama、vLLM 與 SGLang，而昔日明星 TGI 則落入維護模式。**llama.cpp** 在純 CPU 運算上速度最快——具備最廣泛的模型型錄支援，提供對量化精度與多執行緒的完全控制權。**Ollama** 是個人筆電上一鍵安裝的開發工具，但比原生 llama.cpp 慢約 15% 至 30%（源於 Go + CGo + HTTP 序列化開銷），在類正式環境的高並行負載下吞吐量存在高達 3 倍的鴻溝。**TGI 於 2025 年 12 月 11 日正式轉入維護模式**——未來僅提供錯誤修復，原始吞吐量比 vLLM 慢約 10%，但歷史上擁有頂級的可觀測性與 Hugging Face 原生生態整合。維護模式使其成為高風險的長遠賭注——新專案應轉向 vLLM 或 SGLang。**vLLM** 是通用正式環境的事實標準——v0.15.1（2026 年 2 月）新增 PyTorch 2.10、RTX Blackwell SM120 支援與 H200 最佳化。**SGLang** 則是多輪對話 Agent 與前綴密集型任務的專精引擎，已在正式環境中部署於超過 40 萬張 GPU（xAI、LinkedIn、Cursor、Oracle、GCP、Azure、AWS）。硬體硬約束：純 CPU 優先 → 首選 llama.cpp；AMD 異質運算 → vLLM 是獲得最強支援的坦途（TRT-LLM 深度綁定 NVIDIA）。2026 年標準管線模式：開發端 = Ollama，預發布環境 = llama.cpp，正式環境 = vLLM 或 SGLang。各引擎吃不同的權重格式——llama.cpp 家族吃 GGUF，GPU 引擎吃 Hugging Face safetensors——在各階段之間可能需要進行格式轉換。
 
 **Type:** Learn
 **Languages:** Python (stdlib, engine-decision tree walker)
@@ -16,7 +16,7 @@
 
 ## The Problem｜問題
 
-你的團隊即將啟動一項私有化自建大模型推論服務。一位工程師強推 Ollama，另一位工程師非 vLLM 不用，第三位工程師則好奇發問「Hugging Face 的 TGI 難道不能開箱即用嗎？」這三種主張放在特定的孤立語境下皆有其道理，但沒有任何一個引擎適用所有情境。
+你的團隊即將啟動一項私有化自建 LLM 推論服務。一位工程師強推 Ollama，另一位工程師非 vLLM 不用，第三位工程師則好奇發問「Hugging Face 的 TGI 難道不能開箱即用嗎？」這三種主張放在特定的孤立語境下皆有其道理，但沒有任何一個引擎適用所有情境。
 
 在 2026 年，選型決策樹擁有不可顛倒的優先順序：硬體維度第一、並行規模第二、業務特徵第三。此外，一項發生在 2025 年底的標誌性產業大事件——TGI 於 12 月 11 日正式轉入維護模式——徹底改寫了新專案的預設起點。
 
@@ -48,17 +48,17 @@
 
 **單人 / 本機開發測試** → 果斷選用 Ollama。單行指令拉起，數秒內輸出第一個字。
 
-**10 至 100 位並行使用者 / 中小微團隊內部工具** → vLLM 單 GPU。
+**10 至 100 位並行使用者 / 小型團隊** → vLLM 單 GPU。
 
-**100 至 10,000 位並行使用者 / 商業化正式環境** → vLLM production-stack（第 17 課第 18 節）或 SGLang。
+**100 至 10,000 位並行使用者 / 正式環境** → vLLM production-stack（第 17 課第 18 節）或 SGLang。
 
-**10,000 以上超大規模並行 / 跨國巨頭** → vLLM production-stack + Prefill/Decode 物理拆解（第 17 課第 17 節） + LMCache 叢集快取（第 17 課第 18 節）。
+**10,000 以上超大規模並行 / 企業** → vLLM production-stack + Prefill/Decode 物理拆解（第 17 課第 17 節） + LMCache 叢集快取（第 17 課第 18 節）。
 
 ### 第三維度：業務負載決定專精（Workload-third decision）
 
 **常規開放式對話 / 簡短問答** → vLLM 是穩妥的通用預設選擇。
 
-**多輪對話 Agent 智慧代理（頻繁工具呼叫、動態規劃、記憶檢索）** → SGLang 的 RadixAttention 基數樹快取（第 17 課第 06 節）表現突出。
+**多輪對話 agent（工具呼叫、規劃、記憶）** → SGLang 的 RadixAttention 基數樹快取（第 17 課第 06 節）表現突出。
 
 **前綴高度重複的巨型 RAG 檢索** → 推薦 SGLang。
 
@@ -74,7 +74,7 @@ Hugging Face 官方於 2025 年 12 月 11 日正式宣告 TGI 轉入維護模式
 
 ### 漸進式管線模式（The pipeline pattern）
 
-開發環境（Ollama） → 預發布環境（llama.cpp） → 正式環境（vLLM / SGLang）。不同引擎吃完全不同的二進位權重格式——llama.cpp 家族使用量化封裝後的 GGUF，而現代 GPU 推論引擎使用原生 Hugging Face safetensors 格式——因此跨階段時，工程管線中可能需要安排格式轉換。工程師在筆電上快速迭代；預發布環境對應正式環境的量化設定；正式環境供服務使用。
+開發環境（Ollama） → 預發布環境（llama.cpp） → 正式環境（vLLM）。不同引擎吃完全不同的二進位權重格式——llama.cpp 家族使用量化封裝後的 GGUF，而現代 GPU 推論引擎使用原生 Hugging Face safetensors 格式——因此跨階段時，工程管線中可能需要安排格式轉換。工程師在筆電上快速迭代；預發布環境對應正式環境的量化設定；正式環境供服務使用。
 
 ### Ollama 的邊界警示（Ollama caveat）
 
@@ -82,12 +82,12 @@ Ollama 很適合開發，但不太適合共用的正式環境：Go HTTP 序列�
 
 ### 自建 vs 託管是一項獨立決策（Self-hosted vs managed is a separate decision）
 
-第 17 課第 01 節（超大規模雲端託管）與第 02 節（新興推論算力平台）已完整剖析了託管服務的經濟學。本課的所有決策建立在「團隊已出於商業或法規考量決定私有化自建」的基礎之上。推動自建的核心驅動力：嚴苛的境內資料落地隱私限制、極致客製化的私有 fine-tuning 模型、超大規模流量下自建展現出的極致 TCO 總體擁有成本優勢，或是垂直領域專用模型在公共雲端市集中無法取得。
+第 17 課第 01 節（超大規模雲端託管）與第 02 節（新興推論算力平台）已完整剖析了託管服務的經濟學。本課的所有決策建立在「團隊已出於商業或法規考量決定私有化自建」的基礎之上。推動自建的核心驅動力：嚴苛的境內資料落地隱私限制、極致客製化的私有 fine-tuning 模型、超大規模下的 TCO（總體擁有成本）考量，或是垂直領域專用模型在公共雲端市集中無法取得。
 
 ### 務必銘記的核心數字指標（Numbers you should remember）
 
 - TGI 轉入維護模式官方時間：2025 年 12 月 11 日。
-- vLLM v0.15.1 里程碑：2026 年 2 月釋出；原生支援 PyTorch 2.10 與 Blackwell SM120 架構。
+- vLLM v0.15.1 里程碑：2026 年 2 月釋出；新增 PyTorch 2.10，並支援 Blackwell SM120 架構。
 - SGLang 正式環境部署規模：超過 40 萬張 GPU。
 - Ollama 與原生 llama.cpp 效能差距：慢 15% 至 30%；在正式環境高壓下吞吐量存在高達 3 倍落差。
 
@@ -131,5 +131,5 @@ data-parallel
 - [Morph — llama.cpp vs Ollama 2026](https://www.morphllm.com/comparisons/llama-cpp-vs-ollama)
 - [n1n.ai — Comprehensive LLM Inference Engine Comparison](https://explore.n1n.ai/blog/llm-inference-engine-comparison-vllm-tgi-tensorrt-sglang-2026-03-13)
 - [PremAI — 10 Best vLLM Alternatives 2026](https://blog.premai.io/10-best-vllm-alternatives-for-llm-inference-in-production-2026/)
-- [TGI maintenance announcement](https://github.com/huggingface/text-generation-inference)
+- [TGI maintenance announcement](https://github.com/huggingface/text-generation-inference) — 版本資訊。
 - [vLLM v0.15.1 release notes](https://github.com/vllm-project/vllm/releases)

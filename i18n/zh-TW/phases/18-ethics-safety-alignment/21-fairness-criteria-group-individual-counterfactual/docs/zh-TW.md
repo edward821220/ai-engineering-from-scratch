@@ -1,6 +1,6 @@
 # 公平性準則——群體、個體與反事實（Fairness Criteria — Group, Individual, Counterfactual）
 
-> 三類準則構成公平研究文獻。群體公平（Group fairness）：人口統計均等（demographic parity）、均等化賠率（Equalized odds）、條件使用準確度均等（Conditional use accuracy equality）——受保護群體間的平均比率相等。個體公平（Individual fairness，Dwork 等人，2012）：相似的個體應當獲得相似的決策裁定；在數學上表現為決策映射函數滿足李普希茨連續性條件（Lipschitz condition）。反事實公平（Counterfactual fairness，Kusner 等人，2017）：若某個體在因果世界模型中將其敏感屬性反事實替換後其決策結果保持不變，則該決策對其公平。2024 年重大理論突破（NeurIPS 2024）：反事實公平與預測準確率之間存在固有的取捨；提出了一套模型無關方法，能以有界的準確率損失，將最優但不公平的預測器轉換為反事實公平預測器。溯因反事實（Backtracking counterfactuals，arXiv:2401.13935，2024 年 1 月）：開闢了新範式，避免了對受法律保護屬性進行干預的法律疑慮。哲學調和（ICLR Blogposts 2024）：在明確因果有向無環圖（DAG）的前提下，滿足特定群體公平指標在實質上隱含並導向了反事實公平。
+> 三類準則構成公平研究文獻。群體公平（Group fairness）：人口統計均等（demographic parity）、均等化賠率（Equalized odds）、條件使用準確度均等（Conditional use accuracy equality）——受保護群體間的平均比率相等。個體公平（Individual fairness，Dwork 等人，2012）：相似的個體應當獲得相似的決策裁定；在數學上表現為決策映射函數滿足李普希茨連續性條件（Lipschitz condition）。反事實公平（Counterfactual fairness，Kusner 等人，2017）：若某個體在因果世界模型中將其敏感屬性反事實替換後其決策結果保持不變，則該決策對其公平。2024 年理論結果（NeurIPS 2024）：反事實公平與預測準確率之間存在固有的取捨；提出了一套模型無關方法，能以有界的準確率損失，將最優但不公平的預測器轉換為反事實公平預測器。溯因反事實（Backtracking counterfactuals，arXiv:2401.13935，2024 年 1 月）：開闢了新範式，避免了對受法律保護屬性進行干預的法律疑慮。哲學調和（ICLR Blogposts 2024）：在明確因果有向無環圖（DAG）的前提下，滿足特定群體公平指標在實質上隱含並導向了反事實公平。
 
 **Type:** Learn
 **Languages:** Python (stdlib, three-criteria comparison)
@@ -30,7 +30,7 @@
 
 ### 個體公平（Individual fairness）
 
-Dwork 等人於 2012 年確立。若一個決策映射函數 f 相對於特定任務下的相似度度量空間 d 滿足 |f(x) - f(x')| <= L * d(x, x')（其中 L 為李普希茨常數），則該決策具備個體公平性。核心原則：相似的個體應當獲得相似的對待。
+Dwork 等人於 2012 年確立。若一個決策映射函數 f 相對於特定任務下的相似度度量函數 d 滿足 |f(x) - f(x')| <= L * d(x, x')（其中 L 為李普希茨常數），則該決策具備個體公平性。核心原則：相似的個體應當獲得相似的對待。
 
 需要定義距離度量 d。這是政策問題，不是統計問題。
 
@@ -46,7 +46,7 @@ NeurIPS 2024 理論研究指出：反事實公平與預測準確率之間存在�
 
 ### 溯因反事實（Backtracking counterfactuals）
 
-arXiv:2401.13935（2024 年 1 月）。傳統反事實分析需要對敏感屬性進行干預——「如果這個人是另一種性別，系統的決策是否會改變？」在法律上，這可能引發疑慮：分類法中對受保護屬性的干預可能不被接受。
+arXiv:2401.13935（2024 年 1 月）。傳統反事實分析需要對敏感屬性進行干預——「如果這個人是另一種性別，系統的決策是否會改變？」在法律上，這可能引發疑慮：分類法中不能對受保護屬性進行干預。
 
 溯因反事實會翻轉推理方向：不再對屬性進行干預，而是反向詢問：「這個人實際具備哪些特徵組合，會產生反事實結果？」這種做法可避開這項法律疑慮。
 
@@ -74,11 +74,11 @@ an-fairness-trilemma
 
 ## Exercises｜練習
 
-1. 執行 `code/main.py`。在預設資料上回報三項群體公平指標。套用以人口統計均等為目標的重加權後，再回報另外兩項指標。
+1. 執行 `code/main.py`。在預設資料上回報三項群體公平指標。套用以人口統計均等為目標的重加權後，再次回報三項指標。
 2. 採用非敏感特徵上的 L2 歐幾里得幾何距離，動手實作 Dwork 等人 2012 年的個體公平性度量函數。統計在常數 L=1 的約束下，資料集中共有多少對個體直接違反了李普希茨連續條件？
 3. 閱讀 Kusner 等人（2017）。為履歷評分建立一個簡單的雙特徵因果 DAG，並指出它所隱含的反事實公平條件。
 4. 2024 年的溯因反事實論文提出的方法不需對受保護屬性進行干預。描述一個與法律合規相關的情境。
-5. ICLR 2024 的調和論文主張群體與反事實公平是同一因果結構的不同切面。從 `code/main.py` 的三項準則中任選兩項，寫出能使這兩項指標在數學上完全等價所需的因果架構先驗假設。
+5. ICLR 2024 的調和論文主張群體與反事實公平是同一因果結構的不同切面。從 `code/main.py` 的三項準則中任選兩項，寫出能使這兩項指標等價所需的因果架構先驗假設。
 
 ## Key Terms｜關鍵術語
 
@@ -94,7 +94,7 @@ an-fairness-trilemma
 
 ## Further Reading｜延伸閱讀
 
-- [Dwork et al. — Fairness through Awareness (arXiv:1104.3913)](https://arxiv.org/abs/1104.3913) — 個體公平性奠基之作。
-- [Kusner, Loftus, Russell, Silva — Counterfactual Fairness (arXiv:1703.06856)](https://arxiv.org/abs/1703.06856) — 反事實公平性開山論文。
+- [Dwork et al. — Fairness through Awareness (arXiv:1104.3913)](https://arxiv.org/abs/1104.3913) — 個體公平。
+- [Kusner, Loftus, Russell, Silva — Counterfactual Fairness (arXiv:1703.06856)](https://arxiv.org/abs/1703.06856) — 反事實公平。
 - [Chouldechova — Fair prediction with disparate impact (arXiv:1703.00056)](https://arxiv.org/abs/1703.00056) — 不可能定理經典證明。
-- [Backtracking Counterfactuals (arXiv:2401.13935)](https://arxiv.org/abs/2401.13935) — 溯因反事實最新範式。
+- [Backtracking Counterfactuals (arXiv:2401.13935)](https://arxiv.org/abs/2401.13935) — 避免干預受保護屬性的反事實方法。

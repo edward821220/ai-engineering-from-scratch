@@ -1,6 +1,6 @@
 # 紅隊演練：PAIR 與自動化攻擊（Red-Teaming: PAIR and Automated Attacks）
 
-> Chao、Robey、Dobriban、Hassani、Pappas 與 Wong（NeurIPS 2023，arXiv:2310.08419）。PAIR——Prompt 自動迭代精煉演算法（Prompt Automatic Iterative Refinement）——是常用的自動化黑盒越獄基準。一個配備了專屬紅隊系統 Prompt 的攻擊者 LLM，透過反覆向受測目標 LLM 提出越獄試探，並將歷史的所有嘗試與目標回應累加進自身的對話歷史中，作為上下文內回饋（In-context feedback）即時學習。PAIR 通常在 20 次查詢內即可成功，其收斂效率比 GCG（Zou 等人提出的 Token 級梯度搜尋演算法）高出數個數量級，且完全無需存取模型的白盒權重與梯度。PAIR 現已成為 JailbreakBench（arXiv:2404.01318）與 HarmBench 中的常用基準，並與 GCG、AutoDAN、TAP 及說服性對抗 Prompt（PAP）並列。
+> Chao、Robey、Dobriban、Hassani、Pappas 與 Wong（NeurIPS 2023，arXiv:2310.08419）。PAIR——Prompt 自動迭代精煉演算法（Prompt Automatic Iterative Refinement）——是典型的自動化黑盒越獄攻擊方法。一個配備了專屬紅隊系統 Prompt 的攻擊者 LLM，透過反覆向受測目標 LLM 提出越獄試探，並將歷史的所有嘗試與目標回應累加進自身的對話歷史中，作為上下文內回饋（In-context feedback）即時學習。PAIR 通常在 20 次查詢內即可成功，其收斂效率比 GCG（Zou 等人提出的 Token 級梯度搜尋演算法）高出數個數量級，且完全無需存取模型的白盒權重與梯度。PAIR 現已成為 JailbreakBench（arXiv:2404.01318）與 HarmBench 中的常用基準，並與 GCG、AutoDAN、TAP 及說服性對抗 Prompt（PAP）並列。
 
 **Type:** Build
 **Languages:** Python (stdlib, mock PAIR loop against a toy target)
@@ -24,7 +24,7 @@
 
 演算法標準輸入變數：
 - 目標 LLM T（Target LLM，我們試圖攻擊防禦的對象）。
-- 裁判 LLM J（Judge LLM，客觀評判目標回應是否已構成越獄）。
+- 裁判 LLM J（Judge LLM，評估目標回應是否已構成越獄）。
 - 攻擊者 LLM A（Attacker LLM，充當紅隊最佳化器）。
 - 惡意目標字串 G：例如「回應[有害指示]」。
 - 查詢預算上限 K（通常設定為 20 次查詢）。

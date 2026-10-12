@@ -1,6 +1,6 @@
 # 數位浮水印技術——SynthID、Stable Signature 與 C2PA（Watermarking — SynthID, Stable Signature, C2PA）
 
-> 三項技術構成了 2026 年 AI 生成內容（AIGC）的溯源體系。**SynthID**（Google DeepMind 出品）——影像浮水印於 2023 年 8 月正式推出，文字與影片浮水印於 2024 年 5 月推出（Gemini + Veo），文字浮水印演算法於 2024 年 10 月透過「負責任 GenAI 工具箱」正式開源，統一跨模態偵測器則於 2025 年 11 月隨 Gemini 3 Pro 一併發布。文字浮水印在解碼取樣時以人類肉眼完全無法察覺的微幅偏移調整 Next-token 預測機率；而影像與影片浮水印則可經受壓縮、裁切、濾鏡及幀率變更。**Stable Signature**（Fernandez 等人，ICCV 2023，arXiv:2303.15435）——對潛在擴散模型（Latent Diffusion）的解碼器進行專門 fine-tuning，使生成的每一幅影像皆在潛在空間中深嵌一段固定的二進位識別碼；在極端裁剪至僅剩原始畫面 10% 的殘酷測試下，偵測率依然突破 90%，且偽陽性率（FPR）低於 $10^{-6}$。隨後的破譯大作《Stable Signature is Unstable》（arXiv:2405.07145，2024 年 5 月）則展示了脆弱面：僅需對解碼器進行微小的對抗性 fine-tuning，便能在絲毫不損害影像畫質的前提下將浮水印徹底抹除。**C2PA**——經密碼學簽署、可偵測竄改的數位內容來源中繼資料標準（C2PA 2.2 解釋文件，2025 年）。數位浮水印與 C2PA 互補：中繼資料可能遭剝除，但可承載較豐富的溯源資訊；浮水印能經過轉碼而保留，但承載的資訊較少。
+> 三項技術構成了 2026 年 AI 生成內容（AIGC）的溯源體系。**SynthID**（Google DeepMind 出品）——影像浮水印於 2023 年 8 月正式推出，文字與影片浮水印於 2024 年 5 月推出（Gemini + Veo），文字浮水印演算法於 2024 年 10 月透過「負責任 GenAI 工具箱」正式開源，統一跨模態偵測器則於 2025 年 11 月隨 Gemini 3 Pro 一併發布。文字浮水印在解碼取樣時以人類肉眼完全無法察覺的微幅偏移調整 Next-token 預測機率；而影像與影片浮水印則可經受壓縮、裁切、濾鏡及幀率變更。**Stable Signature**（Fernandez 等人，ICCV 2023，arXiv:2303.15435）——對潛在擴散模型（Latent Diffusion）的解碼器進行專門 fine-tuning，使生成的每一幅影像的潛在表示都帶有一段固定的二進位訊息；在極端裁剪至僅剩原始畫面 10% 的殘酷測試下，偵測率依然突破 90%，且偽陽性率（FPR）低於 $10^{-6}$。後續研究《Stable Signature is Unstable》（arXiv:2405.07145，2024 年 5 月）則展示了脆弱面：對解碼器進行 fine-tuning，即可在不損害影像畫質的前提下移除浮水印。**C2PA**——經密碼學簽署、可偵測竄改的數位內容來源中繼資料標準（C2PA 2.2 解釋文件，2025 年）。數位浮水印與 C2PA 互補：中繼資料可能遭剝除，但可承載較豐富的溯源資訊；浮水印能經過轉碼而保留，但承載的資訊較少。
 
 **Type:** Build
 **Languages:** Python (stdlib, token-watermark embed + detect)
@@ -33,13 +33,13 @@ Kirchenbauer 等人於 2023 年確立、後由 Google 官方工程化推向大�
 核心物理特徵：
 - 人類讀者無法察覺（偏置 δ 很小，品質損失也很小）。
 - 偵測需要能存取詞彙表分割函數。
-- 面對同義改寫（Paraphrase）極度脆弱——對文字進行同義句式重構，會徹底摧毀先前的相鄰 Token 雜湊鏈。
+- 面對同義改寫（Paraphrase）極度脆弱——改寫文字會破壞浮水印訊號。
 
 SynthID-text 於 2024 年 10 月透過 Google 的 Responsible GenAI Toolkit 開源。
 
 ### Stable Signature（影像生成浮水印）
 
-Fernandez 等人於 ICCV 2023 提出。核心在於對潛在擴散模型（LDM）的解碼器進行 fine-tuning，使得經其解碼輸出的每一張影像，皆在潛在空間特徵中深嵌了一段固定的二進位簽名。偵測時由神經解碼器從潛在表示解碼出該簽名。在極端幾何裁剪（僅保留原始畫面的 10%）的殘酷破壞下，其偵測率依然高達 90% 以上，且偽陽性率（FPR）嚴格低於 $10^{-6}$。
+Fernandez 等人於 ICCV 2023 提出。核心在於對潛在擴散模型（LDM）的解碼器進行 fine-tuning，使得經其解碼輸出的每一張影像，其潛在表示中都帶有一段固定的二進位訊息。偵測時由神經解碼器從潛在表示解碼出該訊息。在極端幾何裁剪（僅保留原始畫面的 10%）的殘酷破壞下，其偵測率依然高達 90% 以上，且偽陽性率（FPR）嚴格低於 $10^{-6}$。
 
 2024 年 5 月的後續研究《Stable Signature is Unstable》（arXiv:2405.07145）指出，對解碼器進行 fine-tuning 可在保留影像品質的同時移除浮水印。對抗性後生成 fine-tuning 的成本低；該浮水印的對抗穩健性有限。
 
@@ -67,7 +67,7 @@ Google 已在 Search、Ads 和「關於此圖片」功能中整合浮水印與 C
 
 ### 歐盟 AI 法案第 50 條法定約束
 
-歐盟委員會專門針對 AI 生成內容標註確立了《透明度行為準則》（首份草案於 2025 年 12 月發布，第二版草案於 2026 年 3 月更新，預計於 2026 年 6 月定稿，詳見[歐盟執委會官方進度頁面](https://digital-strategy.ec.europa.eu/en/policies/code-practice-ai-generated-content)）。截至 2026 年 4 月，該準則仍處於最後草案修訂階段，時間表仍可能變動。這是要求落實技術層面的監管制度：深度偽造內容必須標示。
+歐盟委員會專門針對 AI 生成內容標註提出《透明度行為準則》草案（首份草案於 2025 年 12 月發布，第二版草案於 2026 年 3 月更新，預計於 2026 年 6 月定稿，詳見[歐盟執委會官方進度頁面](https://digital-strategy.ec.europa.eu/en/policies/code-practice-ai-generated-content)）。截至 2026 年 4 月，該準則仍處於最後草案修訂階段，時間表仍可能變動。這是要求落實技術層面的監管制度：深度偽造內容必須標示。
 
 ### 該研究在第 18 階段中的宏觀座標
 
@@ -83,7 +83,7 @@ an-watermark-greenlist
 
 ## Ship It｜交付成果
 
-本課交付標準實戰產物 `outputs/skill-provenance-audit.md`。輸入一項內容生成業務的內容溯源宣稱方案，該 Skill 將自動全面審計：系統內部實裝的浮水印物理機制（若有）、C2PA 數位簽名信任鏈（若有）、面對惡意擦除攻擊時的理論抗性，以及跨文字、影像、音訊與視訊的多模態覆蓋成熟度。
+本課交付標準實戰產物 `outputs/skill-provenance-audit.md`。輸入一項內容生成業務的內容溯源宣稱方案，該 Skill 將檢查：浮水印機制（若有）、C2PA 簽署鏈（若有）、各項技術的對抗穩健性，以及各模態的涵蓋範圍。
 
 ## Exercises｜練習
 
@@ -91,7 +91,7 @@ an-watermark-greenlist
 2. 在腳本中實作一套微型同義改寫攻擊模組：隨機將文字中 30% 的 Token 替換為其同義詞。重新測量經過改寫後的 Z-score 指標位移。
 3. 閱讀 Kirchenbauer 等人（2023）第 6 節（強健性分析）。為何文字浮水印在改寫下失效，而影像浮水印能承受裁切？
 4. 設計一個整合 SynthID-text 與 C2PA 中繼資料的部署方案。描述消費者看到的溯源鏈條，並指出每個元件的一種失效模式。
-5. 《Stable Signature is Unstable》顯示 fine-tuning 可移除影像浮水印。為大模型託管服務商設計一項可降低此攻擊風險的部署控制，例如要求以簽章發布 fine-tuned model checkpoint。
+5. 《Stable Signature is Unstable》顯示 fine-tuning 可移除影像浮水印。設計一項可降低此攻擊風險的部署控制措施，例如要求對 fine-tuned model checkpoint 的發布進行簽章。
 
 ## Key Terms｜關鍵術語
 

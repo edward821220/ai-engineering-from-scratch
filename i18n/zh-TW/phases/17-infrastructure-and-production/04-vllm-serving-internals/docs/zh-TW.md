@@ -11,7 +11,7 @@
 
 - 將 PagedAttention 深刻理解為 KV 快取的虛擬記憶體配置器：掌握 Block 區塊、Block 表的底層原理，以及為何在正式環境負載下顯示記憶體碎片率能始終壓低在 4% 以下。
 - 在迭代週期（Iteration）層次精準繪製連續批次處理架構圖：清楚理解已完成序列如何退出批次、新序列如何在不排空現有批次的前提下無縫併入。
-- 以一句話精準概括分塊 Prefill（Chunked prefill），並指出它所守護的核心延遲指標（提示：守護的是 P99 TTFT 長尾延遲，而非單純的平均吞吐量）。
+- 以一句話精準概括分塊 Prefill（Chunked prefill），並指出它所守護的核心延遲指標（提示：守護的是 TTFT 長尾延遲，而非平均吞吐量）。
 - 在一口氣啟用所有進階最佳化選項之前，學會嚴格依據你所採用的具體 vLLM 版本核對官方功能相容性矩陣。
 
 ## The Problem｜問題
@@ -42,11 +42,11 @@ GPU 記憶體碎片浪費率因而從傳統連續配置的 60% 至 80% 驟降至
 2. 排程器巡檢等待佇列（waiting queue）。若全域資源池中有足夠的閒置 KV Block，立即准入新序列（執行 Prefill 或還原先前暫停的序列）。
 3. 針對當前 `RUNNING` 清單中的所有序列統一執行一次 Forward 前向傳播，為每條序列並行產出一個全新 Token。
 
-批次大小不再死板固定，亦無需 Padding。處於不同生成進度的序列共享同一個融合成核的 GPU Forward 呼叫。在 2026 年 vLLM 中，這被稱為 `V1 scheduler`。其核心鐵律在於：排程器在每次解碼迭代時皆會執行一次，而非按請求生命週期觸發。
+批次大小不再死板固定，亦無需 Padding。處於不同生成進度的序列共用一次融合式前向傳遞。在 2026 年 vLLM 中，這被稱為 `V1 scheduler`。其核心鐵律在於：排程器在每次解碼迭代時皆會執行一次，而非按請求生命週期觸發。
 
 ### 分塊 Prefill 捍衛長尾 TTFT 延遲（Chunked prefill protects TTFT tail）
 
-Prefill 階段屬於典型的運算受限（Compute-bound）操作。在單張 H100 上為 Llama 3.3 70B 處理一段 32k Token 的超長 Prompt，需要耗費約 800 ms 純粹的 GPU 滿載運算。在此期間，批次中所有其他序列的解碼吐字運算將被迫全數掛起等待。在多租戶服務環境下，單一使用者的超長 Prompt 會直接導致全場數十位其他使用者的 Token 間延遲（Inter-Token Latency, ITL）發生劇烈跳躍與卡頓。
+Prefill 階段屬於典型的運算受限（Compute-bound）操作。在單張 H100 上為 Llama 3.3 70B 處理一段 32k Token 的超長 Prompt，需要約 800 ms 的純 Prefill 運算時間。在此期間，批次中所有其他序列的解碼吐字運算將被迫全數掛起等待。在多租戶服務環境下，單一使用者的超長 Prompt 會直接導致全場數十位其他使用者的 Token 間延遲（Inter-Token Latency, ITL）發生劇烈跳躍與卡頓。
 
 分塊 Prefill 將龐大的 Prefill 任務拆解為固定大小的微小 Chunk（預設通常為 512 Token），並將每個 Chunk 視為獨立的調度單元。在每個 Chunk 運算完畢的間隙，排程器能及時切入，讓等待解碼的序列順利向前推進一個 Token。你僅僅付出了極微小的絕對 Prefill 耗時代價（每個分塊額外增加數毫秒開銷），便換來了解碼端顯著降低的延遲抖動。在各類公開實測中，混合負載下的 P99 ITL 延遲從約 50 ms 驟降至約 15 ms。
 
@@ -58,7 +58,7 @@ Prefill 階段屬於典型的運算受限（Compute-bound）操作。在單張 H
 
 ### 嚴格核對版本相容性矩陣（Check the compatibility matrix）
 
-在將所有最佳化標記全數開啟之前，務必仔細對照你所採用的確切 vLLM 版本的官方相容性矩陣，因為跨版本之間的功能相容性時常發生演進。在 v0.18.0 中，官方功能矩陣明確標註推測解碼（Speculative Decoding）已能與分塊 Prefill 及前綴快取（Prefix Caching）相容；而在推測解碼專屬頁面上，則列出了兩項已知的歷史不相容限制：v0.15.0 之前的流水線平行（Pipeline Parallelism），以及 v0.10.0 之前的獨立草稿模型推測（Draft-model speculation）。針對草稿模型方法本身，2026 年業界的通用預設已廣泛轉向 EAGLE-3（`"method": "eagle3"`），這將在第 17 課第 05 節深度展開。
+在將所有最佳化標記全數開啟之前，務必仔細對照你所採用的確切 vLLM 版本的官方相容性矩陣，因為跨版本之間的功能相容性時常發生演進。在 v0.18.0 中，官方功能矩陣明確標註推測解碼（Speculative Decoding）已能與分塊 Prefill 及前綴快取（Prefix Caching）相容；而在推測解碼專屬頁面上，則列出了兩項已知的歷史不相容限制：v0.15.0 之前的流水線平行（Pipeline Parallelism），以及 v0.10.0 之前的獨立草稿模型推測（Draft-model speculation）。針對草稿模型方法本身，2026 年常見的選擇是 EAGLE-3（`"method": "eagle3"`），這將在第 17 課第 05 節深度展開。
 
 ### 務必銘記的核心數字指標（Numbers you should remember）
 

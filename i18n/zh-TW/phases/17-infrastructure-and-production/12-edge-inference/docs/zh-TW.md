@@ -72,7 +72,7 @@
 
 ### 邊緣端的超長上下文陷阱（The long-context trap on edge）
 
-Llama 3.1 宣稱的 128k 超長上下文是一項專屬資料中心的旗艦特性。在總記憶體僅有 8 GB 的手機上：4 GB 模型權重 + 32k 上下文所需的 2 GB KV 快取 + 作業系統開銷 = 瞬間觸發 OOM 崩潰閃退。邊緣端部署通常將上下文維持在 4K-8K，除非接受積極的 KV 量化（Q4 KV）。
+Llama 3.1 宣稱的 128k 超長上下文是一項資料中心特性。在總記憶體僅有 8 GB 的手機上：4 GB 模型權重 + 32k 上下文所需的 2 GB KV 快取 + 作業系統開銷 = 瞬間觸發 OOM 崩潰閃退。邊緣端部署通常將上下文維持在 4K-8K，除非接受積極的 KV 量化（Q4 KV）。
 
 ### 語音是邊緣端最具爆發力的殺手級應用（Voice is the killer app）
 
@@ -101,10 +101,10 @@ edge-bandwidth-pipe
 
 ## Exercises｜練習
 
-1. 執行 `code/main.py`。針對配備 Snapdragon 8 Gen 3（記憶體頻寬約 77 GB/s）的 Android 旗艦機，計算其運作 7B Q4 模型的理論解碼極限吞吐量。將其與業界實測觀察到的 6 至 8 tok/s 進行對比——評估目前執行環境的底層硬體利用效率如何？
+1. 執行 `code/main.py`。針對配備 Snapdragon 8 Gen 3（記憶體頻寬約 77 GB/s）的中階 Android 手機，計算其運作 7B Q4 模型的理論解碼極限吞吐量。將其與業界實測觀察到的 6 至 8 tok/s 進行對比——評估目前執行環境的底層硬體利用效率如何？
 2. Android 上的 WebGPU 要求 Chrome v121+。為舊版瀏覽器設計備援方案，透過相同的 OpenAI 相容 API 在伺服器端處理。
 3. 你的 iOS App 要求必須支援 4k 上下文的串流輸出。哪一種模型規格與量化格式的組合，能確保系統在 iPhone 16 上運作時活躍記憶體始終壓低在 4 GB 安全線以內？
-4. Jetson AGX Orin 以 40 tok/s 執行 gpt-oss-20b；Jetson Nano 僅能容納 3B 模型。若你的物聯網產品線同時涵蓋高低階兩款硬體，你該如何在軟體層面統一維護推論服務技術堆疊？
+4. Jetson AGX Orin 以 40 tok/s 執行 gpt-oss-20b；Jetson Nano 僅能容納 3B 模型。若你的產品同時支援這兩款裝置，你該如何在軟體層面統一維護推論服務技術堆疊？
 5. 深入辯論「WebLLM 在 2026 年是否已可用於正式環境」，並引用瀏覽器支援範圍、效能與 Firefox Android 的缺口。
 
 ## Key Terms｜關鍵術語

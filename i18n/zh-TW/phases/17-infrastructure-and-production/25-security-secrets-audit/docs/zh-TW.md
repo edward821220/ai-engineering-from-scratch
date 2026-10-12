@@ -1,6 +1,6 @@
 # 安全工程——金鑰管理、API 金鑰輪換、稽核記錄與防護欄（Security — Secrets, API Key Rotation, Audit Logs, Guardrails）
 
-> 透過集中化保險庫（HashiCorp Vault、AWS Secrets Manager、Azure Key Vault）徹底消滅金鑰擴散（Secret sprawl）。嚴禁將機密憑證散落在設定檔、Git 版本控制系統中的環境變數檔，或是試算表之中。全面採用動態 IAM 角色取代傳統靜態金鑰；CI/CD 管線強制透過 OIDC 進行無金鑰身分鑑別。AI Gateway 閘道架構是 2026 年的正式環境標準解法：微服務應用 → 智慧閘道 → 底層模型供應商，閘道在執行時期直接從 Vault 保險庫動態提取最新憑證。只需在保險庫中完成一次金鑰輪換，全線應用程式便會在數分鐘內自動無感生效——無需重新部署，更無需在 Slack 群組中焦急呼喊「誰拿到了新金鑰」。強制金鑰輪換週期不得超過 90 天；在每一次 commit 時透過 TruffleHog / GitGuardian / Gitleaks 進行強制掃描。落實零信任架構：MFA 多因素驗證、SSO 單一登入、RBAC/ABAC 細粒度授權、短時效 Token 以及終端裝置合規態勢校驗。敏感資訊脫敏（PII scrubbing）利用實體辨識技術在請求轉發前即時遮罩 PHI/PII；一致性 tokenization（Consistent tokenization，如 Mesh 方案）將敏感數值映射至穩定的佔位符，使 LLM 能保留程式碼語意與關聯語意。網路出站限制：推論服務必須長駐於專屬 VPC/VNet 子網內部，嚴格僅將 `api.openai.com`、`api.anthropic.com` 等白名單網域放行，徹底封殺一切非授權出站連線。2026 年標誌性資安事件：Vercel 供應鏈遭受攻擊，攻擊者透過被外洩的 CI/CD 憑證盜取了數千個客戶部署的環境變數。
+> 透過集中化保險庫（HashiCorp Vault、AWS Secrets Manager、Azure Key Vault）徹底消滅金鑰擴散（Secret sprawl）。嚴禁將機密憑證散落在設定檔、Git 版本控制系統中的環境變數檔，或是試算表之中。全面採用動態 IAM 角色取代傳統靜態金鑰；CI/CD 使用 OIDC。AI Gateway 閘道架構是 2026 年的正式環境標準解法：微服務應用 → 智慧閘道 → 底層模型供應商，閘道在執行時期直接從 Vault 保險庫動態提取最新憑證。只需在保險庫中完成一次金鑰輪換，全線應用程式便會在數分鐘內自動無感生效——無需重新部署，更無需在 Slack 群組中焦急呼喊「誰拿到了新金鑰」。強制金鑰輪換週期不得超過 90 天；在每一次 commit 時透過 TruffleHog / GitGuardian / Gitleaks 進行強制掃描。落實零信任架構：MFA 多因素驗證、SSO 單一登入、RBAC/ABAC 細粒度授權、短時效 Token 以及終端裝置合規態勢校驗。敏感資訊脫敏（PII scrubbing）利用實體辨識技術在請求轉發前即時遮罩 PHI/PII；一致性 tokenization（Consistent tokenization，如 Mesh 方案）將敏感數值映射至穩定的佔位符，使 LLM 能保留程式碼語意與關聯語意。網路出站限制：推論服務必須長駐於專屬 VPC/VNet 子網內部，嚴格僅將 `api.openai.com`、`api.anthropic.com` 等白名單網域放行，徹底封殺一切非授權出站連線。2026 年標誌性資安事件：Vercel 供應鏈遭受攻擊，攻擊者透過被外洩的 CI/CD 憑證盜取了數千個客戶部署的環境變數。
 
 **Type:** Learn
 **Languages:** Python (stdlib, toy PII-scrubber + audit-log writer)
@@ -20,9 +20,9 @@
 
 在另一個維度，使用者的輸入 Prompt 中包含了「我的社會安全碼是 123-45-6789」。這段文字被直接發送給了 OpenAI。雖然貴公司簽署了 BAA，但內部政策要求在轉送前遮罩 PII。然而你們的系統完全沒有做。
 
-更嚴重的是，你的 EKS 叢集中的大模型 Pod 預設允許存取公網上的任何主機。惡意攻擊者透過向受控網域發起 DNS 查詢，悄悄將機密資料穿透外洩。網路層毫無攔截。
+更嚴重的是，你的 EKS 叢集中的 LLM Pod 預設允許存取網際網路上的任何主機。惡意攻擊者透過向受控網域發起 DNS 查詢，悄悄將機密資料穿透外洩。網路層毫無攔截。
 
-大模型服務的資訊安全必須同時封死這三大致命受攻擊面：基於保險庫的動態憑證管理、出站前的敏感資料脫敏、嚴苛的網路出站白名單過濾，以及防篡改的稽核記錄。
+LLM 服務的資訊安全必須同時封死這三大致命受攻擊面：基於保險庫的動態憑證管理、出站前的敏感資料脫敏、嚴苛的網路出站白名單過濾，以及防篡改的稽核記錄。
 
 ## The Concept｜核心概念
 
@@ -36,11 +36,11 @@
 
 ### 輪換週期小於等於 90 天（Rotation policy ≤ 90 days）
 
-所有模型 API 金鑰、保險庫 Root Token 與 CI/CD 憑證，強制設定 90 天以內的輪換硬約束。盡可能採用自動化無感輪換；手動輪換須記錄並追蹤。
+所有 API 金鑰、保險庫 Root Token 與 CI/CD 憑證，強制設定 90 天以內的輪換硬約束。盡可能採用自動化無感輪換；手動輪換須記錄並追蹤。
 
 ### 原始碼金鑰掃描（Secret scanning）
 
-- **TruffleHog**——使用正則表達式與熵值掃描 commit。
+- **TruffleHog**——使用正規表示式與熵值掃描 commit。
 - **GitGuardian**——企業級商用方案，具備極高的準確率。
 - **Gitleaks**——輕量開源，專門整合進 CI/CD 自動化阻斷管線。
 
@@ -60,7 +60,7 @@
 
 1. 命名實體辨識（spaCy NER、微軟 Presidio 或商業級專案）。
 2. 對命中實體進行安全遮罩：`"My SSN is 123-45-6789"` → `"My SSN is [SSN_TOKEN_A3F]"`。
-3. 一致性 tokenization（Consistent tokenization，Mesh 模式）：完全相同的原始數值必須精確映射至完全相同的佔位符，確保大模型能保留關聯語意。
+3. 一致性 tokenization（Consistent tokenization，Mesh 模式）：完全相同的原始數值必須精確映射至完全相同的佔位符，確保 LLM 能保留關聯語意。
 4. 在模型吐出最終回應後，選擇性將真實數值反向還原回傳給使用者。
 
 純靜態正規表示式只能攔截固定格式；NER 能捕捉更多。兩者應搭配使用。
@@ -69,7 +69,7 @@
 
 輸入端：主動攔截已知的 Prompt 越獄注入、過濾禁止的話題、依據使用者 ID 實施嚴格限流。
 
-輸出端：以正則掃描模型輸出，檢查是否意外洩漏內部 API Key、敏感憑證，或拒答情境中的電子郵件格式；並由輕量分類器審查是否違背合規規範。
+輸出端：以正規表示式掃描模型輸出，檢查是否意外洩漏內部 API Key、敏感憑證，或拒答情境中的電子郵件格式；並由輕量分類器審查是否違背合規規範。
 
 ### 網路出站白名單（Network egress whitelist）
 
@@ -80,7 +80,7 @@
 
 ### 不可篡改的稽核記錄（Audit log）
 
-為每一次大模型呼叫生成具備不可篡改的結構化記錄：
+為每一次 LLM 呼叫生成具備不可篡改的結構化記錄：
 - 精確時間戳記。
 - 呼叫 API 的使用者與所屬租戶。
 - Prompt 雜湊值（基於隱私考量，不記錄原始 Prompt）。
@@ -144,5 +144,5 @@ i4-vault-rotation
 - [Portkey — Manage LLM API keys with secret references](https://portkey.ai/blog/secret-references-ai-api-key-management/)
 - [Datadog — LLM Guardrails Best Practices](https://www.datadoghq.com/blog/llm-guardrails-best-practices/)
 - [JumpServer — Secrets Management Best Practices 2026](https://www.jumpserver.com/blog/secret-management-best-practices-2026)
-- [Microsoft Presidio](https://github.com/microsoft/presidio)
+- [Microsoft Presidio](https://github.com/microsoft/presidio) — PII 偵測與匿名化。
 - [HashiCorp Vault docs](https://developer.hashicorp.com/vault/docs)

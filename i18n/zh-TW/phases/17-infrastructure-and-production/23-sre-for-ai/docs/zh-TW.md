@@ -1,6 +1,6 @@
 # AI SRE 架構——多 Agent 事故響應、維運手冊與預測性偵測（SRE for AI — Multi-Agent Incident Response, Runbooks, Predictive Detection）
 
-> AI SRE 透過 RAG 以基礎架構資料（記錄、runbook、服務拓撲）為 LLM 提供依據，自動化調查、文件記錄與協調階段。2026 年的架構模式是多 Agent 編排——專門處理記錄、指標、runbook 的 agent 由 supervisor 協調；AI 提出假說與查詢，人類批准需要判斷的決策。Datadog Bits AI 與 Azure SRE Agent 以託管產品形式提供。Runbook 維運手冊亦在深刻演進：NeuBird Hawkeye 引入了對抗式雙模型交叉評估（兩個獨立模型分析同一起事故；意見一致 = 高信心，意見分歧 = 存在不確定性需升級審批）；系統運維組織記憶可跨越人員離職交接而持久留存。自動自癒（Auto-remediation）依然嚴格維持審慎原則：AI 負責給出建議，人類最終簽字授權。完全自主的閉環操作被嚴格限制在極狹窄的安全集合中（重啟 Pod、回滾特定部署），並受限於硬性防護欄——任何向你兜售「完全放手全自動運維」的廠商皆屬於過度誇大。新興技術前沿：事故前預測性偵測。MIT 2025 年最新研究指出，基於歷史記錄、GPU 溫度時序與 API 錯誤特徵專門訓練的 LLM，能在正式事故爆發前 10 至 15 分鐘精確預警 89% 的雲端中斷。預測到 2026 年底，95% 的企業級 LLM 將具備自動容錯移轉能力。
+> AI SRE 透過 RAG 以基礎架構資料（記錄、runbook、服務拓撲）為 LLM 提供依據，自動化調查、文件記錄與協調階段。2026 年的架構模式是多 Agent 編排——專門處理記錄、指標、runbook 的 agent 由 supervisor 協調；AI 提出假說與查詢，人類批准需要判斷的決策。Datadog Bits AI 與 Azure SRE Agent 以託管產品形式提供。Runbook 維運手冊亦在深刻演進：NeuBird Hawkeye 引入了對抗式雙模型交叉評估（兩個獨立模型分析同一起事故；意見一致 = 高信心，意見分歧 = 存在不確定性需升級審批）；系統維運組織記憶可跨越人員離職交接而持久留存。自動自癒（Auto-remediation）依然嚴格維持審慎原則：AI 負責給出建議，人類最終簽字授權。完全自主的閉環操作被嚴格限制在極狹窄的安全集合中（重啟 Pod、回滾特定部署），並受限於硬性防護欄——任何向你兜售「完全放手全自動維運」的廠商皆屬於過度誇大。新興技術前沿：事故前預測性偵測。MIT 2025 年研究指出，基於歷史記錄、GPU 溫度時序與 API 錯誤特徵專門訓練的 LLM，能在正式事故爆發前 10 至 15 分鐘精確預警 89% 的雲端中斷。預測到 2026 年底，95% 的企業級 LLM 將具備自動容錯移轉能力。
 
 **Type:** Learn
 **Languages:** Python (stdlib, toy multi-agent incident triage simulator)
@@ -53,35 +53,35 @@ Supervisor 將事故拆成子查詢。專門的 agent 可使用工具（記錄�
 
 **安全操作集合（狹窄受控）**：重啟特定 Pod、回滾特定部署、在預先批准的硬性配額內動態彈性擴縮 GPU 節點池、啟用預先核准的 Feature Flag。
 
-**危險操作集合（寬泛高危，堅決禁止）**：擅自變更微服務拓撲架構、修改資源限制、自動向正式環境送出修改後的應用程式碼、擅自修改 IAM 權限角色、直接執行資料庫 DDL 變更。
+**危險操作集合（寬泛高危，堅決禁止）**：擅自變更微服務拓撲架構、修改資源限制、部署新程式碼、擅自修改 IAM 權限角色、變更資料庫。
 
-任何宣稱「配置完成即可徹底高枕無憂全自動運維」的供應商皆屬於不負責任的過度行銷。隨著 AI SRE 的持續演進，安全集合的邊界會逐步拓展，但安全邊界確實存在。
+任何宣稱「配置完成即可徹底高枕無憂全自動維運」的供應商都是言過其實。隨著 AI SRE 的持續演進，安全集合的邊界會逐步拓展，但安全邊界確實存在。
 
 ### 對抗式交叉驗證（NeuBird Hawkeye）（Adversarial evaluation (NeuBird Hawkeye)）
 
 兩個模型獨立分析同一事故。如果它們對根因一致，信心就高；如果意見不一致，則將兩種假說呈現給人類並升級處理。這種簡單模式可有效過濾幻覺根因。
 
-### 運維組織記憶（Operational memory）
+### 維運組織記憶（Operational memory）
 
 人員頻繁流動是傳統企業 SRE 體系的隱形殺手——隨著核心資深工程師離職，大量實戰經驗也隨之煙消雲散。AI SRE 會將維運手冊與事後檢討報告（Post-mortems）存入向量資料庫；Agent 會在每起新事故中檢索歷史經驗。新進工程師加入時，AI 也能查閱團隊累積的歷史紀錄。
 
 ### 事故前預測性偵測（Pre-incident prediction）
 
-MIT 2025 年最新科研成果：針對歷史系統記錄、實體 GPU 晶片溫度時序曲線與 API 錯誤分佈特徵進行深度學習訓練的大模型，在測試集中提前 10 至 15 分鐘預測了 89% 的服務中斷。
+MIT 2025 年研究：針對歷史系統記錄、實體 GPU 晶片溫度時序曲線與 API 錯誤分佈特徵進行深度學習訓練的 LLM，在測試集中提前 10 至 15 分鐘預測了 89% 的服務中斷。
 
 冷靜的工程審視：缺乏自動執行機制的純預測，充其量只是一面儀表板。真正的維運挑戰在於「一旦模型給出預測，系統該採取何種具體動作？」提前排空流量？呼叫值班工程師？自動彈性擴容？答案取決於政策。
 
 ### 2026 年主流商用產品矩陣（Products in 2026）
 
-- **Datadog Bits AI**——深度內建於 Datadog 生態內部的全託管 SRE Copilot。
-- **Azure SRE Agent**——微軟 Azure 雲原生事故調查代理。
-- **NeuBird Hawkeye**——主打對抗式交叉評估與組織記憶向量庫的創新先鋒。
-- **PagerDuty AIOps**——主打警報智慧分流與雜訊消除。
-- **Incident.io Autopilot**——專精於事故指揮官協調與跨部門溝通同步。
+- **Datadog Bits AI**——Datadog 內的託管式 SRE Copilot。
+- **Azure SRE Agent**——Azure 原生 agent。
+- **NeuBird Hawkeye**——對抗式評估與維運記憶。
+- **PagerDuty AIOps**——警報分流與去重。
+- **Incident.io Autopilot**——提供事故指揮與協調。
 
 ### 維運手冊即程式碼（Runbooks as code）
 
-維運手冊正在經歷從非結構化的 Confluence 雜亂文章向版本受控的結構化 Markdown 演進。標準的現代 Runbook 包含標準章節：故障現象（Symptom）、根因假說（Hypothesis）、驗證指令（Verify）、標準處方（Act）。結構化的維運手冊有助於改善 RAG 檢索。任何企業在導入 AI SRE 之前，第一步永遠是將雜亂無章的手冊重構為結構化文件。
+維運手冊正在經歷從非結構化的 Confluence 雜亂文章向版本受控的結構化 Markdown 演進。標準的現代 Runbook 包含標準章節：故障現象（Symptom）、根因假說（Hypothesis）、驗證指令（Verify）、標準處方（Act）。結構化的維運手冊有助於改善 RAG 檢索。開始導入 AI SRE 時，先將雜亂無章的手冊重構為結構化文件。
 
 ### 務必銘記的核心數字指標（Numbers you should remember）
 

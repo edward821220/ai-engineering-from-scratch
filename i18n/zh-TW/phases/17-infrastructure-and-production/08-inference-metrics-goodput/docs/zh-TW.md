@@ -52,13 +52,13 @@ LLM 推論存在多個不同的延遲面向，且各維度所對應的系統失�
 
 `goodput = fraction of requests meeting (TTFT <= a) AND (TPOT <= b) AND (E2E <= c)`
 
-SLO 是一項多維度的邏輯「且」複合約束。單一請求唯有在同時滿足每一項延遲上限時，才被判定為「合格（Good）」。Goodput 即是合格請求佔總請求數的百分比。以 60% 的 Goodput 換取超高吞吐量本質上是災難性的失敗；以較低吞吐量維持 99% Goodput 是目標。
+SLO 是一項多維度的邏輯「且」複合約束。單一請求唯有在同時滿足每一項延遲上限時，才被判定為「合格（Good）」。Goodput 即是合格請求佔總請求數的百分比。以 60% 的 Goodput 換取高吞吐量本質上是失敗；以較低吞吐量維持 99% Goodput 是目標。
 
 在 2026 年，Goodput 是 MLPerf Inference v6.0 的參測結果及 AI 平台供應商內部 SLA 追蹤所使用的指標。
 
 ### 為何平均值是錯誤的統計量（Why mean is the wrong statistic）
 
-大模型推論的延遲分佈呈現嚴重的右偏態（Right-skewed）長尾特徵。一個解碼批次中若混入了一個超長 Prefill 的鄰居，可能導致前 500 個 Token 的 TPOT 穩定在 7 ms，但中途有 20 個 Token 的 TPOT 暴增至 60 ms。此時算術平均 TPOT 僅為看似健康的 9 ms；然而 P99 TPOT 卻高達 65 ms。真實使用者會頻繁遭遇這 65 ms 的肉眼可見停頓——這正是導致使用者流失的元兇。
+大模型推論的延遲分佈呈現嚴重的右偏態（Right-skewed）長尾特徵。一個解碼批次中若混入了一個超長 Prefill 的鄰居，可能導致前 500 個 Token 的 TPOT 穩定在 7 ms，但中途有 20 個 Token 的 TPOT 暴增至 60 ms。此時算術平均 TPOT 僅為看似健康的 9 ms；然而 P99 TPOT 卻高達 65 ms。使用者會頻繁碰到 65 ms 的 P99 延遲，這也是他們離開的原因。
 
 在任何架構審查會議中，必須強制呈報 (P50, P90, P99) 黃金三元組。就使用者體驗而言，P99 是應最佳化的指標。
 
@@ -106,7 +106,7 @@ throughput-latency
 
 ## Use It｜實際應用
 
-`code/main.py` 實作了一套微型 Goodput 計算引擎。自動生成帶有長尾特徵的擬真延遲分佈，注入多維度 SLO 約束，並即時計算出系統的淨 Goodput。同時在完全相同的追蹤資料上動態展示 GenAI-Perf 與 LLMPerf 對於 TPOT 計算的顯著數值偏差。
+`code/main.py` 實作了一套微型 Goodput 計算引擎。自動產生合成延遲分布，套用多維度 SLO 約束，並即時計算系統的 Goodput。同時在完全相同的追蹤資料上動態展示 GenAI-Perf 與 LLMPerf 對於 TPOT 計算的顯著數值偏差。
 
 ## Ship It｜交付成果
 

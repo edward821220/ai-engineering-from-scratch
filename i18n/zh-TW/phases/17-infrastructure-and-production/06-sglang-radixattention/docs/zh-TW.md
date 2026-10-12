@@ -76,7 +76,7 @@ root
 
 落敗戰場（效能退化至 vLLM 常規水平）：
 - 零前綴共享的單次發散生成（如獨特 Prompt 的程式碼補全、無 System Prompt 的開放式漫聊）。
-- 每次請求皆將獨一無二的隨機動態內容硬性穿插在開頭的混亂 Prompt。
+- 每個請求的 Prompt 都在前綴中穿插獨特動態內容。
 
 ### 為何這本質上是排程器問題而非單純的核心問題（Why this is a scheduler problem, not just a kernel problem）
 

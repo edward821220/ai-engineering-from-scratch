@@ -80,7 +80,7 @@ NIXL 是 NVIDIA 打造的跨節點極速傳輸層。在硬體支援時走 RDMA/I
 
 這個數字是根據多家客戶披露資料綜合估算，而非單一可引用的案例；最接近的已發表資料點是 Baseten 使用 Dynamo KV routing 後 TTFT 加快 2 倍、吞吐量提升 61%（baseten.co，2025-10），以及 VAST 與 CoreWeave 在 KV 命中率為 40% 至 60% 時預估每美元 token 產出增加 60% 至 130%（vastdata.com，2025-12）。節省來自為各資源池配置合適容量；Prefill 負載較重的工作（例如前綴長度為 8K 以上的 RAG）比負載較均衡的工作受益更多。
 
-### 何時絕不應拆解（When NOT to disaggregate）
+### 何時不適合拆解（When NOT to disaggregate）
 
 - 輸入 Prompt 小於 512 Token 且輸出小於 200 Token：網路傳輸稅直接吃乾抹淨一切收益。
 - 超小型微型群集（小於 4 張 GPU）：資源池缺乏足夠的分割彈性。

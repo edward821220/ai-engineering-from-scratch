@@ -12,7 +12,7 @@
 - 深刻解釋為何即便模型權重已被極限壓縮至 NVFP4，KV 快取與注意力機制依然必須嚴格堅守 FP8 底線。
 - 精確計算前沿頂尖模型在 BF16、FP8 與 NVFP4 精度下的 HBM 記憶體用量，並從底層推導記憶體節省的核心來源。
 - 列出 TRT-LLM 深度榨乾的 Blackwell 專屬硬體原語（Day-0 FP4 權重、MTP、拆解式推論服務、All-to-All 通訊原語）。
-- 客觀權衡並判定：何時 TRT-LLM 帶來的 7 倍成本鴻溝足以合理化對 NVIDIA 生態系的單一深度綁定。
+- 客觀權衡並判定：TRT-LLM 相較於 Hopper 上的 vLLM 所帶來的 7 倍成本差距，何時足以合理化對 NVIDIA 生態系的單一深度綁定。
 
 ## The Problem｜問題
 
@@ -52,7 +52,7 @@ NVFP4（2025-2026 年成熟）專門適用於模型靜態權重與動態活化�
 - H100 搭配 vLLM 在等價負載下的基準成本：約 $0.09/M。
 - TRT-LLM 在 2026 年的三個月更新期間，吞吐量提升 2.8 倍。
 - Blackwell 相較於 Hopper 在單 GPU LLM 吞吐量上的硬體提升：高達 11 至 15 倍。
-- MLPerf Inference v6.0（2026 年 4 月發布）：Blackwell 在所有送測的資料中心基準測試項目中全面橫掃霸榜。
+- MLPerf Inference v6.0（2026 年 4 月發布）：Blackwell 在每個送測項目中皆占優勢。
 
 ### FP4 在生成品質上的實質代價（What FP4 actually costs in quality）
 
@@ -62,7 +62,7 @@ NVFP4 是一項極其激進的壓縮技術。在高度依賴嚴密邏輯推理�
 
 ### 為何這項決策本質上是 NVIDIA 生態系鎖定（Why this is an NVIDIA-lock decision）
 
-TRT-LLM 核心完全由 C++ 與 CUDA 編寫，並深嵌大量未公開原始碼的高效能微核心。所有模型必須針對特定的 GPU SKU 型號進行專屬靜態編譯。不支援 AMD，不支援 Intel，更不支援 ARM。若你企業的基礎架構長遠戰略嚴格要求跨雲多供應商相容，那麼採用 TRT-LLM 的服務層不適合該策略；在混合硬體上仍可使用 vLLM。但若你的機房本就百分之百純度押注 NVIDIA，這高達 7 倍的成本差距足以回本一切代價。
+TRT-LLM 核心完全由 C++ 與 CUDA 編寫，並深嵌大量未公開原始碼的高效能微核心。所有模型必須針對特定 GPU SKU 進行編譯。不支援 AMD，不支援 Intel，更不支援 ARM。若你的基礎架構策略採用多供應商模式，那麼採用 TRT-LLM 的服務層不適合該策略；在混合硬體上仍可使用 vLLM。但若你的機房本就百分之百純度押注 NVIDIA，這高達 7 倍的成本差距足以回本一切代價。
 
 ### 2026 年實戰落地處方（2026 practical recipe）
 
@@ -82,7 +82,7 @@ pipeline-parallel
 
 ## Ship It｜交付成果
 
-本課交付標準實戰產物 `outputs/skill-trtllm-blackwell-advisor.md`。輸入具體的業務負載特徵、目標模型參數規模與年度 Token 預算量級，該 Skill 將自動計算投資報酬率（ROI），並判定引入 Blackwell + TRT-LLM 堆疊是否值得承擔 NVIDIA 生態系鎖定的戰略代價。
+本課交付標準實戰產物 `outputs/skill-trtllm-blackwell-advisor.md`。輸入具體的業務負載特徵、目標模型規模與年度 Token 用量，該 Skill 將判定引入 Blackwell + TRT-LLM 堆疊是否值得承擔 NVIDIA 生態系鎖定的戰略代價。
 
 ## Exercises｜練習
 

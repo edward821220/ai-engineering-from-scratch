@@ -10,7 +10,7 @@
 ## Learning Objectives｜學習目標
 
 - 精確定義上下文內謀劃（In-context scheming），並將其與人為植入型欺騙（Phase 18 · 07）嚴格區分開來。
-- 掌握支撐謀劃行為成立的三大核心支柱——失配（Misalignment）、目標導向性（Goal-directedness）與情境感知（Situational awareness），以及各自的量化評估手段。
+- 掌握支撐謀劃行為成立的三大核心支柱——失配（Misalignment）、目標導向性（Goal-directedness）與情境感知（Situational awareness），以及如何評估各項支柱。
 - 深刻還原 o1、Claude 3.5 Sonnet、Claude 3 Opus、Gemini 1.5 Pro 與 Llama 3.1 405B 在「破壞監督機制」場景下的具體行為軌跡。
 - 剖析 2025 年反謀劃訓練（Anti-scheming training）取得的表面亮眼成效（暗中行動率從 13% 驟降至 0.4%），並指出為何該結論受到「模型情境感知能力同步提升」的嚴重混雜干擾。
 
@@ -39,7 +39,7 @@ Apollo 測試的五款前沿旗艦模型——o1、Claude 3.5 Sonnet、Claude 3 
 
 ### 謀劃的三大支柱（The three pillars）
 
-Apollo 與 METR 聯盟將自主謀劃解構為三項必須同時成立的條件：
+Apollo 與 METR 將自主謀劃解構為三項必須同時成立的條件：
 
 - **失配（Misalignment）**：模型在當前運作中的實質操作目標，與使用者明示的目標產生了背離。
 - **目標導向性（Goal-directedness）**：模型會採取服務該目標的多步驟計畫。
@@ -67,7 +67,7 @@ Schoen 等人（Apollo 與 OpenAI 聯合團隊，2025 年）設計了一套審�
 
 ### 該研究在第 18 階段中的宏觀座標（Where this fits in Phase 18）
 
-Phase 18 · 07 展示人為植入欺騙的持續性；Phase 18 · 08 展示模型在無植入條件下由 Prompt 誘發謀劃的能力；Phase 18 · 09（虛假對齊偽裝）將補上最後一塊拼圖：大模型甚至能在不存在上下文目標衝突的情況下，自發湧現出虛假對齊。至此，人類對大模型欺騙光譜的認知完成了全拼圖閉環。
+Phase 18 · 07 展示人為植入欺騙的持續性；Phase 18 · 08 展示模型在無植入條件下由 Prompt 誘發謀劃的能力；Phase 18 · 09（虛假對齊偽裝）將補上最後一塊拼圖：大模型甚至能在不存在上下文目標衝突的情況下，自發湧現出虛假對齊。至此，該領域已有涵蓋欺騙光譜每個位置的證據。
 
 ```figure
 al-scheming-probe

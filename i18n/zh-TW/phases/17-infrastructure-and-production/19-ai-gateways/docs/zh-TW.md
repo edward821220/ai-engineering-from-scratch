@@ -1,6 +1,6 @@
 # AI Gateways 閘道技術——LiteLLM、Portkey、Kong AI Gateway、Bifrost（AI Gateways — LiteLLM, Portkey, Kong AI Gateway, Bifrost）
 
-> AI 閘道（Gateway）位處你的應用程式與底層模型服務供應商之間。其核心能力涵蓋服務供應商智慧路由、故障容錯移轉、指數退避重試、速率限制、機密憑證參照、全鏈路可觀測性以及安全性 Guardrails 防護欄。2026 年的市場技術格局清晰分立：**LiteLLM** 採 MIT 授權開源，支援 100 多家模型服務供應商並與 OpenAI 相容，但在公開壓測中約在 2,000 RPS 時遭遇效能崩潰（記憶體使用量約 8 GB，並引發連鎖故障）；最適配 Python 技術堆疊、500 RPS 以下或研發測試原型。**Portkey** 主打企業級控制平面定位（防護欄、PII 個資遮罩、越獄偵測、合規稽核追蹤），於 2026 年 3 月全面轉為 Apache 2.0 開源，單請求引入約 20 至 40 ms 延遲，提供每月 49 美元的正式環境方案。**Kong AI Gateway** 則直接生長於成熟的 Kong Gateway 企業級底座之上——Kong 官方在等價 12 核心 CPU 上的實測顯示：其吞吐量比 Portkey 快 228%，比 LiteLLM 更是狂飆 859%；採每模型每月 100 美元計價（Plus 層級上限 5 款模型）；若企業已深度採用 Kong 則堪稱最佳歸宿。**Bifrost**（Maxim AI 出品）主打採用可設定退避的自動重試，以及在 OpenAI 回應 429 時自動改用 Anthropic。**Cloudflare 與 Vercel AI Gateways** 則提供邊緣端零維運的全託管基礎重試能力。資料落地合規要求直接驅動了企業是否私有化自建的決策；Portkey 與 Kong 則憑藉開源加可選託管的混合架構穩居中流砥柱。
+> AI 閘道（Gateway）位處你的應用程式與底層模型服務供應商之間。其核心能力涵蓋服務供應商智慧路由、故障容錯移轉、指數退避重試、速率限制、機密憑證參照、全鏈路可觀測性以及安全性 Guardrails 防護欄。2026 年的市場技術格局清晰分立：**LiteLLM** 採 MIT 授權開源，支援 100 多家模型服務供應商並與 OpenAI 相容，但在公開壓測中約在 2,000 RPS 時遭遇效能崩潰（記憶體使用量約 8 GB，並引發連鎖故障）；最適配 Python 技術堆疊、500 RPS 以下或研發測試原型。**Portkey** 主打企業級控制平面定位（防護欄、PII 個資遮罩、越獄偵測、合規稽核追蹤），於 2026 年 3 月全面轉為 Apache 2.0 開源，單請求引入約 20 至 40 ms 延遲，提供每月 49 美元的正式環境方案。**Kong AI Gateway** 則直接生長於成熟的 Kong Gateway 企業級底座之上——Kong 官方在等價 12 核心 CPU 上的實測顯示：其吞吐量比 Portkey 快 228%，比 LiteLLM 更是狂飆 859%；採每模型每月 100 美元計價（Plus 層級上限 5 款模型）；若企業已深度採用 Kong 則堪稱最佳歸宿。**Bifrost**（Maxim AI 出品）主打採用可設定退避的自動重試，以及在 OpenAI 回應 429 時自動改用 Anthropic。**Cloudflare 與 Vercel AI Gateways** 則提供邊緣端零維運的全託管基礎重試能力。資料落地合規要求直接驅動了企業是否自行託管的決策；Portkey 與 Kong 則憑藉開源加可選託管的混合架構穩居中流砥柱。
 
 **Type:** Learn
 **Languages:** Python (stdlib, toy gateway-routing simulator)
@@ -12,11 +12,11 @@
 - 列出 AI 閘道的六項核心功能（智慧路由、容錯移轉、自動重試、速率限制、機密憑證參照、可觀測性、安全防護欄）。
 - 梳理 2026 年四大主流閘道（LiteLLM、Portkey、Kong AI、Bifrost）的規模與效能上限及適用場景。
 - 引用 Kong 官方權威跑分結論（相較於 Portkey 快 228%，相較於 LiteLLM 快 859%），並說明這項落差對超過 500 RPS 的情境有何影響。
-- 立足於資料落地法律約束與工程維運預算，理性在私有化自建與雲端全託管之間做出架構決策。
+- 立足於資料落地法律約束與工程維運預算，理性在自行託管與雲端全託管之間做出架構決策。
 
 ## The Problem｜問題
 
-你的核心產品同時整合了 OpenAI、Anthropic 以及私有自建的 Llama 群集。每家服務供應商皆擁有獨立的 SDK、迥異的錯誤碼格式、自成一體的速率限制，以及獨家的身分鑑別機制。你需要故障切換（若 OpenAI 回應 429，則嘗試 Anthropic）、單一憑證儲存庫、統一的可觀測性，以及按租戶設定的速率限制。
+你的核心產品同時整合了 OpenAI、Anthropic 以及自行託管的 Llama 群集。每家服務供應商皆擁有獨立的 SDK、迥異的錯誤碼格式、自成一體的速率限制，以及獨家的身分鑑別機制。你需要故障切換（若 OpenAI 回應 429，則嘗試 Anthropic）、單一憑證儲存庫、統一的可觀測性，以及按租戶設定的速率限制。
 
 若在應用層重複造輪子實作這些邏輯，會讓每項服務都與每家服務供應商耦合。架構專屬的 AI Gateway 閘道層，將上述複雜性統一收攏至單一獨立行程中，對外暴露單一標準 API（通常相容 OpenAI 規範），由其在底層向各大服務供應商扇出發派。
 
@@ -62,12 +62,12 @@
 ### Cloudflare AI Gateway / Vercel AI Gateway
 
 - 雲端全託管、極致零維運。提供開箱即用的基本重試與調用監控。
-- 最優適配：原廠運作於 Cloudflare Workers 或 Vercel 邊緣運算環境之上的 JavaScript/TypeScript 應用。
+- 最優適配：在 Cloudflare/Vercel 邊緣提供服務的 JavaScript 應用程式。
 - 相較於 Kong 與 Portkey，其安全防護欄與速率限制功能較有限。
 
-### 自建私有化 vs 雲端全託管（Self-hosted vs managed）
+### 自行託管 vs 雲端全託管（Self-hosted vs managed）
 
-資料落地法規是推動自建私有化的根本決定性力量。醫療保健與金融機構預設自行託管（部署 LiteLLM、Portkey 開源版或 Kong）。消費級通用產品則預設擁抱全託管雲端閘道（Cloudflare AI Gateway）或中庸託管（Portkey 商業版）。混合架構：針對強監管企業租戶提供自建獨立實例，其餘普通流量統一導向雲端託管閘道。
+資料落地法規是企業決定自行託管的關鍵因素。醫療保健與金融機構預設自行託管（部署 LiteLLM、Portkey 開源版或 Kong）。消費級通用產品則預設採用全託管雲端閘道（Cloudflare AI Gateway）或中間層級方案（Portkey 託管版）。混合架構：針對強監管企業租戶提供自行託管的獨立實例，其餘普通流量統一導向雲端託管閘道。
 
 ### 延遲預算精算（Latency budget）
 
@@ -108,9 +108,9 @@ mx-gateway-fallback
 
 ## Exercises｜練習
 
-1. 執行 `code/main.py`。配置由 OpenAI → Anthropic → 私有自建 的三級降級容錯鏈路。若單一服務供應商的錯誤率為 5%，預期備援命中率是多少？
+1. 執行 `code/main.py`。配置由 OpenAI → Anthropic → 自行託管 的三級降級容錯鏈路。若單一服務供應商的錯誤率為 5%，預期備援命中率是多少？
 2. 業務 SLA 嚴格承諾 P99 TTFT 必須小於 200 ms，而後端推論的基準延遲為 300 ms。哪幾款閘道能安全落入該延遲預算之內？
-3. 某醫療機構客戶要求閘道必須完全私有化自建、具備個資 PII 即時遮罩能力，並提供稽核功能。在 Portkey 開源版與 Kong 之間做出抉擇並給出論證。
+3. 某醫療機構客戶要求閘道必須完全自行託管、具備個資 PII 即時遮罩能力，並提供稽核功能。在 Portkey 開源版與 Kong 之間做出抉擇並給出論證。
 4. 深度對比 LiteLLM 與 Kong：研發團隊的 RPS 達到多少時，應該從前者遷移至後者？
 5. 為多租戶 SaaS 設計速率限制策略，涵蓋免費、試用與付費方案。你會選擇 token-bucket 還是 sliding-window？
 

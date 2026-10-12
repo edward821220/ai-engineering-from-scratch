@@ -1,6 +1,6 @@
 # AI 控制架構——在潛在叛變下的安全保障（AI Control — Safety Despite Subversion）
 
-> Greenblatt、Shlegeris、Sachan 與 Roger（Redwood Research 團隊，arXiv:2312.06942，ICML 2024）。AI 控制（Control）體系徹底重構了安全命題：給定一個可能在暗中對抗你、具備強大能力的不可信模型 U，我們究竟能透過何種通訊協定，在從中安全榨取實用價值的同時，限制不可接受結果發生的機率？我們手頭的可用資源包括：一個受信任且能力較弱的模型 T、極為有限的受信任人類審核工時預算 H，以及編輯 U 輸出的能力。在該架構體系下，在程式碼後門任務中，受信任編輯（Trusted Editing）支配不可信監控（Untrusted Monitoring）。該框架完全繼承了資安工程學的最壞情況假設：安全性指標是在代表 U 的紅隊壓力測試下，被對抗性選定的 U 無法造成具體不可接受結果的機率。
+> Greenblatt、Shlegeris、Sachan 與 Roger（Redwood Research 團隊，arXiv:2312.06942，ICML 2024）。AI 控制（Control）體系徹底重構了安全命題：給定一個可能在暗中對抗你、具備強大能力的不可信模型 U，我們究竟能透過何種協定，在從中安全榨取實用價值的同時，限制不可接受結果發生的機率？我們手頭的可用資源包括：一個受信任且能力較弱的模型 T、極為有限的受信任人類審核工時預算 H，以及編輯 U 輸出的能力。在該架構體系下，在程式碼後門任務中，受信任編輯（Trusted Editing）支配不可信監控（Untrusted Monitoring）。該框架完全繼承了資安工程學的最壞情況假設：安全性指標是在代表 U 的紅隊壓力測試下，被對抗性選定的 U 無法造成具體不可接受結果的機率。
 
 **Type:** Learn
 **Languages:** Python (stdlib, safety-vs-usefulness frontier on code-backdoor task)
@@ -10,7 +10,7 @@
 ## Learning Objectives｜學習目標
 
 - 精準定義 AI 控制（AI Control）的威脅建模：不可信強模型 U、受信任弱模型 T、受信任人類專家預算 H。
-- 深入描述受信任編輯（Trusted Editing）協定，並解釋為何在 ICML 2024 的程式碼後門任務中，其在帕累托前沿上全面碾壓不可信監控協定。
+- 深入描述受信任編輯（Trusted Editing）協定，並解釋為何在 ICML 2024 的程式碼後門任務中，其在帕累托前沿上支配不可信監控協定。
 - 深刻辨析「模型對齊（Alignment，模型本身值得信任）」與「系統控制（Control，模型不可信但系統依然安全）」兩大典範的本質分歧。
 - 闡明 AI 控制體系的三大物理極限：人類工時無法規模化擴展、受信任弱模型終將面臨智力斷代脫節、控制協定本身無法憑空產出真正對齊的強模型。
 
@@ -42,11 +42,11 @@
 - **不可信自我監控協定（Untrusted Monitoring）**：調用 U 的第二個實例，專門對第一個 U 實例的輸出進行安全審查；人類 H 僅對被標記為可疑的樣本進行人工複核。核心死穴：兩個 U 實例可能暗中勾結。
 - **受信任編輯協定（Trusted Editing）**：T 對每次 U 的輸出進行編輯；若 T 沒有把握，則交由 H 處理。
 
-Greenblatt 等人實測證實：受信任編輯協定（Trusted Editing）在帕累托前沿上全面碾壓不可信監控協定——在各個安全保障水準下，都能提供更高的實用性。
+Greenblatt 等人實測證實：受信任編輯協定（Trusted Editing）在帕累托前沿上支配不可信監控協定——在各個安全保障水準下，都能提供更高的實用性。
 
 ### 為何「受信任編輯」能全面勝出（Why Trusted Editing wins）
 
-不可信自我監控協定存在一項致命的前提假定：它必須假設第二個 U 實例絕不會與第一個 U 實例通謀。在實務中，兩個 U 實例可能透過隱寫線索（Steganographic cues）或共享的訓練先驗知識勾結。協定必須投入資源來抵抗勾結（如改寫、混淆），但這會降低監控器可取得的訊號。受信任編輯協定徹底消除了勾結風險，因為弱模型 T 本身就是絕對可信的——從定義上來說，T 所提出的任何修改依假設都不具對抗性。其唯一的工程代價在於 T 的能力相對較弱，可能會在複雜演算法上產生過度拒絕，或偶發遺漏極其深奧的微小漏洞。
+不可信自我監控協定存在一項致命的前提假定：它必須假設第二個 U 實例絕不會與第一個 U 實例通謀。在實務中，兩個 U 實例可能透過隱寫線索（Steganographic cues）或共享的訓練先驗知識勾結。協定必須投入資源來抵抗勾結（如改寫、混淆），但這會降低監控器可取得的訊號。受信任編輯協定徹底消除了勾結風險，因為弱模型 T 本身是可信的——從定義上來說，T 所提出的任何修改依假設都不具對抗性。其唯一的工程代價在於 T 的能力相對較弱，可能會在複雜演算法上產生過度拒絕，或偶發遺漏極其深奧的微小漏洞。
 
 ### 協定設計的四大核心軸線（The four protocol axes）
 
@@ -70,7 +70,7 @@ Greenblatt 等人實測證實：受信任編輯協定（Trusted Editing）在帕
 
 ### 2025 年前沿安全論證進展（The 2025 development）
 
-UK AISI 與 Redwood Research 合作提出 Control Safety Cases（metr.org / redwoodresearch.org，2025）：控制 safety case 論證在對 U 採取最壞情況假設時，協定如何限制不可接受結果的機率。第 18 課的安全案例沿用控制框架。
+UK AISI 與 Redwood Research 合作提出 Control Safety Cases（metr.org / redwoodresearch.org，2025）：控制 safety case 論證在對 U 採取最壞情況假設時，協定如何限制不可接受結果的機率。第 18 課的安全論證沿用控制框架。
 
 ### 該研究在第 18 階段中的宏觀座標（Where this fits in Phase 18）
 
@@ -86,7 +86,7 @@ al-control-protocol
 
 ## Ship It｜交付成果
 
-本課交付標準實戰產物 `outputs/skill-control-protocol-audit.md`。輸入一套特定的 Agent 部署協定規格說明書，該 Skill 將自動梳理標定出系統中的 U / T / H 實體角色，全面排查潛在的模型間隱寫勾結通道，並在紅隊極限對抗假設下，精確評估該協定在實用性與安全性帕累托前沿上的實質防護位階。
+本課交付標準實戰產物 `outputs/skill-control-protocol-audit.md`。輸入一套特定的 Agent 部署協定規格說明書，該 Skill 將自動梳理標定出系統中的 U / T / H 實體角色，全面排查潛在的模型間隱寫勾結通道，並在紅隊極限對抗假設下，估計該協定在實用性與安全性帕累托前沿上的位置。
 
 ## Exercises｜練習
 

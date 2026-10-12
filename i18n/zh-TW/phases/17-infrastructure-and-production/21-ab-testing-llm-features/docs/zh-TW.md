@@ -52,7 +52,7 @@ Statsig 與 GrowthBook 都有實作該演算法。
 
 ### SRM——樣本比例失配檢驗（SRM — sample ratio mismatch）
 
-分流演算法會將使用者隨機分派至不同版本。若 50/50 分流產生 47/53 的樣本比例，可能有問題，需進一步調查；SRM 檢查會標示這種失配。兩個平台都已實作此檢查。
+分流演算法會將使用者隨機分派至不同版本。若 50/50 分流產生 47/53 的樣本比例，就代表出了問題；SRM 檢查會標示這種失配。兩個平台都已實作此檢查。
 
 ### Statsig vs GrowthBook
 
@@ -71,7 +71,7 @@ Statsig 與 GrowthBook 都有實作該演算法。
 
 ### 非確定性使得統計檢定力計算更加棘手（Non-determinism complicates power）
 
-完全相同的 Prompt 在多次呼叫中會隨機產生不同的文字輸出。傳統的樣本量檢定力公式嚴格基於獨立同分佈（IID）假設。在 LLM 的非確定性干擾下，實體的有效樣本量低於表面標稱值。在進行 A/B 實驗樣本量規劃時，必須強制將理論所需樣本數乘以約 1.3 至 1.5 倍作為安全緩衝區。
+完全相同的 Prompt 在多次呼叫中會隨機產生不同的文字輸出。傳統的樣本量檢定力公式嚴格基於獨立同分佈（IID）假設。在 LLM 的非確定性干擾下，實體的有效樣本量低於表面標稱值。在進行 A/B 實驗樣本量規劃時，將所需樣本數乘以約 1.3 至 1.5 倍作為安全緩衝。
 
 ### 工業級真實案例實效（Real case outcomes）
 
@@ -88,7 +88,7 @@ Statsig 與 GrowthBook 都有實作該演算法。
 - Statsig 併購案：2025 年 9 月被 OpenAI 以 11 億美元收購。
 - GrowthBook：遵循 MIT 開源協議；集齊貝氏、頻率學派與循序檢定三大引擎。
 - CUPED 變異數減少成效：實測可降低 30% 至 70% 的變異數。
-- 大模型非確定性緩衝係數：實驗樣本量需額外增加 30% 至 50%。
+- LLM 非確定性緩衝係數：實驗樣本量需額外增加 30% 至 50%。
 
 ```figure
 mx-sequential-test
@@ -96,7 +96,7 @@ mx-sequential-test
 
 ## Use It｜實際應用
 
-`code/main.py` 模擬了一套在傳統固定樣本檢定與現代循序檢定（Sequential testing）邊界下的 A/B 實驗對抗。展示循序檢定如何允許提前停止實驗，大幅節省時間與試錯成本。
+`code/main.py` 模擬一套使用固定與循序檢定邊界的 A/B 實驗，展示循序檢定如何允許提前停止實驗，大幅節省時間與試錯成本。
 
 ## Ship It｜交付成果
 
@@ -106,7 +106,7 @@ mx-sequential-test
 
 1. 執行 `code/main.py`。針對預期帶來 5% 提升、基準轉化率為 3% 的業務場景，若要達到 80% 的統計檢定力（Power），所需的最小樣本量是多少？
 2. 針對一位受醫療規範、採用 on-prem 部署的客戶，在 Statsig 與 GrowthBook 之間選擇並說明理由。
-3. 設計一套橫向比對 GPT-4 與 GPT-3.5 解決客訴問題成本效益的 A/B 實驗方案。分別給出第一核心指標（Primary metric）、護欄指標（Guardrail metric）與輔助次要指標（Secondary metric）。
+3. 設計一套以每件已解決工單成本為指標、比較 GPT-4 與 GPT-3.5 的 A/B 實驗方案。分別給出第一核心指標（Primary metric）、護欄指標（Guardrail metric）與輔助次要指標（Secondary metric）。
 4. 你的金絲雀發布順利通關，但後續的 A/B 測試顯示轉化率淨下跌了 1.2%。你究竟該不該發布該版本？撰寫標準的決策升級與裁決準則。
 5. 將 CUPED 套用於前期變異數為後期變異數 60% 的資料，計算有效樣本數提升幅度。
 
@@ -129,7 +129,7 @@ mx-sequential-test
 ## Further Reading｜延伸閱讀
 
 - [GrowthBook — How to A/B Test AI](https://blog.growthbook.io/how-to-a-b-test-ai-a-practical-guide/) — AI 功能 A/B 測試實戰指南。
-- [Statsig — Beyond Prompts: Data-Driven LLM Optimization](https://www.statsig.com/blog/llm-optimization-online-experimentation) — 基於資料驅動的大模型最佳化實踐。
+- [Statsig — Beyond Prompts: Data-Driven LLM Optimization](https://www.statsig.com/blog/llm-optimization-online-experimentation) — 基於資料驅動的 LLM 最佳化實踐。
 - [Statsig vs GrowthBook comparison](https://www.statsig.com/perspectives/ab-testing-feature-flags-comparison-tools) — 兩大主流實驗平台深度橫向對比。
-- [Deng et al. — CUPED](https://www.exp-platform.com/Documents/2013-02-CUPED-ImprovingSensitivityOfControlledExperiments.pdf) — 微軟團隊提出 CUPED 演算法的原創經典論文。
-- [Howard — Confidence Sequences](https://arxiv.org/abs/1810.08240) — 永真循序檢定數學理論原著。
+- [Deng et al. — CUPED](https://www.exp-platform.com/Documents/2013-02-CUPED-ImprovingSensitivityOfControlledExperiments.pdf)
+- [Howard — Confidence Sequences](https://arxiv.org/abs/1810.08240)
